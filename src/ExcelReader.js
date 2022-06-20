@@ -31,7 +31,6 @@ class ExcelReader {
 
         for (let i = 0; i < this.data.length; i++) {
             let menuData = this.data[i]
-
             let menu = new IVRMenu(menuData["Menu Name"], menuData["Menu Ext"], menuData["Prompt Name/Script"])
 
             if (menu.textToSpeech) {
@@ -107,6 +106,7 @@ class ExcelReader {
         result = result.replace("$", "")
         result = result.replace("!", ".")
         result = result.replace("?", ".")
+        return result
     }
 
 }
