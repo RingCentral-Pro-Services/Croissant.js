@@ -43,11 +43,22 @@ class XMLReader {
         let menuName = menuData['Name'][0]
         let extensionNumber = menuData['Extension'][0]
         let prompt = ""
-        if ('Text' in menuData['Prompt'][0]) {
-            prompt = menuData['Prompt'][0]['Text'][0]
+
+        let textToSpeech = menuData['Prompt'][0]['TextToSpeech']
+        //console.log("Text to speech: " + textToSpeech)
+        if (textToSpeech == 'true') {
+            if ('Text' in menuData['Prompt'][0]) {
+                prompt = menuData['Prompt'][0]['Text']
+            }
+        }
+        else {
+            prompt = menuData['Prompt'][0]['Name']
+            //console.log(menuData['Prompt'][0]['Name'])
         }
 
-        prompt = prompt.replace(/(\r\n|\n|\r)/gm, " ")
+        // if (textToSpeech == 'true') {
+        //     prompt = prompt.replace(/(\r\n|\n|\r)/gm, " ")
+        // }
         
         let menu = new IVRMenu(menuName, extensionNumber, prompt)
         
