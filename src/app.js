@@ -14,14 +14,12 @@ var server = http.createServer(function (req, res) {
         form.parse(req, function (err, fields, files) {
 
             var filePath = files.filetoupload.filepath;
-            console.log(files.filetoupload.originalFilename)
             let resultingFilename = files.filetoupload.originalFilename.replace(".xlsx", ".xml")
             
             if (files.filetoupload.originalFilename.includes('.xlsx')) {
               // This is an excel file, process accordingly
               const reader = new ExcelReader(filePath)
               let menus = reader.getMenus()
-              //console.log(menus[0].prompt)
               let xmlWriter = new XMLWriter(menus)
 
               res.setHeader('Content-Length', xmlWriter.xmlData.length);
