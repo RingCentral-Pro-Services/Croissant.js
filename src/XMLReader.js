@@ -49,19 +49,21 @@ class XMLReader {
         
         let keyPresses = menuData['CallHandling'][0]['DigitKeyInput']
 
-        for (let keyPressIndex = 0; keyPressIndex < keyPresses.length; keyPressIndex++) {
-            let key = keyPresses[keyPressIndex]['Key'][0]
-            let action = keyPresses[keyPressIndex]['Action'][0]
-
-            if (action != 'ConnectToDialByNameDirectory') {
-                let destination = keyPresses[keyPressIndex]['Destination'][0]
-
-                let keyPress = new IVRKeyPress(key, action, destination)
-                menu.actions.push(keyPress)
-            }
-            else {
-                let keyPress = new IVRKeyPress(key, action, "")
-                menu.actions.push(keyPress)
+        if (keyPresses != undefined) {
+            for (let keyPressIndex = 0; keyPressIndex < keyPresses.length; keyPressIndex++) {
+                let key = keyPresses[keyPressIndex]['Key'][0]
+                let action = keyPresses[keyPressIndex]['Action'][0]
+    
+                if (action != 'ConnectToDialByNameDirectory') {
+                    let destination = keyPresses[keyPressIndex]['Destination'][0]
+    
+                    let keyPress = new IVRKeyPress(key, action, destination)
+                    menu.actions.push(keyPress)
+                }
+                else {
+                    let keyPress = new IVRKeyPress(key, action, "")
+                    menu.actions.push(keyPress)
+                }
             }
         }
         this.menus.push(menu)
