@@ -50,4 +50,4 @@ var server = http.createServer(function (req, res) {
 
 server.listen(3000); //3 - listen for any incoming requests
 
-console.log('Node.js web server at port 5000 is running..')
+console.log('Node.js web server at port 3000 is running..')
