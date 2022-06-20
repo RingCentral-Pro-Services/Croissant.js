@@ -31,7 +31,12 @@ class ExcelReader {
 
         for (let i = 0; i < this.data.length; i++) {
             let menuData = this.data[i]
+
             let menu = new IVRMenu(menuData["Menu Name"], menuData["Menu Ext"], menuData["Prompt Name/Script"])
+
+            if (menu.textToSpeech) {
+                menu.prompt = this.sanitizedPrompt(menu.prompt)
+            }
 
             for (let keyPressIndex = 0; keyPressIndex < 10; keyPressIndex++) {
                 let actionKey = "Key " + keyPressIndex + " Action"
@@ -41,8 +46,13 @@ class ExcelReader {
                     let translatedAction = this.translateMenuAction(menuData[actionKey])
 
                     if (translatedAction != "ConnectToDialByNameDirectory") {
+                        if (!(destinationKey in menuData)) {
+                            console.log('Uh-oh. Destination key not found for key ' + actionKey + 'in ' + menu.name)
+                            console.log('Raw Action: ' + menuData[actionKey])
+                            console.log('Translated Action: ' + translatedAction)
+                        }
                         let rawDestination = menuData[destinationKey]
-                        let destination = rawDestination.replace(/\D/g,'')
+                        let destination = rawDestination.toString().replace(/\D/g,'')
                         let action = new IVRKeyPress(keyPressIndex, translatedAction, destination)
                         menu.actions.push(action)
                     }
@@ -74,7 +84,7 @@ class ExcelReader {
         else if (rawAction == "Transfer to Voicemail of") {
             return "ForwardToVoiceMail"
         }
-        else if (rawAction == "Connect To Dial-By-Name Directory") {
+        else if (rawAction == "Connect to Dial-by-Name Directory") {
             return "ConnectToDialByNameDirectory"
         }
         else if (rawAction == "External Transfer") {
@@ -83,6 +93,20 @@ class ExcelReader {
         else {
             return "ForwardToExtension"
         }
+    }
+
+    sanitizedPrompt(prompt) {
+        let result = prompt.replace("_", "-")
+        result = result.replace("*", "star")
+        result = result.replace("#", "pound")
+        result = result.replace("@", "at")
+        result = result.replace("&", "and")
+        result = result.replace("(", "")
+        result = result.replace(")", "")
+        result = result.replace("%", "")
+        result = result.replace("$", "")
+        result = result.replace("!", ".")
+        result = result.replace("?", ".")
     }
 
 }
