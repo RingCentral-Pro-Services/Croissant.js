@@ -6,6 +6,7 @@ var ExcelReader = require('./ExcelReader.js')
 var XMLWriter = require('./XMLWriter')
 var XMLReader = require('./XMLReader')
 var AuditWriter = require('./AuditWriter')
+var path = require("path");
 
 var server = http.createServer(function (req, res) {
 
@@ -43,7 +44,9 @@ var server = http.createServer(function (req, res) {
      });
       } else {
         res.writeHead(200, {'Content-Type': 'text/html'});
-        fs.createReadStream('./index.html').pipe(res)
+        var absolutePath = path.resolve('index.html');
+        console.log(absolutePath)
+        fs.createReadStream(absolutePath).pipe(res)
       }
 
 });
