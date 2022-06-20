@@ -15,7 +15,7 @@ class AuditWriter {
         for (let i = 0; i < menus.length; i++) {
             let menu = menus[i]
 
-            this.csvData += menu.name + ',' + menu.extensionNumber + ',' + menu.prompt + ','
+            this.csvData += '\"' + menu.name + '\",' + menu.extensionNumber + ',\"' + menu.prompt + '\",'
 
             // There's probably a more efficient way to do this
             // Loop through keys 1 - 9 and write the keypress data if present
