@@ -42,7 +42,11 @@ class XMLReader {
     parseMenu(menuData) {
         let menuName = menuData['Name'][0]
         let extensionNumber = menuData['Extension'][0]
-        let prompt = menuData['Prompt'][0]['Text'][0]
+        let prompt = ""
+        if ('Text' in menuData['Prompt'][0]) {
+            prompt = menuData['Prompt'][0]['Text'][0]
+        }
+
         prompt = prompt.replace(/(\r\n|\n|\r)/gm, " ")
         
         let menu = new IVRMenu(menuName, extensionNumber, prompt)
