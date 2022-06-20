@@ -5,7 +5,7 @@ class IVRMenu {
     name = ""
     extensionNumber = ""
     prompt = ""
-    language = "English (US)"
+    language = "English (United States)"
     actions = []
 
     constructor(name, extensionNumber, prompt) {
