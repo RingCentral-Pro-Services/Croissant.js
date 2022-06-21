@@ -22,14 +22,14 @@ class XMLWriter {
         this.addLine('\t<Name>' + menu["name"] + '</Name>\n')
         this.addLine('\t<Language>' + menu["language"] + '</Language>\n')
         this.addLine('\t<Prompt>\n')
-        if (menu["textToSpeech"]) {
+        if (menu["textToSpeech"] == 'true') {
             this.addLine('\t\t<Text>' + menu["prompt"] + '</Text>\n')
             this.addLine('\t\t<TextToSpeech>true</TextToSpeech>\n')
         }
         else {
             this.addLine('\t\t<Name>' + menu["prompt"] + '</Name>\n')
             this.addLine('\t\t<Text>' + menu["prompt"] + '</Text>\n')
-            this.addLine('\t\t<TextToSpeech>true</TextToSpeech>\n')
+            this.addLine('\t\t<TextToSpeech>false</TextToSpeech>\n')
         }
         this.addLine('\t</Prompt>\n')
         this.addLine('<CallHandling>\n')
