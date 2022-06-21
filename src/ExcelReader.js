@@ -14,8 +14,6 @@ class ExcelReader {
 
         for (let i = 0; i < sheets.length; i++) {
             if (file.SheetNames[i] == "IVRs") {
-                console.log('Found IVRs sheet')
-
                 const temp = reader.utils.sheet_to_json(
                     file.Sheets[file.SheetNames[i]])
                     temp.forEach((res) => {

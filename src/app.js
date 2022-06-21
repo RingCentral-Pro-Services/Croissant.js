@@ -45,7 +45,6 @@ var server = http.createServer(function (req, res) {
       } else {
         res.writeHead(200, {'Content-Type': 'text/html'});
         var absolutePath = path.resolve('./index.html');
-        console.log(absolutePath)
         fs.createReadStream(absolutePath).pipe(res)
       }
 
