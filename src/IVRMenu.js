@@ -15,7 +15,13 @@ class IVRMenu {
     }
 
     textToSpeech() {
-        return this.prompt.includes('.wav') || this.prompt.includes('.mp3')
+        if (this.prompt.includes('.wav')) {
+            return false
+        }
+        else if (this.prompt.includes('.mp3')) {
+            return false
+        }
+        return true
     }
 }
 

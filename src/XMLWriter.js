@@ -22,7 +22,7 @@ class XMLWriter {
         this.addLine('\t<Name>' + menu["name"] + '</Name>\n')
         this.addLine('\t<Language>' + menu["language"] + '</Language>\n')
         this.addLine('\t<Prompt>\n')
-        if (menu["textToSpeech"] == 'true') {
+        if (menu.textToSpeech()) {
             this.addLine('\t\t<Text>' + menu["prompt"] + '</Text>\n')
             this.addLine('\t\t<TextToSpeech>true</TextToSpeech>\n')
         }
