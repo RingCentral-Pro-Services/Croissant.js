@@ -20,7 +20,7 @@ class XMLReader {
             const json = JSON.stringify(result, null, 4);
         
             // log JSON string
-            //console.log(json);
+            console.log(json);
 
             this.rawData = result
             
@@ -81,6 +81,23 @@ class XMLReader {
                 }
             }
         }
+
+        let specialKeyPresses = menuData['CallHandling'][0]['SpecialKeyInput']
+
+        if (specialKeyPresses != undefined) {
+            console.log('Special key presses: ' + specialKeyPresses.length)
+
+            for (let i = 0; i < specialKeyPresses.length; i++) {
+                let specialKeyPressData = specialKeyPresses[i]
+                let key = specialKeyPressData["Key"][0]
+                let action = specialKeyPressData["Action"][0]
+                console.log("Key: " + key)
+                console.log('Action: ' + action)
+                let keyPress = new IVRKeyPress(key, action, "")
+                menu.actions.push(keyPress)
+            }
+        }
+
         this.menus.push(menu)
        // console.log(menu)
 

@@ -7,7 +7,7 @@ class AuditWriter {
         for (let i = 1; i < 10; i++) {
             this.csvData += 'Key ' + i + ' Action,Key ' + i + ' Destination,'
         }
-        this.csvData += 'Key 0 Action,Key 0 Destination,\n'
+        this.csvData += 'Key 0 Action,Key 0 Destination,Key # Action,Key * Action\n'
         this.generateAudit(menus)
     }
 
@@ -34,9 +34,36 @@ class AuditWriter {
             }
 
             // Write the keypress data for 0 if present
+            let zeroKeyFound = false
             menu.actions.forEach(element => {
+                let found = false
                 if (element.key == 0) {
                     this.csvData += element.actionType + ',' + element.destination + ','
+                    zeroKeyFound = true
+                }
+            });
+
+            if (!zeroKeyFound) {
+                this.csvData += ",,"
+            }
+            
+            // Write the keypress data for # if present
+            let poundKeyFound = false
+            menu.actions.forEach(element => {
+                if (element.key == '#') {
+                    this.csvData += element.actionType + ','
+                    poundKeyFound = true
+                }
+            });
+
+            if (!poundKeyFound) {
+                this.csvData += ','
+            }
+
+            // Write the keypress data for * if present
+            menu.actions.forEach(element => {
+                if (element.key == '*') {
+                    this.csvData += element.actionType + ','
                 }
             });
 
