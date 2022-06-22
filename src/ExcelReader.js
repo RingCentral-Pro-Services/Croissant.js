@@ -2,6 +2,7 @@ var reader = require('xlsx')
 
 var IVRMenu = require('./IVRMenu')
 var IVRKeyPress = require('./IVRKeyPress')
+var SpecialKeyPress = require('./SpecialKeyPress')
 
 class ExcelReader {
 
@@ -60,6 +61,21 @@ class ExcelReader {
                     }
                 }
             }
+            
+            // Add # Key if present
+            if ('Key # Press' in menuData) {
+                let actionType = this.translateMenuAction(menuData['Key # Press'])
+                let specialKey = new SpecialKeyPress('#', actionType)
+                menu.specialKeys.push(specialKey)
+            }
+
+            // Add * Key if present
+            if ('Key * Press' in menuData) {
+                let actionType = this.translateMenuAction(menuData['Key * Press'])
+                let specialKey = new SpecialKeyPress('*', actionType)
+                menu.specialKeys.push(specialKey)
+            }
+
             menus.push(menu)
         }
         return menus
@@ -86,6 +102,15 @@ class ExcelReader {
         }
         else if (rawAction == "External Transfer") {
             return "ForwardToExternal"
+        }
+        else if (rawAction == "Repeat the Menu") {
+            return "RepeatMenuGreeting"
+        }
+        else if (rawAction == "Return to the Previous Menu") {
+            return "ReturnToPreviousMenu"
+        }
+        else if (rawAction == "Return to the Root Menu") {
+            return "ReturnToRootMenu"
         }
         else {
             return "ForwardToExtension"

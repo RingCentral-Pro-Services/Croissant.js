@@ -7,6 +7,7 @@ class IVRMenu {
     prompt = ""
     language = "English (United States)"
     actions = []
+    specialKeys = []
 
     constructor(name, extensionNumber, prompt) {
         this.name = name
@@ -22,6 +23,10 @@ class IVRMenu {
             return false
         }
         return true
+    }
+
+    hasSpecialKeys() {
+        return this.specialKeys.length > 0
     }
 }
 
