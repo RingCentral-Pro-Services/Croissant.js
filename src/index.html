@@ -1,4 +1,7 @@
 <head>
+	<!-- For new browsers - multisize ico  -->
+	<link rel="icon" type="image/x-icon" sizes="16x16 32x32" href="favicon.ico">
+
     <style>
         @import url(https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css);
  @import url('https://fonts.googleapis.com/css?family=Roboto');
@@ -200,6 +203,9 @@ window.onload=function(){
     function fileSelectHandler(e) {
       // Fetch FileList object
       var files = e.target.files || e.dataTransfer.files;
+
+	  document.getElementById('notimage').classList.remove("hidden");
+	  var messages = document.getElementById('notimage')
   
       // Cancel event and hover styling
       fileDragHover(e);
@@ -214,6 +220,7 @@ window.onload=function(){
       else if (originalFilename.includes('.xml')) {
         outputFilename = originalFilename.replace('.xml', '.csv')
       }
+	  messages.innerHTML = 'Waiting for server'
         
         // Send the file to the server
        let file = files[0]
@@ -228,9 +235,15 @@ window.onload=function(){
             a.href = objectURL;
             a.download = outputFilename;
             a.click();
+			messages.innerHTML = "Done"
+			window.setTimeout(clearProgressBar, 5000)
             //delete a
         });
     }
+
+	function clearProgressBar() {
+		document.getElementById('notimage').classList.add("hidden");
+	}
   
     // Check for the various File API support.
     if (window.File && window.FileList && window.FileReader) {
