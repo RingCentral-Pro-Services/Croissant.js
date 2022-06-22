@@ -20,7 +20,7 @@ class XMLReader {
             const json = JSON.stringify(result, null, 4);
         
             // log JSON string
-            console.log(json);
+            //console.log(json);
 
             this.rawData = result
             
