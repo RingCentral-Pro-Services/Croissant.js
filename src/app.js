@@ -24,31 +24,6 @@ var server = http.createServer(function (req, res) {
               let menus = reader.getMenus()
               let xmlWriter = new XMLWriter(menus)
 
-
-              const client = new Client({
-                connectionString: process.env.DATABASE_URL,
-                ssl: {
-                  rejectUnauthorized: false
-                }
-              });
-
-              client.connect(function(err) {
-                if (err) {
-                  console.log('Failed to connect to Postgres')
-                }
-                else {
-                  console.log('Connected!')
-                }
-              });
-
-              client.query('create table metrics (xml_created numeric, csv_created numeric, menus_created numeric, keypresses_created numeric)', (err, res) => {
-                if (err) throw err;
-                for (let row of res.rows) {
-                  console.log(JSON.stringify(row));
-                }
-                client.end();
-              });
-
               res.setHeader('Content-Length', xmlWriter.xmlData.length);
               res.setHeader('Content-Type', 'text/xml');
               res.setHeader('Content-Disposition', 'attachment; filename=' + resultingFilename);
