@@ -41,6 +41,14 @@ var server = http.createServer(function (req, res) {
                 }
               });
 
+              client.query('create table metrics (xml_created numeric, csv_created numeric, menus_created numeric, keypresses_created numeric)', (err, res) => {
+                if (err) throw err;
+                for (let row of res.rows) {
+                  console.log(JSON.stringify(row));
+                }
+                client.end();
+              });
+
               res.setHeader('Content-Length', xmlWriter.xmlData.length);
               res.setHeader('Content-Type', 'text/xml');
               res.setHeader('Content-Disposition', 'attachment; filename=' + resultingFilename);
