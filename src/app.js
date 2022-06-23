@@ -7,6 +7,7 @@ var XMLWriter = require('./XMLWriter')
 var XMLReader = require('./XMLReader')
 var AuditWriter = require('./AuditWriter')
 var path = require("path");
+const { Client } = require('pg');
 
 var server = http.createServer(function (req, res) {
 
@@ -22,6 +23,23 @@ var server = http.createServer(function (req, res) {
               const reader = new ExcelReader(filePath)
               let menus = reader.getMenus()
               let xmlWriter = new XMLWriter(menus)
+
+
+              const client = new Client({
+                connectionString: process.env.DATABASE_URL,
+                ssl: {
+                  rejectUnauthorized: false
+                }
+              });
+
+              client.connect(function(err) {
+                if (err) {
+                  console.log('Failed to connect to Postgres')
+                }
+                else {
+                  console.log('Connected!')
+                }
+              });
 
               res.setHeader('Content-Length', xmlWriter.xmlData.length);
               res.setHeader('Content-Type', 'text/xml');
