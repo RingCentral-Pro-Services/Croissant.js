@@ -26,9 +26,13 @@ var server = http.createServer(function (req, res) {
               let menus = reader.getMenus()
               let xmlWriter = new XMLWriter(menus)
 
-              //let emailManager = new EmailManager()
-              //emailManager.logXML()
+              let keyPressCount = 0
+              for (let menu in menus) {
+                keyPressCount += menu.actions.length
+                keyPressCount += menu.specialKeys.length
+              }
 
+              console.log(`Key Presses: ${keyPressCount}}`)
               let database = new DatabaseManager()
               database.logXML(1, 5)
 
