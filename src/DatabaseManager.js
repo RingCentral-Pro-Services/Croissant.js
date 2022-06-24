@@ -2,6 +2,11 @@ const { Client } = require('pg');
 
 class DatabaseManager {
 
+    xml_created = 0
+    csv_created = 0
+    menus_created = 0
+    keypresses_created = 0
+
     constructor() {
 
     }
@@ -26,13 +31,20 @@ class DatabaseManager {
               console.log(err)
             }
             else {
-              console.log(res.rows[0])
-              client.end()
+                this.xml_created = res.rows[0]["xml_created"]
+                this.csv_created = res.rows[0]["csv_created"]
+                this.menus_created = res.rows[0]["menus_created"]
+                this.keypresses_created = res.rows[0]["keypresses_created"]
+
+                console.log(`XML Created: ${this.xml_created}`)
+                console.log(`CSV Created: ${this.csv_created}`)
+                console.log(`Menus Create: ${this.menus_created}`)
+                console.log(`Keypresses Created: ${this.keypresses_created}`)
+
+                client.end()
             }
           });
     }
-
-    addRow
 
 }
 
