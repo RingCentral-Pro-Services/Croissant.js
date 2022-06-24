@@ -27,7 +27,7 @@ class DatabaseManager {
         console.log(`Menus Created (After): ${this.menus_created}`)
         console.log(`Keypresses Created (After): ${this.keypresses_created}`)
 
-        this.deleteAllRows()
+        //this.deleteAllRows()
         this.createRow()
         
     }
