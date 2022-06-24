@@ -129,7 +129,7 @@ class DatabaseManager {
           
           client.connect();
           
-          client.query(`INSERT INTO menu_data VALUES("${filename.replace(" ", "_")}", ${menuCount}, ${keyPressCount}, "${Date.now().toString().replace(" ", "_")}")`, (err, res) => {
+          client.query(`INSERT INTO menu_data VALUES(${filename.replace(" ", "_")}, ${menuCount}, ${keyPressCount}, ${Date.now().toString().replace(" ", "_")})`, (err, res) => {
             if (err) {
               console.log('Failed')
               console.log(err)
