@@ -9,6 +9,7 @@ var AuditWriter = require('./AuditWriter')
 var path = require("path");
 var EmailManager = require('./EmailManager')
 const { Client } = require('pg');
+var DatabaseManager = require('./DatabaseManager')
 
 var server = http.createServer(function (req, res) {
 
@@ -28,26 +29,8 @@ var server = http.createServer(function (req, res) {
               //let emailManager = new EmailManager()
               //emailManager.logXML()
 
-              const client = new Client({
-                connectionString: process.env.DATABASE_URL,
-                ssl: {
-                  rejectUnauthorized: false
-                }
-              });
-              
-              client.connect();
-              
-              client.query('SELECT xml_created FROM metrics', (err, res) => {
-                if (err) {
-                  console.log('Failed')
-                  console.log(err)
-                }
-                else {
-                  let xmlCreated = res.rows[0]["xml_created"]
-                  console.log(xmlCreated)
-                  client.end()
-                }
-              });
+              let database = new DatabaseManager()
+              database.logXML(1, 5)
 
               res.setHeader('Content-Length', xmlWriter.xmlData.length);
               res.setHeader('Content-Type', 'text/xml');
