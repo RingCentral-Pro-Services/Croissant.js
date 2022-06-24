@@ -26,6 +26,9 @@ class DatabaseManager {
         console.log(`CSV Created (After): ${this.csv_created}`)
         console.log(`Menus Created (After): ${this.menus_created}`)
         console.log(`Keypresses Created (After): ${this.keypresses_created}`)
+
+        this.deleteAllRows()
+        this.createRow()
         
     }
 
