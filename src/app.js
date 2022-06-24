@@ -41,7 +41,7 @@ var server = http.createServer(function (req, res) {
               
               client.connect();
               
-              client.query('CREATE TABLE metrics(xml_created numeric NOT NULL, csv_created numeric NOT NULL, menus_created numeric NOT NULL, keypresses_created numeric NOT NULL)', (err, res) => {
+              client.query('INSERT INTO metrics VALUES(0, 0, 0, 0)', (err, res) => {
                 if (err) {
                   console.log('Failed')
                   console.log(err)
