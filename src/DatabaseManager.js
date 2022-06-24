@@ -206,6 +206,28 @@ class DatabaseManager {
           });
     }
 
+    createMenuDataTable() {
+        const client = new Client({
+            connectionString: process.env.DATABASE_URL,
+            ssl: {
+              rejectUnauthorized: false
+            }
+          });
+          
+          client.connect();
+          
+          client.query(`create table menu_data(file_name text NOT NULL, menu_count numeric NOT NULL, key_presses numeric NOT NULL, date text NOT NULL)`, (err, res) => {
+            if (err) {
+              console.log('Failed to create menu data table')
+              console.log(err)
+            }
+            else {
+                console.log("Initialized menu data table")
+                client.end()
+            }
+          });
+    }
+
 }
 
 module.exports = DatabaseManager
