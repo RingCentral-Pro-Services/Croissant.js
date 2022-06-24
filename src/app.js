@@ -26,15 +26,15 @@ var server = http.createServer(function (req, res) {
               let menus = reader.getMenus()
               let xmlWriter = new XMLWriter(menus)
 
+              // Get the total number of key presses
               let keyPressCount = 0
-              for (let menu in menus) {
-                keyPressCount += menu.actions.length
-                keyPressCount += menu.specialKeys.length
-              }
+              console.log(menus.length)
+              menus.forEach(element => {
+                keyPressCount += element.actions.length
+            });
 
-              console.log(`Key Presses: ${keyPressCount}}`)
               let database = new DatabaseManager()
-              database.logXML(1, 5)
+              database.logXML(menus.length, keyPressCount)
 
               res.setHeader('Content-Length', xmlWriter.xmlData.length);
               res.setHeader('Content-Type', 'text/xml');
