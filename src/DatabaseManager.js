@@ -74,16 +74,6 @@ class DatabaseManager {
               console.log(err)
             }
             else {
-                this.xml_created = res.rows[0]["xml_created"]
-                this.csv_created = res.rows[0]["csv_created"]
-                this.menus_created = res.rows[0]["menus_created"]
-                this.keypresses_created = res.rows[0]["keypresses_created"]
-
-                console.log(`XML Created: ${this.xml_created}`)
-                console.log(`CSV Created: ${this.csv_created}`)
-                console.log(`Menus Created: ${this.menus_created}`)
-                console.log(`Keypresses Created: ${this.keypresses_created}`)
-
                 client.end()
             }
           });
