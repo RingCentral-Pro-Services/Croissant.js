@@ -18,9 +18,9 @@ class DatabaseManager {
         console.log(`Menus Created (Before): ${this.menus_created}`)
         console.log(`Keypresses Created (Before): ${this.keypresses_created}`)
 
-        this.xml_created += 1
-        this.menus_created += menuCount
-        this.keypresses_created += keyPressCount
+        // this.xml_created += 1
+        // this.menus_created += menuCount
+        // this.keypresses_created += keyPressCount
 
         console.log(`XML Created (After): ${this.xml_created}`)
         console.log(`CSV Created (After): ${this.csv_created}`)
@@ -54,6 +54,9 @@ class DatabaseManager {
                       console.log(err)
                     }
                     else {
+                        this.xml_created += 1
+                        this.menus_created += menuCount
+                        this.keypresses_created += keyPressCount
                         client.query(`INSERT INTO metrics VALUES(${this.xml_created}, ${this.csv_created}, ${this.menus_created}, ${this.keypresses_created})`, (err, res) => {
                             if (err) {
                               console.log('Failed')
