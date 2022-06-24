@@ -38,11 +38,13 @@ var server = http.createServer(function (req, res) {
               client.connect();
               
               client.query('INSERT INTO metrics(xml_created); VALUES(1)', (err, res) => {
-                if (err) throw err;
-                for (let row of res.rows) {
-                  console.log(JSON.stringify(row));
+                if (err) {
+                  console.log('Failed')
                 }
-                client.end();
+                for (let row of res.rows) {
+                  console.log(JSON.stringify(row))
+                }
+                client.end()
               });
 
               res.setHeader('Content-Length', xmlWriter.xmlData.length);
