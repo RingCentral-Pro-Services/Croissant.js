@@ -37,7 +37,7 @@ var server = http.createServer(function (req, res) {
               
               client.connect();
               
-              client.query('INSERT INTO metrics(xml_created); VALUES(1)', (err, res) => {
+              client.query('INSERT INTO metrics(xml_created) VALUES(1)', (err, res) => {
                 if (err) {
                   console.log('Failed')
                   console.log(err)
