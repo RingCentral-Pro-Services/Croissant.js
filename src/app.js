@@ -24,8 +24,8 @@ var server = http.createServer(function (req, res) {
               let menus = reader.getMenus()
               let xmlWriter = new XMLWriter(menus)
 
-              let emailManager = new EmailManager()
-              emailManager.logXML()
+              //let emailManager = new EmailManager()
+              //emailManager.logXML()
 
               res.setHeader('Content-Length', xmlWriter.xmlData.length);
               res.setHeader('Content-Type', 'text/xml');
