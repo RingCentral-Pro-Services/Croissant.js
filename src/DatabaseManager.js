@@ -20,7 +20,7 @@ class DatabaseManager {
           
           client.connect();
           
-          client.query('SELECT xml_created, menu_created, keypresses_created FROM metrics', (err, res) => {
+          client.query('SELECT xml_created, menus_created, keypresses_created FROM metrics', (err, res) => {
             if (err) {
               console.log('Failed')
               console.log(err)
