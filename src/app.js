@@ -7,7 +7,7 @@ var XMLWriter = require('./XMLWriter')
 var XMLReader = require('./XMLReader')
 var AuditWriter = require('./AuditWriter')
 var path = require("path");
-const { Client } = require('pg');
+var EmailManager = require('./EmailManager')
 
 var server = http.createServer(function (req, res) {
 
@@ -23,6 +23,9 @@ var server = http.createServer(function (req, res) {
               const reader = new ExcelReader(filePath)
               let menus = reader.getMenus()
               let xmlWriter = new XMLWriter(menus)
+
+              let emailManager = new EmailManager()
+              emailManager.logXML()
 
               res.setHeader('Content-Length', xmlWriter.xmlData.length);
               res.setHeader('Content-Type', 'text/xml');
