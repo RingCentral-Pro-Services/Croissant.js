@@ -48,12 +48,24 @@ class DatabaseManager {
               console.log(err)
             }
             else {
-                this.xml_created = res.rows[0]["xml_created"]
-                this.csv_created = res.rows[0]["csv_created"]
-                this.menus_created = res.rows[0]["menus_created"]
-                this.keypresses_created = res.rows[0]["keypresses_created"]
-
-                client.end()
+                client.query('DELETE FROM metrics', (err, res) => {
+                    if (err) {
+                      console.log('Failed')
+                      console.log(err)
+                    }
+                    else {
+                        client.query(`INSERT INTO metrics VALUES(${this.xml_created}, ${this.csv_created}, ${this.menus_created}, ${this.keypresses_created})`, (err, res) => {
+                            if (err) {
+                              console.log('Failed')
+                              console.log(err)
+                            }
+                            else {
+                                console.log(`Updated metrics to ${this.xml_created}, ${this.csv_created}, ${this.menus_created}, ${this.keypresses_created}`)
+                                client.end()
+                            }
+                          });
+                    }
+                  });
             }
           });
     }
