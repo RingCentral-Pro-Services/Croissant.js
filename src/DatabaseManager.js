@@ -123,7 +123,7 @@ class DatabaseManager {
           
           client.query(`CREATE TABLE metrics (xml_created numeric NOT NULL, csv_created numeric NOT NULL, menus_created numeric NOT NULL, keypresses_created numeric NOT NULL, menus_audited numeric NOT NULL, keypresses_audited numeric NOT NULL)`, (err, res) => {
             if (err) {
-              console.log('Failed')
+              console.log('Failed to create bale')
               console.log(err)
             }
             else {
