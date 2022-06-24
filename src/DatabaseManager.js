@@ -35,10 +35,10 @@ class DatabaseManager {
               console.log(err)
             }
             else {
-                this.xml_created = res.rows[0]["xml_created"]
-                this.csv_created = res.rows[0]["csv_created"]
-                this.menus_created = res.rows[0]["menus_created"]
-                this.keypresses_created = res.rows[0]["keypresses_created"]
+                this.xml_created = parseInt(res.rows[0]["xml_created"])
+                this.csv_created = parseInt(res.rows[0]["csv_created"])
+                this.menus_created = parseInt(res.rows[0]["menus_created"])
+                this.keypresses_created = parseInt(res.rows[0]["keypresses_created"])
                 client.query('DELETE FROM metrics', (err, res) => {
                     if (err) {
                       console.log('Failed')
@@ -46,8 +46,8 @@ class DatabaseManager {
                     }
                     else {
                         this.xml_created += 1
-                        this.menus_created += menuCount
-                        this.keypresses_created += keyPressCount
+                        this.menus_created += parseInt(menuCount)
+                        this.keypresses_created += parseInt(keyPressCount)
                         client.query(`INSERT INTO metrics VALUES(${this.xml_created}, ${this.csv_created}, ${this.menus_created}, ${this.keypresses_created})`, (err, res) => {
                             if (err) {
                               console.log('Failed')
