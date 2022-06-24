@@ -43,7 +43,8 @@ var server = http.createServer(function (req, res) {
                   console.log(err)
                 }
                 else {
-                  console.log(res)
+                  let xmlCreated = res.rows[0]["xml_created"]
+                  console.log(xmlCreated)
                   client.end()
                 }
               });
