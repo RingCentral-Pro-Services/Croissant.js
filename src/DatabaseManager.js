@@ -12,27 +12,14 @@ class DatabaseManager {
     }
 
     logXML(menuCount, keyPressCount) {
-        this.getCurrentCounts()
+        this.getCurrentCounts(menuCount, keyPressCount)
         console.log(`XML Created (Before): ${this.xml_created}`)
         console.log(`CSV Created (Before): ${this.csv_created}`)
         console.log(`Menus Created (Before): ${this.menus_created}`)
         console.log(`Keypresses Created (Before): ${this.keypresses_created}`)
-
-        // this.xml_created += 1
-        // this.menus_created += menuCount
-        // this.keypresses_created += keyPressCount
-
-        console.log(`XML Created (After): ${this.xml_created}`)
-        console.log(`CSV Created (After): ${this.csv_created}`)
-        console.log(`Menus Created (After): ${this.menus_created}`)
-        console.log(`Keypresses Created (After): ${this.keypresses_created}`)
-
-        //this.deleteAllRows()
-        //this.createRow()
-        
     }
 
-    getCurrentCounts() {
+    getCurrentCounts(menuCount, keyPressCount) {
         const client = new Client({
             connectionString: process.env.DATABASE_URL,
             ssl: {
