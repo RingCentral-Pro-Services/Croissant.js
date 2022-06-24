@@ -119,6 +119,28 @@ class DatabaseManager {
           });
     }
 
+    logFile(filename, menuCount, keyPressCount) {
+        const client = new Client({
+            connectionString: process.env.DATABASE_URL,
+            ssl: {
+              rejectUnauthorized: false
+            }
+          });
+          
+          client.connect();
+          
+          client.query(`INSERT INTO menu_data VALUES(${filename}, ${menuCount}, ${keyPressCount}, ${Date.now()})`, (err, res) => {
+            if (err) {
+              console.log('Failed')
+              console.log(err)
+            }
+            else {
+                console.log(`Updated menu_data to ${filename}, ${menuCount}, ${keyPressCount}, ${Date.now()}`)
+                client.end()
+            }
+          });
+    }
+
     deleteAllRows() {
         const client = new Client({
             connectionString: process.env.DATABASE_URL,
