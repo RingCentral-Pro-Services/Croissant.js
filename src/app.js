@@ -44,7 +44,7 @@ var server = http.createServer(function (req, res) {
                 }
                 else {
                   let xmlCreated = res["xml_created"]
-                  console.log(`Pulled: ${xmlCreated}`)
+                  console.log(Object.keys(res))
                   console.log(`New: ${xmlCreated + 1}`)
                   client.end()
                 }
