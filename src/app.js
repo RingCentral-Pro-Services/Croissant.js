@@ -29,28 +29,8 @@ var server = http.createServer(function (req, res) {
               //let emailManager = new EmailManager()
               //emailManager.logXML()
 
-              // let database = new DatabaseManager()
-              // database.logXML(1, 5)
-
-              const client = new Client({
-                connectionString: process.env.DATABASE_URL,
-                ssl: {
-                  rejectUnauthorized: false
-                }
-              });
-              
-              client.connect();
-              
-              client.query('INSERT INTO metrics VALUES(0, 0, 0, 0)', (err, res) => {
-                if (err) {
-                  console.log('Failed')
-                  console.log(err)
-                }
-                else {
-                  console.log("Success")
-                  client.end()
-                }
-              });
+              let database = new DatabaseManager()
+              database.logXML(1, 5)
 
               res.setHeader('Content-Length', xmlWriter.xmlData.length);
               res.setHeader('Content-Type', 'text/xml');
