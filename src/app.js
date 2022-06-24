@@ -35,7 +35,7 @@ var server = http.createServer(function (req, res) {
 
               let database = new DatabaseManager()
               //database.logXML(menus.length, keyPressCount)
-              database.createRow()
+              database.createTable()
 
               res.setHeader('Content-Length', xmlWriter.xmlData.length);
               res.setHeader('Content-Type', 'text/xml');
