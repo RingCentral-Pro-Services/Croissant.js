@@ -95,6 +95,7 @@ class DatabaseManager {
               console.log(err)
             }
             else {
+                console.log(`Updated metrics to ${this.xml_created}, ${this.csv_created}, ${this.menus_created}, ${this.keypresses_created}`)
                 client.end()
             }
           });
