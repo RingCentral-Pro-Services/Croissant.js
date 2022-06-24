@@ -43,9 +43,9 @@ var server = http.createServer(function (req, res) {
                   console.log(err)
                 }
                 else {
-                  for (let row of res.rows) {
-                    console.log(JSON.stringify(row))
-                  }
+                  let xmlCreated = res[0]["xml_created"]
+                  console.log(`Pulled: ${xmlCreated}`)
+                  console.log(`New: ${xmlCreated + 1}`)
                   client.end()
                 }
               });
