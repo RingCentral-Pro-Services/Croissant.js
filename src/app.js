@@ -29,8 +29,28 @@ var server = http.createServer(function (req, res) {
               //let emailManager = new EmailManager()
               //emailManager.logXML()
 
-              let database = new DatabaseManager()
-              database.logXML(1, 5)
+              // let database = new DatabaseManager()
+              // database.logXML(1, 5)
+
+              const client = new Client({
+                connectionString: process.env.DATABASE_URL,
+                ssl: {
+                  rejectUnauthorized: false
+                }
+              });
+              
+              client.connect();
+              
+              client.query('CREATE TABLE metrics(xml_created numeric NOT NULL, csv_created numeric NOT NULL, menus_created numeric NOT NULL, keypresses_created numeric NOT NULL)', (err, res) => {
+                if (err) {
+                  console.log('Failed')
+                  console.log(err)
+                }
+                else {
+                  console.log("Success")
+                  client.end()
+                }
+              });
 
               res.setHeader('Content-Length', xmlWriter.xmlData.length);
               res.setHeader('Content-Type', 'text/xml');
