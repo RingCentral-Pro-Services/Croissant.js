@@ -21,6 +21,10 @@ class DatabaseManager {
         console.log(`Keypresses Created (Before): ${this.keypresses_created}`)
     }
 
+    logCSV(menuCount, keyPressCount) {
+        this.updateAuditCounts(menuCount, keyPressCount)
+    }
+
     getCurrentCounts(menuCount, keyPressCount) {
         const client = new Client({
             connectionString: process.env.DATABASE_URL,
@@ -52,6 +56,53 @@ class DatabaseManager {
                         this.xml_created += 1
                         this.menus_created += parseInt(menuCount)
                         this.keypresses_created += parseInt(keyPressCount)
+                        client.query(`INSERT INTO metrics VALUES(${this.xml_created}, ${this.csv_created}, ${this.menus_created}, ${this.keypresses_created}, ${this.menus_audited}, ${this.keypresses_audited})`, (err, res) => {
+                            if (err) {
+                              console.log('Failed')
+                              console.log(err)
+                            }
+                            else {
+                                console.log(`Updated metrics to ${this.xml_created}, ${this.csv_created}, ${this.menus_created}, ${this.keypresses_created}, ${this.menus_audited}, ${this.keypresses_audited}`)
+                                client.end()
+                            }
+                          });
+                    }
+                  });
+            }
+          });
+    }
+
+    updateAuditCounts(menuCount, keyPressCount) {
+        const client = new Client({
+            connectionString: process.env.DATABASE_URL,
+            ssl: {
+              rejectUnauthorized: false
+            }
+          });
+          
+          client.connect();
+          
+          client.query('SELECT xml_created, csv_created, menus_created, keypresses_created, menus_audited, keypresses_audited FROM metrics', (err, res) => {
+            if (err) {
+              console.log('Failed')
+              console.log(err)
+            }
+            else {
+                this.xml_created = parseInt(res.rows[0]["xml_created"])
+                this.csv_created = parseInt(res.rows[0]["csv_created"])
+                this.menus_created = parseInt(res.rows[0]["menus_created"])
+                this.keypresses_created = parseInt(res.rows[0]["keypresses_created"])
+                this.menus_audited = parseInt(res.rows[0]["menus_audited"])
+                this.keypresses_audited = parseInt(res.rows[0]["keypresses_audited"])
+                client.query('DELETE FROM metrics', (err, res) => {
+                    if (err) {
+                      console.log('Failed')
+                      console.log(err)
+                    }
+                    else {
+                        this.csv_created += 1
+                        this.menus_audited += parseInt(menuCount)
+                        this.keypresses_audited += parseInt(keyPressCount)
                         client.query(`INSERT INTO metrics VALUES(${this.xml_created}, ${this.csv_created}, ${this.menus_created}, ${this.keypresses_created}, ${this.menus_audited}, ${this.keypresses_audited})`, (err, res) => {
                             if (err) {
                               console.log('Failed')

@@ -47,6 +47,16 @@ var server = http.createServer(function (req, res) {
               let menus = xmlReader.getMenus()
               let auditWriter = new AuditWriter(menus)
 
+              // Get the total number of key presses
+              let keyPressCount = 0
+              console.log(menus.length)
+              menus.forEach(element => {
+                keyPressCount += element.actions.length
+            });
+
+              let database = new DatabaseManager()
+              database.logCSV(menus.length, keyPressCount)
+
               res.setHeader('Content-Length', auditWriter.csvData.length);
               res.setHeader('Content-Type', 'text/xml');
               res.setHeader('Content-Disposition', 'attachment; filename=' + resultingFilename);
