@@ -269,7 +269,7 @@ class DatabaseManager {
           
           client.connect();
           
-          client.query(`DELETE FROM menu_data)`, (err, res) => {
+          client.query(`DELETE FROM menu_data`, (err, res) => {
             if (err) {
               console.log('Failed to delete menu data table')
               console.log(err)
