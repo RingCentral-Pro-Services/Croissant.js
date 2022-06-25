@@ -120,26 +120,34 @@ class DatabaseManager {
     }
 
     logFile(filename, menuCount, keyPressCount) {
-        const client = new Client({
-            connectionString: process.env.DATABASE_URL,
-            ssl: {
-              rejectUnauthorized: false
-            }
-          });
+            const client = new Client({
+                connectionString: process.env.DATABASE_URL,
+                ssl: {
+                rejectUnauthorized: false
+                }
+            });
           
-          client.connect();
+            client.connect();
           
-          const date = new Date();
-          client.query(`INSERT INTO menu_data VALUES('${filename}', ${menuCount}, ${keyPressCount}, '${date.toString()}')`, (err, res) => {
-            if (err) {
-              console.log('Failed')
-              console.log(err)
-            }
-            else {
-                console.log(`Updated menu_data to ${filename}, ${menuCount}, ${keyPressCount}, ${Date.now()}`)
-                client.end()
-            }
-          });
+            let ts = Date.now();
+
+            let date_ob = new Date(ts);
+            let date = date_ob.getDate();
+            let month = date_ob.getMonth() + 1;
+            let year = date_ob.getFullYear();
+
+            let date_string = `${year}-${month}-${date}`
+
+            client.query(`INSERT INTO menu_data VALUES('${filename}', ${menuCount}, ${keyPressCount}, '${date_string}')`, (err, res) => {
+                if (err) {
+                console.log('Failed')
+                console.log(err)
+                }
+                else {
+                    console.log(`Updated menu_data to ${filename}, ${menuCount}, ${keyPressCount}, ${Date.now()}`)
+                    client.end()
+                }
+            });
     }
 
     deleteAllRows() {
