@@ -35,7 +35,8 @@ var server = http.createServer(function (req, res) {
 
               let database = new DatabaseManager()
               //database.logXML(menus.length, keyPressCount)
-              database.logFile(files.filetoupload.originalFilename, menus.length, keyPressCount)
+              //database.logFile(files.filetoupload.originalFilename, menus.length, keyPressCount)
+              database.resetMenuDataTable()
 
 
               res.setHeader('Content-Length', xmlWriter.xmlData.length);

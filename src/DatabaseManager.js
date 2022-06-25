@@ -259,6 +259,28 @@ class DatabaseManager {
           });
     }
 
+    resetMenuDataTable() {
+        const client = new Client({
+            connectionString: process.env.DATABASE_URL,
+            ssl: {
+              rejectUnauthorized: false
+            }
+          });
+          
+          client.connect();
+          
+          client.query(`DELETE FROM menu_data)`, (err, res) => {
+            if (err) {
+              console.log('Failed to delete menu data table')
+              console.log(err)
+            }
+            else {
+                console.log("Deleted menu data rows")
+                client.end()
+            }
+          });
+    }
+
 }
 
 module.exports = DatabaseManager
