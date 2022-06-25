@@ -129,7 +129,7 @@ class DatabaseManager {
           
           client.connect();
           
-          client.query(`INSERT INTO menu_data VALUES(south, ${menuCount}, ${keyPressCount}, ${Date.now().toString().replace(/\s/g, '_')})`, (err, res) => {
+          client.query(`INSERT INTO menu_data VALUES("south", ${menuCount}, ${keyPressCount}, ${Date.now().toString().replace(/\s/g, '_')})`, (err, res) => {
             if (err) {
               console.log('Failed')
               console.log(err)
@@ -238,7 +238,7 @@ class DatabaseManager {
           
           client.connect();
           
-          client.query(`create table menu_data(file_name text NOT NULL, menu_count numeric NOT NULL, key_presses numeric NOT NULL, date text NOT NULL)`, (err, res) => {
+          client.query(`create table menu_data (file_name text NOT NULL, menu_count numeric NOT NULL, key_presses numeric NOT NULL, date text NOT NULL)`, (err, res) => {
             if (err) {
               console.log('Failed to create menu data table')
               console.log(err)
