@@ -132,7 +132,7 @@ class DatabaseManager {
             let ts = Date.now();
 
             let date_ob = new Date(ts);
-            let date = date_ob.getDate();
+            let date = date_ob.getDate() - 1;
             let month = date_ob.getMonth() + 1;
             let year = date_ob.getFullYear();
 
