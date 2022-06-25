@@ -129,8 +129,8 @@ class DatabaseManager {
           
           client.connect();
           
-          var date = (new Date()).toISOString().split('T')[0];
-          client.query(`INSERT INTO menu_data VALUES('${filename}', ${menuCount}, ${keyPressCount}, ${date})`, (err, res) => {
+          const d = new Date();
+          client.query(`INSERT INTO menu_data VALUES('${filename}', ${menuCount}, ${keyPressCount}, ${date.toString()})`, (err, res) => {
             if (err) {
               console.log('Failed')
               console.log(err)
