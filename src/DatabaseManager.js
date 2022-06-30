@@ -1,5 +1,8 @@
 const { Client } = require('pg');
 
+/**
+ * A class for interacting with the Postgresql database
+ */
 class DatabaseManager {
 
     xml_created = 0
@@ -13,6 +16,11 @@ class DatabaseManager {
 
     }
 
+    /**
+     * Logs an XLSX file in the database
+     * @param {number} menuCount The number of menus to add to the counter
+     * @param {*} keyPressCount The number of keypresses to add to the counter
+     */
     logXML(menuCount, keyPressCount) {
         this.getCurrentCounts(menuCount, keyPressCount)
         console.log(`XML Created (Before): ${this.xml_created}`)
@@ -21,10 +29,20 @@ class DatabaseManager {
         console.log(`Keypresses Created (Before): ${this.keypresses_created}`)
     }
 
+    /**
+     * Logs a CSV in the database
+     * @param {number} menuCount The number of menus to add to the counter
+     * @param {number} keyPressCount The number of keypresses to add to the counter
+     */
     logCSV(menuCount, keyPressCount) {
         this.updateAuditCounts(menuCount, keyPressCount)
     }
 
+    /**
+     * Get current counts from the database and update them with the new values
+     * @param {number} menuCount The number of menus to add to the counter
+     * @param {number} keyPressCount The number of keypresses to add to the counter
+     */
     getCurrentCounts(menuCount, keyPressCount) {
         const client = new Client({
             connectionString: process.env.DATABASE_URL,
@@ -72,6 +90,11 @@ class DatabaseManager {
           });
     }
 
+    /**
+     * Get current counts from the database and update them with the new values
+     * @param {number} menuCount The number of menus to add to the counter
+     * @param {number} keyPressCount The number of keypresses to add to the counter
+     */
     updateAuditCounts(menuCount, keyPressCount) {
         const client = new Client({
             connectionString: process.env.DATABASE_URL,
@@ -119,6 +142,12 @@ class DatabaseManager {
           });
     }
 
+    /**
+     * Add a row for the file in the menu data table
+     * @param {string} filename The name of the file to log
+     * @param {number} menuCount The number of menus in the file
+     * @param {number} keyPressCount The number of keypresses in the file
+     */
     logFile(filename, menuCount, keyPressCount) {
             const client = new Client({
                 connectionString: process.env.DATABASE_URL,
@@ -150,6 +179,9 @@ class DatabaseManager {
             });
     }
 
+    /**
+     * Deletes all row in the metrics table
+     */
     deleteAllRows() {
         const client = new Client({
             connectionString: process.env.DATABASE_URL,
@@ -171,6 +203,9 @@ class DatabaseManager {
           });
     }
 
+    /**
+     * Insert a new row into the metrics table
+     */
     createRow() {
         const client = new Client({
             connectionString: process.env.DATABASE_URL,
@@ -193,6 +228,9 @@ class DatabaseManager {
           });
     }
 
+    /**
+     * Create the the metrics table
+     */
     createTable() {
         const client = new Client({
             connectionString: process.env.DATABASE_URL,
@@ -215,6 +253,9 @@ class DatabaseManager {
           });
     }
 
+    /**
+     * Insert the initial values into the metrics table
+     */
     initializeRow() {
         const client = new Client({
             connectionString: process.env.DATABASE_URL,
@@ -237,6 +278,9 @@ class DatabaseManager {
           });
     }
 
+    /**
+     * Create the menu data table
+     */
     createMenuDataTable() {
         const client = new Client({
             connectionString: process.env.DATABASE_URL,
@@ -259,6 +303,9 @@ class DatabaseManager {
           });
     }
 
+    /**
+     * Delete all rows from the menu data table
+     */
     resetMenuDataTable() {
         const client = new Client({
             connectionString: process.env.DATABASE_URL,

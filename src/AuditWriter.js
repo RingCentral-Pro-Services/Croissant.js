@@ -1,6 +1,9 @@
 var IVRKeyPress = require('./IVRKeyPress')
 var IVRMenu = require('./IVRMenu')
 
+/**
+ * A class for converting IVRMenu objects to CSVs
+ */
 class AuditWriter {
     constructor(menus) {
         this.csvData = 'Menu Name,Menu Ext,Prompt Name/Script,'
@@ -11,6 +14,10 @@ class AuditWriter {
         this.generateAudit(menus)
     }
 
+    /**
+     * Generate a CSV of the passed IVRMenus
+     * @param {IVRMenu[]} menus An array of IVRMenu objects
+     */
     generateAudit(menus) {
         for (let i = 0; i < menus.length; i++) {
             let menu = menus[i]

@@ -1,9 +1,11 @@
 var reader = require('xlsx')
-
 var IVRMenu = require('./IVRMenu')
 var IVRKeyPress = require('./IVRKeyPress')
 var SpecialKeyPress = require('./SpecialKeyPress')
 
+/**
+ * A class for reading the IVRs sheet of the BRD
+ */
 class ExcelReader {
 
     //data = []
@@ -24,6 +26,10 @@ class ExcelReader {
         }
     }
 
+    /**
+     * Get an array of all IVR Menus read by the reader
+     * @returns An array of IVRMenu objects
+     */
     getMenus() {
 
         let menus = []
@@ -117,6 +123,11 @@ class ExcelReader {
         }
     }
 
+    /**
+     * Remove any invalid characters from the prompt
+     * @param {String} prompt The prompt to be sanitized
+     * @returns The sanitized prompt as a string
+     */
     sanitizedPrompt(prompt) {
         let result = prompt.replace("_", "-")
         result = result.replace("*", "star")

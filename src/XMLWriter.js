@@ -1,5 +1,8 @@
 var IVRMenu = require('./IVRMenu')
 
+/**
+ * A class for writing portal-compatible XML files
+ */
 class XMLWriter {
 
     constructor(menus) {
@@ -15,6 +18,10 @@ class XMLWriter {
 
     }
 
+    /**
+     * Add an IVRMenu to the XML string
+     * @param {IVRMenu} menu An IVRMenu object
+     */
     addMenu(menu) {
         this.addLine('<Menu>\n')
 
@@ -68,6 +75,10 @@ class XMLWriter {
         this.addLine('</Menu>\n')
     }
 
+    /**
+     * Add a line to the XML string
+     * @param {String} line A string to be added to the XML string
+     */
     addLine(line) {
         this.xmlData += line
     }

@@ -1,3 +1,6 @@
+/**
+ * Class representing a key press on an IVR Menu
+ */
 class IVRKeyPress {
     key = ""
     actionType = ""

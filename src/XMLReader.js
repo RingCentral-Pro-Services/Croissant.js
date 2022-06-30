@@ -28,6 +28,10 @@ class XMLReader {
         });
     }
 
+    /**
+     * Get an array of IVRMenus ready by the reader
+     * @returns An array of IVRMenu objects
+     */
     getMenus() {
         const menuCount = this.rawData["MultilevelIVR"]["Menu"].length
         //console.log('Menus: ' + menuCount)
@@ -39,6 +43,10 @@ class XMLReader {
         return this.menus
     }
     
+    /**
+     * Parse an IVR menu and add it to the menus array
+     * @param {*} menuData A Javascript object representing an IVR menu
+     */
     parseMenu(menuData) {
         let menuName = menuData['Name'][0]
         let extensionNumber = menuData['Extension'][0]

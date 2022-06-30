@@ -1,5 +1,7 @@
-var IVRKeyPress = require('./IVRKeyPress')
 
+/**
+ * Class representing an IVR Menu
+ */
 class IVRMenu {
 
     name = ""
@@ -15,6 +17,10 @@ class IVRMenu {
         this.prompt = prompt
     }
 
+    /**
+     * Check whether or not the menu is using a text-to-speech prompts
+     * @returns True if the menu has a text-to-speech prompt, false otherwise
+     */
     textToSpeech() {
         if (this.prompt.includes('.wav')) {
             return false
@@ -25,6 +31,10 @@ class IVRMenu {
         return true
     }
 
+    /**
+     * Check whether or not the menu has special keys
+     * @returns True if the menu has special keys, false otherwise
+     */
     hasSpecialKeys() {
         return this.specialKeys.length > 0
     }
