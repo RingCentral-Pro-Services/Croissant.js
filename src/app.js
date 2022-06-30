@@ -50,7 +50,6 @@ var server = http.createServer(function (req, res) {
 
               // Get the total number of key presses
               let keyPressCount = 0
-              console.log(menus.length)
               menus.forEach(element => {
                 keyPressCount += element.actions.length
             });
