@@ -129,17 +129,17 @@ class ExcelReader {
      * @returns The sanitized prompt as a string
      */
     sanitizedPrompt(prompt) {
-        let result = prompt.replace("_", "-")
-        result = result.replace("*", "star")
-        result = result.replace("#", "pound")
-        result = result.replace("@", "at")
-        result = result.replace("&", "and")
-        result = result.replace("(", "")
-        result = result.replace(")", "")
-        result = result.replace("%", "")
-        result = result.replace("$", "")
-        result = result.replace("!", ".")
-        result = result.replace("?", ".")
+        let result = prompt.replaceAll("_", "-")
+        result = result.replaceAll("*", "star")
+        result = result.replaceAll("#", "pound")
+        result = result.replaceAll("@", "at")
+        result = result.replaceAll("&", "and")
+        result = result.replaceAll("(", "")
+        result = result.replaceAll(")", "")
+        result = result.replaceAll("%", "")
+        result = result.replaceAll("$", "")
+        result = result.replaceAll("!", ".")
+        result = result.replaceAll("?", ".")
         return result
     }
 
