@@ -57,6 +57,7 @@ class ExcelReader {
                         }
                         let rawDestination = menuData[destinationKey]
                         let destination = rawDestination.toString().replace(/\D/g,'')
+                        this.isolateExtension(rawDestination)
                         let action = new IVRKeyPress(keyPressIndex, translatedAction, destination)
                         menu.actions.push(action)
                     }
@@ -141,6 +142,65 @@ class ExcelReader {
         result = result.replaceAll("!", ".")
         result = result.replaceAll("?", ".")
         return result
+    }
+
+    /**
+     * Get the extension number from the destination string
+     * @param {string} rawDestination A string containing the raw destination data
+     * @returns The isolated extension number as a string
+     */
+    isolateExtension(rawDestination) {
+        if (rawDestination.includes("-")) {
+            // Split the string at the hyphen
+            let destinationParts = rawDestination.split("-")
+
+            for (let index = 0; index < destinationParts.length; index++) {
+                if (destinationParts[index].toLowerCase().includes("ext") && this.hasNumber(destinationParts[index])) {
+                    // This part contains "Ext." This is likely the extension number
+                    let result = destinationParts[index].toString().replace(/\D/g,'')
+                    console.log(`Part contains Ext. Extension likely found. (${result})`)
+                    console.log(`Raw: ${rawDestination}`)
+                    console.log(`Result: ${result}`)
+                    console.log("----------------------------")
+                }
+                if (!this.hasLetters(destinationParts[index])) {
+                    // This part contains only numbers. This is likely the extension number
+                    // It is legal for extension names to contain only numbers, but it's uncommon
+                    let result = destinationParts[index].toString().replace(/\D/g,'')
+                    console.log(`Part contains only numbers. Extension likely found`)
+                    console.log(`Raw: ${rawDestination}`)
+                    console.log(`Result: ${result}`)
+                    console.log("----------------------------")
+                }
+            }
+        }
+        else {
+            // The raw restination doesn't contain a hyphen, fallback to dumb isolation
+            // just removing any characters that aren't numbers
+            console.log("Raw destination does not contain a hyphen. Using dumb isolation")
+            console.log(`Raw: ${rawDestination}`)
+            console.log(`Result: ${rawDestination.toString().replace(/\D/g,'')}`)
+            console.log("-------------------------------------")
+            return rawDestination.toString().replace(/\D/g,'')
+        }
+    }
+
+    /**
+     * Check whether or not the input string contains numbers
+     * @param {string} input The input string
+     * @returns True if the input string contains numbers, false otherwise
+     */
+    hasNumber(input) {
+        return /\d/.test(input);
+    }
+
+    /**
+     * Check whether or not the input string contains letters
+     * @param {string} input The input string
+     * @returns True if the input string contains letters, false otherwise
+     */
+    hasLetters(input) {
+        return /[a-zA-Z]/g.test(input)
     }
 
 }
