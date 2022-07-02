@@ -56,8 +56,14 @@ class ExcelReader {
                             console.log('Translated Action: ' + translatedAction)
                         }
                         let rawDestination = menuData[destinationKey]
-                        let destination = rawDestination.toString().replace(/\D/g,'')
-                        this.isolateExtension(rawDestination)
+                        let destination = ""
+                        if (translatedAction != "ForwardToExternal") {
+                            destination = this.isolateExtension(rawDestination)
+                        }
+                        else {
+                            // The destination is a phone number. Use dumb isolation
+                            destination = rawDestination.toString().replace(/\D/g,'')
+                        }
                         let action = new IVRKeyPress(keyPressIndex, translatedAction, destination)
                         menu.actions.push(action)
                     }
