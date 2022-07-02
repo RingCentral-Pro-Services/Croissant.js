@@ -8,7 +8,9 @@ var SpecialKeyPress = require('./SpecialKeyPress')
  */
 class ExcelReader {
 
-    extensionRegex = /(x)\d+/g
+    extensionRegex = /(x)\d+/g  // Matches x-denoted extension numbers (Ex. x4796)
+    extRegex = /(ext)\s\d+/g    // Matches "ext" followed by numbers (Ex. ext 4796)
+    extRegex2 = /(ext.)\s\d+/g  // Matches "ext." followed by numbers (Ex. ext. 4796)
 
     constructor(excelFilePath) {
         const file = reader.readFile(excelFilePath)
@@ -156,12 +158,21 @@ class ExcelReader {
      * @returns The isolated extension number as a string
      */
     isolateExtension(rawDestination) {
-        if (rawDestination.includes("-")) {
+        if (this.containsXDenotedExtension(rawDestination)) {
+            // This part contains an 'x' followed by a number (Ex. x4250). This is likely the extension number
+            const result = rawDestination.match(this.extensionRegex).toString().replace(/\D/g,'')
+            console.log(`Raw Destination contains x[Number] extension format`)
+            console.log(`Raw: ${rawDestination}`)
+            console.log(`Result: ${result}`)
+            console.log("----------------------------")
+            return result
+        }
+        else if (rawDestination.includes("-")) {
             // Split the string at the hyphen
             let destinationParts = rawDestination.split("-")
 
             for (let index = 0; index < destinationParts.length; index++) {
-                if (destinationParts[index].toLowerCase().includes("ext") && this.hasNumber(destinationParts[index])) {
+                if (this.containsExt(destinationParts[index])) {
                     // This part contains "Ext." This is likely the extension number
                     let result = destinationParts[index].toString().replace(/\D/g,'')
                     console.log(`Part contains Ext. Extension likely found. (${result})`)
@@ -170,7 +181,7 @@ class ExcelReader {
                     console.log("----------------------------")
                     return result
                 }
-                if (!this.hasLetters(destinationParts[index])) {
+                else if (!this.hasLetters(destinationParts[index])) {
                     // This part contains only numbers. This is likely the extension number
                     // It is legal for extension names to contain only numbers, but it's uncommon
                     let result = destinationParts[index].toString().replace(/\D/g,'')
@@ -180,7 +191,7 @@ class ExcelReader {
                     console.log("----------------------------")
                     return result
                 }
-                if (this.containsExtension(destinationParts[index])) {
+                else if (this.containsXDenotedExtension(destinationParts[index])) {
                     // This part contains an 'x' followed by a number (Ex. x4250). This is likely the extension number
                     const result = destinationParts[index].match(this.extensionRegex).toString().replace(/\D/g,'')
                     console.log(`Part contains x[Number] extension format`)
@@ -220,8 +231,28 @@ class ExcelReader {
         return /[a-zA-Z]/g.test(input)
     }
 
-    containsExtension(input) {
+    /**
+     * Check whether or not the input string contains an x-denoted extension number
+     * For example, x4796
+     * @param {string} input The input string
+     * @returns True if the input string contains an x-denoted extension number
+     */
+    containsXDenotedExtension(input) {
         return /(x)\d+/g.test(input)
+    }
+
+    /**
+     * Check whether or not the input string contains an number preceded by "ext"
+     * @param {string} input The input string
+     */
+    containsExt(input) {
+        if (this.extRegex.test(input.toLowerCase())) {
+            return true
+        }
+        else if (this.extRegex2.test(input.toLowerCase())) {
+            return true
+        }
+        return false
     }
 
 }
