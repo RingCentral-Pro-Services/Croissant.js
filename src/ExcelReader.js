@@ -8,7 +8,7 @@ var SpecialKeyPress = require('./SpecialKeyPress')
  */
 class ExcelReader {
 
-    //data = []
+    extensionRegex = /(x)\d+/g
 
     constructor(excelFilePath) {
         const file = reader.readFile(excelFilePath)
@@ -162,6 +162,7 @@ class ExcelReader {
                     console.log(`Raw: ${rawDestination}`)
                     console.log(`Result: ${result}`)
                     console.log("----------------------------")
+                    return result
                 }
                 if (!this.hasLetters(destinationParts[index])) {
                     // This part contains only numbers. This is likely the extension number
@@ -171,6 +172,16 @@ class ExcelReader {
                     console.log(`Raw: ${rawDestination}`)
                     console.log(`Result: ${result}`)
                     console.log("----------------------------")
+                    return result
+                }
+                if (this.containsExtension(destinationParts[index])) {
+                    // This part contains an 'x' followed by a number (Ex. x4250). This is likely the extension number
+                    const result = destinationParts[index].match(this.extensionRegex).toString().replace(/\D/g,'')
+                    console.log(`Part contains x[Number] extension format`)
+                    console.log(`Raw: ${rawDestination}`)
+                    console.log(`Result: ${result}`)
+                    console.log("----------------------------")
+                    return result
                 }
             }
         }
@@ -201,6 +212,10 @@ class ExcelReader {
      */
     hasLetters(input) {
         return /[a-zA-Z]/g.test(input)
+    }
+
+    containsExtension(input) {
+        return /(x)\d+/g.test(input)
     }
 
 }
