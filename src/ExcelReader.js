@@ -161,10 +161,6 @@ class ExcelReader {
         if (this.containsXDenotedExtension(rawDestination)) {
             // This part contains an 'x' followed by a number (Ex. x4250). This is likely the extension number
             const result = rawDestination.match(this.extensionRegex).toString().replace(/\D/g,'')
-            console.log(`Raw Destination contains x[Number] extension format`)
-            console.log(`Raw: ${rawDestination}`)
-            console.log(`Result: ${result}`)
-            console.log("----------------------------")
             return result
         }
         else if (rawDestination.includes("-")) {
@@ -175,29 +171,17 @@ class ExcelReader {
                 if (this.containsExt(destinationParts[index])) {
                     // This part contains "Ext." This is likely the extension number
                     let result = destinationParts[index].toString().replace(/\D/g,'')
-                    console.log(`Part contains Ext. Extension likely found. (${result})`)
-                    console.log(`Raw: ${rawDestination}`)
-                    console.log(`Result: ${result}`)
-                    console.log("----------------------------")
                     return result
                 }
                 else if (!this.hasLetters(destinationParts[index])) {
                     // This part contains only numbers. This is likely the extension number
                     // It is legal for extension names to contain only numbers, but it's uncommon
                     let result = destinationParts[index].toString().replace(/\D/g,'')
-                    console.log(`Part contains only numbers. Extension likely found`)
-                    console.log(`Raw: ${rawDestination}`)
-                    console.log(`Result: ${result}`)
-                    console.log("----------------------------")
                     return result
                 }
                 else if (this.containsXDenotedExtension(destinationParts[index])) {
                     // This part contains an 'x' followed by a number (Ex. x4250). This is likely the extension number
                     const result = destinationParts[index].match(this.extensionRegex).toString().replace(/\D/g,'')
-                    console.log(`Part contains x[Number] extension format`)
-                    console.log(`Raw: ${rawDestination}`)
-                    console.log(`Result: ${result}`)
-                    console.log("----------------------------")
                     return result
                 }
             }
@@ -205,10 +189,6 @@ class ExcelReader {
         else {
             // The raw restination doesn't contain a hyphen, fallback to dumb isolation
             // just removing any characters that aren't numbers
-            console.log("Raw destination does not contain a hyphen. Using dumb isolation")
-            console.log(`Raw: ${rawDestination}`)
-            console.log(`Result: ${rawDestination.toString().replace(/\D/g,'')}`)
-            console.log("-------------------------------------")
             return rawDestination.toString().replace(/\D/g,'')
         }
     }
