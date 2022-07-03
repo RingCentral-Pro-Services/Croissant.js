@@ -26,7 +26,7 @@ class ExtensionIsolator {
 
             for (let index = 0; index < destinationParts.length; index++) {
                 if (this.containsExt(destinationParts[index])) {
-                    // This part contains "Ext." This is likely the extension number
+                    // This part contains "Ext" followed by a number. This is likely the extension number
                     return destinationParts[index].toString().replace(/\D/g,'')
                 }
                 else if (!this.hasLetters(destinationParts[index])) {
