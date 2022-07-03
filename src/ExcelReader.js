@@ -160,8 +160,7 @@ class ExcelReader {
     isolateExtension(rawDestination) {
         if (this.containsXDenotedExtension(rawDestination)) {
             // This part contains an 'x' followed by a number (Ex. x4250). This is likely the extension number
-            const result = rawDestination.match(this.extensionRegex).toString().replace(/\D/g,'')
-            return result
+            return rawDestination.match(this.extensionRegex).toString().replace(/\D/g,'')
         }
         else if (rawDestination.includes("-")) {
             // Split the string at the hyphen
@@ -170,19 +169,16 @@ class ExcelReader {
             for (let index = 0; index < destinationParts.length; index++) {
                 if (this.containsExt(destinationParts[index])) {
                     // This part contains "Ext." This is likely the extension number
-                    let result = destinationParts[index].toString().replace(/\D/g,'')
-                    return result
+                    return destinationParts[index].toString().replace(/\D/g,'')
                 }
                 else if (!this.hasLetters(destinationParts[index])) {
                     // This part contains only numbers. This is likely the extension number
                     // It is legal for extension names to contain only numbers, but it's uncommon
-                    let result = destinationParts[index].toString().replace(/\D/g,'')
-                    return result
+                    return destinationParts[index].toString().replace(/\D/g,'')
                 }
                 else if (this.containsXDenotedExtension(destinationParts[index])) {
                     // This part contains an 'x' followed by a number (Ex. x4250). This is likely the extension number
-                    const result = destinationParts[index].match(this.extensionRegex).toString().replace(/\D/g,'')
-                    return result
+                    return destinationParts[index].match(this.extensionRegex).toString().replace(/\D/g,'')
                 }
             }
         }
