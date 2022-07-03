@@ -39,10 +39,13 @@ class ExtensionIsolator {
                     return destinationParts[index].match(this.extensionRegex).toString().replace(/\D/g,'')
                 }
             }
+            
+            // Fallback to dumb isolation if extension number couldn't be deduced
+            return rawDestination.toString().replace(/\D/g,'')
         }
         else {
-            // The raw restination doesn't contain a hyphen, fallback to dumb isolation
-            // just removing any characters that aren't numbers
+            // Fallback to dumb isolation if the raw destination did not contain
+            // an x-denoted extension or a hyphen
             return rawDestination.toString().replace(/\D/g,'')
         }
     }
