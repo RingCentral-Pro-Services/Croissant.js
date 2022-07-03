@@ -58,7 +58,7 @@ class ExcelReader {
                         let rawDestination = menuData[destinationKey]
                         let destination = ""
                         if (translatedAction != "ForwardToExternal") {
-                            destination = extensionIsolator.isolateExtension(rawDestination)
+                            destination = extensionIsolator.isolateExtension(rawDestination.toString())
                         }
                         else {
                             // The destination is a phone number. Use dumb isolation
