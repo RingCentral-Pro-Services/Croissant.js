@@ -9,10 +9,6 @@ var ExtensionIsolator = require('./ExtensionIsolator')
  */
 class ExcelReader {
 
-    extensionRegex = /(x)\d+/g  // Matches x-denoted extension numbers (Ex. x4796)
-    extRegex = /(ext)\s\d+/g    // Matches "ext" followed by numbers (Ex. ext 4796)
-    extRegex2 = /(ext.)\s\d+/g  // Matches "ext." followed by numbers (Ex. ext. 4796)
-
     constructor(excelFilePath) {
         const file = reader.readFile(excelFilePath)
         this.data = []
