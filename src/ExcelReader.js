@@ -14,13 +14,24 @@ class ExcelReader {
         this.data = []
         const sheets = file.SheetNames
 
-        for (let i = 0; i < sheets.length; i++) {
-            if (file.SheetNames[i] == "IVRs") {
-                const temp = reader.utils.sheet_to_json(
-                    file.Sheets[file.SheetNames[i]])
-                    temp.forEach((res) => {
-                        this.data.push(res)
-                })
+        if (sheets.length == 1) {
+            // This excel file only has one sheet. Assume it's the IVRs sheet
+            const temp = reader.utils.sheet_to_json(
+                file.Sheets[file.SheetNames[0]])
+                temp.forEach((res) => {
+                    this.data.push(res)
+            })
+        }
+        else {
+            // Search for the IVRs sheet
+            for (let i = 0; i < sheets.length; i++) {
+                if (file.SheetNames[i] == "IVRs") {
+                    const temp = reader.utils.sheet_to_json(
+                        file.Sheets[file.SheetNames[i]])
+                        temp.forEach((res) => {
+                            this.data.push(res)
+                    })
+                }
             }
         }
     }
