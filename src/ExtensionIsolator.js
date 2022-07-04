@@ -16,10 +16,11 @@ class ExtensionIsolator {
      */
      isolateExtension(rawDestination) {
         if (this.containsXDenotedExtension(rawDestination)) {
-            // This part contains an 'x' followed by a number (Ex. x4250). This is likely the extension number
+            // The raw destination contains an 'x' followed by a number (Ex. x4250). This is likely the extension number
             return rawDestination.match(this.extensionRegex).toString().replace(/\D/g,'')
         }
         else if (this.containsExt(rawDestination)) {
+            //The raw destination contains "ext" followed by a number. This is likely the extension number
             return this.getExtensionNumber(rawDestination)
         }
         else if (rawDestination.includes("-")) {
@@ -27,18 +28,10 @@ class ExtensionIsolator {
             let destinationParts = rawDestination.split("-")
 
             for (let index = 0; index < destinationParts.length; index++) {
-                if (this.containsExt(destinationParts[index])) {
-                    // This part contains "Ext" followed by a number. This is likely the extension number
-                    return destinationParts[index].toString().replace(/\D/g,'')
-                }
-                else if (!this.hasLetters(destinationParts[index])) {
+                if (!this.hasLetters(destinationParts[index])) {
                     // This part contains only numbers. This is likely the extension number
                     // It is legal for extension names to contain only numbers, but it's uncommon
                     return destinationParts[index].toString().replace(/\D/g,'')
-                }
-                else if (this.containsXDenotedExtension(destinationParts[index])) {
-                    // This part contains an 'x' followed by a number (Ex. x4250). This is likely the extension number
-                    return destinationParts[index].match(this.extensionRegex).toString().replace(/\D/g,'')
                 }
             }
             
