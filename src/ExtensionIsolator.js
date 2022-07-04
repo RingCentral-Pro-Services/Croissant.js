@@ -5,8 +5,7 @@
 class ExtensionIsolator {
 
     extensionRegex = /(x)\d+/g  // Matches x-denoted extension numbers (Ex. x4796)
-    extRegex = /(ext)\s\d+/g    // Matches "ext" followed by numbers (Ex. ext 4796)
-    extRegex2 = /(ext.)\s\d+/g  // Matches "ext." followed by numbers (Ex. ext. 4796)
+    extRegex = /(ext)(.?)\s\d+/g  // Matches "ext." followed by numbers (Ex. ext. 4796)
 
     constructor() {}
 
@@ -19,6 +18,9 @@ class ExtensionIsolator {
         if (this.containsXDenotedExtension(rawDestination)) {
             // This part contains an 'x' followed by a number (Ex. x4250). This is likely the extension number
             return rawDestination.match(this.extensionRegex).toString().replace(/\D/g,'')
+        }
+        else if (this.containsExt(rawDestination)) {
+            return this.getExtensionNumber(rawDestination)
         }
         else if (rawDestination.includes("-")) {
             // Split the string at the hyphen
@@ -83,13 +85,22 @@ class ExtensionIsolator {
      * @param {string} input The input string
      */
     containsExt(input) {
-        if (this.extRegex.test(input.toLowerCase())) {
-            return true
-        }
-        else if (this.extRegex2.test(input.toLowerCase())) {
+        if (/(ext)(.?)\s\d+/g.test(input.toLowerCase())) {
             return true
         }
         return false
+    }
+
+    /**
+     * Get the extension number from strings containing ext followed by a number
+     * @param {string} input The input string
+     */
+    getExtensionNumber(input) {
+        if (this.extRegex.test(input.toLowerCase())) {
+            console.log("Matches Ext2")
+            return input.toLowerCase().match(this.extRegex).toString().replace(/\D/g,'')
+        }
+        return ""
     }
 
 }
