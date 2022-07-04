@@ -96,11 +96,7 @@ class ExtensionIsolator {
      * @param {string} input The input string
      */
     getExtensionNumber(input) {
-        if (this.extRegex.test(input.toLowerCase())) {
-            console.log("Matches Ext2")
-            return input.toLowerCase().match(this.extRegex).toString().replace(/\D/g,'')
-        }
-        return ""
+        return input.toLowerCase().match(this.extRegex).toString().replace(/\D/g,'')    
     }
 
 }
