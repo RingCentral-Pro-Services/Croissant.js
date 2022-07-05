@@ -137,7 +137,7 @@ class ExcelReader {
             return "ReturnToRootMenu"
         }
         else {
-            return "ForwardToExtension"
+            return rawAction
         }
     }
 
