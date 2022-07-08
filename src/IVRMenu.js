@@ -7,6 +7,7 @@ class IVRMenu {
     name = ""
     extensionNumber = ""
     prompt = ""
+    id = 0
     language = "English (United States)"
     actions = []
     specialKeys = []
