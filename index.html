@@ -260,6 +260,9 @@ window.onload=function(){
       else if (originalFilename.includes('.xml')) {
         outputFilename = originalFilename.replace('.xml', '.csv')
       }
+	  else if (originalFilename.includes(".csv")) {
+		outputFilename = originalFilename.replace('.csv', '.xml')
+	  }
 	  messages.innerHTML = 'Waiting for server'
         
         // Send the file to the server
@@ -301,7 +304,7 @@ window.onload=function(){
     
     <!-- Upload  -->
     <form id="file-upload-form" class="uploader">
-      <input id="file-upload" type="file" name="fileUpload" accept=".xlsx, .xml" />
+      <input id="file-upload" type="file" name="fileUpload" accept=".xlsx, .xml, .csv" />
     
       <label for="file-upload" id="file-drag">
         <img id="file-image" src="#" alt="Preview" class="hidden">
