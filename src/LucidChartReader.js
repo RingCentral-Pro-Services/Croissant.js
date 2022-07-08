@@ -150,17 +150,15 @@ class LucidChartReader {
 
     /**
      * Get the external phone number associated with a given ID
-     * For now, this just uses dumb isolation, just removing any
-     * characters that aren't numbers. This will likely need to
-     * be updated to use regular expressions to isolate the phone
-     * number
      * @param {string} id The ID of the entity
      * @returns The phone number that corresponds to thte given ID
      */
     getExternalNumberForID(id) {
+        const isolator = new ExtensionIsolator()
+
         for (let index = 0; index < this.rowData.length; index++) {
             if (this.rowData[index]["Id"] == id) {
-                return this.rowData[index]["Text Area 1"].toString().replace(/\D/g,'')
+                return isolator.isolatePhoneNumber(this.rowData[index]["Text Area 1"])
             }
         }
     }
