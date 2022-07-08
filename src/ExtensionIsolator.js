@@ -4,8 +4,11 @@
  */
 class ExtensionIsolator {
 
-    extensionRegex = /(x)\d+/g  // Matches x-denoted extension numbers (Ex. x4796)
+    extensionRegex = /(x)\d+/g    // Matches x-denoted extension numbers (Ex. x4796)
     extRegex = /(ext)(.?)\s\d+/g  // Matches "ext." followed by numbers (Ex. ext. 4796)
+
+    // Matches 10-digit phone numbers
+    tenDigitPhoneNumber = /[(]?([0-9]{3})[)]?[-|.|\s]?([0-9]{3})[-|.|\s]?([0-9]{4})/g
 
     constructor() {}
 
@@ -43,6 +46,15 @@ class ExtensionIsolator {
             // an x-denoted extension or a hyphen
             return rawDestination.toString().replace(/\D/g,'')
         }
+    }
+
+    /**
+     * Get the phone number from the destination string
+     * @param {string} rawDestination A string containing the raw destination data
+     * @returns The isolated phone number as a string
+     */
+    isolatePhoneNumber(rawDestination) {
+        return rawDestination.match(this.tenDigitPhoneNumber).toString().replace(/\D/g,'')
     }
 
     /**
