@@ -7,16 +7,8 @@ class ExtensionIsolator {
     extensionRegex = /(x)\d+/g    // Matches x-denoted extension numbers (Ex. x4796)
     extRegex = /(ext)(.?)\s\d+/g  // Matches "ext." followed by numbers (Ex. ext. 4796)
 
-    // Matches numbers in the North American Numbering Plan
-    //nampNumber = /([+][\d]+[\s])?([\d]-)?[(]?([0-9]{3})[)]?[-|.|\s]?([0-9]{3})[-|.|\s]?([0-9]{4})/g
-
+    // Matches a phone number
     phoneNumber = /([+][\d]+[\s])?([\d]-)?[(]?([0-9]+)[)]?[-|.|\s]?([0-9]+)[-|.|\s]?([0-9]+)/g
-
-    // Matches a plus (+) followed by one or more numbers
-    fullNumber = /([+])(\d+)/g
-
-    // Matches internation phone numbers
-    internationalNumber = /([+])(\d+)[\s]?[(]?(\d+)[)]?[-.\s]?(\d+)[-.\s]?(\d+)/g
 
     constructor() {}
 
