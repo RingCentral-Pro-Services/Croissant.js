@@ -7,7 +7,6 @@ var XMLWriter = require('./XMLWriter')
 var XMLReader = require('./XMLReader')
 var AuditWriter = require('./AuditWriter')
 var path = require("path");
-var EmailManager = require('./EmailManager')
 const { Client } = require('pg');
 var DatabaseManager = require('./DatabaseManager')
 var LucidChartReader = require('./LucidChartReader')
