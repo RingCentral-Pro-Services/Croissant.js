@@ -89,10 +89,15 @@ var server = http.createServer(function (req, res) {
                 res.end()
               })
             }
-            
-            //res.end()
      });
-      } else {
+      }
+      else if (req.url == "/link.png") {
+        console.log("Serving PNG")
+        res.writeHead(200, {'Content-Type': 'image/png'});
+        var absolutePath = path.resolve('./link.png');
+        fs.createReadStream(absolutePath).pipe(res)
+      } 
+      else {
         res.writeHead(200, {'Content-Type': 'text/html'});
         var absolutePath = path.resolve('./index.html');
         fs.createReadStream(absolutePath).pipe(res)
