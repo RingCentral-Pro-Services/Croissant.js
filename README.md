@@ -7,7 +7,10 @@ Node 16.5.1
 ## Installation
 
 ### Clone the repo
-[Repo link here]
+```bash
+git clone https://github.com/RingCentral-Pro-Services/Croissant.js.git
+cd Croissant.js
+```
 
 ### Install depedencies
 `npm install`
