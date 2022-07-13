@@ -7,7 +7,6 @@ var XMLWriter = require('./XMLWriter')
 var XMLReader = require('./XMLReader')
 var AuditWriter = require('./AuditWriter')
 var path = require("path");
-const { Client } = require('pg');
 var LucidChartReader = require('./LucidChartReader')
 
 var server = http.createServer(function (req, res) {
