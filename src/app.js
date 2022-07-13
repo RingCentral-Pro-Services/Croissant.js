@@ -8,7 +8,6 @@ var XMLReader = require('./XMLReader')
 var AuditWriter = require('./AuditWriter')
 var path = require("path");
 const { Client } = require('pg');
-var DatabaseManager = require('./DatabaseManager')
 var LucidChartReader = require('./LucidChartReader')
 
 var server = http.createServer(function (req, res) {
@@ -26,17 +25,6 @@ var server = http.createServer(function (req, res) {
               let menus = reader.getMenus()
               let xmlWriter = new XMLWriter(menus)
 
-              // Get the total number of key presses
-              let keyPressCount = 0
-              console.log(menus.length)
-              menus.forEach(element => {
-                keyPressCount += element.actions.length
-            });
-
-              let database = new DatabaseManager()
-              database.logXML(menus.length, keyPressCount)
-              database.logFile(files.filetoupload.originalFilename, menus.length, keyPressCount)
-
               res.setHeader('Content-Length', xmlWriter.xmlData.length);
               res.setHeader('Content-Type', 'text/xml');
               res.setHeader('Content-Disposition', 'attachment; filename=' + resultingFilename);
@@ -48,16 +36,6 @@ var server = http.createServer(function (req, res) {
               let xmlReader = new XMLReader(filePath)
               let menus = xmlReader.getMenus()
               let auditWriter = new AuditWriter(menus)
-
-              // Get the total number of key presses
-              let keyPressCount = 0
-              menus.forEach(element => {
-                keyPressCount += element.actions.length
-            });
-
-              let database = new DatabaseManager()
-              database.logCSV(menus.length, keyPressCount)
-              database.logFile(files.filetoupload.originalFilename, menus.length, keyPressCount)
 
               res.setHeader('Content-Length', auditWriter.csvData.length);
               res.setHeader('Content-Type', 'text/xml');
@@ -72,15 +50,6 @@ var server = http.createServer(function (req, res) {
                 let xmlWriter = new XMLWriter(menus)
                 let outputFilename = files.filetoupload.originalFilename.replace(".csv", ".xml")
 
-                // Get the total number of key presses
-                let keyPressCount = 0
-                menus.forEach(element => {
-                  keyPressCount += element.actions.length
-                });
-
-                let database = new DatabaseManager()
-                database.logFile(files.filetoupload.originalFilename, menus.length, keyPressCount)
-
                 res.setHeader('Content-Length', xmlWriter.xmlData.length);
                 res.setHeader('Content-Type', 'text/xml');
                 res.setHeader('Content-Disposition', 'attachment; filename=' + outputFilename);
@@ -91,7 +60,6 @@ var server = http.createServer(function (req, res) {
      });
       }
       else if (req.url == "/link.png") {
-        console.log("Serving PNG")
         res.writeHead(200, {'Content-Type': 'image/png'});
         var absolutePath = path.resolve('./link.png');
         fs.createReadStream(absolutePath).pipe(res)
