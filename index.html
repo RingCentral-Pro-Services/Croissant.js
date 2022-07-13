@@ -273,6 +273,10 @@ window.onload=function(){
        let res = fetch('/fileupload', {method: "POST", body: formData})
        .then(response => response.blob())
         .then(function(myBlob) {
+			gtag('event', 'file_download', {
+			'event_category' : 'dowloads',
+			'event_label' : outputFilename
+			});
             const a = document.createElement("a");
             var objectURL = URL.createObjectURL(myBlob);
             a.href = objectURL;
