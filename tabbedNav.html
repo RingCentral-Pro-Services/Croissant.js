@@ -65,7 +65,7 @@
                 })
             }
 
-            function openCity(evt, cityName) {
+            function openOption(evt, optionName) {
             var i, x, tablinks;
             x = document.getElementsByClassName("navigation-option");
             for (i = 0; i < x.length; i++) {
@@ -75,7 +75,7 @@
             for (i = 0; i < x.length; i++) {
                 tablinks[i].classList.remove("w3-red");
             }
-            document.getElementById(cityName).style.display = "block";
+            document.getElementById(optionName).style.display = "block";
             evt.currentTarget.classList.add("w3-red");
             }
 
@@ -90,9 +90,9 @@
                 <div class="w3-container">
                   <h5>Croissant&#8482;</h5>
                 </div>
-                <a href="javascript:void(0)" class="w3-bar-item w3-button tablink testbtn w3-red" onclick="openCity(event, 'create-menus')">Create Menus</a>
-                <a href="javascript:void(0)" class="w3-bar-item w3-button tablink" onclick="openCity(event, 'update-menus')">Update / Audit Menus</a>
-                <a href="javascript:void(0)" class="w3-bar-item w3-button tablink" onclick="openCity(event, 'Tokyo')">Something else lol</a>
+                <a href="javascript:void(0)" class="w3-bar-item w3-button tablink testbtn w3-red" onclick="openOption(event, 'create-menus')">Create Menus</a>
+                <a href="javascript:void(0)" class="w3-bar-item w3-button tablink" onclick="openOption(event, 'update-menus')">Update / Audit Menus</a>
+                <a href="javascript:void(0)" class="w3-bar-item w3-button tablink" onclick="openOption(event, 'Tokyo')">Something else lol</a>
               </div>
               
               <div style="margin-left:230px">
