@@ -16,10 +16,10 @@ var server = http.createServer(function (req, res) {
         form.parse(req, function (err, fields, files) {
 
             var filePath = files.filetoupload.filepath;
-            let resultingFilename = files.filetoupload.originalFilename.replace(".xlsx", ".xml")
             
             if (files.filetoupload.originalFilename.includes('.xlsx')) {
               // This is an excel file, process accordingly
+              let resultingFilename = files.filetoupload.originalFilename.replace(".xlsx", ".xml")
               const reader = new ExcelReader(filePath)
               let menus = reader.getMenus()
               let xmlWriter = new XMLWriter(menus)
@@ -32,6 +32,7 @@ var server = http.createServer(function (req, res) {
             }
             else if (files.filetoupload.originalFilename.includes('.xml')) {
               // This is an XML file, generate audit
+              let resultingFilename = files.filetoupload.originalFilename.replace(".xml", ".csv")
               let xmlReader = new XMLReader(filePath)
               let menus = xmlReader.getMenus()
               let auditWriter = new AuditWriter(menus)
