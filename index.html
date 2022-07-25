@@ -1,349 +1,153 @@
-<head>
-	<title>Croissant</title>
+<html>
+    <head>
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 
-    <style>
-        @import url(https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css);
- @import url('https://fonts.googleapis.com/css?family=Roboto');
- html, body, * {
-	 box-sizing: border-box;
-	 font-size: 16px;
-}
- html, body {
-	 height: 100%;
-	 text-align: center;
-}
- 
-.centeredbox {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+        <style>
+            .cont {
+                width: 50%;
+                height: 50%;
+            }
+            a {
+                text-decoration: none;
+            }
 
- body {
-	 padding: 2rem;
-	 background: #f8f8f8;
-}
- h2 {
-	 font-family: "Roboto", sans-serif;
-	 font-size: 26px;
-	 line-height: 1;
-	 color: #454cad;
-	 margin-bottom: 0;
-}
- p {
-	 font-family: "Roboto", sans-serif;
-	 font-size: 18px;
-	 color: #5f6982;
-}
+            a:visited {
+                text-decoration: none;
+            }
 
-a {
-	text-decoration: none;
-	color: #5f6982;
-}
+            a:hover {
+                text-decoration: none;
+            }
 
-a:visited {
-	text-decoration: none;
-}
+            a:active {
+                text-decoration: none;
+            }
 
-a:hover {
-	text-decoration: none;
-}
+            a:link {
+                text-decoration: none;
+            }
+        </style>
 
-a:active {
-	text-decoration: none;
-}
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-K9PZGNBVML"></script>
+        <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
 
-a:link {
-	text-decoration: none;
-}
+        gtag('config', 'G-K9PZGNBVML');
+        </script>
 
-.instructions {
-	display: block;
-	clear: both;
-	margin: 0 auto;
-	width: 100%;
-	max-width: 600px;
-	text-align: left;
-}
- .uploader {
-	 display: block;
-	 clear: both;
-	 margin: 0 auto;
-	 width: 100%;
-	 max-width: 600px;
-}
- .uploader label {
-	 float: left;
-	 clear: both;
-	 width: 100%;
-	 padding: 2rem 1.5rem;
-	 text-align: center;
-	 background: #fff;
-	 border-radius: 7px;
-	 border: 3px solid #eee;
-	 transition: all 0.2s ease;
-	 user-select: none;
-}
- .uploader label:hover {
-	 border-color: #454cad;
-}
- .uploader label.hover {
-	 border: 3px solid #454cad;
-	 box-shadow: inset 0 0 0 6px #eee;
-}
- .uploader label.hover #start i.fa {
-	 transform: scale(0.8);
-	 opacity: 0.3;
-}
- .uploader #start {
-	 float: left;
-	 clear: both;
-	 width: 100%;
-}
- .uploader #start.hidden {
-	 display: none;
-}
- .uploader #start i.fa {
-	 font-size: 50px;
-	 margin-bottom: 1rem;
-	 transition: all 0.2s ease-in-out;
-}
- .uploader #response {
-	 float: left;
-	 clear: both;
-	 width: 100%;
-}
- .uploader #response.hidden {
-	 display: none;
-}
- .uploader #response #messages {
-	 margin-bottom: 0.5rem;
-}
- .uploader #file-image {
-	 display: inline;
-	 margin: 0 auto 0.5rem auto;
-	 width: auto;
-	 height: auto;
-	 max-width: 180px;
-}
- .uploader #file-image.hidden {
-	 display: none;
-}
- .uploader #notimage {
-	 display: block;
-	 float: left;
-	 clear: both;
-	 width: 100%;
-}
- .uploader #notimage.hidden {
-	 display: none;
-}
- .uploader progress, .uploader .progress {
-	 display: inline;
-	 clear: both;
-	 margin: 0 auto;
-	 width: 100%;
-	 max-width: 180px;
-	 height: 8px;
-	 border: 0;
-	 border-radius: 4px;
-	 background-color: #eee;
-	 overflow: hidden;
-}
- .uploader .progress[value]::-webkit-progress-bar {
-	 border-radius: 4px;
-	 background-color: #eee;
-}
- .uploader .progress[value]::-webkit-progress-value {
-	 background: linear-gradient(to right, #393f90 0%, #454cad 50%);
-	 border-radius: 4px;
-}
- .uploader .progress[value]::-moz-progress-bar {
-	 background: linear-gradient(to right, #393f90 0%, #454cad 50%);
-	 border-radius: 4px;
-}
- .uploader input[type="file"] {
-	 display: none;
-}
- .uploader div {
-	 margin: 0 0 0.5rem 0;
-	 color: #5f6982;
-}
- .uploader .btn {
-	 display: inline-block;
-	 margin: 0.5rem 0.5rem 1rem 0.5rem;
-	 clear: both;
-	 font-family: inherit;
-	 font-weight: 700;
-	 font-size: 14px;
-	 text-decoration: none;
-	 text-transform: initial;
-	 border: none;
-	 border-radius: 0.2rem;
-	 outline: none;
-	 padding: 0 1rem;
-	 height: 36px;
-	 line-height: 36px;
-	 color: #fff;
-	 transition: all 0.2s ease-in-out;
-	 box-sizing: border-box;
-	 background: #454cad;
-	 border-color: #454cad;
-	 cursor: pointer;
-}
- 
-    </style>
+        <script>
+            window.onload=function(){
+                // Add event listeners
+                let createMenuFilepicker = document.getElementById("create-menu-file-upload")
+                let updateMenuFilepicker = document.getElementById("update-menu-file-upload")
 
-	<!-- Global site tag (gtag.js) - Google Analytics -->
-	<script async src="https://www.googletagmanager.com/gtag/js?id=G-K9PZGNBVML"></script>
-	<script>
-	window.dataLayer = window.dataLayer || [];
-	function gtag(){dataLayer.push(arguments);}
-	gtag('js', new Date());
+                createMenuFilepicker.addEventListener('change', (e) => {
+                    const [file] = e.target.files
+                    let fileNameLabel = document.getElementById("create-menu-filename")
+                    fileNameLabel.innerHTML = file.name
+                    gtag('event', 'create-menu', {
+                    'event_category' : 'dowloads',
+                    'event_label' : file.name
+                    });
+                })
 
-	gtag('config', 'G-K9PZGNBVML');
-	</script>
+                updateMenuFilepicker.addEventListener('change', (e) => {
+                    const [file] = e.target.files
+                    let updateMenuLabel = document.getElementById("update-menu-filename")
+                    updateMenuLabel.innerHTML = file.name
+                    gtag('event', 'update-audit', {
+                    'event_category' : 'dowloads',
+                    'event_label' : file.name
+                    });
+                })
+            }
 
-    <script>
+            function openOption(evt, optionName) {
+            var i, x, tablinks;
+            x = document.getElementsByClassName("navigation-option");
+            for (i = 0; i < x.length; i++) {
+                x[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablink");
+            for (i = 0; i < x.length; i++) {
+                tablinks[i].classList.remove("w3-red");
+            }
+            document.getElementById(optionName).style.display = "block";
+            evt.currentTarget.classList.add("w3-red");
+            }
 
-window.onload=function(){
-    ekUpload()
-}
-
-        function ekUpload(){
-    function Init() {
-  
-      console.log("Upload Initialised");
-  
-      var fileSelect    = document.getElementById('file-upload'),
-          fileDrag      = document.getElementById('file-drag'),
-          submitButton  = document.getElementById('submit-button');
-  
-      fileSelect.addEventListener('change', fileSelectHandler, false);
-  
-      // Is XHR2 available?
-      var xhr = new XMLHttpRequest();
-      if (xhr.upload) {
-        // File Drop
-        fileDrag.addEventListener('dragover', fileDragHover, false);
-        fileDrag.addEventListener('dragleave', fileDragHover, false);
-        fileDrag.addEventListener('drop', fileSelectHandler, false);
-      }
-    }
-  
-    function fileDragHover(e) {
-      var fileDrag = document.getElementById('file-drag');
-  
-      e.stopPropagation();
-      e.preventDefault();
-  
-      fileDrag.className = (e.type === 'dragover' ? 'hover' : 'modal-body file-upload');
-    }
-  
-    function fileSelectHandler(e) {
-      // Fetch FileList object
-      var files = e.target.files || e.dataTransfer.files;
-
-	  document.getElementById('notimage').classList.remove("hidden");
-	  var messages = document.getElementById('notimage')
-  
-      // Cancel event and hover styling
-      fileDragHover(e);
-
-      // Get the filename
-      let originalFilename = files[0].name
-      let outputFilename = "output.xml"
-
-      if (originalFilename.includes('.xlsx')) {
-        outputFilename = originalFilename.replace('.xlsx', '.xml')
-      }
-      else if (originalFilename.includes('.xml')) {
-        outputFilename = originalFilename.replace('.xml', '.csv')
-      }
-	  else if (originalFilename.includes(".csv")) {
-		outputFilename = originalFilename.replace('.csv', '.xml')
-	  }
-	  messages.innerHTML = 'Waiting for server'
-        
-        // Send the file to the server
-       let file = files[0]
-       let formData = new FormData()
-
-       formData.append("filetoupload", files[0])
-       let res = fetch('/fileupload', {method: "POST", body: formData})
-       .then(response => response.blob())
-        .then(function(myBlob) {
-			gtag('event', 'file_download', {
-			'event_category' : 'dowloads',
-			'event_label' : outputFilename
-			});
-            const a = document.createElement("a");
-            var objectURL = URL.createObjectURL(myBlob);
-            a.href = objectURL;
-            a.download = outputFilename;
-            a.click();
-			messages.innerHTML = "Done"
-			window.setTimeout(clearProgressBar, 5000)
-            //delete a
-        });
-    }
-
-	function clearProgressBar() {
-		document.getElementById('notimage').classList.add("hidden");
-	}
-  
-    // Check for the various File API support.
-    if (window.File && window.FileList && window.FileReader) {
-      Init();
-    } else {
-      document.getElementById('file-drag').style.display = 'none';
-    }
-  }
-  ekUpload();
-    </script>
-</head>
-
-<body>
-    <p class="lead"><b>Upload a BRD or an XML file</b></p>
-    
-    <!-- Upload  -->
-    <form id="file-upload-form" class="uploader">
-      <input id="file-upload" type="file" name="fileUpload" accept=".xlsx, .xml, .csv" />
-    
-      <label for="file-upload" id="file-drag">
-        <img id="file-image" src="#" alt="Preview" class="hidden">
-        <div id="start">
-          <i class="fa fa-download" aria-hidden="true"></i>
-          <div>Select a file or drag here</div>
-          <div id="notimage" class="hidden">Please select an image</div>
-          <span id="file-upload-btn" class="btn btn-primary">Select a file</span>
+            function clickElementWithID(id) {
+                document.getElementById(id).click();
+            }
+        </script>
+    </head>
+    <body>
+        <div class = "cont">
+            <div class="w3-sidebar w3-bar-block w3-light-grey w3-card" style="width:230px">
+                <div class="w3-container">
+                  <h5>Croissant&#8482;</h5>
+                </div>
+                <a href="javascript:void(0)" class="w3-bar-item w3-button tablink testbtn w3-red" onclick="openOption(event, 'create-menus')">Create Menus</a>
+                <a href="javascript:void(0)" class="w3-bar-item w3-button tablink" onclick="openOption(event, 'update-menus')">Update / Audit Menus</a>
+              </div>
+              
+              <div style="margin-left:230px">
+              
+                <div id="create-menus" class="w3-container navigation-option">
+                    <h2>Create Menus</h2>
+                    <form action="fileupload" method="post" enctype="multipart/form-data">
+                        <input hidden id="create-menu-file-upload" type="file" name="filetoupload" accept=".xlsx, .xml, .csv">
+                        <button type="button" style="width: 20%" class="w3-button w3-white w3-border w3-round-large" onclick="clickElementWithID('create-menu-file-upload')">Browse...</button>
+                        <p style="display: inline-block; padding-left: 5px; padding-right: 20px;" id="create-menu-filename">No file chosen</p>
+                        <input class="w3-button w3-white w3-border w3-round-large" type="submit">
+                    </form>
+                    <br>
+                    <p><b>Instructions</b></p>
+                    <p><b>Building from the BRD</b></p>
+                    <p>1. Export the BRD as an Excel file</p>
+                    <p>2. Upload the file into Croissant</p>
+                    <p>3. Check your downloads folder for the auto-generated XML file</p>
+                    <p>4. Upload the file in Service Web under Phone System > Auto-Receptionist > IVR Editor > Import</p>
+                    <p><b>Building from Lucidchart</b></p>
+                    <p>1. Export the Lucidchart, choosing CSV of Shape Data</p>
+                    <p>2. Upload the file into Croissant</p>
+                    <p>3. Check your downloads folder for the auto-generated XML file</p>
+                    <p>4. Upload the file in Service Web under Phone System > Auto-Receptionist > IVR Editor > Import</p>
+                    <p><b>Resources</b></p>
+                    <a href="https://docs.google.com/document/d/1xcF5H6KHnn-UF_vgAq7LEKJBa-g4XKBY3YvH0or-9HQ/edit?usp=sharing" target="_blank">Documentation</a>
+                    <img src="link.png" style="width:10px;height:10px;">
+                    <br>
+                    <a href="https://docs.google.com/spreadsheets/d/1mEaZVjjmesskNf47Dz0jMgPgZDKZ13PISgqiNyyMNos/edit?usp=sharing" target="_blank">Example BRD</a>
+                    <img src="link.png" style="width:10px;height:10px;">
+                    <br>
+                    <a href="https://lucid.app/lucidchart/51421e0f-912e-47ca-a063-59d43cf436fd/edit?viewport_loc=-1505%2C-1165%2C5370%2C2692%2C0_0&invitationId=inv_50c4ff9e-896f-4ddc-b3df-ccd0251074b5#" target="_blank">Example Lucidchart</a>
+                    <img src="link.png" style="width:10px;height:10px;">
+                </div>
+              
+                <div id="update-menus" style="display:none" class="w3-container navigation-option">
+                    <h2>Update / Audit Menus</h2>
+                    <form action="fileupload" method="post" enctype="multipart/form-data">
+                        <input hidden id="update-menu-file-upload" type="file" name="filetoupload" accept=".xlsx, .xml, .csv">
+                        <button type="button" style="width: 20%" class="w3-button w3-white w3-border w3-round-large" onclick="clickElementWithID('update-menu-file-upload')">Browse...</button>
+                        <p style="display: inline-block; padding-left: 5px; padding-right: 20px;" id="update-menu-filename">No file chosen</p>
+                        <input class="w3-button w3-white w3-border w3-round-large" type="submit">
+                    </form>
+                    <br>
+                    <p><b>Instructions</b></p>
+                    <p>1. Export an XML file from Service Web under Phone System > Auto-Receptionist > IVR Editor > Export</p>
+                    <p>2. Upload the file into Croissant</p>
+                    <p>3. Open the generated CSV file in Excel, make your changes, and save it as an Excel file</p>
+                    <p>4. Upload the new Excel file into Croissant</p>
+                    <p>5. Upload the XML file in Service Web under Phone System > Auto-Receptionist > IVR Editor > Import</p>
+                    <p><b>Resources</b></p>
+                    <a href="https://docs.google.com/document/d/1xcF5H6KHnn-UF_vgAq7LEKJBa-g4XKBY3YvH0or-9HQ/edit?usp=sharing" target="_blank">Documentation</a>
+                    <img src="link.png" style="width:10px;height:10px;">
+                </div>
+              
+              </div>
         </div>
-        <div id="response" class="hidden">
-          <div id="messages"></div>
-          <progress class="progress" id="file-progress" value="0">
-            <span>0</span>%
-          </progress>
-        </div>
-      </label>
-	 <div class="instructions">
-		<br>
-		<p align="left"style="font-size: 14px;"><b>Building Menus</b></p>
-		<p align="left"style="font-size: 14px;">1. Export the BRD as an Excel file</p>
-		<p align="left" style="font-size: 14px;">2. Upload the file into Croissant</p>
-		<p align="left" style="font-size: 14px;">3. Check your downloads folder for the auto-generated XML file</p>
-		<p align="left" style="font-size: 14px;">4. Upload the file in Service Web under Phone System > Auto-Receptionist > IVR Editor > Import</p>
-		<p align="left"style="font-size: 15px;"><b>Updating or Auditing Menus</b></p>
-		<p align="left"style="font-size: 14px;">1. Export an XML file from Service Web under Phone System > Auto-Receptionist > IVR Editor > Export</p>
-		<p align="left" style="font-size: 14px;">2. Upload the file into Croissant</p>
-		<p align="left" style="font-size: 14px;">3. Open the generated CSV file in Excel, make your changes, and save it as an Excel file</p>
-		<p align="left" style="font-size: 14px;">4. Upload the new Excel file into Croissant</p>
-		<p align="left" style="font-size: 14px;">5. Upload the generated XML file in Service Web under Phone System > Auto-Receptionist > IVR Editor > Import</p>
-		<p align="left"style="font-size: 14px;"><b>Resources</b></p>
-		<a href="https://docs.google.com/document/d/1xcF5H6KHnn-UF_vgAq7LEKJBa-g4XKBY3YvH0or-9HQ/edit?usp=sharing" target="_blank" style="font-family: Roboto; font-size: 14px;">Documentation</a>
-		<img src="link.png" style="width:10px;height:10px;">
-		<br>
-		<a href="https://docs.google.com/spreadsheets/d/1mEaZVjjmesskNf47Dz0jMgPgZDKZ13PISgqiNyyMNos/edit?usp=sharing" target="_blank" style="font-family: Roboto; font-size: 14px;">Example BRD</a>
-		<img src="link.png" style="width:10px;height:10px;">
-	 </div>
-    </form>
-</body>
+    </body>
+</html>
