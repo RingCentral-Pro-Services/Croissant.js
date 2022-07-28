@@ -134,7 +134,7 @@
               
                 <div id="update-menus" style="display:none" class="w3-container navigation-option">
                     <h2>Update / Audit Menus</h2>
-                    <form action="fileupload" method="post" enctype="multipart/form-data">
+                    <form action="audit" method="post" enctype="multipart/form-data">
                         <input hidden id="update-menu-file-upload" type="file" name="filetoupload" accept=".xlsx, .xml, .csv">
                         <button type="button" style="width: 20%" class="w3-button w3-white w3-border w3-round-large" onclick="clickElementWithID('update-menu-file-upload')">Browse...</button>
                         <p style="display: inline-block; padding-left: 5px; padding-right: 20px;" id="update-menu-filename">No file chosen</p>
@@ -144,8 +144,8 @@
                     <p><b>Instructions</b></p>
                     <p>1. Export an XML file from Service Web under Phone System > Auto-Receptionist > IVR Editor > Export</p>
                     <p>2. Upload the file into Croissant</p>
-                    <p>3. Open the generated CSV file in Excel, make your changes, and save it as an Excel file</p>
-                    <p>4. Upload the new Excel file into Croissant</p>
+                    <p>3. Open the generated Excel file, make your changes, and save it</p>
+                    <p>4. Upload the edited Excel file into Croissant</p>
                     <p>5. Upload the XML file in Service Web under Phone System > Auto-Receptionist > IVR Editor > Import</p>
                     <p><b>Resources</b></p>
                     <a href="https://docs.google.com/document/d/1xcF5H6KHnn-UF_vgAq7LEKJBa-g4XKBY3YvH0or-9HQ/edit?usp=sharing" target="_blank">Documentation</a>

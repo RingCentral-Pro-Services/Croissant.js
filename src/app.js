@@ -8,6 +8,7 @@ var XMLReader = require('./XMLReader')
 var AuditWriter = require('./AuditWriter')
 var path = require("path");
 var LucidChartReader = require('./LucidChartReader')
+var ExcelAuditWriter = require('./ExcelAuditWriter')
 
 var server = http.createServer(function (req, res) {
 
@@ -58,6 +59,27 @@ var server = http.createServer(function (req, res) {
               })
             }
      });
+      }
+      else if (req.url == "/audit") {
+        var form = new formidable.IncomingForm();
+
+        form.parse(req, function (err, fields, files) {
+
+          var filePath = files.filetoupload.filepath;
+          let resultingFilename = files.filetoupload.originalFilename.replace(".xml", ".xlsx")
+          let xmlReader = new XMLReader(filePath)
+          let menus = xmlReader.getMenus()
+
+          let auditWriter = new ExcelAuditWriter(menus)
+          let data = auditWriter.data()
+
+          res.setHeader('Content-Length', data.length);
+          res.setHeader('Content-Type', 'text/xml');
+          res.setHeader('Content-Disposition', 'attachment; filename=' + resultingFilename);
+          res.write(data, 'binary');
+          res.end()
+          
+        });
       }
       else if (req.url == "/link.png") {
         res.writeHead(200, {'Content-Type': 'image/png'});
