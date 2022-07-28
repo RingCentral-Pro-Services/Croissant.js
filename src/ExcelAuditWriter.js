@@ -33,7 +33,6 @@ class ExcelAuditWriter {
      * Add all menu data to the audit data array
      */
     writeMenuData() {
-        console.log(`Writing menu data to ${this.menus.length} menus`)
         for (let index = 0; index < this.menus.length; index++) {
             let menuData = [this.menus[index].name, this.menus[index].extensionNumber, this.menus[index].prompt]
 
