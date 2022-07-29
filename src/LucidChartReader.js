@@ -107,6 +107,9 @@ class LucidChartReader {
                             let action = new IVRKeyPress(key, "ForwardToVoiceMail", extensionNumber)
                             this.menus[menuIndex].actions.push(action)
                         }
+                        else if (destinationType == "Prompts") {
+                            this.menus[menuIndex].prompt = this.getPromptForID(lineDestinationID)
+                        }
                         else {
                             // This code is commented out for now, it's related to the automatic extension number generation
                             // Create a forward to extension action and add it to the menu
@@ -198,6 +201,20 @@ class LucidChartReader {
         }
         console.log(`No extension for: ${name}|`)
         return -1
+    }
+
+    /**
+     * Get the prompt associated with the given ID
+     * @param {string} id The ID of the prompt shape
+     * @returns The prompt associated with the give ID, or an empty string if not found
+     */
+    getPromptForID(id) {
+        for (let index = 0; index < this.rowData.length; index++) {
+            if (this.rowData[index]["Id"] == id) {
+                return this.rowData[index]["Text Area 1"].replace("IVR Prompt: \n", "")
+            }
+        }
+        return ""
     }
 
     /**
