@@ -8,7 +8,7 @@ var XMLReader = require('./XMLReader')
 var AuditWriter = require('./AuditWriter')
 var path = require("path");
 var LucidChartReader = require('./LucidChartReader')
-var ExcelAuditWriter = require('./ExcelAuditWriter')
+const PrettyAuditWriter = require('./PrettyAuditWriter')
 
 var server = http.createServer(function (req, res) {
 
@@ -70,15 +70,15 @@ var server = http.createServer(function (req, res) {
           let xmlReader = new XMLReader(filePath)
           let menus = xmlReader.getMenus()
 
-          let auditWriter = new ExcelAuditWriter(menus)
-          let data = auditWriter.data()
-
-          res.setHeader('Content-Length', data.length);
-          res.setHeader('Content-Type', 'text/xml');
-          res.setHeader('Content-Disposition', 'attachment; filename=' + resultingFilename);
-          res.write(data, 'binary');
-          res.end()
-          
+          const prettyAuditWriter = new PrettyAuditWriter(menus)
+          prettyAuditWriter.getData().then((data) => {
+            res.setHeader('Content-Length', data.length);
+            res.setHeader('Content-Type', 'application/vnd.ms-excel  ');
+            res.setHeader('Content-Disposition', 'attachment; filename=' + resultingFilename);
+            res.write(data, 'binary');
+            res.end()
+          })
+        
         });
       }
       else if (req.url == "/link.png") {
