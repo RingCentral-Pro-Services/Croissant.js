@@ -53,15 +53,18 @@ class XMLReader {
         let prompt = ""
 
         let textToSpeech = menuData['Prompt'][0]['TextToSpeech']
-        //console.log("Text to speech: " + textToSpeech)
+        
         if (textToSpeech == 'true') {
             if ('Text' in menuData['Prompt'][0]) {
-                prompt = menuData['Prompt'][0]['Text']
+                if (menuData['Prompt'][0]['Text'] != undefined) {
+                    prompt = menuData['Prompt'][0]['Text'][0]
+                }
             }
         }
         else {
-            prompt = menuData['Prompt'][0]['Name']
-            //console.log(menuData['Prompt'][0]['Name'])
+            if (menuData['Prompt'][0]['Name'] != undefined) {
+                prompt = menuData['Prompt'][0]['Name'][0]
+            }
         }
 
         // if (textToSpeech == 'true') {
