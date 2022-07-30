@@ -13,7 +13,6 @@ class PrettyAuditWriter {
             workbook.xlsx.readFile("res/ivrs-brd.xlsx")
             .then (() => {
                 workbook.clearThemes()
-                console.log("workbook read")
                 this.writeMenuData()
 
                 const worksheet = workbook.getWorksheet('IVRs')
@@ -25,7 +24,6 @@ class PrettyAuditWriter {
                 .then((buffer) => {
                     resolve(buffer)
                 })
-                //resolve("bruh")
             })
         });
     }
