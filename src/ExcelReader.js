@@ -60,28 +60,32 @@ class ExcelReader {
                 if (actionKey in menuData) {
                     let translatedAction = this.translateMenuAction(menuData[actionKey])
 
-                    if (translatedAction != "ConnectToDialByNameDirectory") {
-                        if (!(destinationKey in menuData)) {
-                            console.log('Uh-oh. Destination key not found for key ' + actionKey + 'in ' + menu.name)
-                            console.log('Raw Action: ' + menuData[actionKey])
-                            console.log('Translated Action: ' + translatedAction)
-                        }
-                        let rawDestination = menuData[destinationKey]
-                        let destination = ""
-                        if (translatedAction != "ForwardToExternal") {
-                            destination = extensionIsolator.isolateExtension(rawDestination.toString())
+                    // Only add the key press if the cell is not empty
+                    // Regular expressions are probably a better solution here
+                    if (translatedAction != "") {
+                        if (translatedAction != "ConnectToDialByNameDirectory") {
+                            if (!(destinationKey in menuData)) {
+                                console.log('Uh-oh. Destination key not found for key ' + actionKey + 'in ' + menu.name)
+                                console.log('Raw Action: ' + menuData[actionKey])
+                                console.log('Translated Action: ' + translatedAction)
+                            }
+                            let rawDestination = menuData[destinationKey]
+                            let destination = ""
+                            if (translatedAction != "ForwardToExternal") {
+                                destination = extensionIsolator.isolateExtension(rawDestination.toString())
+                            }
+                            else {
+                                // The destination is a phone number. Use dumb isolation
+                                destination = rawDestination.toString().replace(/\D/g,'')
+                            }
+                            let action = new IVRKeyPress(keyPressIndex, translatedAction, destination)
+                            menu.actions.push(action)
                         }
                         else {
-                            // The destination is a phone number. Use dumb isolation
-                            destination = rawDestination.toString().replace(/\D/g,'')
+                            let destination = ""
+                            let action = new IVRKeyPress(keyPressIndex, translatedAction, destination)
+                            menu.actions.push(action)
                         }
-                        let action = new IVRKeyPress(keyPressIndex, translatedAction, destination)
-                        menu.actions.push(action)
-                    }
-                    else {
-                        let destination = ""
-                        let action = new IVRKeyPress(keyPressIndex, translatedAction, destination)
-                        menu.actions.push(action)
                     }
                 }
             }
@@ -89,15 +93,23 @@ class ExcelReader {
             // Add # Key if present
             if ('Key # Press' in menuData) {
                 let actionType = this.translateMenuAction(menuData['Key # Press'])
-                let specialKey = new SpecialKeyPress('#', actionType)
-                menu.specialKeys.push(specialKey)
+                // Only add the key press if the cell is not empty
+                // Regular expressions are probably a better solution here
+                if (actionType != "") {
+                    let specialKey = new SpecialKeyPress('#', actionType)
+                    menu.specialKeys.push(specialKey)
+                }
             }
 
             // Add * Key if present
             if ('Key * Press' in menuData) {
                 let actionType = this.translateMenuAction(menuData['Key * Press'])
-                let specialKey = new SpecialKeyPress('*', actionType)
-                menu.specialKeys.push(specialKey)
+                // Only add the key press if the cell is not empty
+                // Regular expressions are probably a better solution here
+                if (actionType != "") {
+                    let specialKey = new SpecialKeyPress('*', actionType)
+                    menu.specialKeys.push(specialKey)
+                }
             }
 
             menus.push(menu)
