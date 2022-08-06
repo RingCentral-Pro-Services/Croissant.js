@@ -9,6 +9,19 @@ var ExtensionIsolator = require('./ExtensionIsolator')
  */
 class ExcelReader {
 
+    // Maps the BRD's keypress actions to Service Web's keywords
+    actionMap = {
+        "Connect To IVR": "ForwardToExtension",
+        "Connect To Queue": "ForwardToExtension",
+        "Connect To Extension": "ForwardToExtension",
+        "Transfer to Voicemail of": "ForwardToVoiceMail",
+        "Connect to Dial-by-Name Directory": "ConnectToDialByNameDirectory",
+        "External Transfer": "ForwardToExternal",
+        "Repeat the Menu": "RepeatMenuGreeting",
+        "Return to the Previous Menu": "ReturnToPreviousMenu",
+        "Return to the Root Menu": "ReturnToRootMenu"
+    }
+
     constructor(excelFilePath) {
         const file = reader.readFile(excelFilePath)
         this.data = []
@@ -58,7 +71,7 @@ class ExcelReader {
                 let destinationKey = "Key " + keyPressIndex + " Destination"
 
                 if (actionKey in menuData) {
-                    let translatedAction = this.translateMenuAction(menuData[actionKey])
+                    const translatedAction = this.actionMap[menuData[actionKey]]
 
                     // Only add the key press if the cell is not empty
                     // Regular expressions are probably a better solution here
@@ -115,42 +128,6 @@ class ExcelReader {
             menus.push(menu)
         }
         return menus
-    }
-
-    /*
-    Translate the BRD's keypress actions into the portal's keywords
-    */
-    translateMenuAction(rawAction) {
-        if (rawAction == "Connect To IVR") {
-            return "ForwardToExtension"
-        }
-        else if (rawAction == "Connect To Queue") {
-            return "ForwardToExtension"
-        }
-        else if (rawAction == "Connect To Extension") {
-            return "ForwardToExtension"
-        }
-        else if (rawAction == "Transfer to Voicemail of") {
-            return "ForwardToVoiceMail"
-        }
-        else if (rawAction == "Connect to Dial-by-Name Directory") {
-            return "ConnectToDialByNameDirectory"
-        }
-        else if (rawAction == "External Transfer") {
-            return "ForwardToExternal"
-        }
-        else if (rawAction == "Repeat the Menu") {
-            return "RepeatMenuGreeting"
-        }
-        else if (rawAction == "Return to the Previous Menu") {
-            return "ReturnToPreviousMenu"
-        }
-        else if (rawAction == "Return to the Root Menu") {
-            return "ReturnToRootMenu"
-        }
-        else {
-            return rawAction
-        }
     }
 
     /**
