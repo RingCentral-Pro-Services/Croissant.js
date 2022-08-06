@@ -79,9 +79,11 @@ class LucidChartReader {
                 extensionName = extensionName.replace("\n", "")
 
                 let id = this.rowData[index]["Id"]
+                const pageName = this.pageMap[this.rowData[index]["Page ID"]]
 
                 let menu = new IVRMenu(extensionName, extensionNumber, "Thank you for calling.")
                 menu.id = id
+                menu.page = pageName
                 
                 if (!this.hasMenu(menu.extensionNumber)) {
                     this.menus.push(menu)
