@@ -45,7 +45,7 @@ class LucidChartReader {
                 console.log("Hey, we got a page")
                 let name = this.rowData[index]["Text Area 1"]
                 let id = this.rowData[index]["Id"]
-                this.pageMap[name] = id
+                this.pageMap[id] = name
             }
         }
     }
