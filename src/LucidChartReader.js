@@ -9,6 +9,7 @@ class LucidChartReader {
     rowData = []
     menus = []
     done = false
+    pageMap = {}
     extensionRegex = /(x)\d+/gi  // Matches x-denoted extension numbers (Ex. x4796)
     extRegex = /(ext)(.?)\s\d+/gi  // Matches "ext." followed by numbers (Ex. ext. 4796)
     extTBD = /(ext[.]?)([\s]?tbd[\s]?[\d]?)/gi
@@ -30,11 +31,23 @@ class LucidChartReader {
                 .pipe(parser({}))
                 .on('data', (data) => this.rowData.push(data))
                 .on('end', () => {
+                    this.createPageMap()
                     this.createMenus()
                     this.addKeyPresses()
                     resolve(this.menus);
                 });
         });
+    }
+
+    createPageMap() {
+        for (let index = 0; index < this.rowData.length; index++) {
+            if (this.rowData[index]["Name"] == "Page") {
+                console.log("Hey, we got a page")
+                let name = this.rowData[index]["Text Area 1"]
+                let id = this.rowData[index]["Id"]
+                this.pageMap[name] = id
+            }
+        }
     }
 
     /**
