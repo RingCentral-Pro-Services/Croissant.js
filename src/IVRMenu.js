@@ -11,6 +11,7 @@ class IVRMenu {
     language = "English (United States)"
     actions = []
     specialKeys = []
+    page = ""
 
     constructor(name, extensionNumber, prompt) {
         this.name = name
