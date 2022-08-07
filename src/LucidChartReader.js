@@ -58,19 +58,6 @@ class LucidChartReader {
             if (this.rowData[index]["Name"] == "IVR") {
                 let shapeText = this.rowData[index]["Text Area 1"]
 
-                // This code is commented out for now, it's related to the automatic extension number generation
-                // let extensionNumber = ""
-
-                // if (/(ext[.]?)([\s]?tbd)/gi.test(shapeText)) {
-                //     const extensionLength = shapeText.match(this.extTBD).toString().replace(/\D/g,'')
-                //     extensionNumber = this.generateRandomExtension(extensionLength)
-                //     console.log(`TBD Extension Length: ${extensionLength}`)
-                //     console.log(`Generated Extension: ${extensionNumber}`)
-                // }
-                // else {
-                //     extensionNumber = isolator.isolateExtension(shapeText.toString())
-                // }
-
                 let extensionNumber = isolator.isolateExtension(shapeText.toString())
                 let extensionName = shapeText.replace(this.extRegex, "")
                 extensionName = extensionName.replace(this.extensionRegex, "")
@@ -125,12 +112,6 @@ class LucidChartReader {
                             this.menus[menuIndex].prompt = this.getPromptForID(lineDestinationID)
                         }
                         else {
-                            // This code is commented out for now, it's related to the automatic extension number generation
-                            // Create a forward to extension action and add it to the menu
-                            // if (destinationType == "IVR") {
-                            //     let extensionName = this.getExtensionNameforID(lineDestinationID)
-                            //     extensionNumber = this.getExtensionforMenuName(extensionName.replace(this.extTBD, ""))
-                            // }
                             let action = new IVRKeyPress(key, "ForwardToExtension", extensionNumber)
                             this.menus[menuIndex].actions.push(action)
                         }
