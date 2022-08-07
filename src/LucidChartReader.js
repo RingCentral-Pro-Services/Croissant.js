@@ -42,7 +42,6 @@ class LucidChartReader {
     createPageMap() {
         for (let index = 0; index < this.rowData.length; index++) {
             if (this.rowData[index]["Name"] == "Page") {
-                console.log("Hey, we got a page")
                 let name = this.rowData[index]["Text Area 1"]
                 let id = this.rowData[index]["Id"]
                 this.pageMap[id] = name
