@@ -45,6 +45,10 @@
             .hidden {
                 display: none;
             }
+
+            .selection-button {
+                padding-bottom: 5px;
+            }
         </style>
 
         <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -99,7 +103,7 @@
             function clearFilters() {
                 let div = document.getElementById("filterBox")
 
-                while (div.childNodes.length > 2) {
+                while (div.childNodes.length > 6) {
                     div.removeChild(div.lastChild)
                 }
             }
@@ -184,6 +188,14 @@
                 }
             }
             }
+
+            function setAllSiteFilters(value) {
+                let checkboxes = document.getElementsByClassName("w3-check")
+
+                for (let index = 0; index < checkboxes.length; index++) {
+                    checkboxes[index].checked = value
+                }
+            }
         </script>
     </head>
     <body>
@@ -206,8 +218,10 @@
                         <p style="display: inline-block; padding-left: 5px; padding-right: 20px;" id="create-menu-filename">No file chosen</p>
                         <div class="w3-dropdown-click hidden" id="site-filter">
                             <button type="button" class="w3-button w3-white w3-border w3-round-large" onclick="dropFunction()">Site(s)</button>
-                            <div class="w3-dropdown-content w3-bar-block w3-card w3-light-grey" style="width: 200px;" id="filterBox">
-                              <input class="w3-input w3-padding" type="text" placeholder="Search.." id="myInput" onkeyup="filterFunction()">
+                            <div class="w3-dropdown-content w3-bar-block w3-card w3-light-grey" style="width: 210px;" id="filterBox">
+                              <input class="w3-input w3-padding" type="text" placeholder="Search.." id="myInput" onkeyup="filterFunction()" autocomplete="off">
+                              <button type="button" class="w3-button w3-white w3-border w3-round-large" style="display: inline; width: 95px;" onclick="setAllSiteFilters(true)">Select all</button>
+                              <button type="button" class="w3-button w3-white w3-border w3-round-large" onclick="setAllSiteFilters(false)">Deselect all</button>
                             </div>
                         </div>
                         <input class="w3-button w3-white w3-border w3-round-large" type="submit">
