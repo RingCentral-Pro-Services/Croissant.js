@@ -31,6 +31,20 @@
             a:link {
                 text-decoration: none;
             }
+
+            .checkbox-label {
+                display: inline-block;
+                padding-left: 5px;
+            }
+
+            .filter-item {
+                padding-left: 5px;
+                padding-bottom: 5px;
+            }
+
+            .hidden {
+                display: none;
+            }
         </style>
 
         <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -51,6 +65,18 @@
 
                 createMenuFilepicker.addEventListener('change', (e) => {
                     const [file] = e.target.files
+
+                    // If the file is a CSV, read the Page names and populate the filter box
+                    if (file.name.includes(".csv")) {
+                        document.getElementById("site-filter").classList.remove("hidden")
+                        clearFilters()
+                        readPageNames(file)
+                    }
+                    else {
+                        document.getElementById("site-filter").classList.add("hidden")
+                    }
+
+                    // Set the label text to the filename
                     let fileNameLabel = document.getElementById("create-menu-filename")
                     fileNameLabel.innerHTML = file.name
                     gtag('event', 'create-menu', {
@@ -70,6 +96,50 @@
                 })
             }
 
+            function clearFilters() {
+                let div = document.getElementById("filterBox")
+
+                while (div.childNodes.length > 2) {
+                    div.removeChild(div.lastChild)
+                }
+            }
+
+            function readPageNames(file) {
+                let reader = new FileReader()
+
+                reader.onload = function() {
+                    //console.log(reader.result);
+                    let rows = reader.result.split("\n")
+                    for (let index = 0; index < rows.length; index++) {
+                        let elements = rows[index].split(",")
+                        if (elements.length >= 12 && elements[1] == "Page") {
+                            let filterBox = document.getElementById("filterBox")
+
+                            var div = document.createElement('div');
+                            div.classList.add('filter-item')
+
+                            var checkbox = document.createElement('input');
+                            checkbox.type = 'checkbox';
+                            checkbox.id = elements[11]
+                            checkbox.name = 'page';
+                            checkbox.value = elements[11]
+                            checkbox.classList.add("w3-check")
+                            checkbox.checked = true
+
+                            let label = document.createElement("label")
+                            label.innerHTML = elements[11]
+                            label.htmlFor = elements[11]
+                            label.classList.add("checkbox-label")
+                            div.appendChild(checkbox)
+                            div.appendChild(label)
+                            filterBox.appendChild(div)
+                        }
+                    }
+                };
+                
+                reader.readAsText(file)
+            }
+
             function openOption(evt, optionName) {
             var i, x, tablinks;
             x = document.getElementsByClassName("navigation-option");
@@ -86,6 +156,33 @@
 
             function clickElementWithID(id) {
                 document.getElementById(id).click();
+            }
+
+            // Dropdown
+            function dropFunction() {
+            var x = document.getElementById("filterBox");
+            if (x.className.indexOf("w3-show") == -1) {
+                x.className += " w3-show";
+            } else {
+                x.className = x.className.replace(" w3-show", "");
+            }
+            }
+
+            // Filter
+            function filterFunction() {
+            var input, filter, ul, li, a, i;
+            input = document.getElementById("myInput");
+            filter = input.value.toUpperCase();
+            div = document.getElementById("filterBox");
+            a = div.getElementsByClassName('filter-item')
+            for (i = 0; i < a.length; i++) {
+                txtValue = a[i].getElementsByClassName('checkbox-label')[0].innerHTML
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    a[i].style.display = "";
+                } else {
+                    a[i].style.display = "none";
+                }
+            }
             }
         </script>
     </head>
@@ -107,6 +204,12 @@
                         <input hidden id="create-menu-file-upload" type="file" name="filetoupload" accept=".xlsx, .xml, .csv">
                         <button type="button" style="width: 20%" class="w3-button w3-white w3-border w3-round-large" onclick="clickElementWithID('create-menu-file-upload')">Browse...</button>
                         <p style="display: inline-block; padding-left: 5px; padding-right: 20px;" id="create-menu-filename">No file chosen</p>
+                        <div class="w3-dropdown-click hidden" id="site-filter">
+                            <button type="button" class="w3-button w3-white w3-border w3-round-large" onclick="dropFunction()">Site(s)</button>
+                            <div class="w3-dropdown-content w3-bar-block w3-card w3-light-grey" style="width: 200px;" id="filterBox">
+                              <input class="w3-input w3-padding" type="text" placeholder="Search.." id="myInput" onkeyup="filterFunction()">
+                            </div>
+                        </div>
                         <input class="w3-button w3-white w3-border w3-round-large" type="submit">
                     </form>
                     <br>
