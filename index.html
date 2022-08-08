@@ -130,7 +130,7 @@
             function clearFilters() {
                 let div = document.getElementById("filterBox")
 
-                while (div.childNodes.length > 10) {
+                while (div.childNodes.length > 5) {
                     div.removeChild(div.lastChild)
                 }
             }
@@ -247,8 +247,6 @@
                             <button type="button" class="w3-button w3-white w3-border w3-round-large" id="filterButton" onclick="dropFunction()">Filter Site(s)</button>
                             <div class="w3-dropdown-content w3-bar-block w3-card w3-light-grey" style="width: 210px;" id="filterBox">
                               <input class="w3-input w3-padding" type="text" placeholder="Search.." id="myInput" onkeyup="filterFunction()" autocomplete="off">
-                              <button type="button" class="w3-button w3-white w3-border w3-round-large selection-button" style="display: inline; width: 95px;" onclick="setAllSiteFilters(true)">Select all</button>
-                              <button type="button" class="w3-button w3-white w3-border w3-round-large selection-button" onclick="setAllSiteFilters(false)">Deselect all</button>
                               <div class="filter-item">
                                 <input type="checkbox" name="select-all-checkbox" id="select-all-checkbox" class="w3-check">
                                 <label for="select-all-checkbox" class="checkbox-label">Select all</label>
