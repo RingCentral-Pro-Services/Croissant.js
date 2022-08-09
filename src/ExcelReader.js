@@ -65,6 +65,10 @@ class ExcelReader {
             let menuData = this.data[i]
             let menu = new IVRMenu(menuData["Menu Name"], menuData["Menu Ext"], menuData["Prompt Name/Script"])
 
+            if (menu.prompt == undefined) {
+                menu.prompt = "Thank you for calling"
+            }
+
             if (menu.textToSpeech) {
                 menu.prompt = this.sanitizedPrompt(menu.prompt)
             }
