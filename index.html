@@ -155,7 +155,9 @@
                             checkbox.name = 'page';
                             checkbox.value = elements[11]
                             checkbox.classList.add("w3-check")
+                            checkbox.classList.add("site-filter-check")
                             checkbox.checked = true
+                            addClickListener(checkbox)
 
                             let label = document.createElement("label")
                             label.innerHTML = elements[11]
@@ -169,6 +171,27 @@
                 };
                 
                 reader.readAsText(file)
+            }
+
+            function addClickListener(checkbox) {
+                checkbox.addEventListener('click', (e) => {
+                    if (isEverySiteSelected()) {
+                        document.getElementById('select-all-checkbox').checked = true
+                    }
+                    else {
+                        document.getElementById('select-all-checkbox').checked = false
+                    }
+                })
+            }
+
+            function isEverySiteSelected() {
+                const siteFilters = document.getElementsByClassName('site-filter-check')
+                for (let index = 0; index < siteFilters.length; index++) {
+                    if (!siteFilters[index].checked) {
+                        return false
+                    }
+                }
+                return true
             }
 
             function openOption(evt, optionName) {
