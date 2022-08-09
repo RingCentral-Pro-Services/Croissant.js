@@ -19,7 +19,10 @@ class ExcelReader {
         "External Transfer": "ForwardToExternal",
         "Repeat the Menu": "RepeatMenuGreeting",
         "Return to the Previous Menu": "ReturnToPreviousMenu",
-        "Return to the Root Menu": "ReturnToRootMenu"
+        "Return to the Root Menu": "ReturnToRootMenu",
+        "Dial by first name": "ConnectToDialByNameDirectory",
+        "Transfer to auto-attendant": "ForwardToExtension",
+        "Transfer to extension": "ForwardToExtension",
     }
 
     constructor(excelFilePath) {
