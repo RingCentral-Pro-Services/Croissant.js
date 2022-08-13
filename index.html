@@ -63,6 +63,27 @@
                 max-height: 450px;
                 overflow-y: auto;
             }
+
+            details {
+                width: 100%;
+                max-width: 550px;
+                padding: 5px;
+            }
+
+            summary {
+                background: #f2f2f2;
+                cursor: pointer;
+                padding: 15px;
+                user-select: none;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+            }
+
+            .detail-text {
+                padding: 10px;
+                margin: 0;
+                background: #f2f2f2;
+            }
         </style>
 
         <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -269,7 +290,7 @@
                 <div id="create-menus" class="w3-container navigation-option">
                     <h2>Create Menus</h2>
                     <form action="fileupload" method="post" enctype="multipart/form-data">
-                        <input hidden id="create-menu-file-upload" type="file" name="filetoupload" accept=".xlsx, .xml, .csv">
+                        <input hidden id="create-menu-file-upload" type="file" name="filetoupload" accept=".xlsx, .xml, .csv" required>
                         <button type="button" style="width: 20%" class="w3-button w3-white w3-border w3-round-large" onclick="clickElementWithID('create-menu-file-upload')">Browse...</button>
                         <p style="display: inline-block; padding-left: 5px; padding-right: 20px;" id="create-menu-filename">No file chosen</p>
                         <div class="w3-dropdown-click hidden" id="site-filter">
@@ -285,18 +306,21 @@
                         <input class="w3-button w3-white w3-border w3-round-large" type="submit">
                     </form>
                     <br>
-                    <p><b>Instructions</b></p>
-                    <p><b>Building from the BRD</b></p>
-                    <p>1. Export the BRD as an Excel file</p>
-                    <p>2. Upload the file into Croissant</p>
-                    <p>3. Check your downloads folder for the auto-generated XML file</p>
-                    <p>4. Upload the file in Service Web under Phone System > Auto-Receptionist > IVR Editor > Import</p>
-                    <p><b>Building from Lucidchart</b></p>
-                    <p>1. Export the Lucidchart, choosing CSV of Shape Data</p>
-                    <p>2. Click the browse button to select the file</p>
-                    <p>3. Optionally, filter out sites that you do not want to build</p>
-                    <p>4. Click 'Submit'</p>
-                    <p>5. Upload the generated XML file in Service Web under Phone System > Auto-Receptionist > IVR Editor > Import</p>
+                    <details>
+                        <summary>Building from the BRD</summary>
+                        <p class="detail-text">1. Export the BRD as an Excel file</p>
+                        <p class="detail-text">2. Upload the file into Croissant</p>
+                        <p class="detail-text">3. Check your downloads folder for the auto-generated XML file</p>
+                        <p class="detail-text">4. Upload the file in Service Web under Phone System > Auto-Receptionist > IVR Editor > Import</p>
+                    </details>
+                    <details>
+                        <summary>Building from Lucidchart</summary>
+                        <p class="detail-text">1. Export the Lucidchart, choosing CSV of Shape Data</p>
+                        <p class="detail-text">2. Click the browse button to select the file</p>
+                        <p class="detail-text">3. Optionally, filter out sites that you do not want to build</p>
+                        <p class="detail-text">4. Click 'Submit'</p>
+                        <p class="detail-text">5. Upload the generated XML file in Service Web under Phone System > Auto-Receptionist > IVR Editor > Import</p>
+                    </details>
                     <p><b>Resources</b></p>
                     <a href="https://docs.google.com/document/d/1xcF5H6KHnn-UF_vgAq7LEKJBa-g4XKBY3YvH0or-9HQ/edit?usp=sharing" target="_blank">Documentation</a>
                     <img src="link.png" style="width:10px;height:10px;">
@@ -317,10 +341,12 @@
                         <input class="w3-button w3-white w3-border w3-round-large" type="submit">
                     </form>
                     <br>
-                    <p><b>Instructions</b></p>
-                    <p>1. Export an XML file from Service Web under Phone System > Auto-Receptionist > IVR Editor > Export</p>
-                    <p>2. Upload the file into Croissant</p>
-                    <p>3. Open the generated Excel file</p>
+                    <details>
+                        <summary>Instructions</summary>
+                        <p class="detail-text">1. Export an XML file from Service Web under Phone System > Auto-Receptionist > IVR Editor > Export</p>
+                        <p class="detail-text">2. Upload the file into Croissant</p>
+                        <p class="detail-text">3. Open the generated Excel file</p>
+                    </details>
                     <p><b>Resources</b></p>
                     <a href="https://docs.google.com/document/d/1xcF5H6KHnn-UF_vgAq7LEKJBa-g4XKBY3YvH0or-9HQ/edit?usp=sharing" target="_blank">Documentation</a>
                     <img src="link.png" style="width:10px;height:10px;">
