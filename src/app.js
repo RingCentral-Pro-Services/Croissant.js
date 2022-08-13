@@ -107,6 +107,21 @@ var server = http.createServer(function (req, res) {
         res.writeHead(200, {'Content-Type': 'image/png'});
         var absolutePath = path.resolve('./link.png');
         fs.createReadStream(absolutePath).pipe(res)
+      }
+      else if (req.url == "/res/croissant-brd.pdf") {
+        res.writeHead(200, {'Content-Type': 'application/pdf'});
+        var absolutePath = path.resolve('./res/croissant-brd.pdf');
+        fs.createReadStream(absolutePath).pipe(res)
+      }
+      else if (req.url == "/res/croissant-lucidchart.pdf") {
+        res.writeHead(200, {'Content-Type': 'application/pdf'});
+        var absolutePath = path.resolve('./res/croissant-lucidchart.pdf');
+        fs.createReadStream(absolutePath).pipe(res)
+      }
+      else if (req.url == "/res/croissant-audit.pdf") {
+        res.writeHead(200, {'Content-Type': 'application/pdf'});
+        var absolutePath = path.resolve('./res/croissant-audit.pdf');
+        fs.createReadStream(absolutePath).pipe(res)
       } 
       else {
         res.writeHead(200, {'Content-Type': 'text/html'});
