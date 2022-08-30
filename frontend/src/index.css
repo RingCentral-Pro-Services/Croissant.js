@@ -38,13 +38,15 @@ body {
 
 .nav-item:hover {
   background-color: #ccc;
+  color: black;
 }
 
 .nav-item-selected {
   background-color: #f44336;
+  color: white;
 }
 
-.sidebar h3 {
+.sidebar h4 {
   padding: 1px 15px;
 }
 
