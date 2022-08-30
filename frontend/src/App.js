@@ -1,19 +1,21 @@
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom'
+import AuditMenus from './components/AuditMenus';
 import CreateMenus from './components/CreateMenus';
 import Sidebar from './components/Sidebar';
 
 function App() {
   return (
-    <div className="App">
-      <Sidebar />
-      <div className="content">
-        <Router>
+    <Router>
+      <div className="App">
+        <Sidebar />
+        <div className="content">
           <Routes>
             <Route path='/' element={<CreateMenus />} />
+            <Route path='/auditmenus' element={<AuditMenus />} />
           </Routes>
-        </Router>
+        </div>
       </div>
-    </div>
+    </Router>
   );
 }
 
