@@ -9,7 +9,9 @@ body {
 
 a {
   text-decoration: none;
-  color: black
+  color: black;
+  display: block;
+  margin-bottom: 3px;
 }
 
 .sidebar {
