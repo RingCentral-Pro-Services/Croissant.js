@@ -112,7 +112,7 @@ class ExcelReader {
             
             // Add # Key if present
             if ('Key # Press' in menuData) {
-                let actionType = this.translateMenuAction(menuData['Key # Press'])
+                let actionType = this.actionMap[(menuData['Key # Press'])]
                 // Only add the key press if the cell is not empty
                 // Regular expressions are probably a better solution here
                 if (actionType != "") {
@@ -123,7 +123,7 @@ class ExcelReader {
 
             // Add * Key if present
             if ('Key * Press' in menuData) {
-                let actionType = this.translateMenuAction(menuData['Key * Press'])
+                let actionType = this.actionMap[(menuData['Key * Press'])]
                 // Only add the key press if the cell is not empty
                 // Regular expressions are probably a better solution here
                 if (actionType != "") {
