@@ -1,5 +1,3 @@
-import { useState } from 'react'
-
 const NavItem = (props) => {
     const { text, handleClick, isSelected } = props
 
