@@ -7,11 +7,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
+.info-link{
   text-decoration: none;
   color: black;
-  display: block;
   margin-bottom: 3px;
+  font-size: 15px;
 }
 
 .sidebar {
@@ -93,4 +93,11 @@ button:hover {
 
 .healthy-margin-right {
   margin-right: 10px;
+}
+
+.link-icon {
+  width: 10px;
+  height: 10px;
+  margin-left: 5px;
+  display: inline;
 }
