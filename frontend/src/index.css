@@ -17,6 +17,9 @@ body {
   box-shadow: 0 2px 5px 0 rgb(0 0 0 / 16%), 0 2px 10px 0 rgb(0 0 0 / 12%);
   color: #000!important;
   background-color: #f1f1f1;
+  display: block;
+  margin-top: 0px;
+  top: 0;
 }
 
 .nav-item {
@@ -52,4 +55,35 @@ body {
 
 .nav-item p {
   margin: 0;
+}
+
+.content {
+  margin-left: 250px;
+  top: 0;
+  width: 100%;
+}
+
+.inline {
+  display: inline-block;
+}
+
+button {
+  background-color: white;
+  color: black;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+button:hover {
+  background-color: #ccc;
+}
+
+.browse-button {
+  width: 150px;
+  margin-right: 10px;
+}
+
+.healthy-margin-right {
+  margin-right: 10px;
 }
