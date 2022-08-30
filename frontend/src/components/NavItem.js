@@ -1,8 +1,8 @@
 const NavItem = (props) => {
-    const { text, handleClick, isSelected } = props
+    const { text, destination, handleClick, isSelected } = props
 
     return ( 
-        <div className= {isSelected ? "nav-item nav-item-selected" : "nav-item"} onClick={() => handleClick(text)}>
+        <div className= {isSelected ? "nav-item nav-item-selected" : "nav-item"} onClick={() => handleClick(text, destination)}>
             <p>{ text }</p>
         </div>
      );
