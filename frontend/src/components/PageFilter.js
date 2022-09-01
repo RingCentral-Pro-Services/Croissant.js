@@ -4,7 +4,6 @@ const PageFilter = (props) => {
     const { pages, handleFilterClick, handleInput, selectAll } = props
 
     const handleClick = () => {
-        console.log('click')
         const box = document.getElementById("filter-box")
         if (box.className.indexOf("w3-show") === -1) {
             box.className += " w3-show";

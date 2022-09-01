@@ -20,7 +20,6 @@ const usePageExtractor = () => {
             for (let index = 0; index < rows.length; index++) {
                 let elements = rows[index].split(",")
                 if (elements.length >= 12 && elements[1] === "Page") {
-                    console.log(elements[11])
                     result.push({text: elements[11], checked: true})
                 }
             }
