@@ -118,9 +118,9 @@ button:hover {
   background-color: #f1f1f1;
   display: none;
   position: absolute;
-  min-width: 160px;
+  min-width: 200px;
   max-width: 460px;
-  max-height: 300px;
+  max-height: 450px;
   overflow-y: auto;
   margin: 0;
   padding-bottom: 10px;
