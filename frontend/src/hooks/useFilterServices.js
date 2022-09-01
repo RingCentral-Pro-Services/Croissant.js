@@ -1,6 +1,7 @@
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 
 const useFilterServices = (pages, setPages, filteredPages, setFilteredPages) => {
+    const [selectAll, setSelectAll] = useState(true)
 
     // Handle clicks to filter items
     const handleFilterClick = (text) => {
@@ -16,12 +17,14 @@ const useFilterServices = (pages, setPages, filteredPages, setFilteredPages) => 
                 result.forEach((page) => {
                     page.checked = false
                 })
+                setSelectAll(false)
             }
             else {
                 // Some pages are not selected, select them all
                 result.forEach((page) => {
                     page.checked = true
                 })
+                setSelectAll(true)
             }
             setPages([...result])
         }
@@ -75,7 +78,7 @@ const useFilterServices = (pages, setPages, filteredPages, setFilteredPages) => 
         })
     }, [])
 
-    return { handleFilterClick, handleInput }
+    return { handleFilterClick, handleInput, selectAll }
 }
 
 export default useFilterServices
