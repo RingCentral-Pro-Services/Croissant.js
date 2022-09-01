@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import useFileSave from "../hooks/useFileSave";
 import ResourcesArea from './ResourcesArea';
 const axios = require('axios').default;
