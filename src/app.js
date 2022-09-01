@@ -1,5 +1,6 @@
 var http = require('http');
 var formidable = require('formidable');
+const express = require('express')
 var fs = require('fs');
 var IVRMenu = require('./IVRMenu.js')
 var ExcelReader = require('./ExcelReader.js')
@@ -10,10 +11,19 @@ var path = require("path");
 var LucidChartReader = require('./LucidChartReader')
 const PrettyAuditWriter = require('./PrettyAuditWriter')
 
-var server = http.createServer(function (req, res) {
-    console.log(`Request to ${req.url}`)
-    if (req.url == '/fileupload') {
-        var form = new formidable.IncomingForm({multiples: true});
+const PORT = process.env.PORT || 3001
+
+const app = express();
+
+app.listen(PORT, () => {
+  console.log(`Server listening on ${PORT}`);
+})
+
+app.use(express.static(path.resolve(__dirname, '../frontend/build')))
+
+app.post('/fileupload', (req, res) => {
+  console.log('request to /fileupload')
+  var form = new formidable.IncomingForm({multiples: true});
         
         form.parse(req, function (err, fields, files) {
 
@@ -82,9 +92,10 @@ var server = http.createServer(function (req, res) {
               })
             }
      });
-      }
-      else if (req.url == "/audit") {
-        var form = new formidable.IncomingForm();
+})
+
+app.post('/audit', (req, res) => {
+  var form = new formidable.IncomingForm();
 
         form.parse(req, function (err, fields, files) {
 
@@ -103,36 +114,8 @@ var server = http.createServer(function (req, res) {
           })
         
         });
-      }
-      else if (req.url == "/link.png") {
-        res.writeHead(200, {'Content-Type': 'image/png'});
-        var absolutePath = path.resolve('./link.png');
-        fs.createReadStream(absolutePath).pipe(res)
-      }
-      else if (req.url == "/res/croissant-brd.pdf") {
-        res.writeHead(200, {'Content-Type': 'application/pdf'});
-        var absolutePath = path.resolve('./res/croissant-brd.pdf');
-        fs.createReadStream(absolutePath).pipe(res)
-      }
-      else if (req.url == "/res/croissant-lucidchart.pdf") {
-        res.writeHead(200, {'Content-Type': 'application/pdf'});
-        var absolutePath = path.resolve('./res/croissant-lucidchart.pdf');
-        fs.createReadStream(absolutePath).pipe(res)
-      }
-      else if (req.url == "/res/croissant-audit.pdf") {
-        res.writeHead(200, {'Content-Type': 'application/pdf'});
-        var absolutePath = path.resolve('./res/croissant-audit.pdf');
-        fs.createReadStream(absolutePath).pipe(res)
-      }
-      else {
-        res.writeHead(200, {'Content-Type': 'text/html'});
-        var absolutePath = path.resolve('./index.html');
-        fs.createReadStream(absolutePath).pipe(res)
-      }
+})
 
-});
-
-let port = process.env.PORT || 3001
-server.listen(port);
-
-console.log('Server running on port ' + port)
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, '../frontend/build', 'index.html'));
+})
