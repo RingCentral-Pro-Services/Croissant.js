@@ -7,7 +7,6 @@ const Sidebar = () => {
     const navigate = useNavigate()
 
     const handleClick = (text, destination) => {
-        console.log(`Navigating to ${destination}`)
         setSelectedItem(text)
         navigate(destination)
     }
