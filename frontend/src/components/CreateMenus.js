@@ -27,6 +27,17 @@ const CreateMenus = () => {
         {text: "Example Lucidchart", link: "https://lucid.app/lucidchart/51421e0f-912e-47ca-a063-59d43cf436fd/edit?viewport_loc=-1505%2C-1165%2C5370%2C2692%2C0_0&invitationId=inv_50c4ff9e-896f-4ddc-b3df-ccd0251074b5#", id:3}
     ]
 
+    useEffect(() => {
+        window.addEventListener('mouseup', (e) => {
+            const filterBox = document.getElementById('filter-box')
+            const filterButton = document.getElementById('filter-button')
+
+            if (e.target != filterButton && !filterBox.contains(e.target)) {
+                filterBox.classList.remove("w3-show")
+            }
+        })
+    }, [])
+
     const handleFilterClick = (text) => {
         if (text === "Select All") {
             let result = [...pages]
