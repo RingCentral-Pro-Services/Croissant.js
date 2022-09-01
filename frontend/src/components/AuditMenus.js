@@ -54,7 +54,7 @@ const AuditMenus = () => {
                 <button type='button' className="inline browse-button" onClick={handleClick}>Browse...</button>
                 <p className="inline healthy-margin-right">{selectedFile ? selectedFile.name : "No file selected"}</p>
                 <button type='button' onClick={handleSubmit}>{isPending ? "Waiting for server" : "Submit"}</button>
-                <input id="audit-menu-file-select" type="file" onInput={(e) => setSelectedFile(e.target.files[0])} hidden/>
+                <input id="audit-menu-file-select" type="file" onInput={(e) => setSelectedFile(e.target.files[0])} accept=".xml" hidden/>
             </form>
             <ResourcesArea title="Instructions" links={instructionsData} />
             <ResourcesArea title="Resources" links={resourcesData} />
