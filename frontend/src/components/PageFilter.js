@@ -15,7 +15,7 @@ const PageFilter = (props) => {
 
     return ( 
         <div className="dropdown-click">
-            <button type="button" onClick={handleClick}>Filter Site(s)</button>
+            <button type="button" id="filter-button" onClick={handleClick}>Filter Site(s)</button>
             <div className="dropdown-content" id="filter-box">
                 <input className="w3-input w3-padding" type="search" placeholder="Search.." id="myInput"  onInput={handleInput} autoComplete="off" />
                 <FilterItem text="Select All" isChecked={true} handleClick={handleFilterClick}/>
