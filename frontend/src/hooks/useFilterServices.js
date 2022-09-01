@@ -6,9 +6,23 @@ const useFilterServices = (pages, setPages, filteredPages, setFilteredPages) => 
     const handleFilterClick = (text) => {
         if (text === "Select All") {
             let result = [...pages]
-            result.forEach((page) => {
-                page.checked = true
+
+            let selectedPages = pages.filter((page) => {
+                return page.checked
             })
+
+            if (selectedPages.length === pages.length) {
+                // All pages are selected, deselect them all
+                result.forEach((page) => {
+                    page.checked = false
+                })
+            }
+            else {
+                // Some pages are not selected, select them all
+                result.forEach((page) => {
+                    page.checked = true
+                })
+            }
             setPages([...result])
         }
 
