@@ -1,16 +1,15 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import PageFilter from './PageFilter';
 import ResourcesArea from './ResourcesArea';
 import usePageExtractor from '../hooks/usePageExtractor';
 import useFilterServices from '../hooks/useFilterServices';
+import useFileSave from '../hooks/useFileSave';
 const axios = require('axios').default;
-const FileSaver = require('file-saver');
 
 const CreateMenus = () => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [isPending, setIsPending] = useState(false)
-    const [data, setData] = useState(null)
-    const [outputFilename, setOutputFilename] = useState(null)
+    const {setData, setOutputFilename} = useFileSave()
     const [filteredPages, setFilteredPages] = useState(null)
     const {pages, setPages, extract} = usePageExtractor()
     const {handleFilterClick, handleInput} = useFilterServices(pages, setPages, filteredPages, setFilteredPages)
@@ -48,16 +47,6 @@ const CreateMenus = () => {
         })
         .catch((err) => alert(err.message));
     }
-
-    useEffect(() => {
-        if (!data) {
-            return
-        }
-
-        const blob = new Blob([data], {type: "text/plain;charset=utf-8"})
-        FileSaver.saveAs(blob, outputFilename)
-        setData(null)
-    }, [data, outputFilename])
 
     const handleFileSelect = (file) => {
         setSelectedFile(file)
