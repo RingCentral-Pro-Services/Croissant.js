@@ -60,7 +60,7 @@ const CreateMenus = () => {
                 <button type='button' className="inline browse-button" onClick={handleClick}>Browse...</button>
                 <p className="inline healthy-margin-right">{selectedFile ? selectedFile.name : "No file selected"}</p>
                 {selectedFile && selectedFile.name.includes('.csv') && <PageFilter pages={filteredPages ? filteredPages : pages} handleFilterClick={handleFilterClick} handleInput={handleInput} />}
-                <button type='button' onClick={handleSubmit}>{isPending ? "Waiting for server" : "Submit"}</button>
+                <button type='button' onClick={handleSubmit}>{isPending ? "Processing" : "Submit"}</button>
                 <input id="create-menu-file-select" type="file" onInput={(e) => handleFileSelect(e.target.files[0])} accept=".xlsx, .xml, .csv" hidden/>
             </form>
             <ResourcesArea title="Instructions" links={instructionsData}/>
