@@ -10,11 +10,7 @@ const CreateMenus = () => {
     const [data, setData] = useState(null)
     const [outputFilename, setOutputFilename] = useState(null)
     const [filteredPages, setFilteredPages] = useState(null)
-    const [pages, setPages] = useState([
-        {text: "Site", checked: false},
-        {text: "Site 2", checked: true},
-        {text: "Site 3", checked: false}
-    ])
+    const [pages, setPages] = useState([])
 
     const instructionsData = [
         {text: "Building with the BRD", link: "", id: 1},
