@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
+import useFileSave from "../hooks/useFileSave";
 import ResourcesArea from './ResourcesArea';
 const axios = require('axios').default;
-const FileSaver = require('file-saver');
 
 const AuditMenus = () => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [isPending, setIsPending] = useState(false)
-    const [data, setData] = useState(null)
-    const [outputFilename, setOutputFilename] = useState(null)
+    const {setData, setOutputFilename} = useFileSave()
 
     const instructionsData = [
         {text: "Auditing Menus", link: "", id: 1}
@@ -36,16 +35,6 @@ const AuditMenus = () => {
         })
         .catch((err) => alert(err.message));
     }
-
-    useEffect(() => {
-        if (!data) {
-            return
-        }
-
-        const blob = new Blob([data])
-        FileSaver.saveAs(blob, outputFilename)
-        setData(null)
-    }, [data, outputFilename])
 
     return ( 
         <>
