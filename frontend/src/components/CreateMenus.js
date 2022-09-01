@@ -92,7 +92,7 @@ const CreateMenus = () => {
             setData(res.data)
             setIsPending(false)
         })
-        .catch((err) => alert("File Upload Error"));
+        .catch((err) => alert(err.message));
     }
 
     useEffect(() => {
