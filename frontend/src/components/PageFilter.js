@@ -1,9 +1,7 @@
-import { useState } from "react";
 import FilterItem from "./FilterItem";
 
 const PageFilter = (props) => {
     const { pages, handleFilterClick, handleInput } = props
-    const [filteredPages, setFilteredPages] = useState(null)
 
     const handleClick = () => {
         console.log('click')
