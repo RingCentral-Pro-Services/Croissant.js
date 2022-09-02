@@ -12,7 +12,7 @@ body {
 .info-link{
   text-decoration: none;
   color: black;
-  margin-bottom: 3px;
+  margin-bottom: 4px;
   font-size: 15px;
 }
 
@@ -173,4 +173,8 @@ button:hover {
   -moz-user-select: none;
   padding-left: 5px;
   width: calc(100% - 30px);
+}
+
+.resources {
+  margin: 20px 0;
 }
