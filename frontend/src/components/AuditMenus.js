@@ -9,7 +9,7 @@ const AuditMenus = () => {
     const {setData, setOutputFilename} = useFileSave()
 
     const instructionsData = [
-        {text: "Auditing Menus", link: "", id: 1}
+        {text: "Auditing Menus", link: "/croissant-audit.pdf", id: 1}
     ]
 
     const resourcesData = [

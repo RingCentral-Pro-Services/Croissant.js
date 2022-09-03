@@ -15,8 +15,8 @@ const CreateMenus = () => {
     const {handleFilterClick, handleInput, selectAll} = useFilterServices(pages, setPages, filteredPages, setFilteredPages)
 
     const instructionsData = [
-        {text: "Building with the BRD", link: "", id: 1},
-        {text: "Building with Lucidchart", link: "", id: 2}
+        {text: "Building with the BRD", link: "/croissant-brd.pdf", id: 1},
+        {text: "Building with Lucidchart", link: "/croissant-lucidchart.pdf", id: 2}
     ]
 
     const rescourcesData = [
