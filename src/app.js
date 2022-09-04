@@ -22,7 +22,6 @@ app.listen(PORT, () => {
 app.use(express.static(path.resolve(__dirname, '../frontend/build')))
 
 app.post('/fileupload', (req, res) => {
-  console.log('request to /fileupload')
   var form = new formidable.IncomingForm({multiples: true});
         
         form.parse(req, function (err, fields, files) {
