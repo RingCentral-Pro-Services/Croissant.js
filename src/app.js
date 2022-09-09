@@ -36,7 +36,6 @@ app.post('/fileupload', (req, res) => {
               let menus = reader.getMenus()
               let xmlWriter = new XMLWriter(menus)
 
-              console.log('Responding to request')
               res.setHeader('Content-Length', xmlWriter.xmlData.length);
               res.setHeader('Content-Type', 'text/xml');
               res.setHeader('Content-Disposition', 'attachment; filename=' + resultingFilename);
