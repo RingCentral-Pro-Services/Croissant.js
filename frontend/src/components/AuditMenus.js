@@ -1,12 +1,14 @@
 import { useState } from "react";
 import useFileSave from "../hooks/useFileSave";
 import ResourcesArea from './ResourcesArea';
+import useAnalytics from "../hooks/useAnalytics";
 const axios = require('axios').default;
 
 const AuditMenus = () => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [isPending, setIsPending] = useState(false)
     const {setData, setOutputFilename} = useFileSave()
+    const {fireEvent} = useAnalytics()
 
     const instructionsData = [
         {text: "Auditing Menus", link: "/croissant-audit.pdf", id: 1}
@@ -32,6 +34,7 @@ const AuditMenus = () => {
             setOutputFilename(res.headers["content-disposition"].replace("attachment; filename=", ""))
             setData(res.data)
             setIsPending(false)
+            fireEvent('update-audit')
         })
         .catch((err) => alert(err.message));
     }

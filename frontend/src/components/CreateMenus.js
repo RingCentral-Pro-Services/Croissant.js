@@ -4,6 +4,7 @@ import ResourcesArea from './ResourcesArea';
 import usePageExtractor from '../hooks/usePageExtractor';
 import useFilterServices from '../hooks/useFilterServices';
 import useFileSave from '../hooks/useFileSave';
+import useAnalytics from '../hooks/useAnalytics';
 const axios = require('axios').default;
 
 const CreateMenus = () => {
@@ -13,6 +14,7 @@ const CreateMenus = () => {
     const [filteredPages, setFilteredPages] = useState(null)
     const {pages, setPages, extract} = usePageExtractor()
     const {handleFilterClick, handleInput, selectAll} = useFilterServices(pages, setPages, filteredPages, setFilteredPages)
+    const {fireEvent} = useAnalytics()
 
     const instructionsData = [
         {text: "Building with the BRD", link: "/croissant-brd.pdf", id: 1},
@@ -44,6 +46,7 @@ const CreateMenus = () => {
             setOutputFilename(res.headers["content-disposition"].replace("attachment; filename=", ""))
             setData(res.data)
             setIsPending(false)
+            fireEvent('create-menu')
         })
         .catch((err) => alert(err.message));
     }
