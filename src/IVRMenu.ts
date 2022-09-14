@@ -17,7 +17,7 @@ class IVRMenu {
     //     this.prompt = prompt
     // }
 
-    constructor(public name: string, public extensionNumber: number, public prompt: string) {}
+    constructor(public name: string, public extensionNumber: string, public prompt: string) {}
 
     /**
      * Check whether or not the menu is using a text-to-speech prompts
