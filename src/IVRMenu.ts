@@ -1,3 +1,4 @@
+import IVRKeyPress from "./IVRKeyPress"
 
 /**
  * Class representing an IVR Menu
@@ -6,7 +7,7 @@ class IVRMenu {
 
     id = 0
     language = "English (United States)"
-    actions = []
+    actions: IVRKeyPress[] = []
     specialKeys = []
     page = ""
 
