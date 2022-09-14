@@ -2,9 +2,9 @@
     "compilerOptions": {
       "target": "es6", 
       "module": "commonjs", 
-      "sourceMap": true, 
+      "sourceMap": false, 
       "outDir": "./build", 
-      "strict": false, 
+      "strict": true, 
       "moduleResolution": "node", 
       "esModuleInterop": true,
       "forceConsistentCasingInFileNames": true 
