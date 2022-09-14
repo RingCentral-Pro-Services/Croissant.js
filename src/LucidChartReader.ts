@@ -10,7 +10,7 @@ export default class LucidChartReader {
     rowData: any = []
     menus: IVRMenu[] = []
     done = false
-    pageMap = {}
+    pageMap: {[key: string]: string} = {}
     filepath: string
     extensionRegex = /(x)\d+/gi  // Matches x-denoted extension numbers (Ex. x4796)
     extRegex = /(ext)(.?)\s\d+/gi  // Matches "ext." followed by numbers (Ex. ext. 4796)
@@ -60,7 +60,7 @@ export default class LucidChartReader {
             if (this.rowData[index]["Name"] == "IVR") {
                 let shapeText = this.rowData[index]["Text Area 1"]
 
-                let extensionNumber = isolator.isolateExtension(shapeText.toString())
+                let extensionNumber = isolator.isolateExtension(shapeText.toString()) ?? ""
                 let extensionName = shapeText.replace(this.extRegex, "")
                 extensionName = extensionName.replace(this.extensionRegex, "")
                 extensionName = extensionName.replace(this.extTBD, "")
@@ -98,7 +98,7 @@ export default class LucidChartReader {
                         if (destinationType == "External Transfer") {
                             // Create an external transfer action and add it to the menu
                             let externalNumber = this.getExternalNumberForID(lineDestinationID)
-                            let action = new IVRKeyPress(key, "ForwardToExternal", externalNumber)
+                            let action = new IVRKeyPress(key, "ForwardToExternal", externalNumber ?? "")
                             this.menus[menuIndex].actions.push(action)
                         }
                         else if (destinationType == "Dial-by-Name") {
@@ -107,14 +107,14 @@ export default class LucidChartReader {
                             this.menus[menuIndex].actions.push(action)
                         }
                         else if (destinationType == "Message Only Extension") {
-                            let action = new IVRKeyPress(key, "ForwardToVoiceMail", extensionNumber)
+                            let action = new IVRKeyPress(key, "ForwardToVoiceMail", extensionNumber ?? "")
                             this.menus[menuIndex].actions.push(action)
                         }
                         else if (destinationType == "Prompts") {
                             this.menus[menuIndex].prompt = this.getPromptForID(lineDestinationID)
                         }
                         else {
-                            let action = new IVRKeyPress(key, "ForwardToExtension", extensionNumber)
+                            let action = new IVRKeyPress(key, "ForwardToExtension", extensionNumber ?? "")
                             this.menus[menuIndex].actions.push(action)
                         }
                     }
