@@ -17,10 +17,10 @@ class ExtensionIsolator {
      * @param {string} rawDestination A string containing the raw destination data
      * @returns The isolated extension number as a string
      */
-     isolateExtension(rawDestination) {
+     isolateExtension(rawDestination: string) {
         if (this.containsXDenotedExtension(rawDestination)) {
             // The raw destination contains an 'x' followed by a number (Ex. x4250). This is likely the extension number
-            return rawDestination.match(this.extensionRegex).toString().replace(/\D/g,'')
+            return rawDestination.match(this.extensionRegex)?.toString().replace(/\D/g,'')
         }
         else if (this.containsExt(rawDestination)) {
             //The raw destination contains "ext" followed by a number. This is likely the extension number
@@ -53,8 +53,8 @@ class ExtensionIsolator {
      * @param {string} rawDestination A string containing the raw destination data
      * @returns The isolated phone number as a string
      */
-    isolatePhoneNumber(rawDestination) {
-        return rawDestination.match(this.phoneNumber).toString().replace(/\D/g,'')
+    isolatePhoneNumber(rawDestination: string) {
+        return rawDestination.match(this.phoneNumber)?.toString().replace(/\D/g,'')
     }
 
     /**
@@ -62,7 +62,7 @@ class ExtensionIsolator {
      * @param {string} input The input string
      * @returns True if the input string contains numbers, false otherwise
      */
-     hasNumber(input) {
+     hasNumber(input: string) {
         return /\d/.test(input);
     }
 
@@ -71,7 +71,7 @@ class ExtensionIsolator {
      * @param {string} input The input string
      * @returns True if the input string contains letters, false otherwise
      */
-    hasLetters(input) {
+    hasLetters(input: string) {
         return /[a-zA-Z]/g.test(input)
     }
 
@@ -81,7 +81,7 @@ class ExtensionIsolator {
      * @param {string} input The input string
      * @returns True if the input string contains an x-denoted extension number
      */
-    containsXDenotedExtension(input) {
+    containsXDenotedExtension(input: string) {
         return /(x)\d+/g.test(input)
     }
 
@@ -89,7 +89,7 @@ class ExtensionIsolator {
      * Check whether or not the input string contains an number preceded by "ext"
      * @param {string} input The input string
      */
-    containsExt(input) {
+    containsExt(input: string) {
         if (/(ext)(.?)\s\d+/g.test(input.toLowerCase())) {
             return true
         }
@@ -100,8 +100,8 @@ class ExtensionIsolator {
      * Get the extension number from strings containing ext followed by a number
      * @param {string} input The input string
      */
-    getExtensionNumber(input) {
-        return input.toLowerCase().match(this.extRegex).toString().replace(/\D/g,'')    
+    getExtensionNumber(input: string) {
+        return input.toLowerCase().match(this.extRegex)?.toString().replace(/\D/g,'')
     }
 
 }
