@@ -1,13 +1,17 @@
+import ExtensionIsolator from './ExtensionIsolator'
+import IVRMenu from './IVRMenu'
+import IVRKeyPress from './IVRKeyPress'
+import SpecialKeyPress from './SpecialKeyPress'
+
 var reader = require('xlsx')
-var IVRMenu = require('./IVRMenu')
-var IVRKeyPress = require('./IVRKeyPress')
-var SpecialKeyPress = require('./SpecialKeyPress')
-var ExtensionIsolator = require('./ExtensionIsolator')
+
 
 /**
  * A class for reading the IVRs sheet of the BRD
  */
 class ExcelReader {
+
+    data: any[] = []
 
     // Maps the BRD's keypress actions to Service Web's keywords
     actionMap = {
@@ -25,7 +29,7 @@ class ExcelReader {
         "Transfer to extension": "ForwardToExtension",
     }
 
-    constructor(excelFilePath) {
+    constructor(excelFilePath: string) {
         const file = reader.readFile(excelFilePath)
         this.data = []
         const sheets = file.SheetNames
@@ -34,7 +38,7 @@ class ExcelReader {
             // This excel file only has one sheet. Assume it's the IVRs sheet
             const temp = reader.utils.sheet_to_json(
                 file.Sheets[file.SheetNames[0]])
-                temp.forEach((res) => {
+                temp.forEach((res: any) => {
                     this.data.push(res)
             })
         }
@@ -44,7 +48,7 @@ class ExcelReader {
                 if (file.SheetNames[i] == "IVRs") {
                     const temp = reader.utils.sheet_to_json(
                         file.Sheets[file.SheetNames[i]])
-                        temp.forEach((res) => {
+                        temp.forEach((res: any) => {
                             this.data.push(res)
                     })
                 }
@@ -63,13 +67,17 @@ class ExcelReader {
 
         for (let i = 0; i < this.data.length; i++) {
             let menuData = this.data[i]
-            let menu = new IVRMenu(menuData["Menu Name"], menuData["Menu Ext"], menuData["Prompt Name/Script"])
+            const menuName: string = menuData["Menu Name"]
+            const prompt: string = menuData["Prompt Name/Script"]
+            const extensionNumber = menuData["Menu Ext"]
+            let menu = new IVRMenu(menuName, extensionNumber, prompt)
+            // let menu = new IVRMenu(menuData["Menu Name"] as string, menuData["Menu Ext"] as string, menuData["Prompt Name/Script"] as string)
 
             if (menu.prompt == undefined) {
                 menu.prompt = "Thank you for calling"
             }
 
-            if (menu.textToSpeech) {
+            if (menu.textToSpeech()) {
                 menu.prompt = this.sanitizedPrompt(menu.prompt)
             }
 
@@ -92,7 +100,7 @@ class ExcelReader {
                             let rawDestination = menuData[destinationKey]
                             let destination = ""
                             if (translatedAction != "ForwardToExternal") {
-                                destination = extensionIsolator.isolateExtension(rawDestination.toString())
+                                destination = extensionIsolator.isolateExtension(rawDestination.toString()) ?? ""
                             }
                             else {
                                 // The destination is a phone number. Use dumb isolation
@@ -142,7 +150,7 @@ class ExcelReader {
      * @param {String} prompt The prompt to be sanitized
      * @returns The sanitized prompt as a string
      */
-    sanitizedPrompt(prompt) {
+    sanitizedPrompt(prompt: any) {
         let result = prompt.replaceAll("_", "-")
         result = result.replaceAll("*", "star")
         result = result.replaceAll("#", "pound")
@@ -161,4 +169,4 @@ class ExcelReader {
 
 }
 
-module.exports = ExcelReader
+export default ExcelReader

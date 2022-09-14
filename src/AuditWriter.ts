@@ -1,11 +1,14 @@
+import IVRMenu from "./IVRMenu"
+
 var IVRKeyPress = require('./IVRKeyPress')
-var IVRMenu = require('./IVRMenu')
 
 /**
  * A class for converting IVRMenu objects to CSVs
  */
-class AuditWriter {
-    constructor(menus) {
+export default class AuditWriter {
+    csvData: string
+
+    constructor(menus: IVRMenu[]) {
         this.csvData = 'Menu Name,Menu Ext,Prompt Name/Script,'
         for (let i = 1; i < 10; i++) {
             this.csvData += 'Key ' + i + ' Action,Key ' + i + ' Destination,'
@@ -18,7 +21,7 @@ class AuditWriter {
      * Generate a CSV of the passed IVRMenus
      * @param {IVRMenu[]} menus An array of IVRMenu objects
      */
-    generateAudit(menus) {
+    generateAudit(menus: IVRMenu[]) {
         for (let i = 0; i < menus.length; i++) {
             let menu = menus[i]
 
@@ -29,7 +32,7 @@ class AuditWriter {
             for (let keyIndex = 1; keyIndex < 10; keyIndex++) {
                 let found = false
                 menu.actions.forEach(element => {
-                    if (element.key == keyIndex) {
+                    if (element.key == `${keyIndex}`) {
                         this.csvData += element.actionType + ',' + element.destination + ','
                         found = true
                     }
@@ -44,7 +47,7 @@ class AuditWriter {
             let zeroKeyFound = false
             menu.actions.forEach(element => {
                 let found = false
-                if (element.key == 0) {
+                if (element.key == '0') {
                     this.csvData += element.actionType + ',' + element.destination + ','
                     zeroKeyFound = true
                 }
@@ -78,5 +81,3 @@ class AuditWriter {
         }
     }
 }
-
-module.exports = AuditWriter

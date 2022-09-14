@@ -1,10 +1,12 @@
+import IVRMenu from './IVRMenu'
 const xlsx = require('xlsx')
 
 class ExcelAuditWriter {
 
-    auditData = []
+    auditData: string[][] = []
+    menus: IVRMenu[] = []
 
-    constructor(menus) {
+    constructor(menus: IVRMenu[]) {
         this.menus = menus
         this.writeHeader()
         this.writeMenuData()
@@ -40,7 +42,7 @@ class ExcelAuditWriter {
             for (let key = 1; key < 10; key++) {
                 let found = false
                 for (let actionIndex = 0; actionIndex < this.menus[index].actions.length; actionIndex++) {
-                    if (this.menus[index].actions[actionIndex].key == key) {
+                    if (this.menus[index].actions[actionIndex].key == `${key}`) {
                         menuData.push(this.menus[index].actions[actionIndex].actionType)
                         menuData.push(this.menus[index].actions[actionIndex].destination)
                         found = true
@@ -55,7 +57,7 @@ class ExcelAuditWriter {
             // Add key 0
             let zeroKeyFound = false
             for (let actionIndex = 0; actionIndex < this.menus[index].actions.length; actionIndex++) {
-                if (this.menus[index].actions[actionIndex].key == 0) {
+                if (this.menus[index].actions[actionIndex].key == '0') {
                     menuData.push(this.menus[index].actions[actionIndex].actionType)
                     menuData.push(this.menus[index].actions[actionIndex].destination)
                     zeroKeyFound = true
