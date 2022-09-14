@@ -6,3 +6,6 @@ node_modules
 
 # Ignore env files
 .env
+
+# production
+/build
