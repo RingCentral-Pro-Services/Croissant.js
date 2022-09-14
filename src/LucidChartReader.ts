@@ -1,11 +1,11 @@
 import IVRMenu from "./IVRMenu";
+import ExtensionIsolator from "./ExtensionIsolator";
+import IVRKeyPress from "./IVRKeyPress";
 
 const parser = require('csv-parser')
 const fs = require('fs');
-const ExtensionIsolator = require('./ExtensionIsolator')
-const IVRKeyPress = require('./IVRKeyPress')
 
-class LucidChartReader {
+export default class LucidChartReader {
 
     rowData: any = []
     menus: IVRMenu[] = []
@@ -270,5 +270,3 @@ class LucidChartReader {
         return ceiling
     }
 }
-
-module.exports = LucidChartReader
