@@ -1,16 +1,21 @@
+import IVRMenu from "./IVRMenu";
+import IVRKeyPress from './IVRKeyPress'
+
 var fs = require('fs');
 var xml2js = require('xml2js')
-var IVRMenu = require('./IVRMenu')
-var IVRKeyPress = require('./IVRKeyPress')
 
 class XMLReader {
+
+    rawData: JSON[]
+    menus: IVRMenu[]
+    xmlData: any
     
-    constructor(xmlFilePath) {
+    constructor(xmlFilePath: string) {
         this.rawData = []
         this.menus = []
 
         this.xmlData = fs.readFileSync(xmlFilePath, 'utf8');
-        xml2js.parseString(this.xmlData, (err, result) => {
+        xml2js.parseString(this.xmlData, (err: any, result: any) => {
             if(err) {
                 throw err;
             }
@@ -47,7 +52,7 @@ class XMLReader {
      * Parse an IVR menu and add it to the menus array
      * @param {*} menuData A Javascript object representing an IVR menu
      */
-    parseMenu(menuData) {
+    parseMenu(menuData: any) {
         let menuName = menuData['Name'][0]
         let extensionNumber = menuData['Extension'][0]
         let prompt = ""
