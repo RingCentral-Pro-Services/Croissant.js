@@ -1,11 +1,13 @@
-var IVRMenu = require('./IVRMenu')
+import IVRMenu from "./IVRMenu"
 
 /**
  * A class for writing portal-compatible XML files
  */
 class XMLWriter {
 
-    constructor(menus) {
+    xmlData = ""
+
+    constructor(menus: IVRMenu[]) {
         this.xmlData = ""
         this.addLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
         this.addLine('<MultilevelIVR>\n')
@@ -15,14 +17,13 @@ class XMLWriter {
         }
 
         this.addLine('</MultilevelIVR>\n')
-
     }
 
     /**
      * Add an IVRMenu to the XML string
      * @param {IVRMenu} menu An IVRMenu object
      */
-    addMenu(menu) {
+    addMenu(menu: IVRMenu) {
         this.addLine('<Menu>\n')
 
         this.addLine('\t<Extension>' + menu["extensionNumber"] + '</Extension>\n')
@@ -79,10 +80,10 @@ class XMLWriter {
      * Add a line to the XML string
      * @param {String} line A string to be added to the XML string
      */
-    addLine(line) {
+    addLine(line: string) {
         this.xmlData += line
     }
 
 }
 
-module.exports = XMLWriter
+export default XMLWriter
