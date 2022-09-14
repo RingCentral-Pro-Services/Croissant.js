@@ -1,21 +1,23 @@
+import IVRMenu from "./IVRMenu";
+
 const parser = require('csv-parser')
 const fs = require('fs');
 const ExtensionIsolator = require('./ExtensionIsolator')
-const IVRMenu = require('./IVRMenu')
 const IVRKeyPress = require('./IVRKeyPress')
 
 class LucidChartReader {
 
-    rowData = []
-    menus = []
+    rowData: any = []
+    menus: IVRMenu[] = []
     done = false
     pageMap = {}
+    filepath: string
     extensionRegex = /(x)\d+/gi  // Matches x-denoted extension numbers (Ex. x4796)
     extRegex = /(ext)(.?)\s\d+/gi  // Matches "ext." followed by numbers (Ex. ext. 4796)
     extTBD = /(ext[.]?)([\s]?tbd[\s]?[\d]?)/gi
 
 
-    constructor(filepath) {
+    constructor(filepath: string) {
         this.filepath = filepath
         this.rowData = []
     }
@@ -29,7 +31,7 @@ class LucidChartReader {
             const _menus = [];
             fs.createReadStream(this.filepath)
                 .pipe(parser({}))
-                .on('data', (data) => this.rowData.push(data))
+                .on('data', (data: any) => this.rowData.push(data))
                 .on('end', () => {
                     this.createPageMap()
                     this.createMenus()
@@ -43,7 +45,7 @@ class LucidChartReader {
         for (let index = 0; index < this.rowData.length; index++) {
             if (this.rowData[index]["Name"] == "Page") {
                 let name = this.rowData[index]["Text Area 1"]
-                let id = this.rowData[index]["Id"]
+                let id = this.rowData[index]["Id"] as string
                 this.pageMap[id] = name
             }
         }
@@ -126,7 +128,7 @@ class LucidChartReader {
      * @param {string} id The ID of the shape
      * @returns The extension number that corresponds with the given ID
      */
-    getExtensionNumberForID(id) {
+    getExtensionNumberForID(id: string) {
         let isolator = new ExtensionIsolator()
         for (let index = 0; index < this.rowData.length; index++) {
             if (this.rowData[index]["Id"] == id) {
@@ -142,7 +144,7 @@ class LucidChartReader {
      * @param {string} id The ID of the entiry
      * @returns The extension name that corresponds with the given ID
      */
-    getExtensionNameforID(id) {
+    getExtensionNameforID(id: string) {
         for (let index = 0; index < this.rowData.length; index++) {
             if (this.rowData[index]["Id"] == id) {
                 let rawText = this.rowData[index]["Text Area 1"]
@@ -159,7 +161,7 @@ class LucidChartReader {
      * @param {string} id The ID of the entity
      * @returns The extension type that corresponds to the given ID
      */
-    getExtensionTypeForID(id) {
+    getExtensionTypeForID(id: string) {
         for (let index = 0; index < this.rowData.length; index++) {
             if (this.rowData[index]["Id"] == id) {
                 return this.rowData[index]["Name"]
@@ -172,7 +174,7 @@ class LucidChartReader {
      * @param {string} id The ID of the entity
      * @returns The phone number that corresponds to thte given ID
      */
-    getExternalNumberForID(id) {
+    getExternalNumberForID(id: string) {
         const isolator = new ExtensionIsolator()
 
         for (let index = 0; index < this.rowData.length; index++) {
@@ -188,7 +190,7 @@ class LucidChartReader {
      * @returns The extension number associated with the given menu name or -1
      * if not found
      */
-    getExtensionforMenuName(name) {
+    getExtensionforMenuName(name: string) {
         for (let index = 0; index < this.menus.length; index++) {
             if (this.menus[index].name == name) {
                 return this.menus[index].extensionNumber
@@ -203,7 +205,7 @@ class LucidChartReader {
      * @param {string} id The ID of the prompt shape
      * @returns The prompt associated with the give ID, or an empty string if not found
      */
-    getPromptForID(id) {
+    getPromptForID(id: string) {
         for (let index = 0; index < this.rowData.length; index++) {
             if (this.rowData[index]["Id"] == id) {
                 return this.rowData[index]["Text Area 1"].replace("IVR Prompt: \n", "")
@@ -218,7 +220,7 @@ class LucidChartReader {
      * @param {string} extensionNumber The extension number of the menu
      * @returns True if a menu with the same extension already exists in the array
      */
-    hasMenu(extensionNumber) {
+    hasMenu(extensionNumber: string) {
         for (let index = 0; index < this.menus.length; index++) {
             if (this.menus[index]["extensionNumber"] == extensionNumber) {
                 return true
@@ -232,7 +234,7 @@ class LucidChartReader {
      * @param length The length of the generated extension number
      * @returns The generated extension number 
      */
-    generateRandomExtension(length) {
+    generateRandomExtension(length: number) {
         const floor = this.generateFloor(length)
         const ceiling = this.generateCeiling(length)
         return Math.floor(Math.random() * parseInt(ceiling)) + parseInt(floor);
@@ -243,7 +245,7 @@ class LucidChartReader {
      * @param length The length of the generated extension number
      * @returns The minimum bound of the generated extension number
      */
-    generateFloor(length) {
+    generateFloor(length: number) {
         let floor = "1"
 
         for (let count = 1; count < length; count++) {
@@ -258,7 +260,7 @@ class LucidChartReader {
      * @param length The length of the generated extension number
      * @returns The maximum bound of the generated extension number
      */
-    generateCeiling(length) {
+    generateCeiling(length: number) {
         let ceiling = "9"
 
         for (let count = 1; count < length; count++) {
