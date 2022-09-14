@@ -14,7 +14,7 @@ class ExcelReader {
     data: any[] = []
 
     // Maps the BRD's keypress actions to Service Web's keywords
-    actionMap = {
+    actionMap: {[key: string]: string} = {
         "Connect To IVR": "ForwardToExtension",
         "Connect To Queue": "ForwardToExtension",
         "Connect To Extension": "ForwardToExtension",
@@ -106,12 +106,12 @@ class ExcelReader {
                                 // The destination is a phone number. Use dumb isolation
                                 destination = rawDestination.toString().replace(/\D/g,'')
                             }
-                            let action = new IVRKeyPress(keyPressIndex, translatedAction, destination)
+                            let action = new IVRKeyPress(`${keyPressIndex}`, translatedAction, destination)
                             menu.actions.push(action)
                         }
                         else {
                             let destination = ""
-                            let action = new IVRKeyPress(keyPressIndex, translatedAction, destination)
+                            let action = new IVRKeyPress(`${keyPressIndex}`, translatedAction, destination)
                             menu.actions.push(action)
                         }
                     }
