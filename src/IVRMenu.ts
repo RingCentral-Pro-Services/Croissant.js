@@ -3,7 +3,7 @@ import IVRKeyPress from "./IVRKeyPress"
 /**
  * Class representing an IVR Menu
  */
-class IVRMenu {
+export default class IVRMenu {
 
     id = 0
     language = "English (United States)"
@@ -41,5 +41,3 @@ class IVRMenu {
         return this.specialKeys.length > 0
     }
 }
-
-export default IVRMenu

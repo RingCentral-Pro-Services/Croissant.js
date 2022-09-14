@@ -2,7 +2,7 @@ import IVRMenu from "./IVRMenu";
 
 const exceljs = require('exceljs')
 
-class PrettyAuditWriter {
+export default class PrettyAuditWriter {
     auditData: string[][] = []
     menus: IVRMenu[] = []
 

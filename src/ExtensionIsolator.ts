@@ -106,4 +106,4 @@ class ExtensionIsolator {
 
 }
 
-module.exports = ExtensionIsolator
+export default ExtensionIsolator

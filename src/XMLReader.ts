@@ -4,7 +4,7 @@ import IVRKeyPress from './IVRKeyPress'
 var fs = require('fs');
 var xml2js = require('xml2js')
 
-class XMLReader {
+export default class XMLReader {
 
     rawData: JSON[]
     menus: IVRMenu[]
@@ -117,5 +117,3 @@ class XMLReader {
     }
 
 }
-
-module.exports = XMLReader
