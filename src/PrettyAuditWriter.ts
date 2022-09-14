@@ -1,9 +1,12 @@
+import IVRMenu from "./IVRMenu";
+
 const exceljs = require('exceljs')
 
 class PrettyAuditWriter {
-    auditData = []
+    auditData: string[][] = []
+    menus: IVRMenu[] = []
 
-    constructor(menus) {
+    constructor(menus: IVRMenu[]) {
         this.menus = menus
     }
 
@@ -21,7 +24,7 @@ class PrettyAuditWriter {
                 worksheet.spliceRows(2, 1)
 
                 workbook.xlsx.writeBuffer()
-                .then((buffer) => {
+                .then((buffer: any) => {
                     resolve(buffer)
                 })
             })
@@ -53,17 +56,17 @@ class PrettyAuditWriter {
      writeMenuData() {
         for (let index = 0; index < this.menus.length; index++) {
             
-            let menuData = [this.menus[index].name, Number(this.menus[index].extensionNumber), "", this.menus[index].prompt, ""]
+            let menuData: string[] = [this.menus[index].name, this.menus[index].extensionNumber, "", this.menus[index].prompt, ""]
 
             // Add keys 1 - 9
             for (let key = 1; key < 10; key++) {
                 let found = false
                 for (let actionIndex = 0; actionIndex < this.menus[index].actions.length; actionIndex++) {
-                    if (this.menus[index].actions[actionIndex].key == key) {
+                    if (this.menus[index].actions[actionIndex].key == `${key}`) {
                         const prettyActionType = this.prettyActionType(this.menus[index].actions[actionIndex].actionType)
                         menuData.push(prettyActionType)
                         if (prettyActionType == "Connect To Extension" || prettyActionType == "Transfer to Voicemail of") {
-                            menuData.push(Number(this.menus[index].actions[actionIndex].destination))    
+                            menuData.push(this.menus[index].actions[actionIndex].destination)    
                         }
                         else if (prettyActionType == "Connect to Dial-by-Name Directory") {
                             menuData.push("")
@@ -83,9 +86,9 @@ class PrettyAuditWriter {
             // Add key 0
             let zeroKeyFound = false
             for (let actionIndex = 0; actionIndex < this.menus[index].actions.length; actionIndex++) {
-                if (this.menus[index].actions[actionIndex].key == 0) {
+                if (this.menus[index].actions[actionIndex].key == '0') {
                     menuData.push(this.prettyActionType(this.menus[index].actions[actionIndex].actionType))
-                    menuData.push(Number(this.menus[index].actions[actionIndex].destination))
+                    menuData.push(this.menus[index].actions[actionIndex].destination)
                     zeroKeyFound = true
                 }
             }
@@ -126,7 +129,7 @@ class PrettyAuditWriter {
      * @param {string} rawActionType 
      * @returns An easy-to-read action type
      */
-    prettyActionType(rawActionType) {
+    prettyActionType(rawActionType: string) {
         switch (rawActionType) {
             case "ForwardToExtension":
                 return "Connect To Extension"
