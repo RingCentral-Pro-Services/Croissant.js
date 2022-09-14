@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "start": "node build/app.js",
-    "build": "cd frontend && npm install && npm run build"
+    "build": "tsc && cd frontend && npm install && npm run build"
   },
   "dependencies": {
     "csv-parser": "^3.0.0",
