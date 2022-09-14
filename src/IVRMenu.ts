@@ -4,20 +4,19 @@
  */
 class IVRMenu {
 
-    name = ""
-    extensionNumber = ""
-    prompt = ""
     id = 0
     language = "English (United States)"
     actions = []
     specialKeys = []
     page = ""
 
-    constructor(name, extensionNumber, prompt) {
-        this.name = name
-        this.extensionNumber = extensionNumber
-        this.prompt = prompt
-    }
+    // constructor(name, extensionNumber, prompt) {
+    //     this.name = name
+    //     this.extensionNumber = extensionNumber
+    //     this.prompt = prompt
+    // }
+
+    constructor(public name: string, public extensionNumber: number, public prompt: string) {}
 
     /**
      * Check whether or not the menu is using a text-to-speech prompts
@@ -42,4 +41,4 @@ class IVRMenu {
     }
 }
 
-module.exports = IVRMenu
+export default IVRMenu
