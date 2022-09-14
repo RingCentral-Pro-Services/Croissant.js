@@ -1,4 +1,5 @@
 import IVRKeyPress from "./IVRKeyPress"
+import SpecialKeyPress from "./SpecialKeyPress"
 
 /**
  * Class representing an IVR Menu
@@ -8,7 +9,7 @@ export default class IVRMenu {
     id = 0
     language = "English (United States)"
     actions: IVRKeyPress[] = []
-    specialKeys = []
+    specialKeys: SpecialKeyPress[] = []
     page = ""
 
     // constructor(name, extensionNumber, prompt) {
