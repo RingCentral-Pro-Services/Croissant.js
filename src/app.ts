@@ -2,14 +2,14 @@ var http = require('http');
 var formidable = require('formidable');
 const express = require('express')
 var fs = require('fs');
-var IVRMenu = require('./IVRMenu.js')
-var ExcelReader = require('./ExcelReader.js')
-var XMLWriter = require('./XMLWriter')
-var XMLReader = require('./XMLReader')
-var AuditWriter = require('./AuditWriter')
+import IVRMenu from './IVRMenu'
+import ExcelReader from './ExcelReader';
+import XMLWriter from './XMLWriter';
+import XMLReader from './XMLReader'
+import AuditWriter from './AuditWriter'
+import LucidChartReader from './LucidChartReader';
+import PrettyAuditWriter from './PrettyAuditWriter';
 var path = require("path");
-var LucidChartReader = require('./LucidChartReader')
-const PrettyAuditWriter = require('./PrettyAuditWriter')
 
 const PORT = process.env.PORT || 3000
 
