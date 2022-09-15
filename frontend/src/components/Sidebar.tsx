@@ -1,3 +1,4 @@
+import React from "react";
 import { useState } from "react";
 import { useNavigate } from 'react-router-dom'
 import NavItem from "./NavItem";
@@ -6,7 +7,7 @@ const Sidebar = () => {
     const [selectedItem, setSelectedItem] = useState("Create Menus")
     const navigate = useNavigate()
 
-    const handleClick = (text, destination) => {
+    const handleClick = (text: string, destination: string) => {
         setSelectedItem(text)
         navigate(destination)
     }

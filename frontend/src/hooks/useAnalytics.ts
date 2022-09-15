@@ -1,5 +1,5 @@
 const useAnalytics = () => {
-    const fireEvent = (eventName) => {
+    const fireEvent = (eventName: string) => {
         window.gtag('event', eventName, {
             'event_category' : 'dowloads',
             'event_label' : "file"

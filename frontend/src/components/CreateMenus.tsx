@@ -1,3 +1,4 @@
+import React from 'react'
 import { useState } from 'react'
 import PageFilter from './PageFilter';
 import ResourcesArea from './ResourcesArea';
@@ -8,7 +9,7 @@ import useAnalytics from '../hooks/useAnalytics';
 const axios = require('axios').default;
 
 const CreateMenus = () => {
-    const [selectedFile, setSelectedFile] = useState(null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [isPending, setIsPending] = useState(false)
     const {setData, setOutputFilename} = useFileSave()
     const [filteredPages, setFilteredPages] = useState(null)
@@ -27,31 +28,31 @@ const CreateMenus = () => {
         {text: "Example Lucidchart", link: "https://lucid.app/lucidchart/51421e0f-912e-47ca-a063-59d43cf436fd/edit?viewport_loc=-1505%2C-1165%2C5370%2C2692%2C0_0&invitationId=inv_50c4ff9e-896f-4ddc-b3df-ccd0251074b5#", id:3}
     ]
 
-    const handleClick = (e) => {
+    const handleClick = (e: React.MouseEvent<HTMLElement>) => {
         e.preventDefault()
-        document.getElementById('create-menu-file-select').click()
+        document.getElementById('create-menu-file-select')?.click()
     }
 
     const handleSubmit = () => {
         const formData = new FormData();
-        formData.append("filetoupload", selectedFile);
-        pages.forEach((page) => {
+        formData.append("filetoupload", selectedFile as File);
+        pages.forEach((page: any) => {
             page.checked && formData.append("page", page.text)
         })
         setIsPending(true)
 
         axios
         .post('/fileupload', formData)
-        .then((res) => {
+        .then((res: any) => {
             setOutputFilename(res.headers["content-disposition"].replace("attachment; filename=", ""))
             setData(res.data)
             setIsPending(false)
             fireEvent('create-menu')
         })
-        .catch((err) => alert(err.message));
+        .catch((err: Error) => alert(err.message));
     }
 
-    const handleFileSelect = (file) => {
+    const handleFileSelect = (file: File) => {
         setSelectedFile(file)
         extract(file)
     }
@@ -64,7 +65,7 @@ const CreateMenus = () => {
                 <p className="inline healthy-margin-right">{selectedFile ? selectedFile.name : "No file selected"}</p>
                 {selectedFile && selectedFile.name.includes('.csv') && <PageFilter pages={filteredPages ? filteredPages : pages} selectAll={selectAll} handleFilterClick={handleFilterClick} handleInput={handleInput} />}
                 <button type='button' onClick={handleSubmit}>{isPending ? "Processing" : "Submit"}</button>
-                <input id="create-menu-file-select" type="file" onInput={(e) => handleFileSelect(e.target.files[0])} accept=".xlsx, .xml, .csv" hidden/>
+                <input id="create-menu-file-select" type="file" onInput={(e) => handleFileSelect((e.target as HTMLInputElement).files![0])} accept=".xlsx, .xml, .csv" hidden/>
             </form>
             <ResourcesArea title="Instructions" links={instructionsData}/>
             <ResourcesArea title="Resources" links={rescourcesData}/>

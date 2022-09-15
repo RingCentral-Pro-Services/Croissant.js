@@ -1,4 +1,6 @@
-const NavItem = (props) => {
+import React from "react";
+
+const NavItem = (props: any) => {
     const { text, destination, handleClick, isSelected } = props
 
     return ( 

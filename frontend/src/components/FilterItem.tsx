@@ -1,4 +1,6 @@
-const FilterItem = (props) => {
+import React from 'react'
+
+const FilterItem = (props: any) => {
     const { text, isChecked, handleClick} = props
 
     return ( 

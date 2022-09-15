@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react'
 
-const useFilterServices = (pages, setPages, filteredPages, setFilteredPages) => {
+const useFilterServices = (pages: any, setPages: any, filteredPages: any, setFilteredPages: any) => {
     const [selectAll, setSelectAll] = useState(true)
 
     // Handle clicks to filter items
-    const handleFilterClick = (text) => {
+    const handleFilterClick = (text: string) => {
         if (text === "Select All") {
             let result = [...pages]
 
-            let selectedPages = pages.filter((page) => {
+            let selectedPages = pages.filter((page: any) => {
                 return page.checked
             })
 
@@ -29,7 +29,7 @@ const useFilterServices = (pages, setPages, filteredPages, setFilteredPages) => 
             setPages([...result])
         }
 
-        let result = pages.map((page) => {
+        let result = pages.map((page: any) => {
             if (page.text !== text) {
                 return {text: page.text, checked: page.checked}
             }
@@ -38,7 +38,7 @@ const useFilterServices = (pages, setPages, filteredPages, setFilteredPages) => 
         setPages(result)
 
         if (filteredPages) {
-            let filtered = filteredPages.map((page) => {
+            let filtered = filteredPages.map((page: any) => {
                 if (page.text !== text) {
                     return {text: page.text, checked: page.checked}
                 }
@@ -50,15 +50,15 @@ const useFilterServices = (pages, setPages, filteredPages, setFilteredPages) => 
     
     // Handle input from the search field, for filtering
     const handleInput = () => {
-        const input = document.getElementById("myInput").value.toUpperCase()
+        const input = (document.getElementById("myInput") as HTMLInputElement).value.toUpperCase()
 
         if (!input) {
             setFilteredPages(null)
             return
         }
 
-        let result = []
-        pages.forEach((page) => {
+        let result: any = []
+        pages.forEach((page: any) => {
             if (page.text.toUpperCase().includes(input)) {
                 result.push({text: page.text, checked: page.checked})
             }
@@ -72,7 +72,7 @@ const useFilterServices = (pages, setPages, filteredPages, setFilteredPages) => 
             const filterBox = document.getElementById('filter-box')
             const filterButton = document.getElementById('filter-button')
 
-            if (filterBox && e.target !== filterButton && !filterBox.contains(e.target)) {
+            if (filterBox && e.target !== filterButton && !filterBox.contains(e.target as HTMLElement)) {
                 filterBox.classList.remove("w3-show")
             }
         })

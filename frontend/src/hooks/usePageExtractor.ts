@@ -8,7 +8,7 @@ import { useState } from 'react'
 const usePageExtractor = () => {
     const [pages, setPages] = useState([])
 
-    const extract = (file) => {
+    const extract = (file: File) => {
         if (!file) {
             return
         }
@@ -16,7 +16,7 @@ const usePageExtractor = () => {
 
         reader.onload = () => {
             let result = []
-            let rows = reader.result.split("\n")
+            let rows = reader.result?.split("\n")
             for (let index = 0; index < rows.length; index++) {
                 let elements = rows[index].split(",")
                 if (elements.length >= 12 && elements[1] === "Page") {

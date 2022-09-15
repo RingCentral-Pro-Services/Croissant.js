@@ -1,7 +1,7 @@
 import { useState, useEffect} from 'react'
 const axios = require('axios').default;
 
-const useFormSubmit = (url) => {
+const useFormSubmit = (url: string) => {
     const [isPending, setIsPending] = useState(false)
     const [data, setData] = useState(null)
     const [error, setError] = useState(null)
@@ -13,13 +13,13 @@ const useFormSubmit = (url) => {
 
         axios
         .post(url, formData)
-        .then((res) => {
+        .then((res: any) => {
             alert("File Upload success");
             console.log(res.data)
             setData(res.data)
             setIsPending(false)
         })
-        .catch((err) => setError(err));
+        .catch((err: any) => setError(err));
 
         return () => abortCont.abort()
     }, [url, formData])
