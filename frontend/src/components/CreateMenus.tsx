@@ -6,6 +6,7 @@ import usePageExtractor from '../hooks/usePageExtractor';
 import useFilterServices from '../hooks/useFilterServices';
 import useFileSave from '../hooks/useFileSave';
 import useAnalytics from '../hooks/useAnalytics';
+import LucidchartFilterPage from '../models/LucidchartFilterPage';
 const axios = require('axios').default;
 
 const CreateMenus = () => {
@@ -36,8 +37,8 @@ const CreateMenus = () => {
     const handleSubmit = () => {
         const formData = new FormData();
         formData.append("filetoupload", selectedFile as File);
-        pages.forEach((page: any) => {
-            page.checked && formData.append("page", page.text)
+        pages.forEach((page: LucidchartFilterPage) => {
+            page.isChecked && formData.append("page", page.text)
         })
         setIsPending(true)
 

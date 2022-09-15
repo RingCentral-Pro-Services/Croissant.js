@@ -24,7 +24,7 @@ const PageFilter = (props: any) => {
                 <input className="w3-input w3-padding" type="search" placeholder="Search.." id="myInput"  onInput={handleInput} autoComplete="off" />
                 <FilterItem text="Select All" isChecked={selectAll} handleClick={handleFilterClick}/>
                 {pages.map((page: any) => (
-                    <FilterItem text={ page.text } isChecked={ page.checked } handleClick={ handleFilterClick } key={page.text} />
+                    <FilterItem text={ page.text } isChecked={ page.isChecked } handleClick={ handleFilterClick } key={page.text} />
                 ))}
             </div>
         </div>

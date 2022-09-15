@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
+import LucidchartFilterPage from '../models/LucidchartFilterPage'
 
-const useFilterServices = (pages: any, setPages: any, filteredPages: any, setFilteredPages: any) => {
+const useFilterServices = (pages: LucidchartFilterPage[], setPages: any, filteredPages: any, setFilteredPages: any) => {
     const [selectAll, setSelectAll] = useState(true)
 
     // Handle clicks to filter items
@@ -8,41 +9,41 @@ const useFilterServices = (pages: any, setPages: any, filteredPages: any, setFil
         if (text === "Select All") {
             let result = [...pages]
 
-            let selectedPages = pages.filter((page: any) => {
-                return page.checked
+            let selectedPages = pages.filter((page: LucidchartFilterPage) => {
+                return page.isChecked
             })
 
             if (selectedPages.length === pages.length) {
                 // All pages are selected, deselect them all
-                result.forEach((page) => {
-                    page.checked = false
+                result.forEach((page: LucidchartFilterPage) => {
+                    page.isChecked = false
                 })
                 setSelectAll(false)
             }
             else {
                 // Some pages are not selected, select them all
-                result.forEach((page) => {
-                    page.checked = true
+                result.forEach((page: LucidchartFilterPage) => {
+                    page.isChecked = true
                 })
                 setSelectAll(true)
             }
             setPages([...result])
         }
 
-        let result = pages.map((page: any) => {
+        let result = pages.map((page: LucidchartFilterPage) => {
             if (page.text !== text) {
-                return {text: page.text, checked: page.checked}
+                return {text: page.text, isChecked: page.isChecked}
             }
-            return {text: page.text, checked: !page.checked}
+            return {text: page.text, isChecked: !page.isChecked}
         })
         setPages(result)
 
         if (filteredPages) {
-            let filtered = filteredPages.map((page: any) => {
+            let filtered = filteredPages.map((page: LucidchartFilterPage) => {
                 if (page.text !== text) {
-                    return {text: page.text, checked: page.checked}
+                    return {text: page.text, isChecked: page.isChecked}
                 }
-                return {text: page.text, checked: !page.checked}
+                return {text: page.text, isChecked: !page.isChecked}
             })
             setFilteredPages(filtered)
         }
@@ -58,9 +59,9 @@ const useFilterServices = (pages: any, setPages: any, filteredPages: any, setFil
         }
 
         let result: any = []
-        pages.forEach((page: any) => {
+        pages.forEach((page: LucidchartFilterPage) => {
             if (page.text.toUpperCase().includes(input)) {
-                result.push({text: page.text, checked: page.checked})
+                result.push({text: page.text, checked: page.isChecked})
             }
         })
         setFilteredPages(result)
