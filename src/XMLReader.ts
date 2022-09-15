@@ -6,12 +6,12 @@ var xml2js = require('xml2js')
 
 export default class XMLReader {
 
-    rawData: JSON[]
+    rawData: any
     menus: IVRMenu[]
     xmlData: any
     
     constructor(xmlFilePath: string) {
-        this.rawData = []
+        // this.rawData
         this.menus = []
 
         this.xmlData = fs.readFileSync(xmlFilePath, 'utf8');
