@@ -6,7 +6,7 @@ import { useState } from 'react'
  * pages, and a function to extract pages from a given CSV file
  */
 const usePageExtractor = () => {
-    const [pages, setPages] = useState([])
+    const [pages, setPages] = useState<any[]>([])
 
     const extract = (file: File) => {
         if (!file) {
@@ -16,7 +16,7 @@ const usePageExtractor = () => {
 
         reader.onload = () => {
             let result = []
-            let rows = reader.result?.split("\n")
+            let rows = (reader.result as string)?.split("\n")
             for (let index = 0; index < rows.length; index++) {
                 let elements = rows[index].split(",")
                 if (elements.length >= 12 && elements[1] === "Page") {
