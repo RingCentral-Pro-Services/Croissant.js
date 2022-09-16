@@ -13,19 +13,8 @@ const Token = () => {
             return
         }
 
-        const url = 'https://platform.devtest.ringcentral.com/restapi/v1.0/account/~/extension/~/notification-settings'
-        axios
-        .get(url, {
-            headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${access_token}`
-            }
-        })
-        .then((res: any) => {
-            console.log('RC API response')
-            console.log(res)
-        })
+        localStorage.setItem('rc_access_token', access_token)
+        navigate('/')
     }, [])
 
     return (
