@@ -1,3 +1,4 @@
+require('dotenv').config()
 var http = require('http');
 var formidable = require('formidable');
 const express = require('express')
@@ -10,16 +11,77 @@ import AuditWriter from './AuditWriter'
 import LucidChartReader from './LucidChartReader';
 import PrettyAuditWriter from './PrettyAuditWriter';
 var path = require("path");
-
-const PORT = process.env.PORT || 3000
+var ringcentral = require('ringcentral');
+const axios = require('axios').default;
 
 const app = express();
+
+var session = require('express-session');
+app.use(session({ secret: 'this-is-a-secret-token', tokens: '', resave: true, saveUninitialized: true}));
+const PORT = process.env.PORT || 3000
+
+var rcsdk = null
+
+// Yoink
+const AUTHORIZATION = Buffer.from(`${process.env.RINGCENTRAL_CLIENT_ID}:${process.env.RINGCENTRAL_CLIENT_SECRET}`).toString('base64')
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 })
 
 app.use(express.static(path.resolve(__dirname, '../frontend/build')))
+
+app.get('/login', (req: any, res: any) => {
+  rcsdk = new ringcentral({
+    server: process.env.RC_SERVER_URL,
+    appKey: process.env.RC_CLIENT_ID,
+    appSecret: process.env.RC_CLIENT_SECRET
+  })
+  let platform = rcsdk.platform()
+  let loginURL = platform.loginUrl({"state": "1234567890"})
+  console.log(`URL: ${loginURL}`)
+  res.redirect(loginURL)
+})
+
+app.get('/oauth2callback', (req: any, res: any) => {
+  console.log('/oauth2callback')
+  let code = req.query.code
+  let expiration = req.query['expires_in']
+  let state = req.query.state
+
+  // let payload = {"grant_type": "authorization_code", "code": code, "client_id": process.env.RC_CLIENT_ID, "redirect_uri": process.env.RC_REDIRECT_URI}
+  // let headers = {"Content-type": "application/x-www-form-urlencoded", "Authorization": `Basic ${AUTHORIZATION}`, "Accept": "application/json"}
+
+  // axios
+  // .post(`${process.env.RC_SERVER_URL}/restapi/oauth/token`, JSON.stringify(payload), {headers: headers})
+  // .then((response: any) => {
+  //   console.log('Got response')
+  // })
+  // .catch((error: any) => {
+  //   console.log('error')
+  //   console.log(error)
+  // })
+
+  rcsdk = new ringcentral({
+    server: process.env.RC_SERVER_URL,
+    appKey: process.env.RC_CLIENT_ID,
+    appSecret: process.env.RC_CLIENT_SECRET
+  })
+  var platform = rcsdk.platform()
+  var resp = platform.login({
+    code: req.query.code,
+    redirectUri: process.env.RC_REDIRECT_URI
+  })
+  .then((data: any) => {
+    //console.log(data["_json"]) // Access token is here!
+    const accessToken = data["_json"]["access_token"]
+    console.log(accessToken)
+    res.redirect(`/token?access_token=${accessToken}`)
+  })
+
+
+  //res.redirect('/auditmenus')
+})
 
 app.post('/fileupload', (req: any, res: any) => {
   var form = new formidable.IncomingForm({multiples: true});
