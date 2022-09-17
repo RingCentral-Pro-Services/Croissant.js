@@ -1,11 +1,11 @@
 import { access } from "fs"
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import RCExtension from "../models/RCExtension"
 const axios = require('axios').default;
 
 const useExtensionList = () => {
     let extensionsList: RCExtension[] = []
-    let isExtensionListPending = true
+    let [isExtensionListPending, setisExtensionListPending] = useState(true)
     let error = ""
     const extensionsURL = 'https://platform.devtest.ringcentral.com/restapi/v1.0/account/~/extension'
     const accessToken = localStorage.getItem('rc_access_token')
@@ -22,6 +22,7 @@ const useExtensionList = () => {
         .then((res: any) => {
             console.log('RC API response')
             console.log(res)
+            setisExtensionListPending(false)
         })
     }, [])
 
