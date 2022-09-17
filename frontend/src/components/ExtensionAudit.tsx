@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import RCExtension from '../models/RCExtension'
 import useExtensionList from '../rcapi/useExtensionList'
 
@@ -9,6 +9,10 @@ const ExtensionAudit = () => {
     const handleClick = () => {
         console.log('click')
     }
+
+    useEffect(() => {
+        localStorage.setItem('target_uid', targetUID)
+    },[targetUID])
 
     return (
         <>
