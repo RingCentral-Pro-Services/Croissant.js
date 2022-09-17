@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom'
 import AuditMenus from './components/AuditMenus';
 import CreateMenus from './components/CreateMenus';
+import ExtensionAudit from './components/ExtensionAudit';
 import Sidebar from './components/Sidebar';
 import Token from './components/Token';
 
@@ -21,6 +22,7 @@ function App() {
             <Route path='/token' element={<Token />} />
             <Route path='/' element={<CreateMenus />} />
             <Route path='/auditmenus' element={<AuditMenus />} />
+            <Route path='/extensionaudit' element={<ExtensionAudit />} />
           </Routes>
         </div>
       </div>
