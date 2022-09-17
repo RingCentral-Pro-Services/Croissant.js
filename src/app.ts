@@ -39,12 +39,10 @@ app.get('/login', (req: any, res: any) => {
   })
   let platform = rcsdk.platform()
   let loginURL = platform.loginUrl({"state": "1234567890"})
-  console.log(`URL: ${loginURL}`)
   res.redirect(loginURL)
 })
 
 app.get('/oauth2callback', (req: any, res: any) => {
-  console.log('/oauth2callback')
   let code = req.query.code
   let expiration = req.query['expires_in']
   let state = req.query.state
@@ -75,7 +73,6 @@ app.get('/oauth2callback', (req: any, res: any) => {
   .then((data: any) => {
     //console.log(data["_json"]) // Access token is here!
     const accessToken = data["_json"]["access_token"]
-    console.log(accessToken)
     res.redirect(`/token?access_token=${accessToken}`)
   })
 
