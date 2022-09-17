@@ -7,14 +7,19 @@ const axios = require('axios').default;
 const useExtensionList = () => {
     let [isExtensionListPending, setisExtensionListPending] = useState(true)
     let error = ""
-    const extensionsURL = 'https://platform.devtest.ringcentral.com/restapi/v1.0/account/~/extension'
-    const accessToken = localStorage.getItem('rc_access_token')
+    const baseExtensionsURL = 'https://platform.devtest.ringcentral.com/restapi/v1.0/account/~/extension'
+    const accessToken = localStorage.getItem('cs_access_token')
     let [extensionsList, setExtensionsList] = useState<RCExtension[]>([])
     let [page, setPage] = useState(1)
 
     useEffect(() => {
+        let targetUID = localStorage.getItem('target_uid')
+        if (!targetUID) return
+        let extensionsURL = `${baseExtensionsURL.replace('~', targetUID)}?page=${page}&perPage=1`
+        console.log(`URL: ${extensionsURL}`)
+
         axios
-        .get(`${extensionsURL}?page=${page}&perPage=1`, {
+        .get(extensionsURL, {
             headers: {
                 "Accept": "application/json",
                 "Content-Type": "application/json",
