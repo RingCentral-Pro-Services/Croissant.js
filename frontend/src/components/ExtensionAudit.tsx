@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import RCExtension from '../models/RCExtension'
 import useExtensionList from '../rcapi/useExtensionList'
+import useGetAccessToken from '../rcapi/useGetAccessToken'
 
 const ExtensionAudit = () => {
     let [targetUID, setTargetUID] = useState("~")
+    useGetAccessToken()
     const { extensionsList, isExtensionListPending } = useExtensionList()
 
     const handleClick = () => {
