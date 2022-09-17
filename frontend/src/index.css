@@ -178,3 +178,8 @@ button:hover {
 .resources {
   margin: 20px 0;
 }
+
+.input-field {
+  height: 25px;
+  margin-right: 20px;
+}
