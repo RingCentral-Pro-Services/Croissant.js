@@ -5,7 +5,7 @@ import useGetAccessToken from '../rcapi/useGetAccessToken'
 
 const ExtensionAudit = () => {
     let [targetUID, setTargetUID] = useState("~")
-    useGetAccessToken()
+    const {fetchToken} = useGetAccessToken()
     const { extensionsList, isExtensionListPending } = useExtensionList()
 
     const handleClick = () => {
@@ -14,6 +14,7 @@ const ExtensionAudit = () => {
 
     useEffect(() => {
         localStorage.setItem('target_uid', targetUID)
+        fetchToken()
     },[targetUID])
 
     return (
