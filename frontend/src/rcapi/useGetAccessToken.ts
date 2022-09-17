@@ -2,6 +2,7 @@
 // For now, it will just copy the RC user access token
 const useGetAccessToken = () => {
     let rc_access_token = localStorage.getItem('rc_access_token')
+    if (!rc_access_token) return
     localStorage.setItem('cs_access_token', rc_access_token)
 }
 
