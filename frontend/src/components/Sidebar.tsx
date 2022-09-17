@@ -17,6 +17,7 @@ const Sidebar = () => {
             <h4>Croissant</h4>
             <NavItem text="Create Menus" destination="/" isSelected={selectedItem === "Create Menus"} handleClick={handleClick}/>
             <NavItem text="Audit Menus" destination="/auditmenus" isSelected={selectedItem === "Audit Menus"} handleClick={handleClick} />
+            <NavItem text="Extensions Audit" destination="/extensionaudit" isSelected={selectedItem === "Extensions Audit"} handleClick={handleClick} />
         </div>
      );
 }
