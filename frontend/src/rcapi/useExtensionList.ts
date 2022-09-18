@@ -1,5 +1,3 @@
-import e from "express";
-import { access } from "fs"
 import { useEffect, useState } from "react";
 import RCExtension from "../models/RCExtension"
 const axios = require('axios').default;
@@ -57,7 +55,7 @@ const useExtensionList = () => {
                 setPage(1)
             }
         })
-    }, [page, shouldFetch])
+    }, [page, shouldFetch, accessToken, extensionsList])
     
     return {extensionsList, isExtensionListPending, error, fetchExtensions}
 }
