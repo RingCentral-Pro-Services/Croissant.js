@@ -33,8 +33,6 @@ const useExtensionList = () => {
             }
         })
         .then((res: any) => {
-            console.log('RC API response')
-            console.log(res)
             let resRecords = res.data.records
             let newRecords = [...extensionsList]
             for (let index = 0; index < resRecords.length; index++) {
