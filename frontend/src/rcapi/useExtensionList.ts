@@ -37,7 +37,7 @@ const useExtensionList = () => {
             let newRecords = [...extensionsList]
             for (let index = 0; index < resRecords.length; index++) {
                 let resRecord = resRecords[index]
-                let site = resRecord.site ? resRecord.site.name : ""
+                let site = resRecord.site ? resRecord.site.name : null
                 let name = resRecord.name ?? "N/A"
                 let extension = new RCExtension(resRecord.id,resRecord.extensionNumber, name, site, resRecord.type, resRecord.status, resRecord.hidden, resRecord.uri )
                 newRecords.push(extension)
