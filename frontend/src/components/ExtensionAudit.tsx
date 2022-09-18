@@ -6,10 +6,10 @@ import useGetAccessToken from '../rcapi/useGetAccessToken'
 const ExtensionAudit = () => {
     let [targetUID, setTargetUID] = useState("~")
     const {fetchToken} = useGetAccessToken()
-    const { extensionsList, isExtensionListPending } = useExtensionList()
+    const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList()
 
     const handleClick = () => {
-        console.log('click')
+        fetchExtensions()
     }
 
     useEffect(() => {
