@@ -60,6 +60,9 @@ const useExtensionList = () => {
                     setPage(1)
                 }
             })
+            .catch((error: Error) => {
+                console.log('Error', error)
+            })
         }, rateLimitInterval)
     }, [page, shouldFetch, accessToken, extensionsList])
     
