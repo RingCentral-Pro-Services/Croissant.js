@@ -11,8 +11,16 @@ const useExtensionList = () => {
     const accessToken = localStorage.getItem('cs_access_token')
     let [extensionsList, setExtensionsList] = useState<RCExtension[]>([])
     let [page, setPage] = useState(1)
+    let [shouldFetch, setShouldFetch] = useState(false)
+
+    const fetchExtensions = () => {
+        setExtensionsList([])
+        setShouldFetch(true)
+    }
 
     useEffect(() => {
+        if (!shouldFetch) return
+
         let targetUID = localStorage.getItem('target_uid')
         if (!targetUID) return
         let extensionsURL = `${baseExtensionsURL.replace('~', targetUID)}?page=${page}&perPage=1`
@@ -45,11 +53,13 @@ const useExtensionList = () => {
             }
             else {
                 setisExtensionListPending(false)
+                setShouldFetch(false)
+                setPage(1)
             }
         })
-    }, [page])
+    }, [page, shouldFetch])
     
-    return {extensionsList, isExtensionListPending, error}
+    return {extensionsList, isExtensionListPending, error, fetchExtensions}
 }
 
 export default useExtensionList
