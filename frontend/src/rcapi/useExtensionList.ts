@@ -16,6 +16,7 @@ const useExtensionList = () => {
     const fetchExtensions = () => {
         setExtensionsList([])
         setShouldFetch(true)
+        setisExtensionListPending(true)
     }
 
     useEffect(() => {
@@ -24,7 +25,6 @@ const useExtensionList = () => {
         let targetUID = localStorage.getItem('target_uid')
         if (!targetUID) return
         let extensionsURL = `${baseExtensionsURL.replace('~', targetUID)}?page=${page}&perPage=1`
-        console.log(`URL: ${extensionsURL}`)
 
         axios
         .get(extensionsURL, {
