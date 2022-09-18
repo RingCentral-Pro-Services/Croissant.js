@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react'
+import csvify from '../helpers/csvify'
 import RCExtension from '../models/RCExtension'
 import useExtensionList from '../rcapi/useExtensionList'
 import useGetAccessToken from '../rcapi/useGetAccessToken'
+const FileSaver = require('file-saver');
 
 const ExtensionAudit = () => {
     let [targetUID, setTargetUID] = useState("~")
@@ -16,6 +18,15 @@ const ExtensionAudit = () => {
         localStorage.setItem('target_uid', targetUID)
         fetchToken()
     },[targetUID])
+
+    useEffect(() => {
+        if (isExtensionListPending) return
+
+        let data = csvify(['Name', 'Ext', 'Site', 'Type', 'Status', 'Hidden'], extensionsList)
+
+        const blob = new Blob([data])
+        FileSaver.saveAs(blob, 'audit.csv')
+    }, [isExtensionListPending])
 
     return (
         <>
