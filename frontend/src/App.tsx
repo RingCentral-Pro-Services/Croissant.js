@@ -22,7 +22,7 @@ function App() {
             <Route path='/token' element={<Token />} />
             <Route path='/' element={<CreateMenus />} />
             <Route path='/auditmenus' element={<AuditMenus />} />
-            <Route path='/extensionaudit' element={<ExtensionAudit />} />
+            <Route path='/accountdump' element={<ExtensionAudit />} />
           </Routes>
         </div>
       </div>
