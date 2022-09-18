@@ -17,7 +17,7 @@ const ExtensionAudit = () => {
     useEffect(() => {
         localStorage.setItem('target_uid', targetUID)
         fetchToken()
-    },[targetUID])
+    },[targetUID, fetchToken])
 
     useEffect(() => {
         if (isExtensionListPending) return
@@ -26,11 +26,11 @@ const ExtensionAudit = () => {
 
         const blob = new Blob([data])
         FileSaver.saveAs(blob, 'audit.csv')
-    }, [isExtensionListPending])
+    }, [isExtensionListPending, extensionsList])
 
     return (
         <>
-            <h2>Extension Audit</h2>
+            <h2>Account Dump</h2>
             <input type="text" className="input-field" value={targetUID} onChange={(e) => setTargetUID(e.target.value)}/>
             <button onClick={handleClick}>Go</button>
             <p>{isExtensionListPending ? "Fetching extensions": `${extensionsList.length} extensions fetched`}</p>
