@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import csvify from '../helpers/csvify'
+import useLogin from '../hooks/useLogin'
 import RCExtension from '../models/RCExtension'
 import useExtensionList from '../rcapi/useExtensionList'
 import useGetAccessToken from '../rcapi/useGetAccessToken'
 const FileSaver = require('file-saver');
 
 const ExtensionAudit = () => {
+    useLogin()
     let [targetUID, setTargetUID] = useState("~")
     const {fetchToken} = useGetAccessToken()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList()
