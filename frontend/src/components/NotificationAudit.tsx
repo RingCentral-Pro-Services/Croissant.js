@@ -27,9 +27,9 @@ const NotificationAudit = () => {
 
     useEffect(() => {
         if (isExtensionListPending) return 
-
+        console.log('useEffect')
         fetchNotificationSettings(extensionsList)
-    }, [isExtensionListPending, extensionsList, fetchNotificationSettings])
+    }, [isExtensionListPending, extensionsList])
 
     useEffect(() => {
         if (isNotificationListPending) return
