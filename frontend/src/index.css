@@ -183,3 +183,18 @@ button:hover {
   height: 25px;
   margin-right: 20px;
 }
+
+.message-info {
+  font-size: 1.1em;
+  color: black;
+}
+
+.message-error {
+  font-size: 1.1em;
+  color: red;
+}
+
+.message-success {
+  font-size: 1.1em;
+  color: green;
+}
