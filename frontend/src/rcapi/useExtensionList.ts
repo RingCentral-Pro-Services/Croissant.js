@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import RCExtension from "../models/RCExtension"
 import rateLimit from "../helpers/rateLimit";
+import { Message, MessageType } from "../models/Message";
 const axios = require('axios').default;
 
-const useExtensionList = () => {
+const useExtensionList = (postMessage: (message: Message) => void) => {
     let [isExtensionListPending, setisExtensionListPending] = useState(true)
     let error = ""
     const baseExtensionsURL = 'https://platform.devtest.ringcentral.com/restapi/v1.0/account/~/extension'
@@ -17,6 +18,7 @@ const useExtensionList = () => {
         setExtensionsList([])
         setShouldFetch(true)
         setisExtensionListPending(true)
+        postMessage(new Message('Fetching extensions', MessageType.INFO))
     }
 
     useEffect(() => {
@@ -58,10 +60,12 @@ const useExtensionList = () => {
                     setShouldFetch(false)
                     setRateLimitInterval(0)
                     setPage(1)
+                    postMessage(new Message('Finished fetching extensions', MessageType.INFO))
                 }
             })
             .catch((error: Error) => {
                 console.log('Error', error)
+                postMessage(new Message(`Error: ${error}`, MessageType.ERROR))
             })
         }, rateLimitInterval)
     }, [page, shouldFetch, accessToken, extensionsList])
