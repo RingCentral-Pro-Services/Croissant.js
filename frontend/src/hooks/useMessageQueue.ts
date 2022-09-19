@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from "react"
-import { Message, MessageType } from "../models/Message"
+import {useState} from "react"
+import { Message } from "../models/Message"
 
 const useMessageQueue = () => {
     let [messages, setMessages] = useState<Message[]>([])
