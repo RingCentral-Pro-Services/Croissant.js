@@ -4,10 +4,7 @@ import { Message, MessageType } from "../models/Message"
 import useExtensionList from "../rcapi/useExtensionList"
 import useGetAccessToken from "../rcapi/useGetAccessToken"
 import useMessageQueue from "../hooks/useMessageQueue"
-import NotificationBundle from "../models/NotificationBundle"
-import NotificationSettings, { NotificationSettingsPayload } from "../models/NotificationSettings"
 import useFetchNotifications from "../rcapi/useFetchNotifications"
-import NotificationBundlePayload from "../models/NotificationBundle"
 import csvify from "../helpers/csvify"
 const FileSaver = require('file-saver');
 
