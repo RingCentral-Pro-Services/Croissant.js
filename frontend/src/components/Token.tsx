@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-const axios = require('axios').default;
 
 const Token = () => {
     const navigate = useNavigate()
