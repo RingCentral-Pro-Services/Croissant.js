@@ -14,7 +14,7 @@ const Token = () => {
 
         localStorage.setItem('rc_access_token', access_token)
         navigate('/')
-    }, [])
+    }, [access_token, navigate])
 
     return (
         <>
