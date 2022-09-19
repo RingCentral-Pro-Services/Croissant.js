@@ -4,7 +4,7 @@ import useLogin from '../hooks/useLogin'
 import useMessageQueue from '../hooks/useMessageQueue'
 import useExtensionList from '../rcapi/useExtensionList'
 import useGetAccessToken from '../rcapi/useGetAccessToken'
-import { Message, MessageType } from '../models/Message'
+import { Message } from '../models/Message'
 const FileSaver = require('file-saver');
 
 const ExtensionAudit = () => {
@@ -27,7 +27,6 @@ const ExtensionAudit = () => {
         if (isExtensionListPending) return
 
         let data = csvify(['Name', 'Ext', 'Site', 'Type', 'Status', 'Hidden'], extensionsList)
-        postMessage(new Message(`Read ${extensionsList.length} extensions`, MessageType.INFO))
 
         const blob = new Blob([data])
         FileSaver.saveAs(blob, 'audit.csv')
