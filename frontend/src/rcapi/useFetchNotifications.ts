@@ -24,6 +24,7 @@ const useFetchNotifications = (postMessage: (message: Message) => void) => {
         console.log(`Filtered extensions: ${filtered.length}`)
 
         setNotifications([])
+        setIsNotificationListPending(true)
         setFilteredExtensions(filtered)
         setShouldFetch(true)
     }
@@ -48,31 +49,37 @@ const useFetchNotifications = (postMessage: (message: Message) => void) => {
                 }
             })
             .then((res: any) => {
-                // Do something with the response
-                console.log(res)
-                let resData = res.data
-                let bundle: NotificationSettingsPayload = resData
-                let notification = new NotificationSettings(filteredExtensions[currentExtensionIndex], bundle)
-                let newNotifications = [...notifications, notification]
-                setNotifications(newNotifications)
-                console.log(bundle)
+               if (res.status == 200) {
+                    // Do something with the response
+                    console.log(res)
+                    let resData = res.data
+                    let bundle: NotificationSettingsPayload = resData
+                    let notification = new NotificationSettings(filteredExtensions[currentExtensionIndex], bundle)
+                    let newNotifications = [...notifications, notification]
+                    setNotifications(newNotifications)
+                    console.log(bundle)
 
-                // Rate limiting
-                setRateLimitInterval(0)
-                if (currentExtensionIndex !== filteredExtensions.length - 1) {
+                    // Rate limiting
                     setRateLimitInterval(rateLimit(res.headers))
-                    setCurrentExtensionIndex(currentExtensionIndex + 1)
-                }
-                else {
-                    setIsNotificationListPending(false)
-                    setShouldFetch(false)
-                    setRateLimitInterval(0)
-                    setCurrentExtensionIndex(0)
-                    console.log('Finished fetching notifications')
-                }
+                    if (currentExtensionIndex !== filteredExtensions.length - 1) {
+                        // setRateLimitInterval(rateLimit(res.headers))
+                        setCurrentExtensionIndex(currentExtensionIndex + 1)
+                    }
+                    else {
+                        setIsNotificationListPending(false)
+                        setShouldFetch(false)
+                        setRateLimitInterval(0)
+                        setCurrentExtensionIndex(0)
+                        console.log('Finished fetching notifications')
+                    }
+               }
+               else {
+                setShouldFetch(false)
+               }
             })
             .catch((error: Error) => {
                 console.log('An error occurred', error)
+                setShouldFetch(false)
             })
 
             // setCurrentExtensionIndex(currentExtensionIndex + 1)
