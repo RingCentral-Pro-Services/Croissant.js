@@ -4,6 +4,12 @@ import { Message, MessageType } from "../models/Message"
 import useExtensionList from "../rcapi/useExtensionList"
 import useGetAccessToken from "../rcapi/useGetAccessToken"
 import useMessageQueue from "../hooks/useMessageQueue"
+import NotificationBundle from "../models/NotificationBundle"
+import NotificationSettings, { NotificationSettingsPayload } from "../models/NotificationSettings"
+import useFetchNotifications from "../rcapi/useFetchNotifications"
+import NotificationBundlePayload from "../models/NotificationBundle"
+import csvify from "../helpers/csvify"
+const FileSaver = require('file-saver');
 
 const NotificationAudit = () => {
     useLogin()
@@ -11,6 +17,7 @@ const NotificationAudit = () => {
     const {fetchToken} = useGetAccessToken()
     let {messages, postMessage} = useMessageQueue()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
+    let {notifications, fetchNotificationSettings, isNotificationListPending} = useFetchNotifications(postMessage)
 
     const handleClick = () => {
         fetchExtensions()
@@ -24,9 +31,17 @@ const NotificationAudit = () => {
     useEffect(() => {
         if (isExtensionListPending) return
         postMessage(new Message(`Read ${extensionsList.length} extensions`, MessageType.INFO))
-        
-        // TODO: Add logic to fetch notification settings
+
+        fetchNotificationSettings(extensionsList)
     }, [isExtensionListPending, extensionsList])
+
+    useEffect(() => {
+        if (isNotificationListPending) return
+        
+        let data = csvify(['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses'], notifications)
+        const blob = new Blob([data])
+        FileSaver.saveAs(blob, 'notifications.csv')
+    }, [isNotificationListPending, notifications])
 
     return (
         <>
