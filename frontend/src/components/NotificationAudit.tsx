@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react"
 import useLogin from "../hooks/useLogin"
-import { Message, MessageType } from "../models/Message"
+import { Message } from "../models/Message"
 import useExtensionList from "../rcapi/useExtensionList"
 import useGetAccessToken from "../rcapi/useGetAccessToken"
 import useMessageQueue from "../hooks/useMessageQueue"
@@ -26,11 +26,10 @@ const NotificationAudit = () => {
     },[targetUID, fetchToken])
 
     useEffect(() => {
-        if (isExtensionListPending) return
-        postMessage(new Message(`Read ${extensionsList.length} extensions`, MessageType.INFO))
+        if (isExtensionListPending) return 
 
         fetchNotificationSettings(extensionsList)
-    }, [isExtensionListPending, extensionsList])
+    }, [isExtensionListPending, extensionsList, fetchNotificationSettings])
 
     useEffect(() => {
         if (isNotificationListPending) return
