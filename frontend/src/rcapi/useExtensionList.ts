@@ -45,7 +45,7 @@ const useExtensionList = (postMessage: (message: Message) => void) => {
                     let resRecord = resRecords[index]
                     let site = resRecord.site ? resRecord.site.name : null
                     let name = resRecord.name ?? "N/A"
-                    let extension = new RCExtension(resRecord.id,resRecord.extensionNumber, name, site, resRecord.type, resRecord.status, resRecord.hidden, resRecord.uri )
+                    let extension = new RCExtension(resRecord.id,resRecord.extensionNumber, name, resRecord.contact, site, resRecord.type, resRecord.status, resRecord.hidden, resRecord.uri )
                     newRecords.push(extension)
                 }
                 setExtensionsList(newRecords)
