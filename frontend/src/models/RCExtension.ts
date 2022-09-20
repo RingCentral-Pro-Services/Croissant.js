@@ -1,4 +1,5 @@
 import CSVFormattable from "./CSVFormattable"
+import ExtensionContact from "./ExtensionContact"
 
 class RCExtension implements CSVFormattable {
 
@@ -23,10 +24,10 @@ class RCExtension implements CSVFormattable {
         "DelegatedLinesGroup": "Delegated Lines Group"
     }
 
-    constructor(public id: number, public extensionNumber: number, public name: string, public site: string, public type: string, public status: string, public hidden: boolean , public uri: string) {}
+    constructor(public id: number, public extensionNumber: number, public name: string, public contact: ExtensionContact, public site: string, public type: string, public status: string, public hidden: boolean , public uri: string) {}
 
     toRow() {
-        return `${this.name},${this.extensionNumber ?? 'N/A'},${this.site ?? 'N/A'},${this.prettyType[this.type] ?? this.type},${this.status},${this.hidden}`
+        return `${this.name},${this.extensionNumber ?? 'N/A'},${this.contact?.email ?? ""},${this.site ?? 'N/A'},${this.prettyType[this.type] ?? this.type},${this.status},${this.hidden}`
     }
 }
 
