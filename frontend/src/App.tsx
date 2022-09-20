@@ -2,6 +2,7 @@ import React from 'react'
 import { useEffect } from 'react';
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom'
 import AuditMenus from './components/AuditMenus';
+import CallQueues from './components/CallQueues';
 import CreateMenus from './components/CreateMenus';
 import ExtensionAudit from './components/ExtensionAudit';
 import NotificationAudit from './components/NotificationAudit';
@@ -25,6 +26,7 @@ function App() {
             <Route path='/auditmenus' element={<AuditMenus />} />
             <Route path='/accountdump' element={<ExtensionAudit />} />
             <Route path='/notificationsaudit' element={<NotificationAudit />} />
+            <Route path='/callqueues' element={<CallQueues />} />
           </Routes>
         </div>
       </div>
