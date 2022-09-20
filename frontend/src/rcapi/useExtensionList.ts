@@ -68,7 +68,7 @@ const useExtensionList = (postMessage: (message: Message) => void) => {
                 postMessage(new Message(`Error: ${error}`, MessageType.ERROR))
             })
         }, rateLimitInterval)
-    }, [page, shouldFetch, accessToken, extensionsList])
+    }, [page, shouldFetch, accessToken, extensionsList, rateLimitInterval, postMessage])
     
     return {extensionsList, isExtensionListPending, error, fetchExtensions}
 }
