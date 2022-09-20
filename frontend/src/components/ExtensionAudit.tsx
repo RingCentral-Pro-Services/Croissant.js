@@ -26,7 +26,7 @@ const ExtensionAudit = () => {
     useEffect(() => {
         if (isExtensionListPending) return
 
-        let data = csvify(['Name', 'Ext', 'Site', 'Type', 'Status', 'Hidden'], extensionsList)
+        let data = csvify(['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden'], extensionsList)
 
         const blob = new Blob([data])
         FileSaver.saveAs(blob, 'audit.csv')
