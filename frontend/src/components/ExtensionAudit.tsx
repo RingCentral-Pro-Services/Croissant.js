@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import csvify from '../helpers/csvify'
 import useLogin from '../hooks/useLogin'
 import useMessageQueue from '../hooks/useMessageQueue'
 import useExtensionList from '../rcapi/useExtensionList'
 import useGetAccessToken from '../rcapi/useGetAccessToken'
+import useWriteExcelFile from '../hooks/useWriteExcelFile'
 import { Message } from '../models/Message'
-const FileSaver = require('file-saver');
 
 const ExtensionAudit = () => {
     useLogin()
@@ -13,6 +12,7 @@ const ExtensionAudit = () => {
     const {fetchToken} = useGetAccessToken()
     let {messages, postMessage} = useMessageQueue()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
+    const {writeExcel} = useWriteExcelFile()
 
     const handleClick = () => {
         fetchExtensions()
@@ -26,10 +26,13 @@ const ExtensionAudit = () => {
     useEffect(() => {
         if (isExtensionListPending) return
 
-        let data = csvify(['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden'], extensionsList)
+        // let data = csvify(['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden'], extensionsList)
 
-        const blob = new Blob([data])
-        FileSaver.saveAs(blob, 'audit.csv')
+        // const blob = new Blob([data])
+        // FileSaver.saveAs(blob, 'audit.csv')
+
+        let header = ['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']
+        writeExcel(header, extensionsList, 'account_dump.xlsx')
     }, [isExtensionListPending, extensionsList])
 
     return (
