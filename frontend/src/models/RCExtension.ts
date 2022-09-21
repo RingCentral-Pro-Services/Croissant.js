@@ -1,4 +1,5 @@
 import CSVFormattable from "./CSVFormattable"
+import ExcelFormattable from "./ExcelFormattable"
 import ExtensionContact from "./ExtensionContact"
 
 class RCExtension implements CSVFormattable, ExcelFormattable {
