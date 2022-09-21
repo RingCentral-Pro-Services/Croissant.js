@@ -47,7 +47,7 @@ const useFetchCallQueueMembers = () => {
                 }
             })
             .then((res: any) => {
-                if (res.status == 200) {
+                if (res.status === 200) {
                     // process response
                     console.log(res)
                     let records = res.data.records
@@ -85,7 +85,7 @@ const useFetchCallQueueMembers = () => {
             })
         }, rateLimitInterval)
 
-    }, [shouldFetch, filteredExtensions, callQueues, currentExtensionIndex])
+    }, [shouldFetch, filteredExtensions, callQueues, currentExtensionIndex, accessToken, baseURL, rateLimitInterval])
 
     return {isQueueListPending, callQueues, fetchQueueMembers}
 }
