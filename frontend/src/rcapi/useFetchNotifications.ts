@@ -85,7 +85,7 @@ const useFetchNotifications = (postMessage: (message: Message) => void) => {
             // setCurrentExtensionIndex(currentExtensionIndex + 1)
         }, rateLimitInterval)
 
-    }, [filteredExtensions, shouldFetch, currentExtensionIndex])
+    }, [filteredExtensions, shouldFetch, currentExtensionIndex, accessToken, rateLimitInterval, notifications])
 
     return {notifications, fetchNotificationSettings, isNotificationListPending}
 }
