@@ -1,0 +1,3 @@
+interface ExcelFormattable {
+    toExcelRow(): string[]
+}
