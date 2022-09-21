@@ -1,6 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { Message, MessageType } from "../models/Message";
-import NotificationSettings, { NotificationSettingsPayload } from "../models/NotificationSettings";
+import { useEffect, useState } from "react";
 import RCExtension from "../models/RCExtension";
 import CallQueue from "../models/CallQueue";
 import rateLimit from "../helpers/rateLimit";
