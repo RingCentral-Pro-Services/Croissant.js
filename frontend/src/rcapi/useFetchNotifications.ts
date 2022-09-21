@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Message, MessageType } from "../models/Message";
+import { useEffect, useState } from "react";
+import { Message } from "../models/Message";
 import NotificationSettings, { NotificationSettingsPayload } from "../models/NotificationSettings";
 import RCExtension from "../models/RCExtension";
 import rateLimit from "../helpers/rateLimit";
@@ -18,7 +18,7 @@ const useFetchNotifications = (postMessage: (message: Message) => void) => {
     const fetchNotificationSettings = (extensionsList: RCExtension[]) => {
         // Filter out extensions that don't have notification settings
         let filtered = extensionsList.filter((extension: RCExtension) => {
-            if (extension.type === 'User' || extension.type === 'Department' || extension.type === 'VirtualUser' || extension.type === 'Voicemail' || extension.type === 'SharedLinesGroup') return true
+            return (extension.type === 'User' || extension.type === 'Department' || extension.type === 'VirtualUser' || extension.type === 'Voicemail' || extension.type === 'SharedLinesGroup')
         })
 
         console.log(`Filtered extensions: ${filtered.length}`)
@@ -49,7 +49,7 @@ const useFetchNotifications = (postMessage: (message: Message) => void) => {
                 }
             })
             .then((res: any) => {
-               if (res.status == 200) {
+               if (res.status === 200) {
                     // Do something with the response
                     console.log(res)
                     let resData = res.data
