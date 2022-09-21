@@ -6,6 +6,7 @@ import useGetAccessToken from "../rcapi/useGetAccessToken"
 import useMessageQueue from "../hooks/useMessageQueue"
 import useFetchNotifications from "../rcapi/useFetchNotifications"
 import csvify from "../helpers/csvify"
+import useWriteExcelFile from "../hooks/useWriteExcelFile"
 const FileSaver = require('file-saver');
 
 const NotificationAudit = () => {
@@ -17,6 +18,7 @@ const NotificationAudit = () => {
     let {notifications, fetchNotificationSettings, isNotificationListPending} = useFetchNotifications(postMessage)
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [isPending, setIsPending] = useState(false)
+    const {writeExcel} = useWriteExcelFile()
 
     const handleClick = () => {
         fetchExtensions()
@@ -27,7 +29,7 @@ const NotificationAudit = () => {
     }
 
     const handleSubmit = () => {
-
+        if (!selectedFile) return
     }
 
     useEffect(() => {
@@ -44,9 +46,11 @@ const NotificationAudit = () => {
     useEffect(() => {
         if (isNotificationListPending) return
         
-        let data = csvify(['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses'], notifications)
-        const blob = new Blob([data])
-        FileSaver.saveAs(blob, 'notifications.csv')
+        // let data = csvify(['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses'], notifications)
+        // const blob = new Blob([data])
+        // FileSaver.saveAs(blob, 'notifications.csv')
+        let header = ['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses']
+        writeExcel(header, notifications, 'notifications.xlsx')
     }, [isNotificationListPending, notifications])
 
     return (
@@ -58,7 +62,7 @@ const NotificationAudit = () => {
                 <button type='button' className="inline browse-button" onClick={handleFileOpenClick}>Browse...</button>
                 <p className="inline healthy-margin-right">{selectedFile ? selectedFile.name : "No file selected"}</p>
                 <button type='button' onClick={handleSubmit}>{isPending ? "Processing" : "Submit"}</button>
-                <input id="notifications-file-select" type="file" onInput={(e) => setSelectedFile((e.target as HTMLInputElement).files![0])} accept=".xml" hidden/>
+                <input id="notifications-file-select" type="file" onInput={(e) => setSelectedFile((e.target as HTMLInputElement).files![0])} accept=".xlsx" hidden/>
             </form>
             {messages.map((message: Message) => (
                 <div key={message.body}>
