@@ -6,7 +6,7 @@ const useReadExcel = () => {
         file.arrayBuffer()
         .then((data) => {
             const workbook = xlsx.read(data)
-            if (sheetName == "") {
+            if (sheetName === "") {
                 // Sheet name empty, just read the first sheet
             }
 
