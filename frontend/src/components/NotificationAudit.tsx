@@ -49,7 +49,7 @@ const NotificationAudit = () => {
         // FileSaver.saveAs(blob, 'notifications.csv')
         let header = ['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses']
         writeExcel(header, notifications, 'notifications.xlsx')
-    }, [isNotificationListPending, notifications])
+    }, [isNotificationListPending, notifications, writeExcel])
 
     return (
         <>
