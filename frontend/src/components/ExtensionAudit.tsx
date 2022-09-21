@@ -33,7 +33,7 @@ const ExtensionAudit = () => {
 
         let header = ['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']
         writeExcel(header, extensionsList, 'account_dump.xlsx')
-    }, [isExtensionListPending, extensionsList])
+    }, [isExtensionListPending, extensionsList, writeExcel])
 
     return (
         <>
