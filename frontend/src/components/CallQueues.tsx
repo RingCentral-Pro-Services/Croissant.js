@@ -5,8 +5,7 @@ import useMessageQueue from "../hooks/useMessageQueue"
 import useExtensionList from "../rcapi/useExtensionList"
 import { Message } from "../models/Message"
 import useFetchCallQueueMembers from "../rcapi/useFetchCallQueueMembers"
-import csvify from "../helpers/csvify"
-const FileSaver = require('file-saver');
+import useWriteExcelFile from "../hooks/useWriteExcelFile"
 
 const CallQueues = () => {
     useLogin()
@@ -15,6 +14,7 @@ const CallQueues = () => {
     let {messages, postMessage} = useMessageQueue()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     let {callQueues, isQueueListPending, fetchQueueMembers} = useFetchCallQueueMembers()
+    let {writeExcel} = useWriteExcelFile()
 
     const handleClick = () => {
         fetchExtensions()
@@ -34,9 +34,8 @@ const CallQueues = () => {
     useEffect(() => {
         if (isQueueListPending) return
 
-        let data = csvify(['Name', 'Ext', 'Site', 'Status', 'Members'], callQueues)
-        const blob = new Blob([data])
-        FileSaver.saveAs(blob, 'queues.csv')
+        const header = ['Name', 'Ext', 'Site', 'Status', 'Members']
+        writeExcel(header, callQueues, 'queues.xlsx')
     }, [isQueueListPending, callQueues])
 
     return (
