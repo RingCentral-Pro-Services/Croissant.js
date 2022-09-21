@@ -5,9 +5,7 @@ import useExtensionList from "../rcapi/useExtensionList"
 import useGetAccessToken from "../rcapi/useGetAccessToken"
 import useMessageQueue from "../hooks/useMessageQueue"
 import useFetchNotifications from "../rcapi/useFetchNotifications"
-import csvify from "../helpers/csvify"
 import useWriteExcelFile from "../hooks/useWriteExcelFile"
-const FileSaver = require('file-saver');
 
 const NotificationAudit = () => {
     useLogin()
