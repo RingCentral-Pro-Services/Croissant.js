@@ -19,6 +19,7 @@ const NotificationAudit = () => {
     const {writeExcel} = useWriteExcelFile()
 
     const handleClick = () => {
+        setIsPending(true)
         fetchExtensions()
     }
 
@@ -43,19 +44,21 @@ const NotificationAudit = () => {
 
     useEffect(() => {
         if (isNotificationListPending) return
+        if (!isPending) return
         
         // let data = csvify(['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses'], notifications)
         // const blob = new Blob([data])
         // FileSaver.saveAs(blob, 'notifications.csv')
         let header = ['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses']
         writeExcel(header, notifications, 'notifications.xlsx')
+        setIsPending(false)
     }, [isNotificationListPending, notifications, writeExcel])
 
     return (
         <>
             <h2>Extension Notifications</h2>
             <input type="text" className="input-field" value={targetUID} onChange={(e) => setTargetUID(e.target.value)}/>
-            <button onClick={handleClick}>Go</button>
+            <button disabled={isPending} onClick={handleClick}>{isPending ? 'Processing' : 'Go'}</button>
             <form>
                 <button type='button' className="inline browse-button" onClick={handleFileOpenClick}>Browse...</button>
                 <p className="inline healthy-margin-right">{selectedFile ? selectedFile.name : "No file selected"}</p>
