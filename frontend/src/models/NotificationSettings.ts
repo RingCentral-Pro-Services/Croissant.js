@@ -1,12 +1,17 @@
 import CSVFormattable from "./CSVFormattable"
+import ExcelFormattable from "./ExcelFormattable"
 import NotificationBundle from "./NotificationBundle"
 import RCExtension from "./RCExtension"
 
-class NotificationSettings implements CSVFormattable {
+class NotificationSettings implements CSVFormattable, ExcelFormattable {
     constructor(public extension: RCExtension, public data: NotificationSettingsPayload) {}
 
     toRow(): string {
         return `${this.extension.id},${this.extension.name},${this.extension.extensionNumber},${this.extension.prettyType[this.extension.type]},"${this.data.emailAddresses ?? ""}"`
+    }
+
+    toExcelRow(): string[] {
+        return [`${this.extension.id}`, this.extension.name, `${this.extension.extensionNumber}`, this.extension.prettyType[this.extension.type] ?? this.extension.type, `${this.data.emailAddresses ?? ''}`]
     }
 }
 
