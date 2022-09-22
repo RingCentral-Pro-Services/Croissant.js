@@ -25,7 +25,7 @@ const useExcelToQueues = () => {
             for (let memberIndex = 0; memberIndex < membersExtensions.length; memberIndex++) {
                 members.push(`${idForExtension(membersExtensions[memberIndex], extensionsList)}`)
             }
-            let queue = new CallQueue(extension, members)
+            let queue = new CallQueue(extension, idForSite(extension.site, extensionsList), members)
             records.push(queue)
         }
         setQueues(records)
@@ -36,6 +36,15 @@ const useExcelToQueues = () => {
         for (let index = 0; index < extensionsList.length; index++) {
             if (`${extensionsList[index].extensionNumber}` === extension) {
                 return extensionsList[index].id
+            }
+        }
+        return 0
+    }
+
+    const idForSite = (siteName: string, extensionList: RCExtension[]) => {
+        for (let index = 0; index < extensionList.length; index++) {
+            if (extensionList[index].name === siteName) {
+                return extensionList[index].id
             }
         }
         return 0
