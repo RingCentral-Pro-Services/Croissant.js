@@ -1,8 +1,10 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto');
 
 body {
-  background-color: #f7f8fa;
+  /* background-color: #f7f8fa; */
+  background-color: #edf0f3;
   margin: 0;
+  top: 0;
   font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
@@ -71,7 +73,9 @@ body {
 
 .content {
   background-color: #f7f8fa;
-  margin-left: 250px;
+  margin-top: 0;
+  margin-left: 230px;
+  position: absolute;
   top: 0;
   width: calc(100% - 250px);
   /* max-width: 1200px; */
@@ -202,6 +206,24 @@ button:hover {
   color: green;
 }
 
+.header {
+  background-color: white;
+  width: 100%;
+  margin-top: 0;
+  box-sizing: border-box;
+}
+
+.header h1 {
+  margin: 0;
+  padding-top: 30px;
+  padding-left: 30px;
+}
+
+.header p {
+  padding-left: 30px;
+  padding-bottom: 20px;
+}
+
 .tool-card {
   color: black;
   background-color: #ffffff;
@@ -209,5 +231,6 @@ button:hover {
   width: 99%;
   border-radius: 7px;
   padding: 10px;
-  margin-top: 20px;
+  margin-top: 30px;
+  margin-left: 30px;
 }
