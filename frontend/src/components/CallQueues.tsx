@@ -65,9 +65,11 @@ const CallQueues = () => {
 
     return (
         <>
-            <h2>Call Queues</h2>
-            <input type="text" className="input-field" value={targetUID} onChange={(e) => setTargetUID(e.target.value)}/>
-            <button onClick={handleClick}>Go</button>
+            <div className="tool-card">
+                <h2>Call Queues</h2>
+                <input type="text" className="input-field" value={targetUID} onChange={(e) => setTargetUID(e.target.value)}/>
+                <button onClick={handleClick}>Go</button>
+            </div>
             <CreateCallQueues />
             {messages.map((message: Message) => (
                 <div key={message.body}>
