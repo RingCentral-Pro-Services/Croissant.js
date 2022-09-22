@@ -6,6 +6,7 @@ import useGetAccessToken from "../rcapi/useGetAccessToken"
 import useMessageQueue from "../hooks/useMessageQueue"
 import useFetchNotifications from "../rcapi/useFetchNotifications"
 import useWriteExcelFile from "../hooks/useWriteExcelFile"
+import useReadExcel from "../hooks/useReadExcel"
 
 const NotificationAudit = () => {
     useLogin()
@@ -17,6 +18,7 @@ const NotificationAudit = () => {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [isPending, setIsPending] = useState(false)
     const {writeExcel} = useWriteExcelFile()
+    let {readFile, excelData, isExcelDataPending} = useReadExcel()
 
     const handleClick = () => {
         setIsPending(true)
@@ -29,7 +31,16 @@ const NotificationAudit = () => {
 
     const handleSubmit = () => {
         if (!selectedFile) return
+
+        readFile(selectedFile, 'IVRs2')
     }
+
+    useEffect(() => {
+        if (isExcelDataPending) return
+
+        console.log('Excel Data')
+        console.log(excelData)
+    }, [isExcelDataPending])
 
     useEffect(() => {
         localStorage.setItem('target_uid', targetUID)
