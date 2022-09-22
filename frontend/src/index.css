@@ -206,8 +206,8 @@ button:hover {
   color: black;
   background-color: #ffffff;
   box-sizing: border-box;
+  width: 99%;
   border-radius: 5px;
   padding: 10px;
-  /* margin: 15px; */
   margin-top: 20px;
 }
