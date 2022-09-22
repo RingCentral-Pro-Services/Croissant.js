@@ -11,6 +11,7 @@ import FileSelect from "./FileSelect"
 import useExcelToQueues from "../rcapi/useExcelToQueues"
 import useCreateCallQueues from "../rcapi/useCreateCallQueues"
 import CreateCallQueues from "./CreateCallQueues"
+import Header from "./Header"
 
 const CallQueues = () => {
     useLogin()
@@ -65,8 +66,9 @@ const CallQueues = () => {
 
     return (
         <>
+        <Header title='Call Queues' body='Do some stuff with call queues' />
             <div className="tool-card">
-                <h2>Call Queues</h2>
+                <h2>Export Call Queues</h2>
                 <input type="text" className="input-field" value={targetUID} onChange={(e) => setTargetUID(e.target.value)}/>
                 <button onClick={handleClick}>Go</button>
             </div>

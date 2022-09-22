@@ -7,6 +7,7 @@ import useMessageQueue from "../hooks/useMessageQueue"
 import useFetchNotifications from "../rcapi/useFetchNotifications"
 import useWriteExcelFile from "../hooks/useWriteExcelFile"
 import useReadExcel from "../hooks/useReadExcel"
+import Header from "./Header"
 
 const NotificationAudit = () => {
     useLogin()
@@ -66,7 +67,9 @@ const NotificationAudit = () => {
     }, [isNotificationListPending, notifications, writeExcel])
 
     return (
-        <div className="tool-card">
+        <>
+            <Header title="Notification Audit" body="Generate a spreadsheet containing notification settings for all extensions"/>
+            <div className="tool-card">
             <h2>Extension Notifications</h2>
             <input type="text" className="input-field" value={targetUID} onChange={(e) => setTargetUID(e.target.value)}/>
             <button disabled={isPending} onClick={handleClick}>{isPending ? 'Processing' : 'Go'}</button>
@@ -81,7 +84,8 @@ const NotificationAudit = () => {
                     <p className={message.type}>{message.body}</p>
                 </div>
             ))}
-        </div>
+            </div>
+        </>
     )
 }
 

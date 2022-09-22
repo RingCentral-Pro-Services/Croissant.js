@@ -7,6 +7,7 @@ import useFilterServices from '../hooks/useFilterServices';
 import useFileSave from '../hooks/useFileSave';
 import useAnalytics from '../hooks/useAnalytics';
 import LucidchartFilterPage from '../models/LucidchartFilterPage';
+import Header from './Header';
 const axios = require('axios').default;
 
 const CreateMenus = () => {
@@ -58,8 +59,10 @@ const CreateMenus = () => {
         extract(file)
     }
 
-    return ( 
-        <div className='tool-card'>
+    return (
+        <>
+        <Header title='Create IVR Menus' body='Create IVRs using either the BRD or a Lucidchart document'/>
+            <div className='tool-card'>
             <h2>Create Menus</h2>
             <form action='/fileupload' method="post" encType="multipart/form-data">
                 <button type='button' className="inline browse-button" onClick={handleClick}>Browse...</button>
@@ -70,7 +73,8 @@ const CreateMenus = () => {
             </form>
             <ResourcesArea title="Instructions" links={instructionsData}/>
             <ResourcesArea title="Resources" links={rescourcesData}/>
-        </div>
+            </div>
+        </>
      );
 }
  

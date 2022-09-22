@@ -3,6 +3,7 @@ import { useState } from "react";
 import useFileSave from "../hooks/useFileSave";
 import ResourcesArea from './ResourcesArea';
 import useAnalytics from "../hooks/useAnalytics";
+import Header from './Header';
 const axios = require('axios').default;
 
 const AuditMenus = () => {
@@ -41,7 +42,9 @@ const AuditMenus = () => {
     }
 
     return ( 
-        <div className='tool-card'>
+        <>
+            <Header title='Audit IVR Menus' body='Upload an XML file and get an audit-friendly spreadsheet containing all menus in an account'/>
+            <div className='tool-card'>
             <h2>Audit Menus</h2>
             <form>
                 <button type='button' className="inline browse-button" onClick={handleClick}>Browse...</button>
@@ -51,7 +54,8 @@ const AuditMenus = () => {
             </form>
             <ResourcesArea title="Instructions" links={instructionsData} />
             <ResourcesArea title="Resources" links={resourcesData} />
-        </div>
+            </div>
+        </>
      );
 }
  

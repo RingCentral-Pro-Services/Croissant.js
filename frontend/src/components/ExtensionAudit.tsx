@@ -5,6 +5,7 @@ import useExtensionList from '../rcapi/useExtensionList'
 import useGetAccessToken from '../rcapi/useGetAccessToken'
 import useWriteExcelFile from '../hooks/useWriteExcelFile'
 import { Message } from '../models/Message'
+import Header from './Header'
 
 const ExtensionAudit = () => {
     useLogin()
@@ -36,7 +37,9 @@ const ExtensionAudit = () => {
     }, [isExtensionListPending, extensionsList, writeExcel])
 
     return (
-        <div className='tool-card'>
+        <>
+            <Header title='Account Dump' body='This tool generatates a list of all extensions in an account'/>
+            <div className='tool-card'>
             <h2>Account Dump</h2>
             <input type="text" className="input-field" value={targetUID} onChange={(e) => setTargetUID(e.target.value)}/>
             <button onClick={handleClick}>Go</button>
@@ -47,6 +50,7 @@ const ExtensionAudit = () => {
                 </div>
             ))}
         </div>
+        </>
     )
 }
 
