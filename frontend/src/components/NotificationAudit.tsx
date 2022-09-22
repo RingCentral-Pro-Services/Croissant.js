@@ -66,7 +66,7 @@ const NotificationAudit = () => {
     }, [isNotificationListPending, notifications, writeExcel])
 
     return (
-        <>
+        <div className="tool-card">
             <h2>Extension Notifications</h2>
             <input type="text" className="input-field" value={targetUID} onChange={(e) => setTargetUID(e.target.value)}/>
             <button disabled={isPending} onClick={handleClick}>{isPending ? 'Processing' : 'Go'}</button>
@@ -81,7 +81,7 @@ const NotificationAudit = () => {
                     <p className={message.type}>{message.body}</p>
                 </div>
             ))}
-        </>
+        </div>
     )
 }
 

@@ -36,7 +36,7 @@ const ExtensionAudit = () => {
     }, [isExtensionListPending, extensionsList, writeExcel])
 
     return (
-        <>
+        <div className='tool-card'>
             <h2>Account Dump</h2>
             <input type="text" className="input-field" value={targetUID} onChange={(e) => setTargetUID(e.target.value)}/>
             <button onClick={handleClick}>Go</button>
@@ -46,7 +46,7 @@ const ExtensionAudit = () => {
                     <p className={message.type}>{message.body}</p>
                 </div>
             ))}
-        </>
+        </div>
     )
 }
 

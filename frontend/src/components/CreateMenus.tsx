@@ -59,7 +59,7 @@ const CreateMenus = () => {
     }
 
     return ( 
-        <>
+        <div className='tool-card'>
             <h2>Create Menus</h2>
             <form action='/fileupload' method="post" encType="multipart/form-data">
                 <button type='button' className="inline browse-button" onClick={handleClick}>Browse...</button>
@@ -70,7 +70,7 @@ const CreateMenus = () => {
             </form>
             <ResourcesArea title="Instructions" links={instructionsData}/>
             <ResourcesArea title="Resources" links={rescourcesData}/>
-        </>
+        </div>
      );
 }
  

@@ -41,7 +41,7 @@ const AuditMenus = () => {
     }
 
     return ( 
-        <>
+        <div className='tool-card'>
             <h2>Audit Menus</h2>
             <form>
                 <button type='button' className="inline browse-button" onClick={handleClick}>Browse...</button>
@@ -51,7 +51,7 @@ const AuditMenus = () => {
             </form>
             <ResourcesArea title="Instructions" links={instructionsData} />
             <ResourcesArea title="Resources" links={resourcesData} />
-        </>
+        </div>
      );
 }
  
