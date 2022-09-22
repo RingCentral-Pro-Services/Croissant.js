@@ -6,6 +6,11 @@ import useExtensionList from "../rcapi/useExtensionList"
 import { Message } from "../models/Message"
 import useFetchCallQueueMembers from "../rcapi/useFetchCallQueueMembers"
 import useWriteExcelFile from "../hooks/useWriteExcelFile"
+import useReadExcel from "../hooks/useReadExcel"
+import FileSelect from "./FileSelect"
+import useExcelToQueues from "../rcapi/useExcelToQueues"
+import useCreateCallQueues from "../rcapi/useCreateCallQueues"
+import CreateCallQueues from "./CreateCallQueues"
 
 const CallQueues = () => {
     useLogin()
@@ -15,10 +20,30 @@ const CallQueues = () => {
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     let {callQueues, isQueueListPending, fetchQueueMembers} = useFetchCallQueueMembers()
     let {writeExcel} = useWriteExcelFile()
+    const [selectedFile, setSelectedFile] = useState<File | null>()
+    const {readFile, excelData, isExcelDataPending} = useReadExcel()
+    let {convert, queues, isQueueConvertPending} = useExcelToQueues()
+    let {isCallQueueCreationPending, createQueues} = useCreateCallQueues()
 
     const handleClick = () => {
         fetchExtensions()
     }
+
+    const handleFileSelect = () => {
+        if (!selectedFile) return
+        console.log(`Selected file: ${selectedFile.name}`)
+        readFile(selectedFile, 'Queues')
+    }
+
+    useEffect(() => {
+        if (isExcelDataPending) return
+        convert(excelData, extensionsList)
+    }, [isExcelDataPending, excelData])
+
+    useEffect(() => {
+        if (isQueueConvertPending) return
+        createQueues(queues)
+    }, [isQueueConvertPending])
 
     useEffect(() => {
         localStorage.setItem('target_uid', targetUID)
@@ -34,7 +59,7 @@ const CallQueues = () => {
     useEffect(() => {
         if (isQueueListPending) return
 
-        const header = ['Name', 'Ext', 'Site', 'Status', 'Members']
+        const header = ['Queue Name', 'Extension', 'Site', 'Status', 'Members (Ext)']
         writeExcel(header, callQueues, 'queues.xlsx')
     }, [isQueueListPending, callQueues])
 
@@ -43,6 +68,7 @@ const CallQueues = () => {
             <h2>Call Queues</h2>
             <input type="text" className="input-field" value={targetUID} onChange={(e) => setTargetUID(e.target.value)}/>
             <button onClick={handleClick}>Go</button>
+            <CreateCallQueues />
             {messages.map((message: Message) => (
                 <div key={message.body}>
                     <p className={message.type}>{message.body}</p>
