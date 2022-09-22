@@ -70,8 +70,8 @@ body {
 .content {
   margin-left: 250px;
   top: 0;
-  width: 100%;
-  max-width: 1200px;
+  width: calc(100% - 250px);
+  /* max-width: 1200px; */
 }
 
 .inline {
@@ -197,4 +197,10 @@ button:hover {
 .message-success {
   font-size: 1.1em;
   color: green;
+}
+
+.tool-card {
+  box-sizing: border-box;
+  padding: 10px;
+  margin-top: 20px;
 }
