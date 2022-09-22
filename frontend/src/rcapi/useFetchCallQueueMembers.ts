@@ -57,7 +57,7 @@ const useFetchCallQueueMembers = () => {
                         extensions.push(records[index].extensionNumber)
                     }
 
-                    let queue = new CallQueue(filteredExtensions[currentExtensionIndex], extensions)
+                    let queue = new CallQueue(filteredExtensions[currentExtensionIndex], 0, extensions)
                     let newCallQueues = [...callQueues, queue]
                     setCallQueues(newCallQueues)
 
