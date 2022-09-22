@@ -3,7 +3,7 @@ import ExcelFormattable from "./ExcelFormattable";
 import RCExtension from "./RCExtension";
 
 class CallQueue implements CSVFormattable, ExcelFormattable {
-    constructor(public extension: RCExtension, public members: string[]) {}
+    constructor(public extension: RCExtension, public siteID: number, public members: string[]) {}
 
     toRow(): string {
         return `${this.extension.name},${this.extension.extensionNumber},${this.extension.site},${this.extension.status},"${this.members}"`
