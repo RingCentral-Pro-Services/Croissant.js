@@ -30,11 +30,13 @@ export interface IVRPrompt {
 export interface IVRAction {
     input: string
     action: string
+    extension?: IVRDestination
+    phoneNumber?: string
 }
 
 export interface IVRDestination {
     id: string
-    uri: string
+    uri?: string
 }
 
 export interface Site {
