@@ -61,9 +61,6 @@ const LegacyCreateMenus = () => {
 
     return (
         <>
-        <Header title='Create IVR Menus' body='Create IVRs using either the BRD or a Lucidchart document'/>
-            <div className='tool-card'>
-            <h2>Create Menus</h2>
             <form action='/fileupload' method="post" encType="multipart/form-data">
                 <button type='button' className="inline browse-button" onClick={handleClick}>Browse...</button>
                 <p className="inline healthy-margin-right">{selectedFile ? selectedFile.name : "No file selected"}</p>
@@ -73,7 +70,6 @@ const LegacyCreateMenus = () => {
             </form>
             <ResourcesArea title="Instructions" links={instructionsData}/>
             <ResourcesArea title="Resources" links={rescourcesData}/>
-            </div>
         </>
      );
 }
