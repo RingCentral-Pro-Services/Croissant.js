@@ -7,6 +7,7 @@ import useExcelToIVRs from "../rcapi/useExcelToIVRs";
 import FileSelect from "./FileSelect";
 import useLogin from "../hooks/useLogin";
 import useCreateIVRs from "../rcapi/useCreateIVRs";
+import DataTable from "./DataTable";
 
 const DirectCreateMenus = () => {
     useLogin()
@@ -59,6 +60,7 @@ const DirectCreateMenus = () => {
             <input type="text" className="input-field" value={targetUID} onChange={(e) => setTargetUID(e.target.value)}/>
             <button onClick={handleClick}>Go</button>
             <FileSelect handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={false} />
+            {isMenuConvertPending ? <></> : <DataTable header={['Name', 'Ext', 'Site', 'Prompt Mode', 'Prompt']} data={menus} />}
         </>
     )
 }
