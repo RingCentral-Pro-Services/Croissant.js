@@ -7,7 +7,6 @@ import useFilterServices from '../hooks/useFilterServices';
 import useFileSave from '../hooks/useFileSave';
 import useAnalytics from '../hooks/useAnalytics';
 import LucidchartFilterPage from '../models/LucidchartFilterPage';
-import Header from './Header';
 const axios = require('axios').default;
 
 const LegacyCreateMenus = () => {
