@@ -6,6 +6,7 @@ import useReadExcel from "../hooks/useReadExcel";
 import useExcelToIVRs from "../rcapi/useExcelToIVRs";
 import FileSelect from "./FileSelect";
 import useLogin from "../hooks/useLogin";
+import useCreateIVRs from "../rcapi/useCreateIVRs";
 
 const DirectCreateMenus = () => {
     useLogin()
@@ -16,6 +17,7 @@ const DirectCreateMenus = () => {
     const [selectedFile, setSelectedFile] = useState<File | null>()
     const {excelData, isExcelDataPending, readFile} = useReadExcel()
     const {menus, isMenuConvertPending, converToMenus} = useExcelToIVRs()
+    const {createMenus} = useCreateIVRs()
 
     const handleClick = () => {
         console.log('Clicked go button!')
@@ -44,6 +46,7 @@ const DirectCreateMenus = () => {
         if (isMenuConvertPending) return 
 
         console.log(menus)
+        createMenus(menus, extensionsList)
     }, [isMenuConvertPending, menus])
 
     useEffect(() => {
