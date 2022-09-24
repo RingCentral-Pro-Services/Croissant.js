@@ -20,6 +20,7 @@ export interface IVRMenuData {
     prompt: IVRPrompt
     site: Site
     actions: IVRAction[]
+    id?: string
 }
 
 export interface IVRPrompt {
