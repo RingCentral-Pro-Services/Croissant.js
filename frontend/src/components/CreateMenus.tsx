@@ -3,7 +3,6 @@ import Header from './Header';
 import LegacyCreateMenus from './LegacyCreateMenus';
 import DirectCreateMenus from './DirectCreateMenus';
 import RadioButtonGroup from './RadioButtonGroup';
-const axios = require('axios').default;
 
 const CreateMenus = () => {
     const [showLegacyComponent, setShowLegacyComponent] = useState(false)
