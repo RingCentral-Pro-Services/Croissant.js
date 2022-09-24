@@ -12,6 +12,7 @@ import DataTable from "./DataTable";
 const DirectCreateMenus = () => {
     useLogin()
     let [targetUID, setTargetUID] = useState("~")
+    let [isReadyToSync, setReadyToSync] = useState(false)
     let {messages, postMessage} = useMessageQueue()
     const {fetchToken} = useGetAccessToken()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
@@ -30,6 +31,10 @@ const DirectCreateMenus = () => {
         fetchExtensions()
     }
 
+    const handleSyncButtonClick = () => {
+        setReadyToSync(true)
+    }
+
     useEffect(() => {
         if (isExtensionListPending) return
         if (!selectedFile) return
@@ -44,11 +49,12 @@ const DirectCreateMenus = () => {
     }, [isExcelDataPending, excelData])
 
     useEffect(() => {
-        if (isMenuConvertPending) return 
+        if (isMenuConvertPending) return
+        if (!isReadyToSync) return
 
         console.log(menus)
         createMenus(menus, extensionsList)
-    }, [isMenuConvertPending, menus])
+    }, [isReadyToSync, isMenuConvertPending, menus])
 
     useEffect(() => {
         localStorage.setItem('target_uid', targetUID)
@@ -60,6 +66,7 @@ const DirectCreateMenus = () => {
             <input type="text" className="input-field" value={targetUID} onChange={(e) => setTargetUID(e.target.value)}/>
             <button onClick={handleClick}>Go</button>
             <FileSelect handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={false} />
+            {isExcelDataPending || isExtensionListPending || isMenuConvertPending ? <></> : <button onClick={handleSyncButtonClick}>Sync</button>}
             {isMenuConvertPending ? <></> : <DataTable header={['Name', 'Ext', 'Site', 'Prompt Mode', 'Prompt']} data={menus} />}
         </>
     )
