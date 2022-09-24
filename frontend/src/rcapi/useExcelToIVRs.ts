@@ -73,7 +73,7 @@ const useExcelToIVRs = () => {
         // Then get the URI of the audio prompt
 
         prompt.mode = 'TextToSpeech'
-        prompt.text = rawText
+        prompt.text = sanitizedPrompt(rawText)
 
         return prompt
     }
@@ -147,6 +147,28 @@ const useExcelToIVRs = () => {
             }
         }
         return 0
+    }
+
+    /**
+     * Remove any invalid characters from the prompt
+     * @param {String} prompt The prompt to be sanitized
+     * @returns The sanitized prompt as a string
+     */
+     const sanitizedPrompt = (prompt: any) => {
+        let result = prompt.replaceAll("_", "-")
+        result = result.replaceAll("*", "star")
+        result = result.replaceAll("#", "pound")
+        result = result.replaceAll("@", "at")
+        result = result.replaceAll("&", "and")
+        result = result.replaceAll("(", "")
+        result = result.replaceAll(")", "")
+        result = result.replaceAll("%", "")
+        result = result.replaceAll("$", "")
+        result = result.replaceAll("!", ".")
+        result = result.replaceAll("?", ".")
+        result = result.replaceAll(":", "")
+        result = result.replaceAll(";", "")
+        return result
     }
 
     return {menus, isMenuConvertPending, converToMenus}
