@@ -10,11 +10,9 @@ interface response {
 }
 
 const useCreateIVRs = () => {
-    let [shouldFetch, setShouldFetch] = useState(false)
     let [rateLimitInterval, setRateLimitInterval] = useState(0)
     const [workingMenus, setMenus] = useState<IVRMenu[]>([])
     let [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
-    const [isMenuCreationPending, setIsPending] = useState(true)
     const [shouldCreateMenus, setShoudCreateMenus] = useState(false)
     const [shouldUpdateMenus, setShouldUpdateMenus] = useState(false)
     const accessToken = localStorage.getItem('cs_access_token')
