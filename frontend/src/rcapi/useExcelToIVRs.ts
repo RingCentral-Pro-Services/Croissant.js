@@ -38,7 +38,8 @@ const useExcelToIVRs = () => {
                 extensionNumber: currentItem['Menu Ext'],
                 prompt: prompt,
                 site: site,
-                actions: actions
+                actions: actions,
+                id: `${idForExtension(currentItem['Menu Ext'], extensionList)}`
             }
             let menu = new IVRMenu(menuData)
             records.push(menu)
@@ -118,7 +119,12 @@ const useExcelToIVRs = () => {
                         else {
                             delete action.phoneNumber
                         }
-                        actions.push(action)
+
+                        // Only add the keypress if the destination extension exists
+                        // TODO: Present an error to the user
+                        if (action.extension?.id !== `0`) {
+                            actions.push(action)
+                        }
                     }
                     else {
                         let action: IVRAction = {
@@ -136,7 +142,7 @@ const useExcelToIVRs = () => {
 
     const idForExtension = (extension: string, extensionsList: RCExtension[]) => {
         for (let index = 0; index < extensionsList.length; index++) {
-            if (`${extensionsList[index].extensionNumber}` === extension) {
+            if (`${extensionsList[index].extensionNumber}` === extension.toString().trim()) {
                 return extensionsList[index].id
             }
         }
