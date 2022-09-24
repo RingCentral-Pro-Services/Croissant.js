@@ -12,9 +12,9 @@ export class IVRMenu implements CSVFormattable, ExcelFormattable {
         let result = [this.data.name, `${this.data.extensionNumber}`, this.data.site.id, this.data.prompt.mode, this.data.prompt.text]
         let actions = this.actionsToRow()
 
-        for (let index = 0; index < actions.length; index++) {
-            result.push(actions[index])
-        }
+        // for (let index = 0; index < actions.length; index++) {
+        //     result.push(actions[index])
+        // }
         
         return result
     }
