@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { IVRMenu } from "../models/IVRMenu"
 import RCExtension from "../models/RCExtension"
 import rateLimit from "../helpers/rateLimit";
+import ExtensionContact from "../models/ExtensionContact";
 const axios = require('axios').default;
 
 interface response {
@@ -31,6 +32,7 @@ const useCreateIVRs = () => {
     useEffect(() => {
         if (!shouldCreateMenus) return
         if (currentExtensionIndex === workingMenus.length) {
+            validateKeyPresses()
             setShouldUpdateMenus(true)
             setShoudCreateMenus(false)
             setCurrentExtensionIndex(0)
@@ -47,11 +49,13 @@ const useCreateIVRs = () => {
                 .then((response: any) => {
                     console.log(`Menu '${workingMenus[currentExtensionIndex].data.name}' created successfully`)
                     setRateLimitInterval(response.rateLimit)
+                    addToExtensionList(workingMenus[currentExtensionIndex])
                     setCurrentExtensionIndex(currentExtensionIndex + 1)
                     let newMenus = workingMenus
                     newMenus[currentExtensionIndex].data.id = response.id
                     setMenus(newMenus)
                     if (currentExtensionIndex === workingMenus.length - 1) {
+                        validateKeyPresses()
                         setShouldUpdateMenus(true)
                         setShoudCreateMenus(false)
                         setCurrentExtensionIndex(0)
@@ -162,6 +166,53 @@ const useCreateIVRs = () => {
             })
         })
         return promise
+    }
+
+    const addToExtensionList = (menu: IVRMenu) => {
+        let newExtensionList = [...exts]
+        let contact: ExtensionContact = {
+            firstName: menu.data.name,
+            lastName: "",
+            email: ""
+        }
+        let newExtension = new RCExtension(0, menu.data.extensionNumber, menu.data.name, contact, menu.data.site.id, 'IvrMenu', 'Enabled', false, '')
+        newExtensionList.push(newExtension)
+        setExtensionList(newExtensionList)
+    }
+
+    const validateKeyPresses = () => {
+        console.log('Validating key presses')
+        let menus = workingMenus
+
+        // Loop through each menus
+        for (let index = 0; index < menus.length; index++) {
+            // Loop through each key press
+            for (let actionIndex = 0; actionIndex < menus[index].data.actions.length; actionIndex++) {
+                let destinationID = idForExtension(menus[index].data.actions[actionIndex].extension?.id ?? '', exts)
+                if (menus[index].data.actions[actionIndex].extension) {
+                    menus[index].data.actions[actionIndex].extension!.id = `${destinationID}`
+                }
+            }
+            let validActions = menus[index].data.actions.filter((action) => {
+                if (action.extension) {
+                    return action.extension.id !== '0'
+                }
+                return true
+            })
+            menus[index].data.actions = validActions
+        }
+
+        console.log('Adjusted menus')
+        console.log(menus)
+    }
+
+    const idForExtension = (extension: string, extensionsList: RCExtension[]) => {
+        for (let index = 0; index < extensionsList.length; index++) {
+            if (`${extensionsList[index].extensionNumber}` === extension.toString().trim()) {
+                return extensionsList[index].id
+            }
+        }
+        return 0
     }
 
     const extensionExists = (extensionNumber: number, extensionList: RCExtension[]) => {
