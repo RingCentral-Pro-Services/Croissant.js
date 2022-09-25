@@ -67,7 +67,7 @@ const DirectCreateMenus = () => {
             <button onClick={handleClick}>Go</button>
             <FileSelect handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={false} />
             {isExcelDataPending || isExtensionListPending || isMenuConvertPending ? <></> : <button onClick={handleSyncButtonClick}>Sync</button>}
-            {isMenuConvertPending ? <></> : <DataTable header={['Name', 'Ext', 'Site', 'Prompt Mode', 'Prompt']} data={menus} />}
+            {isMenuConvertPending ? <></> : <DataTable header={['Name', 'Ext', 'Site', 'Prompt Mode', 'Prompt', 'Key 1 Action', 'Key 1 Destination', 'Key 2 Action', 'Key 2 Destination', 'Key 3 Action', 'Key 3 Destination', 'Key 4 Action', 'Key 4 Destination', 'Key 5 Action', 'Key 5 Destination', 'Key 6 Action', 'Key 6 Destination', 'Key 7 Action', 'Key 7 Destination', 'Key 8 Action', 'Key 8 Destination', 'Key 9 Action', 'Key 9 Destination', 'Key 0 Action', 'Key 0 Destination']} data={menus} />}
         </>
     )
 }
