@@ -5,9 +5,12 @@ import useMessageQueue from "../hooks/useMessageQueue"
 import useExtensionList from "../rcapi/useExtensionList"
 import useExcelToQueues from "../rcapi/useExcelToQueues"
 import useCreateCallQueues from "../rcapi/useCreateCallQueues"
+import DataTable from "./DataTable"
 
 const CreateCallQueues = () => {
     let {messages, postMessage} = useMessageQueue()
+    let [isPending, setIsPending] = useState(true)
+    let [isReadyToSync, setIsReadyToSync] = useState(false)
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     const [selectedFile, setSelectedFile] = useState<File | null>()
     const {readFile, excelData, isExcelDataPending} = useReadExcel()
@@ -19,6 +22,10 @@ const CreateCallQueues = () => {
         console.log(`Selected file: ${selectedFile.name}`)
         fetchExtensions()
         // readFile(selectedFile, 'Queues')
+    }
+
+    const handleSyncButtonClick = () => {
+        setIsReadyToSync(true)
     }
 
     useEffect(() => {
@@ -35,13 +42,16 @@ const CreateCallQueues = () => {
 
     useEffect(() => {
         if (isQueueConvertPending) return
+        if (!isReadyToSync) return
         createQueues(queues, extensionsList)
-    }, [isQueueConvertPending])
+    }, [isQueueConvertPending, isReadyToSync])
 
     return (
         <div className="tool-card">
             <h2>Create Call Queues</h2>
             <FileSelect handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} />
+            <button onClick={handleSyncButtonClick}>Sync</button>
+            {isQueueConvertPending ? <></> : <DataTable header={['Name', 'Extension', 'Site', 'Status', 'Members']} data={queues} />}
         </div>
     )
 }
