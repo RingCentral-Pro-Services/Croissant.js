@@ -259,16 +259,19 @@ button:hover {
 
 .data-table {
   padding-top: 10px;
+  width: 99%;
+  overflow-x: auto;
 }
 
 table {
   /* font-family: arial, sans-serif; */
   border-collapse: collapse;
-  width: 100%;
+  table-layout: fixed;
 }
 
 td, th {
   border: 1px solid #dddddd;
   text-align: left;
   padding: 8px;
+  width: 200px;
 }
