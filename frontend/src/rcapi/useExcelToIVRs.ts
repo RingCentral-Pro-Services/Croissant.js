@@ -101,7 +101,7 @@ const useExcelToIVRs = () => {
                             destination = rawDestination.toString().replace(/\D/g,'')
                         }
                         let extension: IVRDestination = {
-                            id: `${idForExtension(destination, extensionList)}`,
+                            id: destination,
                         }
                         let action: IVRAction = {
                             input: `${keyPressIndex}`,
@@ -120,11 +120,7 @@ const useExcelToIVRs = () => {
                             delete action.phoneNumber
                         }
 
-                        // Only add the keypress if the destination extension exists
-                        // TODO: Present an error to the user
-                        if (action.extension?.id !== `0`) {
-                            actions.push(action)
-                        }
+                        actions.push(action)
                     }
                     else {
                         let action: IVRAction = {
