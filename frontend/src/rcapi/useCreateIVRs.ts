@@ -201,9 +201,6 @@ const useCreateIVRs = () => {
             })
             menus[index].data.actions = validActions
         }
-
-        console.log('Adjusted menus')
-        console.log(menus)
     }
 
     const idForExtension = (extension: string, extensionsList: RCExtension[]) => {
