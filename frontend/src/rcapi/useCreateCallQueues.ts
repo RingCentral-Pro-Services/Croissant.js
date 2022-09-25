@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import CallQueue from "../models/CallQueue"
 import rateLimit from "../helpers/rateLimit";
+import RCExtension from "../models/RCExtension";
 const axios = require('axios').default;
 
 const useCreateCallQueues = () => {
@@ -13,9 +14,11 @@ const useCreateCallQueues = () => {
     const accessToken = localStorage.getItem('cs_access_token')
     const url = 'https://platform.devtest.ringcentral.com/restapi/v1.0/account/~/extension'
     const baseUpdateURL = 'https://platform.devtest.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId/bulk-assign'
+    const [extensionList, setExtensionList] = useState<RCExtension[]>([])
 
-    const createQueues = (callQueues: CallQueue[]) => {
+    const createQueues = (callQueues: CallQueue[], extensions: RCExtension[]) => {
         console.log(`Creating ${callQueues.length} queues`)
+        setExtensionList(extensions)
         setQueues(callQueues)
         setShouldFetch(true)
         setCurrentExtensionIndex(0)
@@ -24,12 +27,22 @@ const useCreateCallQueues = () => {
     // Create queues
     useEffect(() => {
         if (!shouldFetch) return
-        if (currentExtensionIndex === queues.length) return
+        if (currentExtensionIndex === queues.length) {
+            setShouldFetch(false)
+            setCurrentExtensionIndex(0)
+            setShouldUpdateQueues(true)
+            return
+        }
 
         let targetUID = localStorage.getItem('target_uid')
         if (!targetUID) return
 
         const extensionURL = url.replace('~', targetUID)
+
+        if (extensionExists(queues[currentExtensionIndex].extension.extensionNumber, extensionList)) {
+            setCurrentExtensionIndex(currentExtensionIndex + 1)
+            return
+        }
 
         setTimeout(() => {
             console.log(`Email: ${queues[currentExtensionIndex].extension.contact.email}`)
@@ -74,6 +87,7 @@ const useCreateCallQueues = () => {
 
     }, [shouldFetch, currentExtensionIndex, queues, url])
 
+    // Add queue members
     useEffect(() => {
         if (!shouldUpdateQueues) return
         if (currentExtensionIndex === queues.length) return
@@ -119,6 +133,13 @@ const useCreateCallQueues = () => {
         }, rateLimitInterval)
 
     }, [shouldUpdateQueues])
+
+    const extensionExists = (extensionNumber: number, extensionList: RCExtension[]) => {
+        for (let index = 0; index < extensionList.length; index++) {
+            if (extensionList[index].extensionNumber == extensionNumber) return true
+        }
+        return false
+    }
 
     return {isCallQueueCreationPending, createQueues}
 }
