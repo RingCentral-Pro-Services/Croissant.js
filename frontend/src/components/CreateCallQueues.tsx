@@ -35,7 +35,7 @@ const CreateCallQueues = () => {
 
     useEffect(() => {
         if (isQueueConvertPending) return
-        createQueues(queues)
+        createQueues(queues, extensionsList)
     }, [isQueueConvertPending])
 
     return (
