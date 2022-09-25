@@ -17,7 +17,7 @@ const useExcelToQueues = () => {
                 lastName: "",
                 email: currentItem['Email']
             }
-            let extension = new RCExtension(0, currentItem['Extension'], currentItem['Queue Name'], contact, currentItem['Site'], 'Department', '', false, '')
+            let extension = new RCExtension(idForExtension(currentItem['Extension'], extensionsList), currentItem['Extension'], currentItem['Queue Name'], contact, currentItem['Site'], 'Department', '', false, '')
             let memberString: string = currentItem['Members (Ext)']
             let membersExtensions = memberString.split(',')
             let members: string[] = []
@@ -25,7 +25,10 @@ const useExcelToQueues = () => {
             for (let memberIndex = 0; memberIndex < membersExtensions.length; memberIndex++) {
                 members.push(`${idForExtension(membersExtensions[memberIndex], extensionsList)}`)
             }
-            let queue = new CallQueue(extension, idForSite(extension.site, extensionsList), members)
+            let validMembers = members.filter((id) => {
+                return id != '0'
+            })
+            let queue = new CallQueue(extension, idForSite(extension.site, extensionsList), validMembers)
             records.push(queue)
         }
         setQueues(records)
