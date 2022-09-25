@@ -67,7 +67,6 @@ const DirectCreateMenus = () => {
     return (
         <>
             <input type="text" className="input-field" value={targetUID} onChange={(e) => setTargetUID(e.target.value)}/>
-            <button onClick={handleClick}>Go</button>
             <FileSelect handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={isPending} />
             {isExcelDataPending || isExtensionListPending || isMenuConvertPending ? <></> : <button className="inline" onClick={handleSyncButtonClick}>Sync</button>}
             {isMenuConvertPending ? <></> : <DataTable header={['Name', 'Ext', 'Site', 'Prompt Mode', 'Prompt', 'Key 1', 'Key 2', 'Key 3', 'Key 4', 'Key 5', 'Key 6', 'Key 7', 'Key 8', 'Key 9', 'Key 0']} data={menus} />}
