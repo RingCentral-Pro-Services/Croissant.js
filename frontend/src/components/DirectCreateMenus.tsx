@@ -13,6 +13,7 @@ const DirectCreateMenus = () => {
     useLogin()
     let [targetUID, setTargetUID] = useState("~")
     let [isReadyToSync, setReadyToSync] = useState(false)
+    let [isPending, setIsPending] = useState(false)
     let {messages, postMessage} = useMessageQueue()
     const {fetchToken} = useGetAccessToken()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
@@ -28,6 +29,7 @@ const DirectCreateMenus = () => {
     const handleFileSelect = () => {
         if (!selectedFile) return
 
+        setIsPending(true)
         fetchExtensions()
     }
 
@@ -50,6 +52,7 @@ const DirectCreateMenus = () => {
 
     useEffect(() => {
         if (isMenuConvertPending) return
+        setIsPending(false)
         if (!isReadyToSync) return
 
         console.log(menus)
@@ -65,9 +68,9 @@ const DirectCreateMenus = () => {
         <>
             <input type="text" className="input-field" value={targetUID} onChange={(e) => setTargetUID(e.target.value)}/>
             <button onClick={handleClick}>Go</button>
-            <FileSelect handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={false} />
-            {isExcelDataPending || isExtensionListPending || isMenuConvertPending ? <></> : <button onClick={handleSyncButtonClick}>Sync</button>}
-            {isMenuConvertPending ? <></> : <DataTable header={['Name', 'Ext', 'Site', 'Prompt Mode', 'Prompt', 'Key 1 Action', 'Key 1 Destination', 'Key 2 Action', 'Key 2 Destination', 'Key 3 Action', 'Key 3 Destination', 'Key 4 Action', 'Key 4 Destination', 'Key 5 Action', 'Key 5 Destination', 'Key 6 Action', 'Key 6 Destination', 'Key 7 Action', 'Key 7 Destination', 'Key 8 Action', 'Key 8 Destination', 'Key 9 Action', 'Key 9 Destination', 'Key 0 Action', 'Key 0 Destination']} data={menus} />}
+            <FileSelect handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={isPending} />
+            {isExcelDataPending || isExtensionListPending || isMenuConvertPending ? <></> : <button className="inline" onClick={handleSyncButtonClick}>Sync</button>}
+            {isMenuConvertPending ? <></> : <DataTable header={['Name', 'Ext', 'Site', 'Prompt Mode', 'Prompt', 'Key 1', 'Key 2', 'Key 3', 'Key 4', 'Key 5', 'Key 6', 'Key 7', 'Key 8', 'Key 9', 'Key 0']} data={menus} />}
         </>
     )
 }
