@@ -24,19 +24,29 @@ export class IVRMenu implements CSVFormattable, ExcelFormattable {
             let found = false
             for (let actionIndex = 0; actionIndex < this.data.actions.length; actionIndex++) {
                 if (this.data.actions[actionIndex].input === `${keyPressIndex}`) {
-                    result.push(this.data.actions[actionIndex].action)
                     if (this.data.actions[actionIndex].action === 'Transfer') {
-                        result.push(this.data.actions[actionIndex].phoneNumber ?? "")
+                        let cellText = `${this.data.actions[actionIndex].action} to ${this.data.actions[actionIndex].phoneNumber}`
+                        result.push(cellText)
+                        found = true
+                    }
+                    else if (this.data.actions[actionIndex].action === 'Connect') {
+                        let cellText = `${this.data.actions[actionIndex].action} to ${this.data.actions[actionIndex].extension?.id}`
+                        result.push(cellText)
+                        found = true
+                    }
+                    else if (this.data.actions[actionIndex].action === 'Voicemail') {
+                        let cellText = `${this.data.actions[actionIndex].action} of ${this.data.actions[actionIndex].extension?.id}`
+                        result.push(cellText)
                         found = true
                     }
                     else {
-                        result.push(this.data.actions[actionIndex].extension?.id ?? "")
+                        let cellText = `${this.data.actions[actionIndex].action}`
+                        result.push(cellText)
                         found = true
                     }
                 }
             }
             if (!found) {
-                result.push("")
                 result.push("")
             }
         }
@@ -44,13 +54,30 @@ export class IVRMenu implements CSVFormattable, ExcelFormattable {
         let zeroKeyFound = false
         for (let actionIndex = 0; actionIndex < this.data.actions.length; actionIndex++) {
             if (this.data.actions[actionIndex].input === `0`) {
-                result.push(this.data.actions[actionIndex].action)
-                result.push(this.data.actions[actionIndex].extension?.id ?? "")
+                if (this.data.actions[actionIndex].action === 'Transfer') {
+                    let cellText = `${this.data.actions[actionIndex].action} to ${this.data.actions[actionIndex].phoneNumber}`
+                    result.push(cellText)
+                    zeroKeyFound = true
+                }
+                else if (this.data.actions[actionIndex].action === 'Connect') {
+                    let cellText = `${this.data.actions[actionIndex].action} to ${this.data.actions[actionIndex].extension?.id}`
+                    result.push(cellText)
+                    zeroKeyFound = true
+                }
+                else if (this.data.actions[actionIndex].action === 'Voicemail') {
+                    let cellText = `${this.data.actions[actionIndex].action} of ${this.data.actions[actionIndex].extension?.id}`
+                    result.push(cellText)
+                    zeroKeyFound = true
+                }
+                else {
+                    let cellText = `${this.data.actions[actionIndex].action}`
+                    result.push(cellText)
+                    zeroKeyFound = true
+                }
                 zeroKeyFound = true
             }
         }
         if (!zeroKeyFound) {
-            result.push("")
             result.push("")
         }
 
