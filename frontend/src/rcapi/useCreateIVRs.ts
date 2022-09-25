@@ -49,10 +49,10 @@ const useCreateIVRs = () => {
                 .then((response: any) => {
                     console.log(`Menu '${workingMenus[currentExtensionIndex].data.name}' created successfully`)
                     setRateLimitInterval(response.rateLimit)
-                    addToExtensionList(workingMenus[currentExtensionIndex])
-                    setCurrentExtensionIndex(currentExtensionIndex + 1)
                     let newMenus = workingMenus
                     newMenus[currentExtensionIndex].data.id = response.id
+                    // addToExtensionList(workingMenus[currentExtensionIndex])
+                    setCurrentExtensionIndex(currentExtensionIndex + 1)
                     setMenus(newMenus)
                     if (currentExtensionIndex === workingMenus.length - 1) {
                         validateKeyPresses()
@@ -117,6 +117,8 @@ const useCreateIVRs = () => {
                 console.log(res)
                 let interval = rateLimit(res.headers)
                 let id = res.data.id
+                menu.data.id = id
+                addToExtensionList(menu)
                 let response: response = {
                     rateLimit: interval,
                     id: id
@@ -169,22 +171,25 @@ const useCreateIVRs = () => {
     }
 
     const addToExtensionList = (menu: IVRMenu) => {
+        console.log(`Adding menu ${menu.data.extensionNumber} to extension list`)
         let newExtensionList = [...exts]
         let contact: ExtensionContact = {
             firstName: menu.data.name,
             lastName: "",
             email: ""
         }
-        let newExtension = new RCExtension(0, menu.data.extensionNumber, menu.data.name, contact, menu.data.site.id, 'IvrMenu', 'Enabled', false, '')
+        let id = parseInt(menu.data.id!)
+        console.log(id)
+        let newExtension = new RCExtension(id, menu.data.extensionNumber, menu.data.name, contact, menu.data.site.id, 'IvrMenu', 'Enabled', false, '')
         newExtensionList.push(newExtension)
-        setExtensionList(newExtensionList)
+        exts.push(newExtension)
+        // setExtensionList(newExtensionList)
     }
 
     const validateKeyPresses = () => {
-        console.log('Validating key presses')
         let menus = workingMenus
 
-        // Loop through each menus
+        // Loop through each menu
         for (let index = 0; index < menus.length; index++) {
             // Loop through each key press
             for (let actionIndex = 0; actionIndex < menus[index].data.actions.length; actionIndex++) {
@@ -201,14 +206,18 @@ const useCreateIVRs = () => {
             })
             menus[index].data.actions = validActions
         }
+
+        console.log(menus)
     }
 
     const idForExtension = (extension: string, extensionsList: RCExtension[]) => {
         for (let index = 0; index < extensionsList.length; index++) {
-            if (`${extensionsList[index].extensionNumber}` === extension.toString().trim()) {
+            if (`${extensionsList[index].extensionNumber}` == `${extension}`) {
                 return extensionsList[index].id
             }
         }
+        console.log(`No ID for extension ${extension}`)
+        console.log(extensionsList)
         return 0
     }
 
