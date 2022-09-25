@@ -12,9 +12,7 @@ export class IVRMenu implements CSVFormattable, ExcelFormattable {
         let result = [this.data.name, `${this.data.extensionNumber}`, this.data.site.id, this.data.prompt.mode, this.data.prompt.text]
         let actions = this.actionsToRow()
 
-        // for (let index = 0; index < actions.length; index++) {
-        //     result.push(actions[index])
-        // }
+        result = [...result, ...actions]
         
         return result
     }
@@ -27,12 +25,20 @@ export class IVRMenu implements CSVFormattable, ExcelFormattable {
             for (let actionIndex = 0; actionIndex < this.data.actions.length; actionIndex++) {
                 if (this.data.actions[actionIndex].input === `${keyPressIndex}`) {
                     result.push(this.data.actions[actionIndex].action)
-                    result.push(this.data.actions[actionIndex].extension?.id ?? "")
-                    found = true
+                    if (this.data.actions[actionIndex].action === 'Transfer') {
+                        result.push(this.data.actions[actionIndex].phoneNumber ?? "")
+                        found = true
+                    }
+                    else {
+                        result.push(this.data.actions[actionIndex].extension?.id ?? "")
+                        found = true
+                    }
                 }
             }
-            result.push("")
-            result.push("")
+            if (!found) {
+                result.push("")
+                result.push("")
+            }
         }
 
         let zeroKeyFound = false
