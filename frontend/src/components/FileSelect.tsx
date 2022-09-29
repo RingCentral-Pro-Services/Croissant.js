@@ -19,7 +19,7 @@ const FileSelect = (props: {handleSubmit: () => void, setSelectedFile: (file: Fi
                 <button type='button' className="inline browse-button" onClick={handleFileOpenClick}>Browse...</button>
                 <p className="inline healthy-margin-right">{selectedFileName ? selectedFileName : "No file selected"}</p>
                 <button type='button' onClick={handleSubmit}>{isPending ? "Processing" : "Submit"}</button>
-                <input id="file-select" type="file" onInput={(e) => handleFileInput(e)} accept=".xlsx" hidden/>
+                <input id="file-select" type="file" onInput={(e) => handleFileInput(e)} accept=".xlsx, .csv" hidden/>
             </form>
         </div>
     )
