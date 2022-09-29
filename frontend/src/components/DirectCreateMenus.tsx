@@ -44,13 +44,7 @@ const DirectCreateMenus = () => {
         if (!selectedFile) return
 
         setIsPending(true)
-        if (selectedFile.name.includes('.csv')) {
-            // Read Lucidchart file
-            readLucidchart(selectedFile, extensionsList)
-        }
-        else if (selectedFile.name.includes('.xlsx')) {
-            fetchExtensions()
-        }
+        fetchExtensions()
     }
 
     const handleSyncButtonClick = () => {
@@ -80,7 +74,12 @@ const DirectCreateMenus = () => {
         if (isExtensionListPending) return
         if (!selectedFile) return
 
-        readFile(selectedFile, 'IVRs')
+        if (selectedFile.name.includes('.csv')) {
+            readLucidchart(selectedFile, extensionsList)
+        }
+        else if (selectedFile.name.includes('.xlsx')) {
+            readFile(selectedFile, 'IVRs')
+        }
     }, [isExtensionListPending, extensionsList])
 
     useEffect(() => {
