@@ -2,7 +2,7 @@ import CSVFormattable from "./CSVFormattable"
 import ExcelFormattable from "./ExcelFormattable"
 
 export class IVRMenu implements CSVFormattable, ExcelFormattable {
-    constructor(public data: IVRMenuData) {}
+    constructor(public data: IVRMenuData, public page?: string, public lucidchartID?: string) {}
 
     toRow(): string {
         return `${this.data.name},${this.data.extensionNumber},${this.data.site.id},${this.data.prompt.mode},${this.data.prompt.text}`
