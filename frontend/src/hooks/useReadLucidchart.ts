@@ -14,31 +14,24 @@ const useReadLucidchart = () => {
     const [menus, setMenus] = useState<IVRMenu[]>([])
     const [isLucidchartPending, setIsPending] = useState(true)
     const [shouldAddKeyPresses, setShouldAddKeyPresses] = useState(false)
-    const [extensions, setExtensions] = useState<RCExtension[]>([])
+    let extensions: RCExtension[] = []
     const [pages, setPages] = useState<LucidchartFilterPage[]>([])
 
     useEffect(() => {
-        console.log('useEffect menus')
         console.log(menus)
-    }, [menus])
-
-    useEffect(() => {
         addKeyPresses()
     }, [shouldAddKeyPresses])
 
     const readLucidchart = (file: File, extensionList: RCExtension[]) => {
-        setExtensions(extensionList)
+        extensions = extensionList
         Papa.parse(file, {
             header: true,
             skipEmptyLines: true,
             complete: (results) => {
-                // console.log(results)
                 setCSVData(results.data)
                 csvData = results.data
                 createPageMap()
-                console.log(pageMap)
                 createMenus()
-                // addKeyPresses()
             }
         })
     }
@@ -48,7 +41,6 @@ const useReadLucidchart = () => {
         let newPages: LucidchartFilterPage[] = []
         for (let index = 0; index < csvData.length; index++) {
             if (csvData[index]["Name"] == "Page") {
-                console.log('Found page')
                 let name = csvData[index]["Text Area 1"]
                 let id = csvData[index]["Id"] as string
                 pageMap[id] = name
@@ -59,13 +51,12 @@ const useReadLucidchart = () => {
     }
 
     const createMenus = () => {
-        console.log('createMenus()')
         let isolator = new ExtensionIsolator()
         let newMenus: IVRMenu[] = []
+        console.log(`Extensions: ${extensions.length}`)
         
         for (let index = 0; index < csvData.length; index++) {
             if (csvData[index]["Name"] == "IVR") {
-                console.log('Found menu')
                 let shapeText = csvData[index]["Text Area 1"]
 
                 let extensionNumber = isolator.isolateExtension(shapeText.toString()) ?? ""
@@ -84,7 +75,7 @@ const useReadLucidchart = () => {
                     prompt: {mode: "TextToSpeech", text: "Thank you for calling."},
                     site: {id: getSiteID(pageName), name: ""},
                     actions: [],
-                    id: "0"
+                    id: `${idForExtension(extensionNumber, extensions)}`
                 }
                 let menu = new IVRMenu(menuData)
 
@@ -161,6 +152,15 @@ const useReadLucidchart = () => {
         setIsPending(false)
     }
 
+    const idForExtension = (extension: string, extensionsList: RCExtension[]) => {
+        for (let index = 0; index < extensionsList.length; index++) {
+            if (`${extensionsList[index].extensionNumber}` == extension.toString().trim()) {
+                return extensionsList[index].id
+            }
+        }
+        return 0
+    }
+
     /**
      * Get the extension number associated with a given ID
      * @param {string} id The ID of the shape
@@ -234,7 +234,6 @@ const useReadLucidchart = () => {
                 return menus[index].data.extensionNumber
             }
         }
-        console.log(`No extension for: ${name}|`)
         return -1
     }
 
