@@ -171,7 +171,6 @@ const useCreateIVRs = () => {
     }
 
     const addToExtensionList = (menu: IVRMenu) => {
-        console.log(`Adding menu ${menu.data.extensionNumber} to extension list`)
         let newExtensionList = [...exts]
         let contact: ExtensionContact = {
             firstName: menu.data.name,
@@ -183,7 +182,6 @@ const useCreateIVRs = () => {
         let newExtension = new RCExtension(id, menu.data.extensionNumber, menu.data.name, contact, menu.data.site.id, 'IvrMenu', 'Enabled', false, '')
         newExtensionList.push(newExtension)
         exts.push(newExtension)
-        // setExtensionList(newExtensionList)
     }
 
     const validateKeyPresses = () => {
@@ -216,8 +214,6 @@ const useCreateIVRs = () => {
                 return extensionsList[index].id
             }
         }
-        console.log(`No ID for extension ${extension}`)
-        console.log(extensionsList)
         return 0
     }
 
