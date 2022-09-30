@@ -283,4 +283,13 @@ progress {
   width: 100%;
   -webkit-appearance: none;
   appearance: none;
+  margin-bottom: 10px;
+}
+
+progress::-webkit-progress-bar {
+  background: #ccc;
+}
+
+progress::-webkit-progress-value {
+  background: gray;
 }
