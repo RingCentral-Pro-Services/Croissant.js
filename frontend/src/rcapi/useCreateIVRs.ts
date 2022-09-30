@@ -10,7 +10,7 @@ interface response {
     id: string
 }
 
-const useCreateIVRs = () => {
+const useCreateIVRs = (setProgressValue: (value: number) => void) => {
     let [rateLimitInterval, setRateLimitInterval] = useState(0)
     const [workingMenus, setMenus] = useState<IVRMenu[]>([])
     let [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
@@ -19,6 +19,7 @@ const useCreateIVRs = () => {
     const accessToken = localStorage.getItem('cs_access_token')
     const url = 'https://platform.devtest.ringcentral.com/restapi/v1.0/account/~/ivr-menus'
     const [exts, setExtensionList] = useState<RCExtension[]>([])
+    let [progrssCounter, setProgressCounter] = useState(1)
 
     const createMenus = (menus: IVRMenu[], extensionList: RCExtension[]) => {
         setShoudCreateMenus(true)
@@ -26,6 +27,7 @@ const useCreateIVRs = () => {
         setShouldUpdateMenus(false)
         setMenus(menus)
         setExtensionList(extensionList)
+        setProgressCounter(1)
     }
 
     // Create menus
@@ -53,6 +55,7 @@ const useCreateIVRs = () => {
                     newMenus[currentExtensionIndex].data.id = response.id
                     // addToExtensionList(workingMenus[currentExtensionIndex])
                     setCurrentExtensionIndex(currentExtensionIndex + 1)
+                    increaseProgress()
                     setMenus(newMenus)
                     if (currentExtensionIndex === workingMenus.length - 1) {
                         validateKeyPresses()
@@ -80,10 +83,12 @@ const useCreateIVRs = () => {
                 console.log(`Menu '${workingMenus[currentExtensionIndex].data.name}' updated successfully`)
                 setRateLimitInterval(response.rateLimit)
                 setCurrentExtensionIndex(currentExtensionIndex + 1)
+                increaseProgress()
                 if (currentExtensionIndex === workingMenus.length - 1) {
                     setShouldUpdateMenus(false)
                     setShoudCreateMenus(false)
                     setCurrentExtensionIndex(0)
+                    setProgressValue(workingMenus.length * 2)
                     console.log('Done')
                 }
             })
@@ -168,6 +173,11 @@ const useCreateIVRs = () => {
             })
         })
         return promise
+    }
+
+    const increaseProgress = () => {
+        setProgressValue(progrssCounter)
+        setProgressCounter(progrssCounter + 1)
     }
 
     const addToExtensionList = (menu: IVRMenu) => {
