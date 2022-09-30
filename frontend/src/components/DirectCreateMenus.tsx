@@ -26,7 +26,6 @@ const DirectCreateMenus = () => {
     const [selectedFile, setSelectedFile] = useState<File | null>()
     const {excelData, isExcelDataPending, readFile} = useReadExcel()
     const {menus: excelMenus, isMenuConvertPending, converToMenus} = useExcelToIVRs()
-    const {createMenus} = useCreateIVRs()
     const {readLucidchart, isLucidchartPending, menus: lucidchartMenus, pages, setPages} = useReadLucidchart()
 
     // Filter stuff
@@ -34,8 +33,11 @@ const DirectCreateMenus = () => {
     const [filteredPages, setFilteredPages] = useState(null)
     const {handleFilterClick, handleInput, selectAll} = useFilterServices(pages, setPages, filteredPages, setFilteredPages)
 
+    // Progress bar
+    const [progressValue, setProgressValue] = useState(0)
+    const [maxProgressValue, setMaxProgressValue] = useState(0)
+    const {createMenus} = useCreateIVRs(setProgressValue)
     
-
     const handleClick = () => {
         console.log('Clicked go button!')
     }
@@ -62,6 +64,7 @@ const DirectCreateMenus = () => {
                 return false
             })
             console.log(filteredMenus)
+            setMaxProgressValue(filteredMenus.length * 2)
             createMenus(filteredMenus, extensionsList)
         }
         else {
@@ -118,6 +121,7 @@ const DirectCreateMenus = () => {
             <FileSelect handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={isExcelDataPending || isExtensionListPending || isLucidchartPending || isMenuConvertPending} />
             {isDisplayingFilterBox ? <PageFilter pages={filteredPages ? filteredPages : pages} selectAll={selectAll} handleFilterClick={handleFilterClick} handleInput={handleInput} /> : <></>}
             {!isReadyToSync ? <></> : <button className="inline" onClick={handleSyncButtonClick}>Sync</button>}
+            <progress id='sync_progress' value={progressValue} max={maxProgressValue} />
             {isPending ? <></> : <DataTable header={['Name', 'Ext', 'Site', 'Prompt Mode', 'Prompt', 'Key 1', 'Key 2', 'Key 3', 'Key 4', 'Key 5', 'Key 6', 'Key 7', 'Key 8', 'Key 9', 'Key 0']} data={menus} />}
         </>
     )
