@@ -18,7 +18,7 @@ const DirectCreateMenus = () => {
     useLogin()
     let [targetUID, setTargetUID] = useState("~")
     let [isReadyToSync, setReadyToSync] = useState(false)
-    let [isPending, setIsPending] = useState(true)
+    let [isPending, setIsPending] = useState(false)
     const [menus, setMenus] = useState<IVRMenu[]>([])
     let {messages, postMessage} = useMessageQueue()
     const {fetchToken} = useGetAccessToken()
@@ -118,7 +118,7 @@ const DirectCreateMenus = () => {
     return (
         <>
             <input type="text" className="input-field" value={targetUID} onChange={(e) => setTargetUID(e.target.value)}/>
-            <FileSelect handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={isExcelDataPending || isExtensionListPending || isLucidchartPending || isMenuConvertPending} />
+            <FileSelect handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={isPending} />
             {isDisplayingFilterBox ? <PageFilter pages={filteredPages ? filteredPages : pages} selectAll={selectAll} handleFilterClick={handleFilterClick} handleInput={handleInput} /> : <></>}
             {!isReadyToSync ? <></> : <button className="inline" onClick={handleSyncButtonClick}>Sync</button>}
             <progress id='sync_progress' value={progressValue} max={maxProgressValue} />
