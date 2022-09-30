@@ -277,3 +277,10 @@ td, th {
   padding: 8px;
   width: 200px;
 }
+
+progress {
+  display: block;
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+}
