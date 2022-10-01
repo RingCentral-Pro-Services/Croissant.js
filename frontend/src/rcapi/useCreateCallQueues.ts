@@ -85,7 +85,7 @@ const useCreateCallQueues = () => {
               })
         }, rateLimitInterval)
 
-    }, [shouldFetch, currentExtensionIndex, queues, url])
+    }, [shouldFetch, currentExtensionIndex, queues, url, accessToken, extensionList, rateLimitInterval])
 
     // Add queue members
     useEffect(() => {
@@ -132,7 +132,7 @@ const useCreateCallQueues = () => {
               })
         }, rateLimitInterval)
 
-    }, [shouldUpdateQueues])
+    }, [shouldUpdateQueues, accessToken, currentExtensionIndex, queues, rateLimitInterval])
 
     const extensionExists = (extensionNumber: number, extensionList: RCExtension[]) => {
         for (let index = 0; index < extensionList.length; index++) {

@@ -33,18 +33,18 @@ const CreateCallQueues = () => {
         if (!selectedFile) return
 
         readFile(selectedFile, 'Queues')
-    }, [isExtensionListPending])
+    }, [isExtensionListPending, selectedFile])
 
     useEffect(() => {
         if (isExcelDataPending) return
         convert(excelData, extensionsList)
-    }, [isExcelDataPending, excelData])
+    }, [isExcelDataPending, excelData, extensionsList])
 
     useEffect(() => {
         if (isQueueConvertPending) return
         if (!isReadyToSync) return
         createQueues(queues, extensionsList)
-    }, [isQueueConvertPending, isReadyToSync])
+    }, [isQueueConvertPending, isReadyToSync, extensionsList, queues])
 
     return (
         <div className="tool-card">

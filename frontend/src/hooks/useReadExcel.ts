@@ -24,7 +24,7 @@ const useReadExcel = () => {
             else {
                 // Search for the IVRs sheet
                 for (let i = 0; i < sheets.length; i++) {
-                    if (workbook.SheetNames[i] == sheetName) {
+                    if (workbook.SheetNames[i] === sheetName) {
                         const temp = xlsx.utils.sheet_to_json(
                             workbook.Sheets[workbook.SheetNames[i]])
                             temp.forEach((res: any) => {

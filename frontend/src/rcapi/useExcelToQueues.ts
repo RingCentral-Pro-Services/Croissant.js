@@ -26,7 +26,7 @@ const useExcelToQueues = () => {
                 members.push(`${idForExtension(membersExtensions[memberIndex], extensionsList)}`)
             }
             let validMembers = members.filter((id) => {
-                return id != '0'
+                return id !== '0'
             })
             let queue = new CallQueue(extension, idForSite(extension.site, extensionsList), validMembers)
             records.push(queue)

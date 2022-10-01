@@ -89,11 +89,11 @@ const useExcelToIVRs = () => {
             if (actionKey in data) {
                 const translatedAction = actionMap[data[actionKey]]
 
-                if (translatedAction != "") {
-                    if (translatedAction != 'DialByName') {
+                if (translatedAction !== "") {
+                    if (translatedAction !== 'DialByName') {
                         let rawDestination = data[destinationKey]
                         let destination = ""
-                        if (translatedAction != "Transfer") {
+                        if (translatedAction !== "Transfer") {
                             destination = extensionIsolator.isolateExtension(rawDestination.toString()) ?? ""
                         }
                         else {

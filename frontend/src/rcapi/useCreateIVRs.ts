@@ -70,7 +70,7 @@ const useCreateIVRs = (setProgressValue: (value: number) => void) => {
             }
         }, rateLimitInterval)
         
-    }, [shouldCreateMenus, rateLimitInterval, currentExtensionIndex])
+    }, [shouldCreateMenus, rateLimitInterval, currentExtensionIndex, workingMenus, exts])
 
     // Update menus
     useEffect(() => {
@@ -99,7 +99,7 @@ const useCreateIVRs = (setProgressValue: (value: number) => void) => {
 
         console.log('Updating')
 
-    }, [shouldUpdateMenus, currentExtensionIndex])
+    }, [shouldUpdateMenus, currentExtensionIndex, rateLimitInterval, workingMenus])
 
     const createMenu = (menu: IVRMenu) => {
         let promise = new Promise((resolve, reject) => {
@@ -230,13 +230,6 @@ const useCreateIVRs = (setProgressValue: (value: number) => void) => {
     const extensionExists = (extensionNumber: number, extensionList: RCExtension[]) => {
         for (let index = 0; index < extensionList.length; index++) {
             if (extensionList[index].extensionNumber == extensionNumber) return true
-        }
-        return false
-    }
-
-    const isIVRMenu = (extensionNumber: number, extensionList: RCExtension[]) => {
-        for (let index = 0; index < extensionList.length; index++) {
-            if (extensionList[index].extensionNumber === extensionNumber && extensionList[index].type === 'IvrMenu') return true
         }
         return false
     }

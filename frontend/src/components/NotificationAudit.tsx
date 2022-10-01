@@ -39,9 +39,8 @@ const NotificationAudit = () => {
     useEffect(() => {
         if (isExcelDataPending) return
 
-        console.log('Excel Data')
         console.log(excelData)
-    }, [isExcelDataPending])
+    }, [isExcelDataPending, excelData])
 
     useEffect(() => {
         localStorage.setItem('target_uid', targetUID)
@@ -64,7 +63,7 @@ const NotificationAudit = () => {
         let header = ['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses']
         writeExcel(header, notifications, 'notifications.xlsx')
         setIsPending(false)
-    }, [isNotificationListPending, notifications, writeExcel])
+    }, [isNotificationListPending, notifications, writeExcel, isPending])
 
     return (
         <>

@@ -37,10 +37,6 @@ const DirectCreateMenus = () => {
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
     const {createMenus} = useCreateIVRs(setProgressValue)
-    
-    const handleClick = () => {
-        console.log('Clicked go button!')
-    }
 
     const handleFileSelect = () => {
         if (!selectedFile) return
@@ -51,7 +47,7 @@ const DirectCreateMenus = () => {
 
     const handleSyncButtonClick = () => {
         setReadyToSync(true)
-        if (lucidchartMenus.length != 0) {
+        if (lucidchartMenus.length !== 0) {
             const selectedPages = pages.filter((page: LucidchartFilterPage) => {
                 return page.isChecked
             })
@@ -83,13 +79,13 @@ const DirectCreateMenus = () => {
         else if (selectedFile.name.includes('.xlsx')) {
             readFile(selectedFile, 'IVRs')
         }
-    }, [isExtensionListPending, extensionsList])
+    }, [isExtensionListPending, extensionsList, selectedFile])
 
     useEffect(() => {
         if (isExcelDataPending) return
 
         converToMenus(excelData, extensionsList)
-    }, [isExcelDataPending, excelData])
+    }, [isExcelDataPending, excelData, extensionsList])
 
     useEffect(() => {
         if (isLucidchartPending) return

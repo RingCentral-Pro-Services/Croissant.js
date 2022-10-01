@@ -43,7 +43,7 @@ const CallQueues = () => {
     useEffect(() => {
         if (isQueueConvertPending) return
         createQueues(queues, extensionsList)
-    }, [isQueueConvertPending])
+    }, [isQueueConvertPending, extensionsList])
 
     useEffect(() => {
         localStorage.setItem('target_uid', targetUID)

@@ -18,7 +18,6 @@ const useReadLucidchart = () => {
     const [pages, setPages] = useState<LucidchartFilterPage[]>([])
 
     useEffect(() => {
-        console.log(menus)
         addKeyPresses()
     }, [shouldAddKeyPresses])
 
@@ -41,7 +40,7 @@ const useReadLucidchart = () => {
         console.log(csvData)
         let newPages: LucidchartFilterPage[] = []
         for (let index = 0; index < csvData.length; index++) {
-            if (csvData[index]["Name"] == "Page") {
+            if (csvData[index]["Name"] === "Page") {
                 let name = csvData[index]["Text Area 1"]
                 let id = csvData[index]["Id"] as string
                 pageMap[id] = name
@@ -57,7 +56,7 @@ const useReadLucidchart = () => {
         console.log(`Extensions: ${extensions.length}`)
         
         for (let index = 0; index < csvData.length; index++) {
-            if (csvData[index]["Name"] == "IVR") {
+            if (csvData[index]["Name"] === "IVR") {
                 let shapeText = csvData[index]["Text Area 1"]
 
                 let extensionNumber = isolator.isolateExtension(shapeText.toString()) ?? ""
@@ -98,17 +97,17 @@ const useReadLucidchart = () => {
 
         let newMenus = menus
         for(let index = 0; index < csvData.length; index++) {
-            if (csvData[index]["Name"] == 'Line') {
+            if (csvData[index]["Name"] === 'Line') {
                 let lineSourceID = csvData[index]["Line Source"]
                 let lineDestinationID = csvData[index]["Line Destination"]
                 let key = csvData[index]["Text Area 1"]
 
                 for (let menuIndex = 0; menuIndex < newMenus.length; menuIndex++) {
-                    if (newMenus[menuIndex].lucidchartID == lineSourceID) {
+                    if (newMenus[menuIndex].lucidchartID === lineSourceID) {
                         let destinationType = getExtensionTypeForID(lineDestinationID)
                         let extensionNumber = getExtensionNumberForID(lineDestinationID)
 
-                        if (destinationType == "External Transfer") {
+                        if (destinationType === "External Transfer") {
                             // Create an external transfer action and add it to the menu
                             let externalNumber = getExternalNumberForID(lineDestinationID)
                             let action: IVRAction = {
@@ -118,7 +117,7 @@ const useReadLucidchart = () => {
                             }
                             newMenus[menuIndex].data.actions.push(action)
                         }
-                        else if (destinationType == "Dial-by-Name") {
+                        else if (destinationType === "Dial-by-Name") {
                             // Create a dial-by-name action and add it to the menu
                             let action: IVRAction = {
                                 input: key,
@@ -126,7 +125,7 @@ const useReadLucidchart = () => {
                             }
                             newMenus[menuIndex].data.actions.push(action)
                         }
-                        else if (destinationType == "Message Only Extension") {
+                        else if (destinationType === "Message Only Extension") {
                             let action: IVRAction = {
                                 input: key,
                                 action: 'Voicemail',
@@ -134,7 +133,7 @@ const useReadLucidchart = () => {
                             }
                             newMenus[menuIndex].data.actions.push(action)
                         }
-                        else if (destinationType == "Prompts") {
+                        else if (destinationType === "Prompts") {
                             newMenus[menuIndex].data.prompt = getPromptForID(lineDestinationID)
                         }
                         else {
@@ -170,27 +169,10 @@ const useReadLucidchart = () => {
      const getExtensionNumberForID = (id: string) => {
         let isolator = new ExtensionIsolator()
         for (let index = 0; index < csvData.length; index++) {
-            if (csvData[index]["Id"] == id) {
+            if (csvData[index]["Id"] === id) {
                 let rawText = csvData[index]["Text Area 1"]
                 let extensionNumber = isolator.isolateExtension(rawText.toString())
                 return extensionNumber
-            }
-        }
-    }
-
-    /**
-     * Get the extension name assiciated with a given ID
-     * @param {string} id The ID of the entiry
-     * @returns The extension name that corresponds with the given ID
-     */
-    const getExtensionNameforID = (id: string) => {
-        for (let index = 0; index < csvData.length; index++) {
-            if (csvData[index]["Id"] == id) {
-                let rawText = csvData[index]["Text Area 1"]
-                let extensionName = rawText.replace(extRegex, "")
-                extensionName = extensionName.replace(extensionRegex, "")
-                extensionName = extensionName.replace("\n", "")
-                return extensionName
             }
         }
     }
@@ -202,7 +184,7 @@ const useReadLucidchart = () => {
      */
     const getExtensionTypeForID = (id: string) => {
         for (let index = 0; index < csvData.length; index++) {
-            if (csvData[index]["Id"] == id) {
+            if (csvData[index]["Id"] === id) {
                 return csvData[index]["Name"]
             }
         }
@@ -217,25 +199,10 @@ const useReadLucidchart = () => {
         const isolator = new ExtensionIsolator()
 
         for (let index = 0; index < csvData.length; index++) {
-            if (csvData[index]["Id"] == id) {
+            if (csvData[index]["Id"] === id) {
                 return isolator.isolatePhoneNumber(csvData[index]["Text Area 1"])
             }
         }
-    }
-
-    /**
-     * Get the extension number 
-     * @param {string} name The name of the menu
-     * @returns The extension number associated with the given menu name or -1
-     * if not found
-     */
-    const getExtensionforMenuName = (name: string) => {
-        for (let index = 0; index < menus.length; index++) {
-            if (menus[index].data.name == name) {
-                return menus[index].data.extensionNumber
-            }
-        }
-        return -1
     }
 
     /**
@@ -245,7 +212,7 @@ const useReadLucidchart = () => {
      */
     const getPromptForID = (id: string) => {
         for (let index = 0; index < csvData.length; index++) {
-            if (csvData[index]["Id"] == id) {
+            if (csvData[index]["Id"] === id) {
                 return csvData[index]["Text Area 1"].replace("IVR Prompt: \n", "")
             }
         }
