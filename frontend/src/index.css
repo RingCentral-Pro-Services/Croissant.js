@@ -281,8 +281,7 @@ td, th {
 progress {
   display: block;
   width: 100%;
-  -webkit-appearance: none;
-  appearance: none;
+  height: 1.4em;
   margin-bottom: 10px;
 }
 
