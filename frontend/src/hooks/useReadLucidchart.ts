@@ -24,6 +24,7 @@ const useReadLucidchart = () => {
 
     const readLucidchart = (file: File, extensionList: RCExtension[]) => {
         extensions = extensionList
+        setShouldAddKeyPresses(false)
         Papa.parse(file, {
             header: true,
             skipEmptyLines: true,
