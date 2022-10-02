@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { RestCentral } from "./RestCentral";
 import RCExtension from "../models/RCExtension"
-import { Message, MessageType } from "../models/Message";
+import { Message } from "../models/Message";
 
 const useExtensionList = (postMessage: (message: Message) => void) => {
     let [isExtensionListPending, setisExtensionListPending] = useState(true)
@@ -17,7 +17,7 @@ const useExtensionList = (postMessage: (message: Message) => void) => {
         setExtensionsList([])
         setShouldFetch(true)
         setisExtensionListPending(true)
-        postMessage(new Message('Fetching extensions', MessageType.INFO))
+        postMessage(new Message('Fetching extensions', 'info'))
     }
 
     useEffect(() => {
@@ -58,13 +58,13 @@ const useExtensionList = (postMessage: (message: Message) => void) => {
                         setShouldFetch(false)
                         setRateLimitInterval(0)
                         setPage(1)
-                        postMessage(new Message('Finished fetching extensions', MessageType.INFO))
+                        postMessage(new Message('Finished fetching extensions', 'info'))
                     }
                 }
                 catch (e) {
                     console.log('Something bad happened')
                     console.log(e)
-                    postMessage(new Message('Failed to fetch extensions', MessageType.ERROR))
+                    postMessage(new Message('Failed to fetch extensions', 'error'))
                 }
             }, rateLimitInterval)
     }, [page, shouldFetch, accessToken, extensionsList, rateLimitInterval, postMessage])
