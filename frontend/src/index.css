@@ -107,6 +107,14 @@ button:hover {
   margin-right: 10px;
 }
 
+.healthy-margin-top {
+  margin-top: 10px;
+}
+
+.healthy-margin-bottom {
+  margin-bottom: 10px;
+}
+
 .link-icon {
   width: 10px;
   height: 10px;
