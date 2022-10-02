@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react"
 import CallQueue from "../models/CallQueue"
-import rateLimit from "../helpers/rateLimit";
 import RCExtension from "../models/RCExtension";
-const axios = require('axios').default;
+import { RestCentral } from "./RestCentral";
 
 const useCreateCallQueues = () => {
     const [queues, setQueues] = useState<CallQueue[]>([])
@@ -44,45 +43,41 @@ const useCreateCallQueues = () => {
             return
         }
 
-        setTimeout(() => {
-            console.log(`Email: ${queues[currentExtensionIndex].extension.contact.email}`)
-            axios({
-                method: "POST",
-                url: extensionURL,
-                headers: {
+        setTimeout(async () => {
+            try {
+                const headers = {
                     "Accept": "application/json",
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${accessToken}`
-                },
-                data: {
+                }
+                const body = {
                     extensionNumber: queues[currentExtensionIndex].extension.extensionNumber,
                     type: 'Department',
                     contact: {
                         firstName: queues[currentExtensionIndex].extension.name,
                         email: queues[currentExtensionIndex].extension.contact.email
                     }
-                },
-              })
-              .then((res: any) => {
-                console.log(res)
-                queues[currentExtensionIndex].extension.id = res.data.id
-                setRateLimitInterval(rateLimit(res.headers))
+                }
+                let response = await RestCentral.post(extensionURL, headers, body)
+                console.log(response)
+
+                queues[currentExtensionIndex].extension.id = response.data.id
+                setRateLimitInterval(response.rateLimitInterval)
                 if (currentExtensionIndex !== queues.length - 1) {
                     setCurrentExtensionIndex(currentExtensionIndex + 1)
                 }
                 else {
-                    // setIsPending(false)
                     setCurrentExtensionIndex(0)
                     setShouldFetch(false)
                     setShouldUpdateQueues(true)
                     setRateLimitInterval(0)
                     console.log('Finished creating queues')
                 }
-              })
-              .catch((error: Error) => {
+            }
+            catch (e) {
                 console.log('Something bad happened')
-                console.log(error)
-              })
+                console.log(e)
+            }
         }, rateLimitInterval)
 
     }, [shouldFetch, currentExtensionIndex, queues, url, accessToken, extensionList, rateLimitInterval])
@@ -98,22 +93,18 @@ const useCreateCallQueues = () => {
         let queueURL = baseUpdateURL.replace('~', targetUID)
         queueURL = queueURL.replace('groupId', `${queues[currentExtensionIndex].extension.id}`)
 
-        setTimeout(() => {
-            axios({
-                method: "POST",
-                url: queueURL,
-                headers: {
+        setTimeout(async () => {
+            try {
+                const headers = {
                     "Accept": "application/json",
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${accessToken}`
-                },
-                data: {
-                    addedExtensionIds: queues[currentExtensionIndex].members
-                },
-              })
-              .then((res: any) => {
-                console.log(res)
-                setRateLimitInterval(rateLimit(res.headers))
+                }
+                const body = {addedExtensionIds: queues[currentExtensionIndex].members}
+                let response = await RestCentral.post(queueURL, headers, body)
+                console.log(response)
+
+                setRateLimitInterval(response.rateLimitInterval)
                 if (currentExtensionIndex !== queues.length - 1) {
                     setCurrentExtensionIndex(currentExtensionIndex + 1)
                 }
@@ -125,11 +116,11 @@ const useCreateCallQueues = () => {
                     setCurrentExtensionIndex(0)
                     console.log('Finished updating queues')
                 }
-              })
-              .catch((error: Error) => {
-                console.log('Something bad happened')
-                console.log(error)
-              })
+            }
+            catch (e) {
+                console.log('Something went wrong')
+                console.log(e)
+            }
         }, rateLimitInterval)
 
     }, [shouldUpdateQueues, accessToken, currentExtensionIndex, queues, rateLimitInterval])
