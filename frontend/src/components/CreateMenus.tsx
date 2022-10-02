@@ -6,7 +6,7 @@ import RadioButtonGroup from './RadioButtonGroup';
 import {ToggleButtonGroup, ToggleButton} from '@mui/material'
 
 const CreateMenus = () => {
-    const [buildModeSelection, setBuildMode] = useState('xml')
+    const [buildModeSelection, setBuildMode] = useState('direct')
 
     const handleChange = (event: any, newSelection: string) => {
         if (newSelection === null) return
