@@ -17,18 +17,19 @@ const CreateMenus = () => {
         <>
         <Header title='Create IVR Menus' body='Create IVRs using either the BRD or a Lucidchart document'/>
             <div className='tool-card'>
-            <h2>Create Menus</h2>
-            <ToggleButtonGroup
-                color='primary'
-                exclusive
-                value={buildModeSelection}
-                aria-label='Build Mode'
-                onChange={handleChange}
-            >
-                <ToggleButton value='xml'>XML</ToggleButton>
-                <ToggleButton value='direct'>Direct</ToggleButton>
-            </ToggleButtonGroup>
-            {buildModeSelection === 'xml' ? <LegacyCreateMenus /> : <DirectCreateMenus />}
+                <h2>Create Menus</h2>
+                <ToggleButtonGroup
+                    color='primary'
+                    exclusive
+                    value={buildModeSelection}
+                    size='small'
+                    aria-label='Build Mode'
+                    onChange={handleChange}
+                >
+                    <ToggleButton value='xml'>XML</ToggleButton>
+                    <ToggleButton value='direct'>Direct</ToggleButton>
+                </ToggleButtonGroup>
+                {buildModeSelection === 'xml' ? <LegacyCreateMenus /> : <DirectCreateMenus />}
             </div>
         </>
      );
