@@ -44,7 +44,7 @@ const useReadLucidchart = () => {
                 let name = csvData[index]["Text Area 1"]
                 let id = csvData[index]["Id"] as string
                 pageMap[id] = name
-                newPages.push({text: name, isChecked: true})
+                newPages.push({label: name, isChecked: true})
             }
         }
         setPages(newPages)

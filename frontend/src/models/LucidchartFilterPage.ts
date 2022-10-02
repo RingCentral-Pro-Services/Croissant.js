@@ -1,4 +1,4 @@
 export default interface LucidchartFilterPage {
-    text: string
+    label: string
     isChecked: boolean
 }

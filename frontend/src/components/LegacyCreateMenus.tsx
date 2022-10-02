@@ -39,7 +39,7 @@ const LegacyCreateMenus = () => {
         const formData = new FormData();
         formData.append("filetoupload", selectedFile as File);
         pages.forEach((page: LucidchartFilterPage) => {
-            page.isChecked && formData.append("page", page.text)
+            page.isChecked && formData.append("page", page.label)
         })
         setIsPending(true)
 

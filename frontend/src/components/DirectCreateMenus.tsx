@@ -54,7 +54,7 @@ const DirectCreateMenus = () => {
             })
             let filteredMenus = menus.filter((menu: IVRMenu) => {
                 for (let index = 0; index < selectedPages.length; index++) {
-                    if (menu.page === selectedPages[index].text) {
+                    if (menu.page === selectedPages[index].label) {
                         return true
                     }
                 }
