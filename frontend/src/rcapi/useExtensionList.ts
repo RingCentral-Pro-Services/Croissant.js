@@ -17,7 +17,6 @@ const useExtensionList = (postMessage: (message: Message) => void) => {
         setExtensionsList([])
         setShouldFetch(true)
         setisExtensionListPending(true)
-        postMessage(new Message('Fetching extensions', 'info'))
     }
 
     useEffect(() => {
@@ -58,7 +57,6 @@ const useExtensionList = (postMessage: (message: Message) => void) => {
                         setShouldFetch(false)
                         setRateLimitInterval(0)
                         setPage(1)
-                        postMessage(new Message('Finished fetching extensions', 'info'))
                     }
                 }
                 catch (e) {
