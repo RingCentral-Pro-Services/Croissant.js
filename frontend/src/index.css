@@ -100,7 +100,7 @@ button:hover {
 
 .browse-button {
   width: 150px;
-  margin-right: 10px;
+  margin-right: 10px!important;
 }
 
 .healthy-margin-right {
