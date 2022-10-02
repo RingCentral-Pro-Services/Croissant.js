@@ -128,7 +128,7 @@ const DirectCreateMenus = () => {
             {!isReadyToSync ? <></> : <Button variant="contained" className="inline" onClick={handleSyncButtonClick}>Sync</Button>}
             {!(menus.length > 0) ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
             {messages.map((message) => (
-                <Alert className="healthy-margin-bottom" severity="info">{message.body}</Alert>
+                <Alert className="healthy-margin-bottom" severity={message.type}>{message.body}</Alert>
             ))}
             {!(menus.length > 0) ? <></> : <DataTable header={['Name', 'Ext', 'Site', 'Prompt Mode', 'Prompt', 'Key 1', 'Key 2', 'Key 3', 'Key 4', 'Key 5', 'Key 6', 'Key 7', 'Key 8', 'Key 9', 'Key 0']} data={menus} />}
         </ div>
