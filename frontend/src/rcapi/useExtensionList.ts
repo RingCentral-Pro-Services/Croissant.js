@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
+import { RestCentral } from "./RestCentral";
 import RCExtension from "../models/RCExtension"
-import rateLimit from "../helpers/rateLimit";
 import { Message, MessageType } from "../models/Message";
-const axios = require('axios').default;
 
 const useExtensionList = (postMessage: (message: Message) => void) => {
     let [isExtensionListPending, setisExtensionListPending] = useState(true)
@@ -26,48 +25,47 @@ const useExtensionList = (postMessage: (message: Message) => void) => {
 
         let targetUID = localStorage.getItem('target_uid')
         if (!targetUID) return
-        let extensionsURL = `${baseExtensionsURL.replace('~', targetUID)}?page=${page}&perPage=100`
+        let extensionsURL = `${baseExtensionsURL.replace('~', targetUID)}?page=${page}&perPage=100`;
 
-        setTimeout(() => {
-            axios
-            .get(extensionsURL, {
-                headers: {
-                    "Accept": "application/json",
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${accessToken}`
-                }
-            })
-            .then((res: any) => {
-                console.log(res)
-                let resRecords = res.data.records
-                let newRecords = [...extensionsList]
-                for (let index = 0; index < resRecords.length; index++) {
-                    let resRecord = resRecords[index]
-                    let site = resRecord.site ? resRecord.site.name : null
-                    let name = resRecord.name ?? "N/A"
-                    let extension = new RCExtension(resRecord.id,resRecord.extensionNumber, name, resRecord.contact, site, resRecord.type, resRecord.status, resRecord.hidden, resRecord.uri )
-                    newRecords.push(extension)
-                }
-                setExtensionsList(newRecords)
-                setRateLimitInterval(0)
+            setTimeout(async () => {
+                try {
+                    const headers = {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${accessToken}`
+                    }
+                    let response = await RestCentral.get(extensionsURL, headers)
+                    console.log(response)
 
-                if (res.data.navigation.nextPage) {
-                    setRateLimitInterval(rateLimit(res.headers))
-                    setPage(page + 1)
-                }
-                else {
-                    setisExtensionListPending(false)
-                    setShouldFetch(false)
+                    let resRecords = response.data.records
+                    let newRecords = [...extensionsList]
+                    for (let index = 0; index < resRecords.length; index++) {
+                        let resRecord = resRecords[index]
+                        let site = resRecord.site ? resRecord.site.name : null
+                        let name = resRecord.name ?? "N/A"
+                        let extension = new RCExtension(resRecord.id,resRecord.extensionNumber, name, resRecord.contact, site, resRecord.type, resRecord.status, resRecord.hidden, resRecord.uri )
+                        newRecords.push(extension)
+                    }
+                    setExtensionsList(newRecords)
                     setRateLimitInterval(0)
-                    setPage(1)
-                    postMessage(new Message('Finished fetching extensions', MessageType.INFO))
+
+                    if (response.data.navigation.nextPage) {
+                        setRateLimitInterval(response.rateLimitInterval)
+                        setPage(page + 1)
+                    }
+                    else {
+                        setisExtensionListPending(false)
+                        setShouldFetch(false)
+                        setRateLimitInterval(0)
+                        setPage(1)
+                        postMessage(new Message('Finished fetching extensions', MessageType.INFO))
+                    }
                 }
-            })
-            .catch((error: Error) => {
-                console.log('Error', error)
-                postMessage(new Message(`Error: ${error}`, MessageType.ERROR))
-            })
-        }, rateLimitInterval)
+                catch (e) {
+                    console.log('Something bad happened')
+                    console.log(e)
+                }
+            }, rateLimitInterval)
     }, [page, shouldFetch, accessToken, extensionsList, rateLimitInterval, postMessage])
     
     return {extensionsList, isExtensionListPending, error, fetchExtensions}
