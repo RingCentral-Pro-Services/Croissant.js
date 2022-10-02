@@ -13,6 +13,7 @@ import { IVRMenu } from "../models/IVRMenu";
 import useFilterServices from "../hooks/useFilterServices";
 import PageFilter from "./PageFilter";
 import LucidchartFilterPage from "../models/LucidchartFilterPage";
+import {TextField} from '@mui/material'
 
 const DirectCreateMenus = () => {
     useLogin()
@@ -113,7 +114,14 @@ const DirectCreateMenus = () => {
     
     return (
         <div className="main-content">
-            <input type="text" className="input-field" value={targetUID} onChange={(e) => setTargetUID(e.target.value)}/>
+            <TextField 
+            className="input-field"
+                required
+                id="outline-required"
+                label="Account UID"
+                defaultValue="~"
+                onChange={(e) => setTargetUID(e.target.value)}
+            ></TextField>
             <FileSelect handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={isPending} />
             {isDisplayingFilterBox ? <PageFilter pages={filteredPages ? filteredPages : pages} selectAll={selectAll} handleFilterClick={handleFilterClick} handleInput={handleInput} /> : <></>}
             {!isReadyToSync ? <></> : <button className="inline" onClick={handleSyncButtonClick}>Sync</button>}
