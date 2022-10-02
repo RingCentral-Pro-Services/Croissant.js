@@ -70,7 +70,7 @@ const CallQueues = () => {
             <div className="tool-card">
                 <h2>Export Call Queues</h2>
                 <TextField 
-                    className="vertical-middle"
+                    className="vertical-middle healthy-margin-right"
                     required
                     id="outline-required"
                     label="Account UID"

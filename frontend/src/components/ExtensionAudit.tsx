@@ -44,7 +44,7 @@ const ExtensionAudit = () => {
             <h2>Account Dump</h2>
             {/* <input type="text" className="input-field" value={targetUID} onChange={(e) => setTargetUID(e.target.value)}/> */}
             <TextField 
-                className="vertical-middle"
+                className="vertical-middle healthy-margin-right"
                 required
                 id="outline-required"
                 label="Account UID"
