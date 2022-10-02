@@ -64,6 +64,7 @@ const useExtensionList = (postMessage: (message: Message) => void) => {
                 catch (e) {
                     console.log('Something bad happened')
                     console.log(e)
+                    postMessage(new Message('Failed to fetch extensions', MessageType.ERROR))
                 }
             }, rateLimitInterval)
     }, [page, shouldFetch, accessToken, extensionsList, rateLimitInterval, postMessage])
