@@ -8,6 +8,7 @@ import useFetchNotifications from "../rcapi/useFetchNotifications"
 import useWriteExcelFile from "../hooks/useWriteExcelFile"
 import useReadExcel from "../hooks/useReadExcel"
 import Header from "./Header"
+import {TextField, Button} from '@mui/material'
 
 const NotificationAudit = () => {
     useLogin()
@@ -70,8 +71,16 @@ const NotificationAudit = () => {
             <Header title="Notification Audit" body="Generate a spreadsheet containing notification settings for all extensions"/>
             <div className="tool-card">
             <h2>Extension Notifications</h2>
-            <input type="text" className="input-field" value={targetUID} onChange={(e) => setTargetUID(e.target.value)}/>
-            <button disabled={isPending} onClick={handleClick}>{isPending ? 'Processing' : 'Go'}</button>
+            <TextField 
+                    className="vertical-middle healthy-margin-right"
+                    required
+                    id="outline-required"
+                    label="Account UID"
+                    defaultValue="~"
+                    size="small"
+                    onChange={(e) => setTargetUID(e.target.value)}
+                ></TextField>
+                <Button variant="contained" onClick={handleClick}>Go</Button>
             <form>
                 <button type='button' className="inline browse-button" onClick={handleFileOpenClick}>Browse...</button>
                 <p className="inline healthy-margin-right">{selectedFile ? selectedFile.name : "No file selected"}</p>
