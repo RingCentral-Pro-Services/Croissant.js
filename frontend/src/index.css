@@ -292,3 +292,7 @@ progress::-webkit-progress-bar {
 progress::-webkit-progress-value {
   background: gray;
 }
+
+.main-content {
+  display: block;
+}
