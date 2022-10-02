@@ -5,9 +5,7 @@ const useMessageQueue = () => {
     let [messages, setMessages] = useState<Message[]>([])
     
     const postMessage = (message: Message) => {
-        let newMessages = [...messages, message]
-        console.log(`Messages: ${messages.length}`)
-        setMessages(newMessages)
+        setMessages(prev => [...prev, message])
     }
 
     return {messages, postMessage}
