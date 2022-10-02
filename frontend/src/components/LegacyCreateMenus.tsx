@@ -7,6 +7,7 @@ import useFilterServices from '../hooks/useFilterServices';
 import useFileSave from '../hooks/useFileSave';
 import useAnalytics from '../hooks/useAnalytics';
 import LucidchartFilterPage from '../models/LucidchartFilterPage';
+import {Button} from '@mui/material'
 const axios = require('axios').default;
 
 const LegacyCreateMenus = () => {
@@ -61,10 +62,10 @@ const LegacyCreateMenus = () => {
     return (
         <>
             <form action='/fileupload' method="post" encType="multipart/form-data">
-                <button type='button' className="inline browse-button" onClick={handleClick}>Browse...</button>
+                <Button variant='outlined' type='button' className="inline browse-button" onClick={handleClick}>Browse...</Button>
                 <p className="inline healthy-margin-right">{selectedFile ? selectedFile.name : "No file selected"}</p>
                 {selectedFile && selectedFile.name.includes('.csv') && <PageFilter pages={filteredPages ? filteredPages : pages} selectAll={selectAll} handleFilterClick={handleFilterClick} handleInput={handleInput} />}
-                <button type='button' onClick={handleSubmit}>{isPending ? "Processing" : "Submit"}</button>
+                <Button variant='contained' type='button' onClick={handleSubmit}>{isPending ? "Processing" : "Submit"}</Button>
                 <input id="create-menu-file-select" type="file" onInput={(e) => handleFileSelect((e.target as HTMLInputElement).files![0])} accept=".xlsx, .xml, .csv" hidden/>
             </form>
             <ResourcesArea title="Instructions" links={instructionsData}/>

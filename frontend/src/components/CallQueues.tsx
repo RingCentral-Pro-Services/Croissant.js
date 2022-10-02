@@ -11,6 +11,7 @@ import useExcelToQueues from "../rcapi/useExcelToQueues"
 import useCreateCallQueues from "../rcapi/useCreateCallQueues"
 import CreateCallQueues from "./CreateCallQueues"
 import Header from "./Header"
+import {TextField, Button} from '@mui/material'
 
 const CallQueues = () => {
     useLogin()
@@ -68,8 +69,16 @@ const CallQueues = () => {
         <Header title='Call Queues' body='Do some stuff with call queues' />
             <div className="tool-card">
                 <h2>Export Call Queues</h2>
-                <input type="text" className="input-field" value={targetUID} onChange={(e) => setTargetUID(e.target.value)}/>
-                <button onClick={handleClick}>Go</button>
+                <TextField 
+                    className="vertical-middle"
+                    required
+                    id="outline-required"
+                    label="Account UID"
+                    defaultValue="~"
+                    size="small"
+                    onChange={(e) => setTargetUID(e.target.value)}
+                ></TextField>
+                <Button variant="contained" onClick={handleClick}>Go</Button>
             </div>
             <CreateCallQueues />
             {messages.map((message: Message) => (

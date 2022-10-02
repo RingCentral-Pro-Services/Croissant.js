@@ -4,6 +4,7 @@ import useFileSave from "../hooks/useFileSave";
 import ResourcesArea from './ResourcesArea';
 import useAnalytics from "../hooks/useAnalytics";
 import Header from './Header';
+import {Button} from '@mui/material'
 const axios = require('axios').default;
 
 const AuditMenus = () => {
@@ -47,9 +48,9 @@ const AuditMenus = () => {
             <div className='tool-card'>
             <h2>Audit Menus</h2>
             <form>
-                <button type='button' className="inline browse-button" onClick={handleClick}>Browse...</button>
+                <Button variant='outlined' type='button' className="inline browse-button" onClick={handleClick}>Browse...</Button>
                 <p className="inline healthy-margin-right">{selectedFile ? selectedFile.name : "No file selected"}</p>
-                <button type='button' onClick={handleSubmit}>{isPending ? "Processing" : "Submit"}</button>
+                <Button variant='contained' type='button' onClick={handleSubmit}>{isPending ? "Processing" : "Submit"}</Button>
                 <input id="audit-menu-file-select" type="file" onInput={(e) => setSelectedFile((e.target as HTMLInputElement).files![0])} accept=".xml" hidden/>
             </form>
             <ResourcesArea title="Instructions" links={instructionsData} />
