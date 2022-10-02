@@ -13,7 +13,7 @@ import { IVRMenu } from "../models/IVRMenu";
 import useFilterServices from "../hooks/useFilterServices";
 import PageFilter from "./PageFilter";
 import LucidchartFilterPage from "../models/LucidchartFilterPage";
-import {TextField} from '@mui/material'
+import {TextField, Button} from '@mui/material'
 
 const DirectCreateMenus = () => {
     useLogin()
@@ -115,16 +115,18 @@ const DirectCreateMenus = () => {
     return (
         <div className="main-content">
             <TextField 
-            className="input-field"
+                className="vertical-middle"
                 required
                 id="outline-required"
                 label="Account UID"
                 defaultValue="~"
+                size="small"
                 onChange={(e) => setTargetUID(e.target.value)}
             ></TextField>
             <FileSelect handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={isPending} />
             {isDisplayingFilterBox ? <PageFilter pages={filteredPages ? filteredPages : pages} selectAll={selectAll} handleFilterClick={handleFilterClick} handleInput={handleInput} /> : <></>}
-            {!isReadyToSync ? <></> : <button className="inline" onClick={handleSyncButtonClick}>Sync</button>}
+            {/* {!isReadyToSync ? <></> : <button className="inline" onClick={handleSyncButtonClick}>Sync</button>} */}
+            {!isReadyToSync ? <></> : <Button variant="contained" className="inline" onClick={handleSyncButtonClick}>Sync</Button>}
             {!(menus.length > 0) ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
             {!(menus.length > 0) ? <></> : <DataTable header={['Name', 'Ext', 'Site', 'Prompt Mode', 'Prompt', 'Key 1', 'Key 2', 'Key 3', 'Key 4', 'Key 5', 'Key 6', 'Key 7', 'Key 8', 'Key 9', 'Key 0']} data={menus} />}
         </ div>

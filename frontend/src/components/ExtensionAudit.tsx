@@ -6,6 +6,7 @@ import useGetAccessToken from '../rcapi/useGetAccessToken'
 import useWriteExcelFile from '../hooks/useWriteExcelFile'
 import { Message } from '../models/Message'
 import Header from './Header'
+import {TextField, Button} from '@mui/material'
 
 const ExtensionAudit = () => {
     useLogin()
@@ -41,8 +42,17 @@ const ExtensionAudit = () => {
             <Header title='Account Dump' body='This tool generatates a list of all extensions in an account'/>
             <div className='tool-card'>
             <h2>Account Dump</h2>
-            <input type="text" className="input-field" value={targetUID} onChange={(e) => setTargetUID(e.target.value)}/>
-            <button onClick={handleClick}>Go</button>
+            {/* <input type="text" className="input-field" value={targetUID} onChange={(e) => setTargetUID(e.target.value)}/> */}
+            <TextField 
+                className="vertical-middle"
+                required
+                id="outline-required"
+                label="Account UID"
+                defaultValue="~"
+                size='small'
+                onChange={(e) => setTargetUID(e.target.value)}
+            ></TextField>
+            <Button variant='contained' onClick={handleClick}>Go</Button>
             <p>{isExtensionListPending ? "": `${extensionsList.length} extensions fetched`}</p>
             {messages.map((message: Message) => (
                 <div key={message.body}>

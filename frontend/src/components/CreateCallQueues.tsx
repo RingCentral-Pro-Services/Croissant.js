@@ -6,6 +6,7 @@ import useExtensionList from "../rcapi/useExtensionList"
 import useExcelToQueues from "../rcapi/useExcelToQueues"
 import useCreateCallQueues from "../rcapi/useCreateCallQueues"
 import DataTable from "./DataTable"
+import {Button} from '@mui/material'
 
 const CreateCallQueues = () => {
     let {messages, postMessage} = useMessageQueue()
@@ -50,7 +51,7 @@ const CreateCallQueues = () => {
         <div className="tool-card">
             <h2>Create Call Queues</h2>
             <FileSelect handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} />
-            <button onClick={handleSyncButtonClick}>Sync</button>
+            <Button variant="contained" onClick={handleSyncButtonClick}>Sync</Button>
             {isQueueConvertPending ? <></> : <DataTable header={['Name', 'Extension', 'Site', 'Status', 'Members']} data={queues} />}
         </div>
     )
