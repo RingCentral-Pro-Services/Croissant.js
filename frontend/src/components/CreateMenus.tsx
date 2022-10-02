@@ -1,15 +1,16 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from './Header';
 import LegacyCreateMenus from './LegacyCreateMenus';
 import DirectCreateMenus from './DirectCreateMenus';
 import RadioButtonGroup from './RadioButtonGroup';
+import {ToggleButtonGroup, ToggleButton} from '@mui/material'
 
 const CreateMenus = () => {
-    const [showLegacyComponent, setShowLegacyComponent] = useState(false)
+    const [buildModeSelection, setBuildMode] = useState('xml')
 
-    const handleRadioButtonClick = (title: string) => {
-        console.log(title)
-        setShowLegacyComponent(title === 'XML')
+    const handleChange = (event: any, newSelection: string) => {
+        if (newSelection === null) return
+        setBuildMode(newSelection)
     }
 
     return (
@@ -17,8 +18,17 @@ const CreateMenus = () => {
         <Header title='Create IVR Menus' body='Create IVRs using either the BRD or a Lucidchart document'/>
             <div className='tool-card'>
             <h2>Create Menus</h2>
-            <RadioButtonGroup title='Build Mode:' options={['XML', 'Direct']} handleClick={handleRadioButtonClick} />
-            {showLegacyComponent ? <LegacyCreateMenus /> : <DirectCreateMenus />}
+            <ToggleButtonGroup
+                color='primary'
+                exclusive
+                value={buildModeSelection}
+                aria-label='Build Mode'
+                onChange={handleChange}
+            >
+                <ToggleButton value='xml'>XML</ToggleButton>
+                <ToggleButton value='direct'>Direct</ToggleButton>
+            </ToggleButtonGroup>
+            {buildModeSelection === 'xml' ? <LegacyCreateMenus /> : <DirectCreateMenus />}
             </div>
         </>
      );
