@@ -1,4 +1,5 @@
 import React, { useState } from "react"
+import {Button} from '@mui/material'
 
 const FileSelect = (props: {handleSubmit: () => void, setSelectedFile: (file: File) => void, isPending: boolean}) => {
     const {handleSubmit, setSelectedFile, isPending} = props
@@ -16,9 +17,9 @@ const FileSelect = (props: {handleSubmit: () => void, setSelectedFile: (file: Fi
     return (
         <div className="file-select">
             <form>
-                <button type='button' className="inline browse-button" onClick={handleFileOpenClick}>Browse...</button>
+                <Button className="inline browse-button" variant="outlined" type="button" onClick={handleFileOpenClick}>Browse...</Button>
                 <p className="inline healthy-margin-right">{selectedFileName ? selectedFileName : "No file selected"}</p>
-                <button type='button' onClick={handleSubmit}>{isPending ? "Processing" : "Submit"}</button>
+                <Button variant="outlined" type="button" onClick={handleSubmit}>{isPending ? "Processing" : "Submit"}</Button>
                 <input id="file-select" type="file" onInput={(e) => handleFileInput(e)} accept=".xlsx, .csv" hidden/>
             </form>
         </div>
