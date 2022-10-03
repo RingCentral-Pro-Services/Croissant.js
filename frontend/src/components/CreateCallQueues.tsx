@@ -17,6 +17,7 @@ const CreateCallQueues = () => {
     const {readFile, excelData, isExcelDataPending} = useReadExcel()
     let {convert, queues, isQueueConvertPending} = useExcelToQueues()
     let {isCallQueueCreationPending, createQueues} = useCreateCallQueues()
+    const [selectedSheet, setSelectedSheet] = useState<string>('')
 
     const handleFileSelect = () => {
         if (!selectedFile) return
@@ -33,7 +34,7 @@ const CreateCallQueues = () => {
         if (isExtensionListPending) return
         if (!selectedFile) return
 
-        readFile(selectedFile, 'Queues')
+        readFile(selectedFile, selectedSheet)
     }, [isExtensionListPending, selectedFile])
 
     useEffect(() => {
@@ -50,7 +51,7 @@ const CreateCallQueues = () => {
     return (
         <div className="tool-card">
             <h2>Create Call Queues</h2>
-            <FileSelect handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} />
+            <FileSelect handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} />
             <Button variant="contained" onClick={handleSyncButtonClick}>Sync</Button>
             {isQueueConvertPending ? <></> : <DataTable header={['Name', 'Extension', 'Site', 'Status', 'Members']} data={queues} />}
         </div>
