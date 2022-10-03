@@ -5,6 +5,15 @@ const useReadExcel = () => {
 
     const [excelData, setData] = useState<any[]>([])
     const [isExcelDataPending, setIsExcelDataPending] = useState(true)
+    const [excelSheets, setSheetNames] = useState<string[]>([])
+
+    const readSheetNames = (file: File) => {
+        file.arrayBuffer()
+        .then((data) => {
+            let workbook = xlsx.read(data)
+            setSheetNames(workbook.SheetNames)
+        })
+    }
 
     const readFile = (file: File, sheetName: string = "") => {
 
@@ -42,7 +51,7 @@ const useReadExcel = () => {
         })
     }
 
-    return {readFile, excelData, isExcelDataPending}
+    return {readFile, excelData, isExcelDataPending, excelSheets, readSheetNames}
 }
 
 export default useReadExcel
