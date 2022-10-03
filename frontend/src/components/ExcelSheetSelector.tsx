@@ -19,9 +19,9 @@ const ExcelSheetSelector = (props: {sheets: string[], setSelectedSheet: (name: s
             select
             id="demo-simple-select"
             value={selectedValue}
-            label='Select page'
+            label='Select sheet'
             size='small'
-            aria-label='Select page'
+            aria-label='Select sheet'
             onChange={handleChange}
         >
             {sheets.map((sheet) => (
