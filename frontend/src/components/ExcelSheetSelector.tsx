@@ -1,8 +1,8 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import {Select, MenuItem, SelectChangeEvent, TextField} from '@mui/material'
 
-const ExcelSheetSelector = (props: {sheets: string[], setSelectedSheet: (name: string) => void}) => {
-    const {sheets, setSelectedSheet} = props
+const ExcelSheetSelector = (props: {sheets: string[], setSelectedSheet: (name: string) => void, defaultSheet: string}) => {
+    const {sheets, setSelectedSheet, defaultSheet} = props
     const [selectedValue, setSelectedValue] = useState<string>('IVRs')
 
     const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -11,6 +11,18 @@ const ExcelSheetSelector = (props: {sheets: string[], setSelectedSheet: (name: s
         setSelectedValue(event.target.value)
         setSelectedSheet(event.target.value)
     }
+
+    useEffect(() => {
+        console.log('use effect')
+        if (sheets.includes(defaultSheet)) {
+            setSelectedValue(defaultSheet)
+            setSelectedSheet(defaultSheet)
+        }
+        else {
+            setSelectedValue(sheets[0])
+            setSelectedSheet(sheets[0])
+        }
+    }, [sheets])
 
     return (
         <TextField
@@ -22,6 +34,7 @@ const ExcelSheetSelector = (props: {sheets: string[], setSelectedSheet: (name: s
             label='Select sheet'
             size='small'
             aria-label='Select sheet'
+            sx={{minWidth: 100}}
             onChange={handleChange}
         >
             {sheets.map((sheet) => (
