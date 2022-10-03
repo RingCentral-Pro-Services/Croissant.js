@@ -33,6 +33,7 @@ const DirectCreateMenus = () => {
     const [isDisplayingFilterBox, setDisplayFilterBox] = useState(false)
     const [filteredPages, setFilteredPages] = useState(null)
     const {handleFilterClick, handleInput, selectAll} = useFilterServices(pages, setPages, filteredPages, setFilteredPages)
+    const [selectedSheet, setSelectedSheet] = useState<string>('')
 
     // Progress bar
     const [progressValue, setProgressValue] = useState(0)
@@ -78,7 +79,7 @@ const DirectCreateMenus = () => {
             readLucidchart(selectedFile, extensionsList)
         }
         else if (selectedFile.name.includes('.xlsx')) {
-            readFile(selectedFile, 'IVRs')
+            readFile(selectedFile, selectedSheet)
         }
     }, [isExtensionListPending, extensionsList, selectedFile])
 
@@ -123,7 +124,7 @@ const DirectCreateMenus = () => {
                 size="small"
                 onChange={(e) => setTargetUID(e.target.value)}
             ></TextField>
-            <FileSelect handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={isPending} />
+            <FileSelect handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={isPending} setSelectedSheet={setSelectedSheet} />
             {isDisplayingFilterBox ? <PageFilter pages={filteredPages ? filteredPages : pages} selectAll={selectAll} handleFilterClick={handleFilterClick} handleInput={handleInput} /> : <></>}
             {!isReadyToSync ? <></> : <Button variant="contained" className="inline" onClick={handleSyncButtonClick}>Sync</Button>}
             {!(menus.length > 0) ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
