@@ -19,7 +19,7 @@ const useCreateIVRs = (setProgressValue: (value: number) => void) => {
     const accessToken = localStorage.getItem('cs_access_token')
     const url = 'https://platform.devtest.ringcentral.com/restapi/v1.0/account/~/ivr-menus'
     const [exts, setExtensionList] = useState<RCExtension[]>([])
-    let [progrssCounter, setProgressCounter] = useState(1)
+    let [progressCounter, setProgressCounter] = useState(1)
 
     const createMenus = (menus: IVRMenu[], extensionList: RCExtension[]) => {
         setShoudCreateMenus(true)
@@ -176,8 +176,8 @@ const useCreateIVRs = (setProgressValue: (value: number) => void) => {
     }
 
     const increaseProgress = () => {
-        setProgressValue(progrssCounter)
-        setProgressCounter(progrssCounter + 1)
+        setProgressValue(progressCounter)
+        setProgressCounter(progressCounter + 1)
     }
 
     const addToExtensionList = (menu: IVRMenu) => {
