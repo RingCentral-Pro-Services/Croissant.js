@@ -18,7 +18,7 @@ const useCreateIVRs = (setProgressValue: (value: (any)) => void, postMessage: (m
     const [shouldCreateMenus, setShoudCreateMenus] = useState(false)
     const [shouldUpdateMenus, setShouldUpdateMenus] = useState(false)
     const accessToken = localStorage.getItem('cs_access_token')
-    const url = 'https://platform.devtest.ringcentral.com/restapi/v1.0/account/~/ivr-menus'
+    const url = 'https://platform.ringcentral.com/restapi/v1.0/account/~/ivr-menus'
     const [exts, setExtensionList] = useState<RCExtension[]>([])
 
     const createMenus = (menus: IVRMenu[], extensionList: RCExtension[]) => {

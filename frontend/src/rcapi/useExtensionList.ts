@@ -6,7 +6,7 @@ import { Message } from "../models/Message";
 const useExtensionList = (postMessage: (message: Message) => void) => {
     let [isExtensionListPending, setisExtensionListPending] = useState(true)
     let error = ""
-    const baseExtensionsURL = 'https://platform.devtest.ringcentral.com/restapi/v1.0/account/~/extension'
+    const baseExtensionsURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension'
     const accessToken = localStorage.getItem('cs_access_token')
     let [extensionsList, setExtensionsList] = useState<RCExtension[]>([])
     let [page, setPage] = useState(1)

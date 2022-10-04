@@ -11,8 +11,8 @@ const useCreateCallQueues = () => {
     let [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
     let [isCallQueueCreationPending, setIsPending] = useState(true)
     const accessToken = localStorage.getItem('cs_access_token')
-    const url = 'https://platform.devtest.ringcentral.com/restapi/v1.0/account/~/extension'
-    const baseUpdateURL = 'https://platform.devtest.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId/bulk-assign'
+    const url = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension'
+    const baseUpdateURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId/bulk-assign'
     const [extensionList, setExtensionList] = useState<RCExtension[]>([])
 
     const createQueues = (callQueues: CallQueue[], extensions: RCExtension[]) => {

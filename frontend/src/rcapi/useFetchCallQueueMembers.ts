@@ -11,7 +11,7 @@ const useFetchCallQueueMembers = () => {
     let [rateLimitInterval, setRateLimitInterval] = useState(0)
     let [filteredExtensions, setFilteredExtensions] = useState<RCExtension[]>([])
     let [isQueueListPending, setIsQueueListPending] = useState(true)
-    let baseURL = 'https://platform.devtest.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId/members'
+    let baseURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId/members'
     let [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
 
     const fetchQueueMembers = (extensionList: RCExtension[]) => {

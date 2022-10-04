@@ -12,7 +12,7 @@ const useFetchNotifications = (postMessage: (message: Message) => void) => {
     let [rateLimitInterval, setRateLimitInterval] = useState(0)
     let [filteredExtensions, setFilteredExtensions] = useState<RCExtension[]>([])
     let [isNotificationListPending, setIsNotificationListPending] = useState(true)
-    const baseURL = 'https://platform.devtest.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/notification-settings'
+    const baseURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/notification-settings'
     let [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
 
     const fetchNotificationSettings = (extensionsList: RCExtension[]) => {
