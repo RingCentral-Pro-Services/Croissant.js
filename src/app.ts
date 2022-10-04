@@ -22,9 +22,6 @@ const PORT = process.env.PORT || 3000
 
 var rcsdk = null
 
-// Yoink
-const AUTHORIZATION = Buffer.from(`${process.env.RINGCENTRAL_CLIENT_ID}:${process.env.RINGCENTRAL_CLIENT_SECRET}`).toString('base64')
-
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 })
@@ -33,7 +30,7 @@ app.use(express.static(path.resolve(__dirname, '../frontend/build')))
 
 app.get('/login', (req: any, res: any) => {
   rcsdk = new ringcentral({
-    server: process.env.RC_SERVER_URL,
+    server: process.env.RC_PLATFORM_URL,
     appKey: process.env.RC_CLIENT_ID,
     appSecret: process.env.RC_CLIENT_SECRET
   })
@@ -47,21 +44,8 @@ app.get('/oauth2callback', (req: any, res: any) => {
   let expiration = req.query['expires_in']
   let state = req.query.state
 
-  // let payload = {"grant_type": "authorization_code", "code": code, "client_id": process.env.RC_CLIENT_ID, "redirect_uri": process.env.RC_REDIRECT_URI}
-  // let headers = {"Content-type": "application/x-www-form-urlencoded", "Authorization": `Basic ${AUTHORIZATION}`, "Accept": "application/json"}
-
-  // axios
-  // .post(`${process.env.RC_SERVER_URL}/restapi/oauth/token`, JSON.stringify(payload), {headers: headers})
-  // .then((response: any) => {
-  //   console.log('Got response')
-  // })
-  // .catch((error: any) => {
-  //   console.log('error')
-  //   console.log(error)
-  // })
-
   rcsdk = new ringcentral({
-    server: process.env.RC_SERVER_URL,
+    server: process.env.RC_PLATFORM_URL,
     appKey: process.env.RC_CLIENT_ID,
     appSecret: process.env.RC_CLIENT_SECRET
   })
@@ -71,13 +55,9 @@ app.get('/oauth2callback', (req: any, res: any) => {
     redirectUri: process.env.RC_REDIRECT_URI
   })
   .then((data: any) => {
-    //console.log(data["_json"]) // Access token is here!
     const accessToken = data["_json"]["access_token"]
     res.redirect(`/token?access_token=${accessToken}`)
   })
-
-
-  //res.redirect('/auditmenus')
 })
 
 app.post('/fileupload', (req: any, res: any) => {
