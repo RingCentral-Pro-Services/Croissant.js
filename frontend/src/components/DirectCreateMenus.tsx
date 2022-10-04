@@ -49,6 +49,7 @@ const DirectCreateMenus = () => {
     }
 
     const handleSyncButtonClick = () => {
+        setProgressValue(0)
         setReadyToSync(true)
         if (lucidchartMenus.length !== 0) {
             const selectedPages = pages.filter((page: LucidchartFilterPage) => {
@@ -62,11 +63,11 @@ const DirectCreateMenus = () => {
                 }
                 return false
             })
-            console.log(filteredMenus)
             setMaxProgressValue(filteredMenus.length * 2)
             createMenus(filteredMenus, extensionsList)
         }
         else {
+            setMaxProgressValue(menus.length * 2)
             createMenus(menus, extensionsList)
         }
         // createMenus(menus, extensionsList)
