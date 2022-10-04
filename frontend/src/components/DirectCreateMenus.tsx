@@ -39,7 +39,7 @@ const DirectCreateMenus = () => {
     // Progress bar
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
-    const {createMenus} = useCreateIVRs(setProgressValue)
+    const {createMenus} = useCreateIVRs(setProgressValue, postMessage)
 
     const handleFileSelect = () => {
         if (!selectedFile) return
