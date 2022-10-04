@@ -3,6 +3,7 @@ import { IVRMenu } from "../models/IVRMenu"
 import RCExtension from "../models/RCExtension"
 import rateLimit from "../helpers/rateLimit";
 import ExtensionContact from "../models/ExtensionContact";
+import { Message } from "../models/Message";
 const axios = require('axios').default;
 
 interface response {
@@ -10,7 +11,7 @@ interface response {
     id: string
 }
 
-const useCreateIVRs = (setProgressValue: (value: number) => void) => {
+const useCreateIVRs = (setProgressValue: (value: number) => void, postMessage: (message: Message) => void) => {
     let [rateLimitInterval, setRateLimitInterval] = useState(0)
     const [workingMenus, setMenus] = useState<IVRMenu[]>([])
     let [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
@@ -66,6 +67,7 @@ const useCreateIVRs = (setProgressValue: (value: number) => void) => {
                 })
                 .catch((error: Error) => {
                     console.log(`Failed to create menu '${workingMenus[currentExtensionIndex]}'`)
+                    postMessage(new Message(`Failed to create menu '${workingMenus[currentExtensionIndex].data.name}'`, 'error'))
                 })
             }
         }, rateLimitInterval)
@@ -94,6 +96,7 @@ const useCreateIVRs = (setProgressValue: (value: number) => void) => {
             })
             .catch((error: Error) => {
                 console.log(`Failed to update menu '${workingMenus[currentExtensionIndex]}'`)
+                postMessage(new Message(`Failed to update menu '${workingMenus[currentExtensionIndex].data.name}'`, 'error'))
             })
         }, rateLimitInterval)
 
@@ -212,6 +215,11 @@ const useCreateIVRs = (setProgressValue: (value: number) => void) => {
                 }
                 return true
             })
+
+            if (validActions.length !== menus[index].data.actions.length) {
+                postMessage(new Message(`Some keypresses were removed from menu '${menus[index].data.name}' because the destination does not exist`, 'warning'))
+            }
+
             menus[index].data.actions = validActions
         }
 
