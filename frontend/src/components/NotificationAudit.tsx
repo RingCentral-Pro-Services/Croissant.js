@@ -81,12 +81,6 @@ const NotificationAudit = () => {
                     onChange={(e) => setTargetUID(e.target.value)}
                 ></TextField>
                 <Button variant="contained" onClick={handleClick}>Go</Button>
-            <form>
-                <button type='button' className="inline browse-button" onClick={handleFileOpenClick}>Browse...</button>
-                <p className="inline healthy-margin-right">{selectedFile ? selectedFile.name : "No file selected"}</p>
-                <button type='button' onClick={handleSubmit}>{isPending ? "Processing" : "Submit"}</button>
-                <input id="notifications-file-select" type="file" onInput={(e) => setSelectedFile((e.target as HTMLInputElement).files![0])} accept=".xlsx" hidden/>
-            </form>
             {messages.map((message: Message) => (
                 <div key={message.body}>
                     <p className={message.type}>{message.body}</p>
