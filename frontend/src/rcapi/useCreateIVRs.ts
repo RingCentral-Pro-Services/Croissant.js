@@ -216,8 +216,15 @@ const useCreateIVRs = (setProgressValue: (value: number) => void, postMessage: (
                 return true
             })
 
-            if (validActions.length !== menus[index].data.actions.length) {
-                postMessage(new Message(`Some keypresses were removed from menu '${menus[index].data.name}' because the destination does not exist`, 'warning'))
+            let removedKeypresses: string[] = []
+            menus[index].data.actions.map((action) => {
+                if (action.extension && action.extension.id === '0') {
+                    removedKeypresses.push(`Key ${action.input}`)
+                }
+            })
+
+            if (removedKeypresses.length > 0) {
+                postMessage(new Message(`The following key presses were removed from menu '${menus[index].data.name}' due to invalid destinations: ${removedKeypresses.join(', ')}`, 'warning'))
             }
 
             menus[index].data.actions = validActions
