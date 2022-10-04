@@ -52,7 +52,7 @@ const CreateCallQueues = () => {
     return (
         <div className="tool-card">
             <h2>Create Call Queues</h2>
-            <FileSelect handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
+            <FileSelect accept=".xlsx" handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
             <Button variant="contained" onClick={handleSyncButtonClick}>Sync</Button>
             {isQueueConvertPending ? <></> : <DataTable header={['Name', 'Extension', 'Site', 'Status', 'Members']} data={queues} />}
         </div>
