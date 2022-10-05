@@ -46,6 +46,11 @@ const CreateCallQueues = () => {
 
     useEffect(() => {
         if (isQueueConvertPending) return
+        setIsPending(false)
+    }, [isQueueConvertPending])
+
+    useEffect(() => {
+        if (isQueueConvertPending) return
         if (!isReadyToSync) return
         createQueues(queues, extensionsList)
     }, [isQueueConvertPending, isReadyToSync, extensionsList, queues])
@@ -54,7 +59,7 @@ const CreateCallQueues = () => {
         <div className="tool-card">
             <h2>Create Call Queues</h2>
             <FileSelect accept=".xlsx" handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
-            <Button variant="contained" onClick={handleSyncButtonClick}>Sync</Button>
+            {isPending ? <></> : <Button variant="contained" onClick={handleSyncButtonClick}>Sync</Button>}
             <MessagesArea messages={messages} />
             {isQueueConvertPending ? <></> : <DataTable header={['Name', 'Extension', 'Site', 'Status', 'Members']} data={queues} />}
         </div>
