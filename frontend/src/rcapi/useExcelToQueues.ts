@@ -36,7 +36,7 @@ const useExcelToQueues = (postMessage: (message: Message) => void) => {
             })
 
             if (invalidMembers.length > 0) {
-                postMessage(new Message(`${invalidMembers.length} members were removed from ${contact.firstName} - Ext ${extension.extensionNumber}`, 'warning'))
+                postMessage(new Message(`${invalidMembers.length} members were removed from ${contact.firstName} - Ext ${extension.extensionNumber}.`, 'warning'))
             }
 
             let queue = new CallQueue(extension, idForSite(extension.site, extensionsList), validMembers)
