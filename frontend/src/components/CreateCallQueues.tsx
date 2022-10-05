@@ -6,6 +6,7 @@ import useExtensionList from "../rcapi/useExtensionList"
 import useExcelToQueues from "../rcapi/useExcelToQueues"
 import useCreateCallQueues from "../rcapi/useCreateCallQueues"
 import DataTable from "./DataTable"
+import MessagesArea from "./MessagesArea"
 import {Button} from '@mui/material'
 
 const CreateCallQueues = () => {
@@ -15,7 +16,7 @@ const CreateCallQueues = () => {
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     const [selectedFile, setSelectedFile] = useState<File | null>()
     const {readFile, excelData, isExcelDataPending} = useReadExcel()
-    let {convert, queues, isQueueConvertPending} = useExcelToQueues()
+    let {convert, queues, isQueueConvertPending} = useExcelToQueues(postMessage)
     let {isCallQueueCreationPending, createQueues} = useCreateCallQueues(postMessage)
     const [selectedSheet, setSelectedSheet] = useState<string>('')
     const defaultSheet = "Queues"
@@ -54,6 +55,7 @@ const CreateCallQueues = () => {
             <h2>Create Call Queues</h2>
             <FileSelect accept=".xlsx" handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
             <Button variant="contained" onClick={handleSyncButtonClick}>Sync</Button>
+            <MessagesArea messages={messages} />
             {isQueueConvertPending ? <></> : <DataTable header={['Name', 'Extension', 'Site', 'Status', 'Members']} data={queues} />}
         </div>
     )

@@ -23,7 +23,7 @@ const CallQueues = () => {
     let {writeExcel} = useWriteExcelFile()
     const [selectedFile, setSelectedFile] = useState<File | null>()
     const {readFile, excelData, isExcelDataPending} = useReadExcel()
-    let {convert, queues, isQueueConvertPending} = useExcelToQueues()
+    let {convert, queues, isQueueConvertPending} = useExcelToQueues(postMessage)
     let {isCallQueueCreationPending, createQueues} = useCreateCallQueues(postMessage)
 
     const handleClick = () => {
