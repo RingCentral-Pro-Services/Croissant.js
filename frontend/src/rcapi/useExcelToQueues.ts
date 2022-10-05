@@ -22,6 +22,17 @@ const useExcelToQueues = (postMessage: (message: Message) => void) => {
             let memberString: string = currentItem['Members (Ext)']
             let membersExtensions = memberString.split(',')
             let members: string[] = []
+            let removedExtensions: string[] = []
+
+            membersExtensions.map((extension) => {
+                if (!isValidQueueMember(extension, extensionsList)) {
+                    removedExtensions.push(extension)
+                }
+            })
+
+            membersExtensions = membersExtensions.filter((extension) => {
+                return isValidQueueMember(extension, extensionsList)
+            })
 
             for (let memberIndex = 0; memberIndex < membersExtensions.length; memberIndex++) {
                 members.push(`${idForExtension(membersExtensions[memberIndex], extensionsList)}`)
@@ -31,12 +42,8 @@ const useExcelToQueues = (postMessage: (message: Message) => void) => {
                 return id !== '0'
             })
 
-            let invalidMembers = members.filter((id) => {
-                return id === '0'
-            })
-
-            if (invalidMembers.length > 0) {
-                postMessage(new Message(`${invalidMembers.length} members were removed from ${contact.firstName} - Ext ${extension.extensionNumber}.`, 'warning'))
+            if (removedExtensions.length > 0) {
+                postMessage(new Message(`The following members were removed from ${contact.firstName} - Ext ${extension.extensionNumber} because they either don't exist or they are not valid queue members: ${removedExtensions.join(', ')}`, 'warning'))
             }
 
             let queue = new CallQueue(extension, idForSite(extension.site, extensionsList), validMembers)
@@ -62,6 +69,15 @@ const useExcelToQueues = (postMessage: (message: Message) => void) => {
             }
         }
         return 0
+    }
+
+    const isValidQueueMember = (extensionNumber: string, extensionList: RCExtension[]) => {
+        for (let index = 0; index < extensionList.length; index++) {
+            if (`${extensionList[index].extensionNumber}`=== extensionNumber) {
+                return extensionList[index].type === 'User' || extensionList[index].type === 'VirtualUser'
+            }
+        }
+        return false
     }
 
     return {convert, queues, isQueueConvertPending}
