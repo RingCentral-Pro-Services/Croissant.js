@@ -2,8 +2,9 @@ import { useState } from "react"
 import CallQueue from "../models/CallQueue"
 import RCExtension from "../models/RCExtension"
 import ExtensionContact from "../models/ExtensionContact"
+import { Message } from "../models/Message"
 
-const useExcelToQueues = () => {
+const useExcelToQueues = (postMessage: (message: Message) => void) => {
     const [queues, setQueues] = useState<CallQueue[]>([])
     const [isQueueConvertPending, setIsQueueConvertPending] = useState(true)
 
@@ -25,9 +26,19 @@ const useExcelToQueues = () => {
             for (let memberIndex = 0; memberIndex < membersExtensions.length; memberIndex++) {
                 members.push(`${idForExtension(membersExtensions[memberIndex], extensionsList)}`)
             }
+
             let validMembers = members.filter((id) => {
                 return id !== '0'
             })
+
+            let invalidMembers = members.filter((id) => {
+                return id === '0'
+            })
+
+            if (invalidMembers.length > 0) {
+                postMessage(new Message(`${invalidMembers.length} members were removed from ${contact.firstName} - Ext ${extension.extensionNumber}`, 'warning'))
+            }
+
             let queue = new CallQueue(extension, idForSite(extension.site, extensionsList), validMembers)
             records.push(queue)
         }
