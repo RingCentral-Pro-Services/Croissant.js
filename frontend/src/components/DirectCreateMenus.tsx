@@ -14,6 +14,7 @@ import useFilterServices from "../hooks/useFilterServices";
 import PageFilter from "./PageFilter";
 import LucidchartFilterPage from "../models/LucidchartFilterPage";
 import {TextField, Button, Alert} from '@mui/material'
+import MessagesArea from "./MessagesArea";
 
 const DirectCreateMenus = () => {
     useLogin()
@@ -130,9 +131,7 @@ const DirectCreateMenus = () => {
             {isDisplayingFilterBox ? <PageFilter pages={filteredPages ? filteredPages : pages} selectAll={selectAll} handleFilterClick={handleFilterClick} handleInput={handleInput} /> : <></>}
             {!isReadyToSync ? <></> : <Button variant="contained" className="inline" onClick={handleSyncButtonClick}>Sync</Button>}
             {!(menus.length > 0) ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
-            {messages.map((message) => (
-                <Alert className="healthy-margin-bottom" severity={message.type}>{message.body}</Alert>
-            ))}
+            <MessagesArea messages={messages} />
             {!(menus.length > 0) ? <></> : <DataTable header={['Name', 'Ext', 'Site', 'Prompt Mode', 'Prompt', 'Key 1', 'Key 2', 'Key 3', 'Key 4', 'Key 5', 'Key 6', 'Key 7', 'Key 8', 'Key 9', 'Key 0']} data={menus} />}
         </ div>
     )
