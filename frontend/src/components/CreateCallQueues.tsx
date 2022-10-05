@@ -17,9 +17,13 @@ const CreateCallQueues = () => {
     const [selectedFile, setSelectedFile] = useState<File | null>()
     const {readFile, excelData, isExcelDataPending} = useReadExcel()
     let {convert, queues, isQueueConvertPending} = useExcelToQueues(postMessage)
-    let {isCallQueueCreationPending, createQueues} = useCreateCallQueues(postMessage)
     const [selectedSheet, setSelectedSheet] = useState<string>('')
     const defaultSheet = "Queues"
+
+    // Progess bar
+    const [progressValue, setProgressValue] = useState(0)
+    const [maxProgressValue, setMaxProgressValue] = useState(0)
+    let {isCallQueueCreationPending, createQueues} = useCreateCallQueues(setProgressValue ,postMessage)
 
     const handleFileSelect = () => {
         if (!selectedFile) return
@@ -52,6 +56,8 @@ const CreateCallQueues = () => {
     useEffect(() => {
         if (isQueueConvertPending) return
         if (!isReadyToSync) return
+
+        setMaxProgressValue(queues.length * 2)
         createQueues(queues, extensionsList)
     }, [isQueueConvertPending, isReadyToSync, extensionsList, queues])
 
@@ -60,6 +66,7 @@ const CreateCallQueues = () => {
             <h2>Create Call Queues</h2>
             <FileSelect accept=".xlsx" handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
             {isPending ? <></> : <Button variant="contained" onClick={handleSyncButtonClick}>Sync</Button>}
+            {!(queues.length > 0) ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
             <MessagesArea messages={messages} />
             {isQueueConvertPending ? <></> : <DataTable header={['Name', 'Extension', 'Site', 'Status', 'Members']} data={queues} />}
         </div>

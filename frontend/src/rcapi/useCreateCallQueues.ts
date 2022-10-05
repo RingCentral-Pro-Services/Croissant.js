@@ -4,7 +4,7 @@ import { Message } from "../models/Message";
 import RCExtension from "../models/RCExtension";
 import { RestCentral } from "./RestCentral";
 
-const useCreateCallQueues = (postMessage: (message: Message) => void) => {
+const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessage: (message: Message) => void) => {
     const [queues, setQueues] = useState<CallQueue[]>([])
     let [shouldFetch, setShouldFetch] = useState(false)
     let [shouldUpdateQueues, setShouldUpdateQueues] = useState(false)
@@ -65,6 +65,7 @@ const useCreateCallQueues = (postMessage: (message: Message) => void) => {
                 queues[currentExtensionIndex].extension.id = response.data.id
                 setRateLimitInterval(response.rateLimitInterval)
                 if (currentExtensionIndex !== queues.length - 1) {
+                    increaseProgress()
                     setCurrentExtensionIndex(currentExtensionIndex + 1)
                 }
                 else {
@@ -108,6 +109,7 @@ const useCreateCallQueues = (postMessage: (message: Message) => void) => {
 
                 setRateLimitInterval(response.rateLimitInterval)
                 if (currentExtensionIndex !== queues.length - 1) {
+                    increaseProgress()
                     setCurrentExtensionIndex(currentExtensionIndex + 1)
                 }
                 else {
@@ -116,6 +118,7 @@ const useCreateCallQueues = (postMessage: (message: Message) => void) => {
                     setShouldUpdateQueues(false)
                     setRateLimitInterval(0)
                     setCurrentExtensionIndex(0)
+                    setProgressValue(queues.length * 2)
                     console.log('Finished updating queues')
                 }
             }
@@ -133,6 +136,10 @@ const useCreateCallQueues = (postMessage: (message: Message) => void) => {
             if (extensionList[index].extensionNumber == extensionNumber) return true
         }
         return false
+    }
+
+    const increaseProgress = () => {
+        setProgressValue((prev: any) => prev + 1)
     }
 
     return {isCallQueueCreationPending, createQueues}
