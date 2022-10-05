@@ -24,7 +24,7 @@ const CallQueues = () => {
     const [selectedFile, setSelectedFile] = useState<File | null>()
     const {readFile, excelData, isExcelDataPending} = useReadExcel()
     let {convert, queues, isQueueConvertPending} = useExcelToQueues()
-    let {isCallQueueCreationPending, createQueues} = useCreateCallQueues()
+    let {isCallQueueCreationPending, createQueues} = useCreateCallQueues(postMessage)
 
     const handleClick = () => {
         fetchExtensions()
