@@ -7,7 +7,7 @@ const MessagesArea = (props: {messages: Message[]}) => {
 
     return (
         <div className="messages-area">
-            {messages.map((message) => (
+            {messages.slice().reverse().map((message) => (
                 <Alert className="healthy-margin-bottom" severity={message.type}>{message.body}</Alert>
             ))}
         </div>
