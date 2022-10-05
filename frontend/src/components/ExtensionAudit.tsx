@@ -4,7 +4,6 @@ import useMessageQueue from '../hooks/useMessageQueue'
 import useExtensionList from '../rcapi/useExtensionList'
 import useGetAccessToken from '../rcapi/useGetAccessToken'
 import useWriteExcelFile from '../hooks/useWriteExcelFile'
-import { Message } from '../models/Message'
 import Header from './Header'
 import {TextField, Button} from '@mui/material'
 
@@ -53,12 +52,6 @@ const ExtensionAudit = () => {
                 onChange={(e) => setTargetUID(e.target.value)}
             ></TextField>
             <Button variant='contained' onClick={handleClick}>Go</Button>
-            <p>{isExtensionListPending ? "": `${extensionsList.length} extensions fetched`}</p>
-            {messages.map((message: Message) => (
-                <div key={message.body}>
-                    <p className={message.type}>{message.body}</p>
-                </div>
-            ))}
         </div>
         </>
     )
