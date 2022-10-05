@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react"
 import CallQueue from "../models/CallQueue"
+import { Message } from "../models/Message";
 import RCExtension from "../models/RCExtension";
 import { RestCentral } from "./RestCentral";
 
-const useCreateCallQueues = () => {
+const useCreateCallQueues = (postMessage: (message: Message) => void) => {
     const [queues, setQueues] = useState<CallQueue[]>([])
     let [shouldFetch, setShouldFetch] = useState(false)
     let [shouldUpdateQueues, setShouldUpdateQueues] = useState(false)
@@ -77,6 +78,7 @@ const useCreateCallQueues = () => {
             catch (e) {
                 console.log('Something bad happened')
                 console.log(e)
+                postMessage(new Message(`Failed to create queue '${queues[currentExtensionIndex].extension.name}'`, 'error'))
             }
         }, rateLimitInterval)
 
@@ -120,6 +122,7 @@ const useCreateCallQueues = () => {
             catch (e) {
                 console.log('Something went wrong')
                 console.log(e)
+                postMessage(new Message(`Failed to add members to queue '${queues[currentExtensionIndex].extension.name}'`, 'error'))
             }
         }, rateLimitInterval)
 
