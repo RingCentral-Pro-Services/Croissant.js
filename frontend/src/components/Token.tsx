@@ -12,7 +12,11 @@ const Token = () => {
             return
         }
 
+        let date = new Date()
+        date.setTime(date.getTime() + 1 * 60 * 60 * 1000)
+
         localStorage.setItem('rc_access_token', access_token)
+        localStorage.setItem('rc_token_expiry', `${date.getTime()}`)
         navigate('/')
     }, [access_token, navigate])
 
