@@ -6,7 +6,6 @@ import useGetAccessToken from "../rcapi/useGetAccessToken"
 import useMessageQueue from "../hooks/useMessageQueue"
 import useFetchNotifications from "../rcapi/useFetchNotifications"
 import useWriteExcelFile from "../hooks/useWriteExcelFile"
-import useReadExcel from "../hooks/useReadExcel"
 import Header from "./Header"
 import {TextField, Button} from '@mui/material'
 
@@ -17,31 +16,13 @@ const NotificationAudit = () => {
     let {messages, postMessage} = useMessageQueue()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     let {notifications, fetchNotificationSettings, isNotificationListPending} = useFetchNotifications(postMessage)
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [isPending, setIsPending] = useState(false)
     const {writeExcel} = useWriteExcelFile()
-    let {readFile, excelData, isExcelDataPending} = useReadExcel()
 
     const handleClick = () => {
         setIsPending(true)
         fetchExtensions()
     }
-
-    const handleFileOpenClick = () => {
-        document.getElementById('notifications-file-select')?.click()
-    }
-
-    const handleSubmit = () => {
-        if (!selectedFile) return
-
-        readFile(selectedFile, 'IVRs2')
-    }
-
-    useEffect(() => {
-        if (isExcelDataPending) return
-
-        console.log(excelData)
-    }, [isExcelDataPending, excelData])
 
     useEffect(() => {
         localStorage.setItem('target_uid', targetUID)
@@ -57,10 +38,7 @@ const NotificationAudit = () => {
     useEffect(() => {
         if (isNotificationListPending) return
         if (!isPending) return
-        
-        // let data = csvify(['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses'], notifications)
-        // const blob = new Blob([data])
-        // FileSaver.saveAs(blob, 'notifications.csv')
+
         let header = ['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses']
         writeExcel(header, notifications, 'notifications.xlsx')
         setIsPending(false)
