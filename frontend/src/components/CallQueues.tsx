@@ -21,34 +21,10 @@ const CallQueues = () => {
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     let {callQueues, isQueueListPending, fetchQueueMembers} = useFetchCallQueueMembers()
     let {writeExcel} = useWriteExcelFile()
-    const [selectedFile, setSelectedFile] = useState<File | null>()
-    const {readFile, excelData, isExcelDataPending} = useReadExcel()
-    let {convert, queues, isQueueConvertPending} = useExcelToQueues(postMessage)
-    
-    // Progess bar
-    const [progressValue, setProgressValue] = useState(0)
-    const [maxProgressValue, setMaxProgressValue] = useState(0)
-    let {isCallQueueCreationPending, createQueues} = useCreateCallQueues(setProgressValue ,postMessage)
 
     const handleClick = () => {
         fetchExtensions()
     }
-
-    const handleFileSelect = () => {
-        if (!selectedFile) return
-        console.log(`Selected file: ${selectedFile.name}`)
-        readFile(selectedFile, 'Queues')
-    }
-
-    useEffect(() => {
-        if (isExcelDataPending) return
-        convert(excelData, extensionsList)
-    }, [isExcelDataPending, excelData, extensionsList])
-
-    useEffect(() => {
-        if (isQueueConvertPending) return
-        createQueues(queues, extensionsList)
-    }, [isQueueConvertPending, extensionsList])
 
     useEffect(() => {
         localStorage.setItem('target_uid', targetUID)
