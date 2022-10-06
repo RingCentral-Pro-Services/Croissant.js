@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
-import {Select, MenuItem, SelectChangeEvent, TextField} from '@mui/material'
+import { MenuItem, TextField } from '@mui/material'
 
 const ExcelSheetSelector = (props: {sheets: string[], setSelectedSheet: (name: string) => void, defaultSheet: string}) => {
     const {sheets, setSelectedSheet, defaultSheet} = props
@@ -22,7 +22,7 @@ const ExcelSheetSelector = (props: {sheets: string[], setSelectedSheet: (name: s
             setSelectedValue(sheets[0])
             setSelectedSheet(sheets[0])
         }
-    }, [sheets])
+    }, [sheets, defaultSheet])
 
     return (
         <TextField
