@@ -5,9 +5,8 @@ import useMessageQueue from "../hooks/useMessageQueue"
 import useExtensionList from "../rcapi/useExtensionList"
 import useExcelToQueues from "../rcapi/useExcelToQueues"
 import useCreateCallQueues from "../rcapi/useCreateCallQueues"
-import DataTable from "./DataTable"
-import MessagesArea from "./MessagesArea"
 import {Button} from '@mui/material'
+import FeedbackArea from "./FeedbackArea"
 
 const CreateCallQueues = () => {
     let {messages, postMessage} = useMessageQueue()
@@ -67,8 +66,7 @@ const CreateCallQueues = () => {
             <FileSelect accept=".xlsx" handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
             {isPending ? <></> : <Button variant="contained" onClick={handleSyncButtonClick}>Sync</Button>}
             {!(queues.length > 0) ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
-            <MessagesArea messages={messages} />
-            {isQueueConvertPending ? <></> : <DataTable header={['Name', 'Extension', 'Site', 'Status', 'Members']} data={queues} />}
+            {isQueueConvertPending ? <></> : <FeedbackArea tableHeader={['Name', 'Extension', 'Site', 'Status', 'Members']} tableData={queues} messages={messages} />}
         </div>
     )
 }
