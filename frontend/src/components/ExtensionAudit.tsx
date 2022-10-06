@@ -6,6 +6,7 @@ import useGetAccessToken from '../rcapi/useGetAccessToken'
 import useWriteExcelFile from '../hooks/useWriteExcelFile'
 import Header from './Header'
 import {TextField, Button} from '@mui/material'
+import FeedbackArea from './FeedbackArea'
 
 const ExtensionAudit = () => {
     useLogin()
@@ -52,6 +53,7 @@ const ExtensionAudit = () => {
                 onChange={(e) => setTargetUID(e.target.value)}
             ></TextField>
             <Button variant='contained' onClick={handleClick}>Go</Button>
+            {extensionsList.length > 0 ? <FeedbackArea tableHeader={['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']} tableData={extensionsList} messages={messages} /> : <></>}
         </div>
         </>
     )
