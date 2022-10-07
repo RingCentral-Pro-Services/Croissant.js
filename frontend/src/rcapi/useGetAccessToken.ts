@@ -3,17 +3,12 @@ import { useState } from "react";
 const sign = require('jwt-encode');
 const axios = require('axios').default;
 
-// Eventually this hook will submit a fetch request to obtain an access token for a customer account
-// For now, it will just copy the RC user access token
 const useGetAccessToken = () => {
     const [hasCustomerToken, setHasToken] = useState(false)
 
     const fetchToken = (uid: string) => {
         let rc_access_token = localStorage.getItem('rc_access_token')
-        console.log(rc_access_token)
-        console.log(uid)
         if (!rc_access_token) return
-        localStorage.setItem('cs_access_token', rc_access_token)
 
         const headers = {
             "Accept": "application/json",
