@@ -3,8 +3,8 @@ import {Button} from '@mui/material'
 import useReadExcel from "../hooks/useReadExcel"
 import ExcelSheetSelector from "./ExcelSheetSelector"
 
-const FileSelect = (props: {handleSubmit: () => void, setSelectedFile: (file: File) => void, isPending: boolean, setSelectedSheet: (sheetName: string) => void, defaultSheet: string, accept: string}) => {
-    const {handleSubmit, setSelectedFile, isPending, setSelectedSheet, defaultSheet, accept} = props
+const FileSelect = (props: {enabled: boolean, handleSubmit: () => void, setSelectedFile: (file: File) => void, isPending: boolean, setSelectedSheet: (sheetName: string) => void, defaultSheet: string, accept: string}) => {
+    const {enabled, handleSubmit, setSelectedFile, isPending, setSelectedSheet, defaultSheet, accept} = props
     const [selectedFileName, setSelectedFileName] = useState<string | null>()
     const {excelSheets, readSheetNames} = useReadExcel()
 
@@ -24,10 +24,10 @@ const FileSelect = (props: {handleSubmit: () => void, setSelectedFile: (file: Fi
     return (
         <div className="file-select">
             <form>
-                <Button className="inline browse-button" variant="outlined" type="button" onClick={handleFileOpenClick}>Browse...</Button>
+                <Button disabled={!enabled} className="inline browse-button" variant="outlined" type="button" onClick={handleFileOpenClick}>Browse...</Button>
                 <p className="inline healthy-margin-right">{selectedFileName ? selectedFileName : "No file selected"}</p>
                 {selectedFileName && selectedFileName.includes('.xlsx') ? <ExcelSheetSelector sheets={excelSheets} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} /> : <></>}
-                <Button variant="outlined" type="button" onClick={handleSubmit}>{isPending ? "Processing" : "Submit"}</Button>
+                <Button disabled={!enabled} variant="outlined" type="button" onClick={handleSubmit}>{isPending ? "Processing" : "Submit"}</Button>
                 <input id="file-select" type="file" onInput={(e) => handleFileInput(e)} accept={accept} hidden/>
             </form>
         </div>
