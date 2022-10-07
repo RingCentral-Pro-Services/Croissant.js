@@ -14,6 +14,8 @@ import PageFilter from "./PageFilter";
 import LucidchartFilterPage from "../models/LucidchartFilterPage";
 import {TextField, Button} from '@mui/material'
 import FeedbackArea from "./FeedbackArea";
+import usePostTimedMessage from "../hooks/usePostTimedMessage";
+import { Message } from "../models/Message";
 
 const DirectCreateMenus = () => {
     useLogin()
@@ -29,6 +31,7 @@ const DirectCreateMenus = () => {
     const {menus: excelMenus, isMenuConvertPending, converToMenus} = useExcelToIVRs()
     const {readLucidchart, isLucidchartPending, menus: lucidchartMenus, pages, setPages} = useReadLucidchart()
     const defaultSheet = 'IVRs'
+    const {timedMessages, postTimedMessage} = usePostTimedMessage()
 
     // Filter stuff
     const [isDisplayingFilterBox, setDisplayFilterBox] = useState(false)
@@ -39,7 +42,7 @@ const DirectCreateMenus = () => {
     // Progress bar
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
-    const {createMenus} = useCreateIVRs(setProgressValue, postMessage)
+    const {createMenus} = useCreateIVRs(setProgressValue, postMessage, postTimedMessage)
 
     const handleFileSelect = () => {
         if (!selectedFile) return
@@ -130,7 +133,10 @@ const DirectCreateMenus = () => {
             {isDisplayingFilterBox ? <PageFilter pages={filteredPages ? filteredPages : pages} selectAll={selectAll} handleFilterClick={handleFilterClick} handleInput={handleInput} /> : <></>}
             {!isReadyToSync ? <></> : <Button variant="contained" className="inline" onClick={handleSyncButtonClick}>Sync</Button>}
             {!(menus.length > 0) ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
-            {!(menus.length > 0) ? <></> : <FeedbackArea tableHeader={['Name', 'Ext', 'Site', 'Prompt Mode', 'Prompt', 'Key 1', 'Key 2', 'Key 3', 'Key 4', 'Key 5', 'Key 6', 'Key 7', 'Key 8', 'Key 9', 'Key 0']} tableData={menus} messages={messages} /> }
+            {timedMessages.map((timedMessage) => (
+                <p>{timedMessage.body}</p>
+            ))}
+            {!(menus.length > 0) ? <></> : <FeedbackArea tableHeader={['Name', 'Ext', 'Site', 'Prompt Mode', 'Prompt', 'Key 1', 'Key 2', 'Key 3', 'Key 4', 'Key 5', 'Key 6', 'Key 7', 'Key 8', 'Key 9', 'Key 0']} tableData={menus} messages={messages} timedMessages={timedMessages} /> }
         </ div>
     )
 }

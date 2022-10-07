@@ -5,6 +5,7 @@ import useMessageQueue from "../hooks/useMessageQueue"
 import useExtensionList from "../rcapi/useExtensionList"
 import useExcelToQueues from "../rcapi/useExcelToQueues"
 import useCreateCallQueues from "../rcapi/useCreateCallQueues"
+import usePostTimedMessage from "../hooks/usePostTimedMessage"
 import {Button} from '@mui/material'
 import FeedbackArea from "./FeedbackArea"
 
@@ -18,6 +19,7 @@ const CreateCallQueues = () => {
     let {convert, queues, isQueueConvertPending} = useExcelToQueues(postMessage)
     const [selectedSheet, setSelectedSheet] = useState<string>('')
     const defaultSheet = "Queues"
+    const {timedMessages, postTimedMessage} = usePostTimedMessage()
 
     // Progess bar
     const [progressValue, setProgressValue] = useState(0)
@@ -66,7 +68,7 @@ const CreateCallQueues = () => {
             <FileSelect accept=".xlsx" handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
             {isPending ? <></> : <Button variant="contained" onClick={handleSyncButtonClick}>Sync</Button>}
             {!(queues.length > 0) ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
-            {isQueueConvertPending ? <></> : <FeedbackArea tableHeader={['Name', 'Extension', 'Site', 'Status', 'Members']} tableData={queues} messages={messages} />}
+            {isQueueConvertPending ? <></> : <FeedbackArea tableHeader={['Name', 'Extension', 'Site', 'Status', 'Members']} tableData={queues} messages={messages} timedMessages={timedMessages} />}
         </div>
     )
 }

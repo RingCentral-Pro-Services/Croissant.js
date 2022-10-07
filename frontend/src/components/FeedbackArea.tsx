@@ -14,8 +14,8 @@ interface TabPanelProps {
     value: number;
   }
 
-const FeedbackArea = (props: {tableHeader: string[], tableData: ExcelFormattable[], messages: Message[]}) => {
-    const {tableData, tableHeader, messages} = props
+const FeedbackArea = (props: {tableHeader: string[], tableData: ExcelFormattable[], messages: Message[], timedMessages: Message[]}) => {
+    const {tableData, tableHeader, messages, timedMessages} = props
     const [value, setValue] = React.useState(0);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -34,6 +34,7 @@ const FeedbackArea = (props: {tableHeader: string[], tableData: ExcelFormattable
                 <DataTable header={tableHeader} data={tableData} />
             </TabPanel>
             <TabPanel value={value} index={1}>
+              <MessagesArea messages={timedMessages} />
                 <MessagesArea messages={messages} />
             </TabPanel>
         </>
