@@ -273,19 +273,6 @@ button:hover {
   overflow-x: auto;
 }
 
-table {
-  /* font-family: arial, sans-serif; */
-  border-collapse: collapse;
-  table-layout: fixed;
-}
-
-td, th {
-  border: 1px solid #dddddd;
-  text-align: left;
-  padding: 8px;
-  width: 200px;
-}
-
 progress {
   display: block;
   width: 100%;
