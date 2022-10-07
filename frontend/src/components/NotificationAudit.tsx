@@ -11,7 +11,7 @@ import {TextField, Button} from '@mui/material'
 
 const NotificationAudit = () => {
     useLogin()
-    let [targetUID, setTargetUID] = useState("~")
+    let [targetUID, setTargetUID] = useState("")
     const {fetchToken} = useGetAccessToken()
     let {messages, postMessage} = useMessageQueue()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
@@ -55,7 +55,7 @@ const NotificationAudit = () => {
                     required
                     id="outline-required"
                     label="Account UID"
-                    defaultValue="~"
+                    defaultValue=""
                     size="small"
                     onChange={(e) => setTargetUID(e.target.value)}
                 ></TextField>

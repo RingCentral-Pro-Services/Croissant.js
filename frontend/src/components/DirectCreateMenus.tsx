@@ -18,12 +18,12 @@ import usePostTimedMessage from "../hooks/usePostTimedMessage";
 
 const DirectCreateMenus = () => {
     useLogin()
-    let [targetUID, setTargetUID] = useState("~")
+    let [targetUID, setTargetUID] = useState("")
     let [isReadyToSync, setReadyToSync] = useState(false)
     let [isPending, setIsPending] = useState(false)
     const [menus, setMenus] = useState<IVRMenu[]>([])
     let {messages, postMessage} = useMessageQueue()
-    const {fetchToken} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken} = useGetAccessToken()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     const [selectedFile, setSelectedFile] = useState<File | null>()
     const {excelData, isExcelDataPending, readFile} = useReadExcel()
@@ -125,11 +125,11 @@ const DirectCreateMenus = () => {
                 required
                 id="outline-required"
                 label="Account UID"
-                defaultValue="~"
+                defaultValue=""
                 size="small"
                 onChange={(e) => setTargetUID(e.target.value)}
             ></TextField>
-            <FileSelect accept=".xlsx, .csv" handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={isPending} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
+            <FileSelect enabled={hasCustomerToken} accept=".xlsx, .csv" handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={isPending} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
             {isDisplayingFilterBox ? <PageFilter pages={filteredPages ? filteredPages : pages} selectAll={selectAll} handleFilterClick={handleFilterClick} handleInput={handleInput} /> : <></>}
             {!isReadyToSync ? <></> : <Button variant="contained" className="inline" onClick={handleSyncButtonClick}>Sync</Button>}
             {!(menus.length > 0) ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}

@@ -12,8 +12,8 @@ import {TextField, Button} from '@mui/material'
 
 const CallQueues = () => {
     useLogin()
-    let [targetUID, setTargetUID] = useState("~")
-    const {fetchToken} = useGetAccessToken()
+    let [targetUID, setTargetUID] = useState("")
+    const {fetchToken, hasCustomerToken} = useGetAccessToken()
     let {messages, postMessage} = useMessageQueue()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     let {callQueues, isQueueListPending, fetchQueueMembers} = useFetchCallQueueMembers()
@@ -52,11 +52,11 @@ const CallQueues = () => {
                     required
                     id="outline-required"
                     label="Account UID"
-                    defaultValue="~"
+                    defaultValue=""
                     size="small"
                     onChange={(e) => setTargetUID(e.target.value)}
                 ></TextField>
-                <Button variant="contained" onClick={handleClick}>Go</Button>
+                <Button disabled={!hasCustomerToken} variant="contained" onClick={handleClick}>Go</Button>
             </div>
             <CreateCallQueues />
             {messages.map((message: Message) => (

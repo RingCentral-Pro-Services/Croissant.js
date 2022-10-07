@@ -11,7 +11,7 @@ import usePostTimedMessage from '../hooks/usePostTimedMessage'
 
 const ExtensionAudit = () => {
     useLogin()
-    let [targetUID, setTargetUID] = useState("~")
+    let [targetUID, setTargetUID] = useState("")
     const {fetchToken} = useGetAccessToken()
     let {messages, postMessage} = useMessageQueue()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
@@ -51,7 +51,7 @@ const ExtensionAudit = () => {
                 required
                 id="outline-required"
                 label="Account UID"
-                defaultValue="~"
+                defaultValue=""
                 size='small'
                 onChange={(e) => setTargetUID(e.target.value)}
             ></TextField>
