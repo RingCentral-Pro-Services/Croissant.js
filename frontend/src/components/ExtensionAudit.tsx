@@ -12,7 +12,7 @@ import usePostTimedMessage from '../hooks/usePostTimedMessage'
 const ExtensionAudit = () => {
     useLogin()
     let [targetUID, setTargetUID] = useState("")
-    const {fetchToken} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken} = useGetAccessToken()
     let {messages, postMessage} = useMessageQueue()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     const {writeExcel} = useWriteExcelFile()
@@ -55,7 +55,7 @@ const ExtensionAudit = () => {
                 size='small'
                 onChange={(e) => setTargetUID(e.target.value)}
             ></TextField>
-            <Button variant='contained' onClick={handleClick}>Go</Button>
+            <Button disabled={!hasCustomerToken} variant='contained' onClick={handleClick}>Go</Button>
             {extensionsList.length > 0 ? <FeedbackArea tableHeader={['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']} tableData={extensionsList} messages={messages} timedMessages={timedMessages} /> : <></>}
         </div>
         </>

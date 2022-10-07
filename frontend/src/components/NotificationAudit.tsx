@@ -12,7 +12,7 @@ import {TextField, Button} from '@mui/material'
 const NotificationAudit = () => {
     useLogin()
     let [targetUID, setTargetUID] = useState("")
-    const {fetchToken} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken} = useGetAccessToken()
     let {messages, postMessage} = useMessageQueue()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     let {notifications, fetchNotificationSettings, isNotificationListPending} = useFetchNotifications(postMessage)
@@ -59,7 +59,7 @@ const NotificationAudit = () => {
                     size="small"
                     onChange={(e) => setTargetUID(e.target.value)}
                 ></TextField>
-                <Button variant="contained" onClick={handleClick}>Go</Button>
+                <Button disabled={!hasCustomerToken} variant="contained" onClick={handleClick}>Go</Button>
             {messages.map((message: Message) => (
                 <div key={message.body}>
                     <p className={message.type}>{message.body}</p>
