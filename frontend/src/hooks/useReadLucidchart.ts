@@ -134,7 +134,7 @@ const useReadLucidchart = () => {
                             newMenus[menuIndex].data.actions.push(action)
                         }
                         else if (destinationType === "Prompts") {
-                            newMenus[menuIndex].data.prompt = getPromptForID(lineDestinationID)
+                            newMenus[menuIndex].data.prompt.text = getPromptForID(lineDestinationID)
                         }
                         else {
                             let action: IVRAction = {
