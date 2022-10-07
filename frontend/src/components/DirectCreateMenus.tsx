@@ -15,7 +15,6 @@ import LucidchartFilterPage from "../models/LucidchartFilterPage";
 import {TextField, Button} from '@mui/material'
 import FeedbackArea from "./FeedbackArea";
 import usePostTimedMessage from "../hooks/usePostTimedMessage";
-import { Message } from "../models/Message";
 
 const DirectCreateMenus = () => {
     useLogin()
