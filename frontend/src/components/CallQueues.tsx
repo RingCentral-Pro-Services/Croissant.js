@@ -24,8 +24,9 @@ const CallQueues = () => {
     }
 
     useEffect(() => {
+        if (targetUID.length < 5) return
         localStorage.setItem('target_uid', targetUID)
-        fetchToken()
+        fetchToken(targetUID)
     },[targetUID, fetchToken])
 
     useEffect(() => {
