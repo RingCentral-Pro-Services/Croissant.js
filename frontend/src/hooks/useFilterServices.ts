@@ -61,7 +61,7 @@ const useFilterServices = (pages: LucidchartFilterPage[], setPages: any, filtere
         let result: any = []
         pages.forEach((page: LucidchartFilterPage) => {
             if (page.label.toUpperCase().includes(input)) {
-                result.push({label: page.label, checked: page.isChecked})
+                result.push({label: page.label, isChecked: page.isChecked})
             }
         })
         setFilteredPages(result)
