@@ -11,7 +11,7 @@ interface response {
     id: string
 }
 
-const useCreateIVRs = (setProgressValue: (value: (any)) => void, postMessage: (message: Message) => void) => {
+const useCreateIVRs = (setProgressValue: (value: (any)) => void, postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void) => {
     let [rateLimitInterval, setRateLimitInterval] = useState(0)
     const [workingMenus, setMenus] = useState<IVRMenu[]>([])
     let [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
@@ -49,6 +49,7 @@ const useCreateIVRs = (setProgressValue: (value: (any)) => void, postMessage: (m
                 createMenu(workingMenus[currentExtensionIndex])
                 .then((response: any) => {
                     console.log(`Menu '${workingMenus[currentExtensionIndex].data.name}' created successfully`)
+                    if (response.rateLimit > 0) postTimedMessage(new Message(`Rate limit reached. Waiting 60 seconds`, 'info'), 60000)
                     setRateLimitInterval(response.rateLimit)
                     let newMenus = workingMenus
                     newMenus[currentExtensionIndex].data.id = response.id
@@ -81,6 +82,7 @@ const useCreateIVRs = (setProgressValue: (value: (any)) => void, postMessage: (m
             updateMenu(workingMenus[currentExtensionIndex])
             .then((response: any) => {
                 console.log(`Menu '${workingMenus[currentExtensionIndex].data.name}' updated successfully`)
+                if (response.rateLimit > 0) postTimedMessage(new Message(`Rate limit reached. Waiting 60 seconds`, 'info'), 60000)
                 setRateLimitInterval(response.rateLimit)
                 setCurrentExtensionIndex(currentExtensionIndex + 1)
                 increaseProgress()
