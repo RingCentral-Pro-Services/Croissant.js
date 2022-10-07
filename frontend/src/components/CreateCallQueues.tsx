@@ -24,7 +24,7 @@ const CreateCallQueues = () => {
     // Progess bar
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
-    let {isCallQueueCreationPending, createQueues} = useCreateCallQueues(setProgressValue ,postMessage)
+    let {isCallQueueCreationPending, createQueues} = useCreateCallQueues(setProgressValue ,postMessage, postTimedMessage)
 
     const handleFileSelect = () => {
         if (!selectedFile) return

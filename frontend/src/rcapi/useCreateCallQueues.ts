@@ -4,7 +4,7 @@ import { Message } from "../models/Message";
 import RCExtension from "../models/RCExtension";
 import { RestCentral } from "./RestCentral";
 
-const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessage: (message: Message) => void) => {
+const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void) => {
     const [queues, setQueues] = useState<CallQueue[]>([])
     let [shouldFetch, setShouldFetch] = useState(false)
     let [shouldUpdateQueues, setShouldUpdateQueues] = useState(false)
@@ -63,6 +63,7 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
                 console.log(response)
 
                 queues[currentExtensionIndex].extension.id = response.data.id
+                if (response.rateLimitInterval > 0) postTimedMessage(new Message(`Rate limit reached. Resuming in 60 seconds`, 'info'), 60000)
                 setRateLimitInterval(response.rateLimitInterval)
                 if (currentExtensionIndex !== queues.length - 1) {
                     increaseProgress()
@@ -107,6 +108,7 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
                 let response = await RestCentral.post(queueURL, headers, body)
                 console.log(response)
 
+                if (response.rateLimitInterval > 0) postTimedMessage(new Message(`Rate limit reached 😩. Resuming in 60 seconds`, 'info'), 60000)
                 setRateLimitInterval(response.rateLimitInterval)
                 if (currentExtensionIndex !== queues.length - 1) {
                     increaseProgress()
