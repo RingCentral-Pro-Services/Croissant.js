@@ -137,6 +137,7 @@ const useExcelToIVRs = () => {
     }
 
     const idForExtension = (extension: string, extensionsList: RCExtension[]) => {
+        if (extension === undefined) return 0
         for (let index = 0; index < extensionsList.length; index++) {
             if (`${extensionsList[index].extensionNumber}` === extension.toString().trim()) {
                 return extensionsList[index].id
@@ -151,6 +152,7 @@ const useExcelToIVRs = () => {
      * @returns The sanitized prompt as a string
      */
      const sanitizedPrompt = (prompt: any) => {
+        if (prompt === undefined) return
         let result = prompt.replaceAll("_", "-")
         result = result.replaceAll("*", "star")
         result = result.replaceAll("#", "pound")
