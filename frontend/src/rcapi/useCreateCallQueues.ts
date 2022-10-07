@@ -37,7 +37,7 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
         let targetUID = localStorage.getItem('target_uid')
         if (!targetUID) return
 
-        const extensionURL = url.replace('~', targetUID)
+        const extensionURL = url
 
         if (extensionExists(queues[currentExtensionIndex].extension.extensionNumber, extensionList)) {
             setCurrentExtensionIndex(currentExtensionIndex + 1)
@@ -94,7 +94,7 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
         let targetUID = localStorage.getItem('target_uid')
         if (!targetUID) return
 
-        let queueURL = baseUpdateURL.replace('~', targetUID)
+        let queueURL = baseUpdateURL
         queueURL = queueURL.replace('groupId', `${queues[currentExtensionIndex].extension.id}`)
 
         setTimeout(async () => {
