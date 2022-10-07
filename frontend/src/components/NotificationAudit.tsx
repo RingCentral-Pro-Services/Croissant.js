@@ -28,7 +28,7 @@ const NotificationAudit = () => {
         if (targetUID.length < 5) return
         localStorage.setItem('target_uid', targetUID)
         fetchToken(targetUID)
-    },[targetUID, fetchToken])
+    },[targetUID])
 
     useEffect(() => {
         if (isExtensionListPending) return 
