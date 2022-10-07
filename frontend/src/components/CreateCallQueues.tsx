@@ -8,11 +8,14 @@ import useCreateCallQueues from "../rcapi/useCreateCallQueues"
 import usePostTimedMessage from "../hooks/usePostTimedMessage"
 import {Button} from '@mui/material'
 import FeedbackArea from "./FeedbackArea"
+import UIDInputField from "./UIDInputField"
+import useGetAccessToken from "../rcapi/useGetAccessToken"
 
 const CreateCallQueues = () => {
     let {messages, postMessage} = useMessageQueue()
     let [isPending, setIsPending] = useState(true)
     let [isReadyToSync, setIsReadyToSync] = useState(false)
+    const [targetUID, setTargetUID] = useState('')
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     const [selectedFile, setSelectedFile] = useState<File | null>()
     const {readFile, excelData, isExcelDataPending} = useReadExcel()
@@ -20,6 +23,7 @@ const CreateCallQueues = () => {
     const [selectedSheet, setSelectedSheet] = useState<string>('')
     const defaultSheet = "Queues"
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
+    const {fetchToken, hasCustomerToken} = useGetAccessToken()
 
     // Progess bar
     const [progressValue, setProgressValue] = useState(0)
@@ -36,6 +40,11 @@ const CreateCallQueues = () => {
     const handleSyncButtonClick = () => {
         setIsReadyToSync(true)
     }
+
+    useEffect(() => {
+        if (targetUID.length > 5) return
+        fetchToken(targetUID)
+    }, [targetUID])
 
     useEffect(() => {
         if (isExtensionListPending) return
@@ -65,7 +74,8 @@ const CreateCallQueues = () => {
     return (
         <div className="tool-card">
             <h2>Create Call Queues</h2>
-            <FileSelect accept=".xlsx" handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
+            <UIDInputField setTargetUID={setTargetUID} />
+            <FileSelect enabled={hasCustomerToken} accept=".xlsx" handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
             {isPending ? <></> : <Button variant="contained" onClick={handleSyncButtonClick}>Sync</Button>}
             {!(queues.length > 0) ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
             {isQueueConvertPending ? <></> : <FeedbackArea tableHeader={['Name', 'Extension', 'Site', 'Status', 'Members']} tableData={queues} messages={messages} timedMessages={timedMessages} />}
