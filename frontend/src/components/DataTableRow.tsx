@@ -1,15 +1,16 @@
 import React from "react";
 import ExcelFormattable from "../models/ExcelFormattable";
+import {TableRow, TableCell} from '@mui/material'
 
 const DataTableRow = (props: {dataSource: ExcelFormattable}) => {
     const {dataSource} = props
 
     return (
-        <tr>
+        <TableRow>
             {dataSource.toExcelRow().map((value) => (
-                <td>{value}</td>
+                <TableCell>{value}</TableCell>
             ))}
-        </tr>
+        </TableRow>
     )
 }
 
