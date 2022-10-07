@@ -27,14 +27,14 @@ const FeedbackArea = (props: {tableHeader: string[], tableData: ExcelFormattable
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs value={value} onChange={handleChange} aria-label="feedback area">
                 <Tab label="Table" icon={<TableRowsIcon/>} iconPosition='start' {...a11yProps(0)} />
-                <Tab label="Messages" icon={<Badge badgeContent={messages.length} color='primary' anchorOrigin={{vertical: "top", horizontal: "left"}} ><MailIcon/></Badge>} iconPosition='start' {...a11yProps(1)} />
+                <Tab label="Messages" icon={<Badge badgeContent={messages.length + timedMessages.length} color='primary' anchorOrigin={{vertical: "top", horizontal: "left"}} ><MailIcon/></Badge>} iconPosition='start' {...a11yProps(1)} />
             </Tabs>
             </Box>
             <TabPanel value={value} index={0}>
                 <DataTable header={tableHeader} data={tableData} />
             </TabPanel>
             <TabPanel value={value} index={1}>
-              <MessagesArea messages={timedMessages} />
+               <MessagesArea messages={timedMessages} />
                 <MessagesArea messages={messages} />
             </TabPanel>
         </>
