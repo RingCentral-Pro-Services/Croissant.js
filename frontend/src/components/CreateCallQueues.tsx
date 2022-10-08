@@ -42,7 +42,7 @@ const CreateCallQueues = () => {
     }
 
     useEffect(() => {
-        if (targetUID.length > 5) return
+        if (targetUID.length < 5) return
         fetchToken(targetUID)
     }, [targetUID])
 
