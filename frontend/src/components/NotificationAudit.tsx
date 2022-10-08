@@ -8,6 +8,8 @@ import useFetchNotifications from "../rcapi/useFetchNotifications"
 import useWriteExcelFile from "../hooks/useWriteExcelFile"
 import Header from "./Header"
 import {TextField, Button} from '@mui/material'
+import FeedbackArea from "./FeedbackArea"
+import usePostTimedMessage from "../hooks/usePostTimedMessage"
 
 const NotificationAudit = () => {
     useLogin()
@@ -18,6 +20,7 @@ const NotificationAudit = () => {
     let {notifications, fetchNotificationSettings, isNotificationListPending} = useFetchNotifications(postMessage)
     const [isPending, setIsPending] = useState(false)
     const {writeExcel} = useWriteExcelFile()
+    const {postTimedMessage, timedMessages} = usePostTimedMessage()
 
     const handleClick = () => {
         setIsPending(true)
@@ -60,11 +63,7 @@ const NotificationAudit = () => {
                     onChange={(e) => setTargetUID(e.target.value)}
                 ></TextField>
                 <Button disabled={!hasCustomerToken} variant="contained" onClick={handleClick}>Go</Button>
-            {messages.map((message: Message) => (
-                <div key={message.body}>
-                    <p className={message.type}>{message.body}</p>
-                </div>
-            ))}
+                {notifications.length > 0 ? <FeedbackArea tableHeader={['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses']} tableData={notifications} messages={messages} timedMessages={timedMessages} /> : <></>}
             </div>
         </>
     )
