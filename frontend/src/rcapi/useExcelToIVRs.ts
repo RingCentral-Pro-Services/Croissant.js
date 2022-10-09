@@ -1,9 +1,11 @@
 import { useState } from "react"
 import ExtensionIsolator from "../helpers/ExtensionIsolator"
-import { IVRAction, IVRDestination, IVRMenu, IVRMenuData, IVRPrompt, Site } from "../models/IVRMenu"
+import { AudioPrompt } from "../models/AudioPrompt"
+import { IVRAction, IVRaudioPrompt, IVRDestination, IVRMenu, IVRMenuData, IVRPrompt, Site } from "../models/IVRMenu"
+import { Message } from "../models/Message"
 import RCExtension from "../models/RCExtension"
 
-const useExcelToIVRs = () => {
+const useExcelToIVRs = (postMessage: (message: Message) => void) => {
     const [menus, setMenus] = useState<IVRMenu[]>([])
     const [isMenuConvertPending, setPending] = useState(true)
     const extensionIsolator = new ExtensionIsolator()
@@ -24,14 +26,14 @@ const useExcelToIVRs = () => {
         "Transfer to extension": "Connect",
     }
 
-    const converToMenus = (data: any[], extensionList: RCExtension[]) => {
+    const converToMenus = (data: any[], extensionList: RCExtension[], audioPromptList: AudioPrompt[]) => {
         let records: IVRMenu[] = []
 
         for (let index = 0; index < data.length; index++) {
             let currentItem = data[index]
             let actions = getActions(data[index], extensionList)
             let site = getSite(currentItem['Site'], extensionList)
-            let prompt = getPrompt(currentItem['Prompt Name/Script'])
+            let prompt = getPrompt(currentItem['Prompt Name/Script'], audioPromptList)
             let menuData: IVRMenuData = {
                 uri: "",
                 name: currentItem['Menu Name'],
@@ -63,7 +65,7 @@ const useExcelToIVRs = () => {
         return site
     }
 
-    const getPrompt = (rawText: string) => {
+    const getPrompt = (rawText: string, audioPromptList: AudioPrompt[]) => {
         let prompt: IVRPrompt = {
             mode: "",
             text: ""
@@ -72,8 +74,23 @@ const useExcelToIVRs = () => {
         // TODO: Check to see if the prompt is an audio prompt
         // Then get the URI of the audio prompt
 
-        prompt.mode = 'TextToSpeech'
-        prompt.text = sanitizedPrompt(rawText)
+        if (rawText.includes('.mp3') || rawText.includes('.wav')) {
+            const audio = getIVRAudioPrompt(rawText.trim(), audioPromptList)
+            if (audio.id === '') {
+                prompt.mode = 'TextToSpeech'
+                prompt.text = 'Thank you for calling.'
+                postMessage(new Message(`Audio prompt '${rawText}' could not be found in the account. Building with text-to-speech prompt instead`, 'warning'))
+            }
+            else {
+                prompt.mode = 'Audio'
+                prompt.audio = audio
+                delete prompt.text
+            }
+        }
+        else {
+            prompt.mode = 'TextToSpeech'
+            prompt.text = sanitizedPrompt(rawText)
+        }
 
         return prompt
     }
@@ -134,6 +151,22 @@ const useExcelToIVRs = () => {
         }
 
         return actions
+    }
+
+    const getIVRAudioPrompt = (filename: string, audioPromptList: AudioPrompt[]) => {
+        let result: IVRaudioPrompt = {
+            uri: "",
+            id: ""
+        }
+
+        for (const prompt of audioPromptList) {
+            if (prompt.filename === filename) {
+                result.id = prompt.id
+                result.uri = prompt.uri
+            }
+        }
+
+        return result
     }
 
     const idForExtension = (extension: string, extensionsList: RCExtension[]) => {

@@ -15,6 +15,7 @@ import LucidchartFilterPage from "../models/LucidchartFilterPage";
 import {TextField, Button} from '@mui/material'
 import FeedbackArea from "./FeedbackArea";
 import usePostTimedMessage from "../hooks/usePostTimedMessage";
+import useGetAudioPrompts from "../rcapi/useGetAudioPrompts";
 
 const DirectCreateMenus = () => {
     useLogin()
@@ -27,10 +28,11 @@ const DirectCreateMenus = () => {
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     const [selectedFile, setSelectedFile] = useState<File | null>()
     const {excelData, isExcelDataPending, readFile} = useReadExcel()
-    const {menus: excelMenus, isMenuConvertPending, converToMenus} = useExcelToIVRs()
-    const {readLucidchart, isLucidchartPending, menus: lucidchartMenus, pages, setPages} = useReadLucidchart()
+    const {menus: excelMenus, isMenuConvertPending, converToMenus} = useExcelToIVRs(postMessage)
+    const {readLucidchart, isLucidchartPending, menus: lucidchartMenus, pages, setPages} = useReadLucidchart(postMessage)
     const defaultSheet = 'IVRs'
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
+    const {audioPromptList, isAudioPromptListPending, fetchAudioPrompts} = useGetAudioPrompts(postMessage, postTimedMessage)
 
     // Filter stuff
     const [isDisplayingFilterBox, setDisplayFilterBox] = useState(false)
@@ -76,26 +78,36 @@ const DirectCreateMenus = () => {
     }
 
     useEffect(() => {
-        if (isExtensionListPending) return
+        if (isAudioPromptListPending) return
         if (!selectedFile) return
 
+        console.log('audio prompts ->', audioPromptList)
         if (selectedFile.name.includes('.csv')) {
-            readLucidchart(selectedFile, extensionsList)
+            readLucidchart(selectedFile, extensionsList, audioPromptList)
         }
         else if (selectedFile.name.includes('.xlsx')) {
             readFile(selectedFile, selectedSheet)
         }
-    }, [isExtensionListPending, extensionsList, selectedFile])
+        
+    }, [isAudioPromptListPending, extensionsList, selectedFile])
+
+    useEffect(() => {
+        if (isExtensionListPending) return
+        if (!selectedFile) return
+
+        fetchAudioPrompts()
+    }, [isExtensionListPending, selectedFile])
 
     useEffect(() => {
         if (isExcelDataPending) return
 
-        converToMenus(excelData, extensionsList)
+        converToMenus(excelData, extensionsList, audioPromptList)
     }, [isExcelDataPending, excelData, extensionsList])
 
     useEffect(() => {
         if (isLucidchartPending) return
         console.log('Lucidchart done')
+        console.log(lucidchartMenus)
         setMenus(lucidchartMenus)
         setIsPending(false)
         setReadyToSync(true)

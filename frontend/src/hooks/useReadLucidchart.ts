@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import Papa from 'papaparse'
 import ExtensionIsolator from '../helpers/ExtensionIsolator'
-import { IVRAction, IVRMenu, IVRMenuData } from '../models/IVRMenu'
+import { IVRAction, IVRaudioPrompt, IVRMenu, IVRMenuData, IVRPrompt } from '../models/IVRMenu'
 import RCExtension from '../models/RCExtension'
 import LucidchartFilterPage from '../models/LucidchartFilterPage'
+import { AudioPrompt } from '../models/AudioPrompt'
+import { Message } from '../models/Message'
 
-const useReadLucidchart = () => {
+const useReadLucidchart = (postMessage: (message: Message) => void) => {
     let [csvData, setCSVData] = useState<any>({})
     let pageMap: {[key: string]: string} = {}
     const extensionRegex = /(x)\d+/gi  // Matches x-denoted extension numbers (Ex. x4796)
@@ -15,14 +17,16 @@ const useReadLucidchart = () => {
     const [isLucidchartPending, setIsPending] = useState(true)
     const [shouldAddKeyPresses, setShouldAddKeyPresses] = useState(false)
     let extensions: RCExtension[] = []
+    const [audioPromptList, setAudioPromptList] = useState<AudioPrompt[]>([])
     const [pages, setPages] = useState<LucidchartFilterPage[]>([])
 
     useEffect(() => {
         addKeyPresses()
     }, [shouldAddKeyPresses])
 
-    const readLucidchart = (file: File, extensionList: RCExtension[]) => {
+    const readLucidchart = (file: File, extensionList: RCExtension[], audioPromptList: AudioPrompt[]) => {
         extensions = extensionList
+        setAudioPromptList(audioPromptList)
         setShouldAddKeyPresses(false)
         Papa.parse(file, {
             header: true,
@@ -37,7 +41,6 @@ const useReadLucidchart = () => {
     }
 
     const createPageMap = () => {
-        console.log(csvData)
         let newPages: LucidchartFilterPage[] = []
         for (let index = 0; index < csvData.length; index++) {
             if (csvData[index]["Name"] === "Page") {
@@ -53,7 +56,6 @@ const useReadLucidchart = () => {
     const createMenus = () => {
         let isolator = new ExtensionIsolator()
         let newMenus: IVRMenu[] = []
-        console.log(`Extensions: ${extensions.length}`)
         
         for (let index = 0; index < csvData.length; index++) {
             if (csvData[index]["Name"] === "IVR") {
@@ -134,7 +136,9 @@ const useReadLucidchart = () => {
                             newMenus[menuIndex].data.actions.push(action)
                         }
                         else if (destinationType === "Prompts") {
-                            newMenus[menuIndex].data.prompt.text = getPromptForID(lineDestinationID)
+                            let rawPrompt = getPromptForID(lineDestinationID)
+                            const prompt = getPrompt(rawPrompt, audioPromptList)
+                            newMenus[menuIndex].data.prompt = prompt
                         }
                         else {
                             let action: IVRAction = {
@@ -150,6 +154,75 @@ const useReadLucidchart = () => {
         }
         setMenus(newMenus)
         setIsPending(false)
+    }
+
+    const getPrompt = (rawText: string, audioPromptList: AudioPrompt[]) => {
+        let prompt: IVRPrompt = {
+            mode: "",
+            text: ""
+        }
+
+        // TODO: Check to see if the prompt is an audio prompt
+        // Then get the URI of the audio prompt
+
+        if (rawText.includes('.mp3') || rawText.includes('.wav')) {
+            const audio = getIVRAudioPrompt(rawText.trim(), audioPromptList)
+            if (audio.id === '') {
+                prompt.mode = 'TextToSpeech'
+                prompt.text = 'Thank you for calling.'
+                postMessage(new Message(`Audio prompt '${rawText}' could not be found in the account. Building with text-to-speech prompt instead`, 'warning'))
+            }
+            else {
+                prompt.mode = 'Audio'
+                prompt.audio = audio
+                delete prompt.text
+            }
+        }
+        else {
+            prompt.mode = 'TextToSpeech'
+            prompt.text = sanitizedPrompt(rawText)
+        }
+
+        return prompt
+    }
+
+    const getIVRAudioPrompt = (filename: string, audioPromptList: AudioPrompt[]) => {
+        let result: IVRaudioPrompt = {
+            uri: "",
+            id: ""
+        }
+
+        for (const prompt of audioPromptList) {
+            if (prompt.filename == filename) {
+                result.id = prompt.id
+                result.uri = prompt.uri
+            }
+        }
+
+        return result
+    }
+
+    /**
+     * Remove any invalid characters from the prompt
+     * @param {String} prompt The prompt to be sanitized
+     * @returns The sanitized prompt as a string
+     */
+     const sanitizedPrompt = (prompt: any) => {
+        if (prompt === undefined) return
+        let result = prompt.replaceAll("_", "-")
+        result = result.replaceAll("*", "star")
+        result = result.replaceAll("#", "pound")
+        result = result.replaceAll("@", "at")
+        result = result.replaceAll("&", "and")
+        result = result.replaceAll("(", "")
+        result = result.replaceAll(")", "")
+        result = result.replaceAll("%", "")
+        result = result.replaceAll("$", "")
+        result = result.replaceAll("!", ".")
+        result = result.replaceAll("?", ".")
+        result = result.replaceAll(":", "")
+        result = result.replaceAll(";", "")
+        return result
     }
 
     const idForExtension = (extension: string, extensionsList: RCExtension[]) => {

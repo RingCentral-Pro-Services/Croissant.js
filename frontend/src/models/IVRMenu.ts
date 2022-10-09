@@ -9,7 +9,7 @@ export class IVRMenu implements CSVFormattable, ExcelFormattable {
     }
 
     toExcelRow(): string[] {
-        let result = [this.data.name, `${this.data.extensionNumber}`, this.data.site.id, this.data.prompt.mode, this.data.prompt.text]
+        let result = [this.data.name, `${this.data.extensionNumber}`, this.data.site.id, this.data.prompt.mode, this.data.prompt.mode === 'Audio' ? this.data.prompt.audio?.id ?? '0' : this.data.prompt.text ?? '']
         let actions = this.actionsToRow()
 
         result = [...result, ...actions]
@@ -97,7 +97,13 @@ export interface IVRMenuData {
 
 export interface IVRPrompt {
     mode: string
-    text: string
+    text?: string
+    audio?: IVRaudioPrompt
+}
+
+export interface IVRaudioPrompt {
+    uri: string
+    id: string
 }
 
 export interface IVRAction {
