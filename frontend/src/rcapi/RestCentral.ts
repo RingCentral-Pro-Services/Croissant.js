@@ -55,6 +55,31 @@ export class RestCentral {
         })
     }
 
+    static put = (url: string, headers: any, body: any) => {
+        return new Promise<APIResponse>((resolve, reject) => {
+            axios({
+                method: "PUT",
+                url: url,
+                headers: headers,
+                data: body
+            })
+            .then((res: any) => {
+                const response: APIResponse = {
+                    data: res.data,
+                    rateLimitInterval: rateLimit(res.headers)
+                }
+                resolve(response)
+            })
+            .catch((res: any) => {
+                let response: APIResponse = {
+                    data: res.data,
+                    rateLimitInterval: rateLimit(res.response.headers),
+                    error: 'Drats. Something went wrong.'
+                }
+                reject(response)
+            })
+        })
+    }
 }
 
 export interface APIResponse {
