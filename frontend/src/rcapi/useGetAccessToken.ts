@@ -30,7 +30,6 @@ const useGetAccessToken = () => {
             headers: headers
         })
         .then((res: any) => {
-            console.log(res.data['access_token'])
             localStorage.setItem('cs_access_token', res.data['access_token'])
             setHasToken(true)
         })
