@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react"
+import { Message } from "../models/Message"
 import NotificationSettings from "../models/NotificationSettings"
 import { RestCentral } from "./RestCentral"
 
-const useUpdateNotifications = () => {
+const useUpdateNotifications = (setProgressValue: (value: (any)) => void, postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void) => {
     const [notifications, setNotifications] = useState<NotificationSettings[]>([])
     const [shouldUpdate, setShouldUpdate] = useState(false)
     let [rateLimitInterval, setRateLimitInterval] = useState(0)
@@ -37,11 +38,13 @@ const useUpdateNotifications = () => {
             try {
                 let response = await RestCentral.put(url, headers, notifications[currentExtensionIndex].data)
                 // console.log(response)
+                if (response.rateLimitInterval > 0) postTimedMessage(new Message(`Rate limit reached. Resuming in 60 seconds`, 'info'), 60000)
                 setRateLimitInterval(response.rateLimitInterval)
             }
             catch (error) {
                 console.log('Oh no! Something went wrong')
                 console.log(error)
+                postMessage(new Message(`Something went wrong updating notifications for ${notifications[currentExtensionIndex].extension.name} - Ext. ${notifications[currentExtensionIndex].extension.extensionNumber}`, 'error'))
             }
             setCurrentExtensionIndex(currentExtensionIndex + 1)
         }, rateLimitInterval)
