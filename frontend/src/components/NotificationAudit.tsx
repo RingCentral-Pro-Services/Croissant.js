@@ -29,7 +29,11 @@ const NotificationAudit = () => {
     const [selectedSheet, setSelectedSheet] = useState('')
     const {readFile, excelData, isExcelDataPending} = useReadExcel()
     const {adjustedNotifications, isEmailSwapPending} = useSwapNotificationEmails(notifications, excelData, isExcelDataPending)
-    const {updateNotifications, isNotificationUpdatePending} = useUpdateNotifications()
+
+    // Progess bar
+    const [progressValue, setProgressValue] = useState(0)
+    const [maxProgressValue, setMaxProgressValue] = useState(0)
+    const {updateNotifications, isNotificationUpdatePending} = useUpdateNotifications(setProgressValue, postMessage, postTimedMessage)
 
     const handleClick = () => {
         setIsPending(true)
@@ -43,7 +47,7 @@ const NotificationAudit = () => {
 
     useEffect(() => {
         if (isEmailSwapPending) return
-        console.log('should be updating')
+        setMaxProgressValue(adjustedNotifications.length)
         updateNotifications(adjustedNotifications)
     }, [isEmailSwapPending])
 
@@ -90,7 +94,8 @@ const NotificationAudit = () => {
                 ></TextField>
                 <Button disabled={!hasCustomerToken} variant="contained" onClick={handleClick}>Go</Button>
                 {isNotificationListPending ? <></> : <FileSelect isPending={false} enabled={true} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} accept='.xlsx' defaultSheet='Notifications' handleSubmit={handleFileSubmit}/>}
-                {notifications.length > 0 ? <FeedbackArea tableHeader={['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses']} tableData={notifications} messages={messages} timedMessages={timedMessages} /> : <></>}
+                {isEmailSwapPending ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
+                {isEmailSwapPending ? <></> : <FeedbackArea tableHeader={['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses']} tableData={notifications} messages={messages} timedMessages={timedMessages} />}
             </div>
         </>
     )

@@ -24,6 +24,7 @@ const useUpdateNotifications = (setProgressValue: (value: (any)) => void, postMe
         if (!shouldUpdate) return
         if (currentExtensionIndex >= notifications.length) {
             setShouldUpdate(false)
+            setProgressValue(notifications.length)
             return
         }
 
@@ -46,9 +47,14 @@ const useUpdateNotifications = (setProgressValue: (value: (any)) => void, postMe
                 console.log(error)
                 postMessage(new Message(`Something went wrong updating notifications for ${notifications[currentExtensionIndex].extension.name} - Ext. ${notifications[currentExtensionIndex].extension.extensionNumber}`, 'error'))
             }
+            increaseProgress()
             setCurrentExtensionIndex(currentExtensionIndex + 1)
         }, rateLimitInterval)
     }, [currentExtensionIndex, rateLimitInterval, notifications])
+
+    const increaseProgress = () => {
+        setProgressValue((prev: any) => prev + 1)
+    }
 
     return {updateNotifications, isNotificationUpdatePending}
 }
