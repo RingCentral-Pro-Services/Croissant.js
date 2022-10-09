@@ -79,23 +79,23 @@ const NotificationAudit = () => {
 
     return (
         <>
-            <Header title="Notification Audit" body="Generate a spreadsheet containing notification settings for all extensions"/>
+            <Header title="Notifications" body="Audit and update notification emails"/>
             <div className="tool-card">
             <h2>Extension Notifications</h2>
             <TextField 
-                    className="vertical-middle healthy-margin-right"
-                    required
-                    id="outline-required"
-                    label="Account UID"
-                    defaultValue=""
-                    size="small"
-                    onChange={(e) => setTargetUID(e.target.value)}
-                ></TextField>
-                <Button disabled={!hasCustomerToken} variant="contained" onClick={handleClick}>Go</Button>
-                {isNotificationListPending ? <></> : <FileSelect isPending={false} enabled={true} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} accept='.xlsx' defaultSheet='Notifications' handleSubmit={handleFileSubmit}/>}
-                {isEmailSwapPending ? <></> : <Button variant='contained' onClick={handleSyncButtonClick} >Sync</Button>}
-                {isEmailSwapPending ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
-                {isEmailSwapPending ? <></> : <FeedbackArea tableHeader={['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses']} tableData={notifications} messages={messages} timedMessages={timedMessages} />}
+                className="vertical-middle healthy-margin-right"
+                required
+                id="outline-required"
+                label="Account UID"
+                defaultValue=""
+                size="small"
+                onChange={(e) => setTargetUID(e.target.value)}
+            ></TextField>
+            <Button disabled={!hasCustomerToken} variant="contained" onClick={handleClick}>Go</Button>
+            {isNotificationListPending ? <></> : <FileSelect isPending={false} enabled={true} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} accept='.xlsx' defaultSheet='Notifications' handleSubmit={handleFileSubmit}/>}
+            {isEmailSwapPending ? <></> : <Button variant='contained' onClick={handleSyncButtonClick} >Sync</Button>}
+            {isEmailSwapPending ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
+            {isEmailSwapPending ? <></> : <FeedbackArea tableHeader={['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses']} tableData={notifications} messages={messages} timedMessages={timedMessages} />}
             </div>
         </>
     )
