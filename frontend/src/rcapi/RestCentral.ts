@@ -17,9 +17,9 @@ export class RestCentral {
                 }
                 resolve(response)
             })
-            .catch ((res: any) => {
+            .catch ((res: any) => { 
                 let response: APIResponse = {
-                    data: res.data,
+                    data: res.response.data,
                     rateLimitInterval: rateLimit(res.response.headers),
                     error: 'Drats. Something went wrong.'
                 }
@@ -46,7 +46,7 @@ export class RestCentral {
             })
             .catch((res: any) => {
                 let response: APIResponse = {
-                    data: res.data,
+                    data: res.response.data,
                     rateLimitInterval: rateLimit(res.response.headers),
                     error: 'Drats. Something went wrong.'
                 }
@@ -72,7 +72,7 @@ export class RestCentral {
             })
             .catch((res: any) => {
                 let response: APIResponse = {
-                    data: res.data,
+                    data: res.response.data,
                     rateLimitInterval: rateLimit(res.response.headers),
                     error: 'Drats. Something went wrong.'
                 }
