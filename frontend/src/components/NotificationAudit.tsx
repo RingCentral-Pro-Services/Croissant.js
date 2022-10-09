@@ -10,6 +10,10 @@ import Header from "./Header"
 import {TextField, Button} from '@mui/material'
 import FeedbackArea from "./FeedbackArea"
 import usePostTimedMessage from "../hooks/usePostTimedMessage"
+import FileSelect from "./FileSelect"
+import useReadExcel from "../hooks/useReadExcel"
+import useSwapNotificationEmails from "../rcapi/useSwapNotificationEmails"
+import useUpdateNotifications from "../rcapi/useUpdateNotifications"
 
 const NotificationAudit = () => {
     useLogin()
@@ -21,11 +25,27 @@ const NotificationAudit = () => {
     const [isPending, setIsPending] = useState(false)
     const {writeExcel} = useWriteExcelFile()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
+    const [selectedFile, setSelectedFile] = useState<File | null>()
+    const [selectedSheet, setSelectedSheet] = useState('')
+    const {readFile, excelData, isExcelDataPending} = useReadExcel()
+    const {adjustedNotifications, isEmailSwapPending} = useSwapNotificationEmails(notifications, excelData, isExcelDataPending)
+    const {updateNotifications, isNotificationUpdatePending} = useUpdateNotifications()
 
     const handleClick = () => {
         setIsPending(true)
         fetchExtensions()
     }
+
+    const handleFileSubmit = () => {
+        if (!selectedFile) return
+        readFile(selectedFile, selectedSheet)
+    }
+
+    useEffect(() => {
+        if (isEmailSwapPending) return
+        console.log('should be updating')
+        updateNotifications(adjustedNotifications)
+    }, [isEmailSwapPending])
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -34,8 +54,13 @@ const NotificationAudit = () => {
     },[targetUID])
 
     useEffect(() => {
+        if (isNotificationUpdatePending) return
+
+        console.log('Done')
+    }, [isNotificationUpdatePending])
+
+    useEffect(() => {
         if (isExtensionListPending) return 
-        console.log('useEffect')
         fetchNotificationSettings(extensionsList)
     }, [isExtensionListPending, extensionsList])
 
@@ -43,6 +68,7 @@ const NotificationAudit = () => {
         if (isNotificationListPending) return
         if (!isPending) return
 
+        console.log(notifications)
         let header = ['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses']
         writeExcel(header, notifications, 'notifications.xlsx')
         setIsPending(false)
@@ -63,6 +89,7 @@ const NotificationAudit = () => {
                     onChange={(e) => setTargetUID(e.target.value)}
                 ></TextField>
                 <Button disabled={!hasCustomerToken} variant="contained" onClick={handleClick}>Go</Button>
+                {isNotificationListPending ? <></> : <FileSelect isPending={false} enabled={true} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} accept='.xlsx' defaultSheet='Notifications' handleSubmit={handleFileSubmit}/>}
                 {notifications.length > 0 ? <FeedbackArea tableHeader={['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses']} tableData={notifications} messages={messages} timedMessages={timedMessages} /> : <></>}
             </div>
         </>
