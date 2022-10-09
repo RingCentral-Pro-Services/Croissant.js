@@ -40,16 +40,15 @@ const NotificationAudit = () => {
         fetchExtensions()
     }
 
+    const handleSyncButtonClick = () => {
+        setMaxProgressValue(adjustedNotifications.length)
+        updateNotifications(adjustedNotifications)
+    }
+
     const handleFileSubmit = () => {
         if (!selectedFile) return
         readFile(selectedFile, selectedSheet)
     }
-
-    useEffect(() => {
-        if (isEmailSwapPending) return
-        setMaxProgressValue(adjustedNotifications.length)
-        updateNotifications(adjustedNotifications)
-    }, [isEmailSwapPending])
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -94,6 +93,7 @@ const NotificationAudit = () => {
                 ></TextField>
                 <Button disabled={!hasCustomerToken} variant="contained" onClick={handleClick}>Go</Button>
                 {isNotificationListPending ? <></> : <FileSelect isPending={false} enabled={true} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} accept='.xlsx' defaultSheet='Notifications' handleSubmit={handleFileSubmit}/>}
+                {isEmailSwapPending ? <></> : <Button variant='contained' onClick={handleSyncButtonClick} >Sync</Button>}
                 {isEmailSwapPending ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
                 {isEmailSwapPending ? <></> : <FeedbackArea tableHeader={['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses']} tableData={notifications} messages={messages} timedMessages={timedMessages} />}
             </div>
