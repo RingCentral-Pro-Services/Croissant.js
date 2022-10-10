@@ -1,8 +1,9 @@
 import CSVFormattable from "./CSVFormattable"
+import { DataTableFormattable } from "./DataTableFormattable"
 import ExcelFormattable from "./ExcelFormattable"
 import ExtensionContact from "./ExtensionContact"
 
-class RCExtension implements CSVFormattable, ExcelFormattable {
+class RCExtension implements CSVFormattable, ExcelFormattable, DataTableFormattable {
 
     prettyType: {[key: string]: string} = {
         "Department": "Call Queue",
@@ -32,6 +33,10 @@ class RCExtension implements CSVFormattable, ExcelFormattable {
     }
 
     toExcelRow(): string[] {
+        return [this.name, `${this.extensionNumber ?? ''}`, this.contact?.email ?? '', this.site ?? 'N/A', this.prettyType[this.type] ?? this.type, this.status, `${this.hidden}`]
+    }
+
+    toDataTableRow(): string[] {
         return [this.name, `${this.extensionNumber ?? ''}`, this.contact?.email ?? '', this.site ?? 'N/A', this.prettyType[this.type] ?? this.type, this.status, `${this.hidden}`]
     }
 }

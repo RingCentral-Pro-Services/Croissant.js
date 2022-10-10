@@ -1,7 +1,8 @@
 import CSVFormattable from "./CSVFormattable"
 import ExcelFormattable from "./ExcelFormattable"
+import { DataTableFormattable } from "./DataTableFormattable"
 
-export class IVRMenu implements CSVFormattable, ExcelFormattable {
+export class IVRMenu implements CSVFormattable, ExcelFormattable, DataTableFormattable {
     constructor(public data: IVRMenuData, public page?: string, public lucidchartID?: string) {}
 
     toRow(): string {
@@ -9,6 +10,15 @@ export class IVRMenu implements CSVFormattable, ExcelFormattable {
     }
 
     toExcelRow(): string[] {
+        let result = [this.data.name, `${this.data.extensionNumber}`, this.data.site.name, this.data.prompt.mode, this.data.prompt.mode === 'Audio' ? this.data.prompt.audio?.id ?? '0' : this.data.prompt.text ?? '']
+        let actions = this.actionsToRow()
+
+        result = [...result, ...actions]
+        
+        return result
+    }
+
+    toDataTableRow(): string[] {
         let result = [this.data.name, `${this.data.extensionNumber}`, this.data.site.id, this.data.prompt.mode, this.data.prompt.mode === 'Audio' ? this.data.prompt.audio?.id ?? '0' : this.data.prompt.text ?? '']
         let actions = this.actionsToRow()
 

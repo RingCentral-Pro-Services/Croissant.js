@@ -1,9 +1,10 @@
 import CSVFormattable from "./CSVFormattable"
 import ExcelFormattable from "./ExcelFormattable"
 import NotificationBundle from "./NotificationBundle"
+import { DataTableFormattable } from "./DataTableFormattable"
 import RCExtension from "./RCExtension"
 
-class NotificationSettings implements CSVFormattable, ExcelFormattable {
+class NotificationSettings implements CSVFormattable, ExcelFormattable, DataTableFormattable {
     constructor(public extension: RCExtension, public data: NotificationSettingsPayload) {}
 
     toRow(): string {
@@ -11,6 +12,10 @@ class NotificationSettings implements CSVFormattable, ExcelFormattable {
     }
 
     toExcelRow(): string[] {
+        return [`${this.extension.id}`, this.extension.name, `${this.extension.extensionNumber}`, this.extension.prettyType[this.extension.type] ?? this.extension.type, `${this.data.emailAddresses ?? ''}`]
+    }
+
+    toDataTableRow(): string[] {
         return [`${this.extension.id}`, this.extension.name, `${this.extension.extensionNumber}`, this.extension.prettyType[this.extension.type] ?? this.extension.type, `${this.data.emailAddresses ?? ''}`]
     }
 }

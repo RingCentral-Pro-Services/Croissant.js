@@ -1,9 +1,9 @@
 import React from "react";
-import ExcelFormattable from "../models/ExcelFormattable";
+import { DataTableFormattable } from "../models/DataTableFormattable";
 import DataTableRow from "./DataTableRow";
 import {Table, TableHead, TableRow, TableCell, TableBody} from '@mui/material'
 
-const DataTable = (props: {header: string[], data: ExcelFormattable[]}) => {
+const DataTable = (props: {header: string[], data: DataTableFormattable[]}) => {
     const {header, data} = props
 
     return (
