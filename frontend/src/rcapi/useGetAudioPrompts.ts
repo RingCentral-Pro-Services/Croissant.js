@@ -57,7 +57,7 @@ const useGetAudioPrompts = (postMessage: (message: Message) => void, postTimedMe
                 console.log('Failed to fetch audio prompts')
                 postMessage(new Message('Failed to fetch audio prompts', 'error'))
             }
-        }, rateLimitInterval)
+        }, rateLimitInterval, page)
     })
 
     return {fetchAudioPrompts, audioPromptList, isAudioPromptListPending}
