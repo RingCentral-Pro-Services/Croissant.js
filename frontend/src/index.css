@@ -108,11 +108,11 @@ button:hover {
 }
 
 .healthy-margin-top {
-  margin-top: 10px;
+  margin-top: 10px!important;
 }
 
 .healthy-margin-bottom {
-  margin-bottom: 10px;
+  margin-bottom: 10px!important;
 }
 
 .link-icon {
@@ -290,6 +290,7 @@ progress::-webkit-progress-value {
 
 .main-content {
   display: block;
+  margin-top: 10px;
 }
 
 .vertical-middle {
