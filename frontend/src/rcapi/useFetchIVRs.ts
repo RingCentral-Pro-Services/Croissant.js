@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { IVRMenu, IVRMenuData } from "../models/IVRMenu"
 import RCExtension from "../models/RCExtension"
 import { RestCentral } from "./RestCentral"
+import { IVRPrompt } from "../models/IVRMenu"
 
 const useFetchIVRs = () => {
     const [isIVRsListPending, setIsIVRsListPending] = useState(true)
@@ -17,7 +18,6 @@ const useFetchIVRs = () => {
         const ivrs = extensionList.filter((extension) => {
             return extension.type === 'IvrMenu'
         })
-        console.log(`IVRs found: ${ivrs.length}`)
         setIvrExtensions(ivrs)
         setIsIVRsListPending(true)
         setCurrentExtensionIndex(0)
@@ -26,10 +26,10 @@ const useFetchIVRs = () => {
     }
 
     useEffect(() => {
-        console.log('use effect')
         if (!shouldFetch) return
         if (currentExtensionIndex >= ivrExtensions.length) {
             console.log('Done fetching IVRs')
+            console.log(ivrsList)
             setIsIVRsListPending(false)
             setShouldFetch(false)
             return
@@ -47,6 +47,16 @@ const useFetchIVRs = () => {
                 let response = await RestCentral.get(ivrURL, headers)
                 console.log(response)
                 const menuData: IVRMenuData = response.data
+                if (menuData.prompt === undefined) {
+                    const prompt: IVRPrompt = {
+                        mode: "TextToSpeech",
+                        text: 'Thank you for calling'
+                    }
+                    menuData.prompt = prompt
+                }
+                if (menuData.actions === undefined) {
+                    menuData.actions = []
+                }
                 const menu = new IVRMenu(menuData)
                 setIvrsList(prev => [...prev, menu])
                 // setRateLimitInterval(response.rateLimitInterval)

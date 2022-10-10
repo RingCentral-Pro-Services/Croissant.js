@@ -33,6 +33,7 @@ const useExcelToIVRs = (postMessage: (message: Message) => void) => {
             let currentItem = data[index]
             let actions = getActions(data[index], extensionList)
             let site = getSite(currentItem['Site'], extensionList)
+            console.log(`Getting prompt for ${currentItem['Menu Name']} - Raw Text |${currentItem['Prompt Name/Script']}|`)
             let prompt = getPrompt(currentItem['Prompt Name/Script'], audioPromptList)
             let menuData: IVRMenuData = {
                 uri: "",
@@ -44,6 +45,9 @@ const useExcelToIVRs = (postMessage: (message: Message) => void) => {
                 id: `${idForExtension(currentItem['Menu Ext'], extensionList)}`
             }
             let menu = new IVRMenu(menuData)
+            if (prompt.audio) {
+                menu.audioPromptFilename = currentItem['Prompt Name/Script']
+            }
             records.push(menu)
         }
         setMenus(records)
@@ -105,13 +109,17 @@ const useExcelToIVRs = (postMessage: (message: Message) => void) => {
 
             if (actionKey in data) {
                 const translatedAction = actionMap[data[actionKey]]
+                console.log(`Raw Action: |${data[actionKey]}|`)
+                console.log(`Translated Action: ${translatedAction}`)
 
-                if (translatedAction !== "") {
+                if (translatedAction!= undefined && translatedAction !== "") {
                     if (translatedAction !== 'DialByName') {
                         let rawDestination = data[destinationKey]
                         let destination = ""
                         if (translatedAction !== "Transfer") {
-                            destination = extensionIsolator.isolateExtension(rawDestination.toString()) ?? ""
+                            if (rawDestination != undefined) {
+                                destination = extensionIsolator.isolateExtension(rawDestination.toString()) ?? ""
+                            }
                         }
                         else {
                             // The destination is a phone number. Use dumb isolation
