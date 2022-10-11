@@ -24,6 +24,7 @@ const CreateMenus = () => {
                     size='small'
                     aria-label='Build Mode'
                     onChange={handleChange}
+                    className='healthy-margin-bottom'
                 >
                     <ToggleButton value='xml'>XML</ToggleButton>
                     <ToggleButton value='direct'>Direct</ToggleButton>

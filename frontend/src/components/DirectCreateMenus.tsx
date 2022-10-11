@@ -131,7 +131,7 @@ const DirectCreateMenus = () => {
     },[targetUID])
     
     return (
-        <div className="main-content">
+        <div>
             <TextField 
                 className="vertical-middle"
                 required
