@@ -74,7 +74,7 @@ const CreateCallQueues = () => {
     return (
         <div className="tool-card">
             <h2>Create Call Queues</h2>
-            <UIDInputField setTargetUID={setTargetUID} />
+            <UIDInputField disabled={hasCustomerToken} setTargetUID={setTargetUID} />
             <FileSelect enabled={hasCustomerToken} accept=".xlsx" handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
             {isPending ? <></> : <Button variant="contained" onClick={handleSyncButtonClick}>Sync</Button>}
             {!(queues.length > 0) ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}

@@ -1,8 +1,8 @@
 import React from "react";
 import {TextField} from '@mui/material'
 
-const UIDInputField = (props: {setTargetUID: (value: string) => void}) => {
-    const {setTargetUID} = props
+const UIDInputField = (props: {setTargetUID: (value: string) => void, disabled: boolean}) => {
+    const {setTargetUID, disabled} = props
 
     return (
         <TextField 
@@ -13,6 +13,7 @@ const UIDInputField = (props: {setTargetUID: (value: string) => void}) => {
             defaultValue=""
             size="small"
             onChange={(e) => setTargetUID(e.target.value)}
+            disabled={disabled}
         ></TextField>
     )
 }

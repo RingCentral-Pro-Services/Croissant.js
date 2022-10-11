@@ -140,6 +140,7 @@ const DirectCreateMenus = () => {
                 defaultValue=""
                 size="small"
                 onChange={(e) => setTargetUID(e.target.value)}
+                disabled={hasCustomerToken}
             ></TextField>
             <FileSelect enabled={hasCustomerToken} accept=".xlsx, .csv" handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={isPending} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
             {isDisplayingFilterBox ? <PageFilter pages={filteredPages ? filteredPages : pages} selectAll={selectAll} handleFilterClick={handleFilterClick} handleInput={handleInput} /> : <></>}

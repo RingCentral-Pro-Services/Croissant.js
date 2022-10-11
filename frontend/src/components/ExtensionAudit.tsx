@@ -54,6 +54,7 @@ const ExtensionAudit = () => {
                 defaultValue=""
                 size='small'
                 onChange={(e) => setTargetUID(e.target.value)}
+                disabled={hasCustomerToken}
             ></TextField>
             <Button disabled={!hasCustomerToken} variant='contained' onClick={handleClick}>Go</Button>
             {extensionsList.length > 0 ? <FeedbackArea tableHeader={['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']} tableData={extensionsList} messages={messages} timedMessages={timedMessages} /> : <></>}
