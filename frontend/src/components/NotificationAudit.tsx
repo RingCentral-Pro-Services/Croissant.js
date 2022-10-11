@@ -21,19 +21,19 @@ const NotificationAudit = () => {
     const {fetchToken, hasCustomerToken} = useGetAccessToken()
     let {messages, postMessage} = useMessageQueue()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
-    let {notifications, fetchNotificationSettings, isNotificationListPending} = useFetchNotifications(postMessage)
     const [isPending, setIsPending] = useState(false)
     const {writeExcel} = useWriteExcelFile()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const [selectedFile, setSelectedFile] = useState<File | null>()
     const [selectedSheet, setSelectedSheet] = useState('')
     const {readFile, excelData, isExcelDataPending} = useReadExcel()
-    const {adjustedNotifications, isEmailSwapPending} = useSwapNotificationEmails(notifications, excelData, isExcelDataPending)
 
     // Progess bar
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
+    let {notifications, fetchNotificationSettings, isNotificationListPending} = useFetchNotifications(postMessage, setProgressValue, setMaxProgressValue)
     const {updateNotifications, isNotificationUpdatePending} = useUpdateNotifications(setProgressValue, postMessage, postTimedMessage)
+    const {adjustedNotifications, isEmailSwapPending} = useSwapNotificationEmails(notifications, excelData, isExcelDataPending)
 
     const handleClick = () => {
         setIsPending(true)
@@ -42,6 +42,7 @@ const NotificationAudit = () => {
 
     const handleSyncButtonClick = () => {
         setMaxProgressValue(adjustedNotifications.length)
+        setProgressValue(0)
         updateNotifications(adjustedNotifications)
     }
 
@@ -90,11 +91,12 @@ const NotificationAudit = () => {
                 defaultValue=""
                 size="small"
                 onChange={(e) => setTargetUID(e.target.value)}
+                disabled={hasCustomerToken}
             ></TextField>
             <Button disabled={!hasCustomerToken} variant="contained" onClick={handleClick}>Go</Button>
             {isNotificationListPending ? <></> : <FileSelect isPending={false} enabled={true} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} accept='.xlsx' defaultSheet='Notifications' handleSubmit={handleFileSubmit}/>}
             {isEmailSwapPending ? <></> : <Button variant='contained' onClick={handleSyncButtonClick} >Sync</Button>}
-            {isEmailSwapPending ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
+            {false ? <></> : <progress className='healthy-margin-top' id='sync_progress' value={progressValue} max={maxProgressValue} />}
             {isEmailSwapPending ? <></> : <FeedbackArea tableHeader={['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses']} tableData={notifications} messages={messages} timedMessages={timedMessages} />}
             </div>
         </>
