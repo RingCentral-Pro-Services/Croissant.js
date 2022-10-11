@@ -17,6 +17,7 @@ const useExtensionList = (postMessage: (message: Message) => void) => {
         setExtensionsList([])
         setShouldFetch(true)
         setisExtensionListPending(true)
+        setPage(1)
     }
 
     useEffect(() => {
