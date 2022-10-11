@@ -8,7 +8,7 @@ import useFetchCallQueueMembers from "../rcapi/useFetchCallQueueMembers"
 import useWriteExcelFile from "../hooks/useWriteExcelFile"
 import CreateCallQueues from "./CreateCallQueues"
 import Header from "./Header"
-import {TextField, Button} from '@mui/material'
+import {TextField, Button, CircularProgress} from '@mui/material'
 
 const CallQueues = () => {
     useLogin()
@@ -18,8 +18,10 @@ const CallQueues = () => {
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     let {callQueues, isQueueListPending, fetchQueueMembers} = useFetchCallQueueMembers()
     let {writeExcel} = useWriteExcelFile()
+    const [isPending, setisPending] = useState(false)
 
     const handleClick = () => {
+        setisPending(true)
         fetchExtensions()
     }
 
@@ -40,6 +42,7 @@ const CallQueues = () => {
 
         const header = ['Queue Name', 'Extension', 'Site', 'Status', 'Members (Ext)']
         writeExcel(header, callQueues, 'queues.xlsx')
+        setisPending(false)
     }, [isQueueListPending, callQueues])
 
     return (
@@ -56,7 +59,8 @@ const CallQueues = () => {
                     size="small"
                     onChange={(e) => setTargetUID(e.target.value)}
                 ></TextField>
-                <Button disabled={!hasCustomerToken} variant="contained" onClick={handleClick}>Go</Button>
+                <Button className='healthy-margin-right' disabled={!hasCustomerToken || isPending} variant="contained" onClick={handleClick}>Go</Button>
+                {isPending ? <CircularProgress className="vertical-middle" /> : <></>}
             </div>
             <CreateCallQueues />
             {messages.map((message: Message) => (

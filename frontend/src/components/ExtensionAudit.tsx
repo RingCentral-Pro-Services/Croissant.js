@@ -5,7 +5,7 @@ import useExtensionList from '../rcapi/useExtensionList'
 import useGetAccessToken from '../rcapi/useGetAccessToken'
 import useWriteExcelFile from '../hooks/useWriteExcelFile'
 import Header from './Header'
-import {TextField, Button} from '@mui/material'
+import {TextField, Button, CircularProgress} from '@mui/material'
 import FeedbackArea from './FeedbackArea'
 import usePostTimedMessage from '../hooks/usePostTimedMessage'
 
@@ -56,7 +56,7 @@ const ExtensionAudit = () => {
                 onChange={(e) => setTargetUID(e.target.value)}
                 disabled={hasCustomerToken}
             ></TextField>
-            <Button disabled={!hasCustomerToken} variant='contained' onClick={handleClick}>Go</Button>
+            <Button className='healthy-margin-right' disabled={!hasCustomerToken} variant='contained' onClick={handleClick}>Go</Button>
             {extensionsList.length > 0 ? <FeedbackArea tableHeader={['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']} tableData={extensionsList} messages={messages} timedMessages={timedMessages} /> : <></>}
         </div>
         </>

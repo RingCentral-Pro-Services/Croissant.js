@@ -93,7 +93,7 @@ const NotificationAudit = () => {
                 onChange={(e) => setTargetUID(e.target.value)}
                 disabled={hasCustomerToken}
             ></TextField>
-            <Button disabled={!hasCustomerToken} variant="contained" onClick={handleClick}>Go</Button>
+            <Button disabled={!hasCustomerToken || isPending} variant="contained" onClick={handleClick}>Go</Button>
             {isNotificationListPending ? <></> : <FileSelect isPending={false} enabled={true} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} accept='.xlsx' defaultSheet='Notifications' handleSubmit={handleFileSubmit}/>}
             {isEmailSwapPending ? <></> : <Button variant='contained' onClick={handleSyncButtonClick} >Sync</Button>}
             {false ? <></> : <progress className='healthy-margin-top' id='sync_progress' value={progressValue} max={maxProgressValue} />}
