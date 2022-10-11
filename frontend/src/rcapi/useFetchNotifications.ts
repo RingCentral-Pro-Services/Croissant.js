@@ -5,7 +5,7 @@ import RCExtension from "../models/RCExtension";
 import rateLimit from "../helpers/rateLimit";
 const axios = require('axios').default;
 
-const useFetchNotifications = (postMessage: (message: Message) => void) => {
+const useFetchNotifications = (postMessage: (message: Message) => void, setProgressValue: (value: (any)) => void, setMaxProgressValue: (value: (any)) => void) => {
     let [notifications, setNotifications] = useState<NotificationSettings[]>([])
     const accessToken = localStorage.getItem('cs_access_token')
     let [shouldFetch, setShouldFetch] = useState(false)
@@ -20,6 +20,7 @@ const useFetchNotifications = (postMessage: (message: Message) => void) => {
         let filtered = extensionsList.filter((extension: RCExtension) => {
             return (extension.type === 'User' || extension.type === 'Department' || extension.type === 'VirtualUser' || extension.type === 'Voicemail' || extension.type === 'SharedLinesGroup')
         })
+        setMaxProgressValue(filtered.length)
 
         console.log(`Filtered extensions: ${filtered.length}`)
 
@@ -64,12 +65,14 @@ const useFetchNotifications = (postMessage: (message: Message) => void) => {
                     if (currentExtensionIndex !== filteredExtensions.length - 1) {
                         // setRateLimitInterval(rateLimit(res.headers))
                         setCurrentExtensionIndex(currentExtensionIndex + 1)
+                        increaseProgress()
                     }
                     else {
                         setIsNotificationListPending(false)
                         setShouldFetch(false)
                         setRateLimitInterval(0)
                         setCurrentExtensionIndex(0)
+                        increaseProgress()
                         console.log('Finished fetching notifications')
                     }
                }
@@ -86,6 +89,10 @@ const useFetchNotifications = (postMessage: (message: Message) => void) => {
         }, rateLimitInterval)
 
     }, [filteredExtensions, shouldFetch, currentExtensionIndex, accessToken, rateLimitInterval, notifications])
+
+    const increaseProgress = () => {
+        setProgressValue((prev: any) => prev + 1)
+    }
 
     return {notifications, fetchNotificationSettings, isNotificationListPending}
 }
