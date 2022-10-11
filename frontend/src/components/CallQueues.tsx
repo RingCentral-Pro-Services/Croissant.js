@@ -58,6 +58,7 @@ const CallQueues = () => {
                     defaultValue=""
                     size="small"
                     onChange={(e) => setTargetUID(e.target.value)}
+                    disabled={hasCustomerToken}
                 ></TextField>
                 <Button className='healthy-margin-right' disabled={!hasCustomerToken || isPending} variant="contained" onClick={handleClick}>Go</Button>
                 {isPending ? <CircularProgress className="vertical-middle" /> : <></>}
