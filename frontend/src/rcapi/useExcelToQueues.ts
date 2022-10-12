@@ -18,7 +18,7 @@ const useExcelToQueues = (postMessage: (message: Message) => void) => {
                 lastName: "",
                 email: currentItem['Email']
             }
-            let extension = new RCExtension(idForExtension(currentItem['Extension'], extensionsList), currentItem['Extension'], currentItem['Queue Name'], contact, currentItem['Site'], 'Department', '', false, '')
+            let extension = new RCExtension(idForQueue(currentItem['Extension'], extensionsList), currentItem['Extension'], currentItem['Queue Name'], contact, currentItem['Site'], 'Department', '', false, '')
             let memberString: string = currentItem['Members (Ext)']
             let membersExtensions = memberString.split(',')
             let members: string[] = []
@@ -53,9 +53,18 @@ const useExcelToQueues = (postMessage: (message: Message) => void) => {
         setIsQueueConvertPending(false)
     }
 
+    const idForQueue = (extension: string, extensionsList: RCExtension[]) => {
+        for (let index = 0; index < extensionsList.length; index++) {
+            if (`${extensionsList[index].extensionNumber}` == extension && extensionsList[index].type === 'Department') {
+                return extensionsList[index].id
+            }
+        }
+        return 0
+    }
+
     const idForExtension = (extension: string, extensionsList: RCExtension[]) => {
         for (let index = 0; index < extensionsList.length; index++) {
-            if (`${extensionsList[index].extensionNumber}` === extension) {
+            if (`${extensionsList[index].extensionNumber}` == extension) {
                 return extensionsList[index].id
             }
         }
