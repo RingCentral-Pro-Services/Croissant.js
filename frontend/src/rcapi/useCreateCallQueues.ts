@@ -80,6 +80,8 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
             catch (e) {
                 console.log('Something bad happened')
                 console.log(e)
+                increaseProgress()
+                setCurrentExtensionIndex(currentExtensionIndex + 1)
                 postMessage(new Message(`Failed to create queue '${queues[currentExtensionIndex].extension.name}'`, 'error'))
             }
         }, rateLimitInterval)
@@ -127,6 +129,8 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
             catch (e) {
                 console.log('Something went wrong')
                 console.log(e)
+                increaseProgress()
+                setCurrentExtensionIndex(currentExtensionIndex + 1)
                 postMessage(new Message(`Failed to add members to queue '${queues[currentExtensionIndex].extension.name}'`, 'error'))
             }
         }, rateLimitInterval)
