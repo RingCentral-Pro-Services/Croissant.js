@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import Papa from 'papaparse'
 import ExtensionIsolator from '../helpers/ExtensionIsolator'
-import { IVRAction, IVRaudioPrompt, IVRMenu, IVRMenuData, IVRPrompt } from '../models/IVRMenu'
+import { IVRAction, IVRaudioPrompt, IVRMenu, IVRMenuData, IVRPrompt, Site } from '../models/IVRMenu'
 import RCExtension from '../models/RCExtension'
 import LucidchartFilterPage from '../models/LucidchartFilterPage'
 import { AudioPrompt } from '../models/AudioPrompt'
@@ -75,10 +75,11 @@ const useReadLucidchart = (postMessage: (message: Message) => void) => {
                     name: extensionName,
                     extensionNumber: parseInt(extensionNumber),
                     prompt: {mode: "TextToSpeech", text: "Thank you for calling."},
-                    site: {id: getSiteID(pageName), name: ""},
+                    site: getSite(pageName, extensions),
                     actions: [],
                     id: `${idForExtension(extensionNumber, extensions)}`
                 }
+
                 let menu = new IVRMenu(menuData)
 
                 menu.lucidchartID = id
@@ -139,6 +140,10 @@ const useReadLucidchart = (postMessage: (message: Message) => void) => {
                             let rawPrompt = getPromptForID(lineDestinationID)
                             const prompt = getPrompt(rawPrompt, audioPromptList)
                             newMenus[menuIndex].data.prompt = prompt
+
+                            if (newMenus[menuIndex].data.prompt.audio) {
+                                newMenus[menuIndex].audioPromptFilename = rawPrompt
+                            }
                         }
                         else {
                             let action: IVRAction = {
@@ -311,6 +316,22 @@ const useReadLucidchart = (postMessage: (message: Message) => void) => {
             }
         }
         return "main-site"
+    }
+
+    const getSite = (siteName: string, extensionList: RCExtension[]) => {
+        let site: Site = {
+            name: "Main Site",
+            id: "main-site"
+        }
+
+        for (let index = 0; index < extensionList.length; index++) {
+            if (extensionList[index].name === siteName) {
+                site.id = `${extensionList[index].id}`
+                site.name = siteName
+            }
+        }
+
+        return site
     }
 
     return {readLucidchart, menus, isLucidchartPending, pages, setPages}
