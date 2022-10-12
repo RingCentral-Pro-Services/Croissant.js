@@ -56,13 +56,14 @@ const useExcelToIVRs = (postMessage: (message: Message) => void) => {
 
     const getSite = (siteName: string, extensionList: RCExtension[]) => {
         let site: Site = {
-            name: "",
-            id: ""
+            name: "Main Site",
+            id: "main-site"
         }
 
         for (let index = 0; index < extensionList.length; index++) {
             if (extensionList[index].name === siteName) {
                 site.id = `${extensionList[index].id}`
+                site.name = siteName
             }
         }
 
