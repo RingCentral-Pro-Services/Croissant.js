@@ -57,6 +57,9 @@ const useFetchIVRs = () => {
                 if (menuData.actions === undefined) {
                     menuData.actions = []
                 }
+                if (menuData.site.name === undefined) {
+                    menuData.site.name = "Main Site"
+                }
                 const menu = new IVRMenu(menuData)
                 setIvrsList(prev => [...prev, menu])
                 // setRateLimitInterval(response.rateLimitInterval)
