@@ -32,6 +32,7 @@ const DirectAuditMenus = () => {
 
     useEffect(() => {
         if (targetUID.length < 5) return
+        localStorage.setItem('target_uid', targetUID)
         fetchToken(targetUID)
     }, [targetUID])
 
