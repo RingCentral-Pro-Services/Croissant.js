@@ -18,7 +18,7 @@ const useFetchNotifications = (postMessage: (message: Message) => void, setProgr
     const fetchNotificationSettings = (extensionsList: RCExtension[]) => {
         // Filter out extensions that don't have notification settings
         let filtered = extensionsList.filter((extension: RCExtension) => {
-            return (extension.type === 'User' || extension.type === 'Department' || extension.type === 'VirtualUser' || extension.type === 'Voicemail' || extension.type === 'SharedLinesGroup')
+            return extension.extensionNumber !== undefined && (extension.type === 'User' || extension.type === 'Department' || extension.type === 'VirtualUser' || extension.type === 'Voicemail' || extension.type === 'SharedLinesGroup')
         })
         setMaxProgressValue(filtered.length)
 
@@ -37,8 +37,7 @@ const useFetchNotifications = (postMessage: (message: Message) => void, setProgr
         let targetUID = localStorage.getItem('target_uid')
         if (!targetUID) return
 
-        let url = baseURL.replace('~', targetUID!)
-        url = url.replace('extensionId', `${filteredExtensions[currentExtensionIndex].id}`)
+        let url = baseURL.replace('extensionId', `${filteredExtensions[currentExtensionIndex].id}`)
 
         setTimeout(() => {
             axios
