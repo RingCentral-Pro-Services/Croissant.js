@@ -34,7 +34,6 @@ const CreateCallQueues = () => {
         if (!selectedFile) return
         console.log(`Selected file: ${selectedFile.name}`)
         fetchExtensions()
-        readFile(selectedFile, 'Queues')
     }
 
     const handleSyncButtonClick = () => {
