@@ -10,7 +10,7 @@ export class IVRMenu implements CSVFormattable, ExcelFormattable, DataTableForma
     }
 
     toExcelRow(): string[] {
-        let result = [this.data.name, `${this.data.extensionNumber}`, this.data.site.name, this.data.prompt.mode, this.data.prompt.mode === 'Audio' ? this.audioPromptFilename ?? '0' : this.data.prompt.text ?? '',]
+        let result = [this.data.name, `${this.data.extensionNumber}`, this.data.site ? this.data.site.name : 'Main Site', this.data.prompt.mode, this.data.prompt.mode === 'Audio' ? this.audioPromptFilename ?? '0' : this.data.prompt.text ?? '',]
         let actions = this.excelActionsToRow()
 
         result = [...result, ...actions]
@@ -19,7 +19,7 @@ export class IVRMenu implements CSVFormattable, ExcelFormattable, DataTableForma
     }
 
     toDataTableRow(): string[] {
-        let result = [this.data.name, `${this.data.extensionNumber}`, this.data.site.name, this.data.prompt.mode, this.data.prompt.mode === 'Audio' ? this.audioPromptFilename ?? '0' : this.data.prompt.text ?? '']
+        let result = [this.data.name, `${this.data.extensionNumber}`, this.data.site ? this.data.site.name : 'Main Site', this.data.prompt.mode, this.data.prompt.mode === 'Audio' ? this.audioPromptFilename ?? '0' : this.data.prompt.text ?? '']
         let actions = this.actionsToRow()
 
         result = [...result, ...actions]
