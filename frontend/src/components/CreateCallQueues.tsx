@@ -34,10 +34,6 @@ const CreateCallQueues = () => {
         if (!selectedFile) return
         console.log(`Selected file: ${selectedFile.name}`)
         fetchExtensions()
-<<<<<<< HEAD
-        readFile(selectedFile, selectedSheet)
-=======
->>>>>>> develop
     }
 
     const handleSyncButtonClick = () => {
