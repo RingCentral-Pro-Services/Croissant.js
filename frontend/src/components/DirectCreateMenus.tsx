@@ -135,6 +135,7 @@ const DirectCreateMenus = () => {
             <TextField 
                 className="vertical-middle"
                 required
+                autoComplete="off"
                 id="outline-required"
                 label="Account UID"
                 defaultValue=""

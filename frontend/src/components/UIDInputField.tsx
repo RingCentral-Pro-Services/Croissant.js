@@ -8,6 +8,7 @@ const UIDInputField = (props: {setTargetUID: (value: string) => void, disabled: 
         <TextField 
             className="vertical-middle healthy-margin-right"
             required
+            autoComplete="off"
             id="outline-required"
             label="Account UID"
             defaultValue=""

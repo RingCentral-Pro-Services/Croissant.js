@@ -49,6 +49,7 @@ const ExtensionAudit = () => {
             <TextField 
                 className="vertical-middle healthy-margin-right"
                 required
+                autoComplete="off"
                 id="outline-required"
                 label="Account UID"
                 defaultValue=""
