@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import CallQueue from "../models/CallQueue"
 import { Message } from "../models/Message";
 import RCExtension from "../models/RCExtension";
-import { RestCentral } from "./RestCentral";
+import { APIResponse, RestCentral } from "./RestCentral";
 
 const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void) => {
     const [queues, setQueues] = useState<CallQueue[]>([])
@@ -18,6 +18,7 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
 
     const createQueues = (callQueues: CallQueue[], extensions: RCExtension[]) => {
         console.log(`Creating ${callQueues.length} queues`)
+        console.log(callQueues)
         setExtensionList(extensions)
         setQueues(callQueues)
         setShouldFetch(true)
@@ -54,6 +55,9 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
                 const body = {
                     extensionNumber: queues[currentExtensionIndex].extension.extensionNumber,
                     type: 'Department',
+                    site: {
+                        id: queues[currentExtensionIndex].siteID
+                    },
                     contact: {
                         firstName: queues[currentExtensionIndex].extension.name,
                         email: queues[currentExtensionIndex].extension.contact.email
@@ -65,24 +69,15 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
                 queues[currentExtensionIndex].extension.id = response.data.id
                 if (response.rateLimitInterval > 0) postTimedMessage(new Message(`Rate limit reached. Resuming in 60 seconds`, 'info'), 60000)
                 setRateLimitInterval(response.rateLimitInterval)
-                if (currentExtensionIndex !== queues.length - 1) {
-                    increaseProgress()
-                    setCurrentExtensionIndex(currentExtensionIndex + 1)
-                }
-                else {
-                    setCurrentExtensionIndex(0)
-                    setShouldFetch(false)
-                    setShouldUpdateQueues(true)
-                    setRateLimitInterval(0)
-                    console.log('Finished creating queues')
-                }
+                createNext()
             }
-            catch (e) {
+            catch (e: any) {
                 console.log('Something bad happened')
                 console.log(e)
                 increaseProgress()
                 setCurrentExtensionIndex(currentExtensionIndex + 1)
-                postMessage(new Message(`Failed to create queue '${queues[currentExtensionIndex].extension.name}'`, 'error'))
+                postMessage(new Message(`Failed to create queue '${queues[currentExtensionIndex].extension.name}' Platform response: ${e.error}`, 'error'))
+                createNext()
             }
         }, rateLimitInterval)
 
@@ -112,26 +107,15 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
 
                 if (response.rateLimitInterval > 0) postTimedMessage(new Message(`Rate limit reached 😩. Resuming in 60 seconds`, 'info'), 60000)
                 setRateLimitInterval(response.rateLimitInterval)
-                if (currentExtensionIndex !== queues.length - 1) {
-                    increaseProgress()
-                    setCurrentExtensionIndex(currentExtensionIndex + 1)
-                }
-                else {
-                    setIsPending(false)
-                    setShouldFetch(false)
-                    setShouldUpdateQueues(false)
-                    setRateLimitInterval(0)
-                    setCurrentExtensionIndex(0)
-                    setProgressValue(queues.length * 2)
-                    console.log('Finished updating queues')
-                }
+                updateNext()
             }
-            catch (e) {
+            catch (e: any) {
                 console.log('Something went wrong')
                 console.log(e)
                 increaseProgress()
                 setCurrentExtensionIndex(currentExtensionIndex + 1)
-                postMessage(new Message(`Failed to add members to queue '${queues[currentExtensionIndex].extension.name}'`, 'error'))
+                postMessage(new Message(`Failed to add members to queue '${queues[currentExtensionIndex].extension.name}.' Platform response: ${e.error}`, 'error'))
+                updateNext()
             }
         }, rateLimitInterval)
 
@@ -146,6 +130,36 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
 
     const increaseProgress = () => {
         setProgressValue((prev: any) => prev + 1)
+    }
+
+    const createNext = () => {
+        if (currentExtensionIndex !== queues.length - 1) {
+            increaseProgress()
+            setCurrentExtensionIndex(currentExtensionIndex + 1)
+        }
+        else {
+            setCurrentExtensionIndex(0)
+            setShouldFetch(false)
+            setShouldUpdateQueues(true)
+            setRateLimitInterval(0)
+            console.log('Finished creating queues')
+        }
+    }
+
+    const updateNext = () => {
+        if (currentExtensionIndex !== queues.length - 1) {
+            increaseProgress()
+            setCurrentExtensionIndex(currentExtensionIndex + 1)
+        }
+        else {
+            setIsPending(false)
+            setShouldFetch(false)
+            setShouldUpdateQueues(false)
+            setRateLimitInterval(0)
+            setCurrentExtensionIndex(0)
+            setProgressValue(queues.length * 2)
+            console.log('Finished updating queues')
+        }
     }
 
     return {isCallQueueCreationPending, createQueues}
