@@ -61,19 +61,7 @@ const useFetchNotifications = (postMessage: (message: Message) => void, setProgr
 
                     // Rate limiting
                     setRateLimitInterval(rateLimit(res.headers))
-                    if (currentExtensionIndex !== filteredExtensions.length - 1) {
-                        // setRateLimitInterval(rateLimit(res.headers))
-                        setCurrentExtensionIndex(currentExtensionIndex + 1)
-                        increaseProgress()
-                    }
-                    else {
-                        setIsNotificationListPending(false)
-                        setShouldFetch(false)
-                        setRateLimitInterval(0)
-                        setCurrentExtensionIndex(0)
-                        increaseProgress()
-                        console.log('Finished fetching notifications')
-                    }
+                    fetchNext()
                }
                else {
                 setShouldFetch(false)
@@ -81,7 +69,7 @@ const useFetchNotifications = (postMessage: (message: Message) => void, setProgr
             })
             .catch((error: Error) => {
                 console.log('An error occurred', error)
-                setShouldFetch(false)
+                fetchNext()
             })
 
             // setCurrentExtensionIndex(currentExtensionIndex + 1)
@@ -91,6 +79,22 @@ const useFetchNotifications = (postMessage: (message: Message) => void, setProgr
 
     const increaseProgress = () => {
         setProgressValue((prev: any) => prev + 1)
+    }
+
+    const fetchNext = () => {
+        if (currentExtensionIndex !== filteredExtensions.length - 1) {
+            // setRateLimitInterval(rateLimit(res.headers))
+            setCurrentExtensionIndex(currentExtensionIndex + 1)
+            increaseProgress()
+        }
+        else {
+            setIsNotificationListPending(false)
+            setShouldFetch(false)
+            setRateLimitInterval(0)
+            setCurrentExtensionIndex(0)
+            increaseProgress()
+            console.log('Finished fetching notifications')
+        }
     }
 
     return {notifications, fetchNotificationSettings, isNotificationListPending}
