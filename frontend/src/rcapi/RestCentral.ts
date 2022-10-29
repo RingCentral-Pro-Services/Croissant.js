@@ -21,7 +21,7 @@ export class RestCentral {
                 let response: APIResponse = {
                     data: res.response.data,
                     rateLimitInterval: rateLimit(res.response.headers),
-                    error: 'Drats. Something went wrong.'
+                    error: res.response.message
                 }
                 reject(response)
             })
@@ -48,7 +48,7 @@ export class RestCentral {
                 let response: APIResponse = {
                     data: res.response.data,
                     rateLimitInterval: rateLimit(res.response.headers),
-                    error: 'Drats. Something went wrong.'
+                    error: res.response.data.message
                 }
                 reject(response)
             })
@@ -74,7 +74,7 @@ export class RestCentral {
                 let response: APIResponse = {
                     data: res.response.data,
                     rateLimitInterval: rateLimit(res.response.headers),
-                    error: 'Drats. Something went wrong.'
+                    error: res.response.data.message
                 }
                 reject(response)
             })
