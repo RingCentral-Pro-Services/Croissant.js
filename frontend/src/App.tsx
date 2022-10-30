@@ -5,6 +5,7 @@ import AuditMenus from './components/AuditMenus';
 import CallQueues from './components/CallQueues';
 import CreateMenus from './components/CreateMenus';
 import ExtensionAudit from './components/ExtensionAudit';
+import ExtensionDeleter from './components/ExtensionDeleter';
 import NotificationAudit from './components/NotificationAudit';
 import Sidebar from './components/Sidebar';
 import Token from './components/Token';
@@ -27,6 +28,7 @@ function App() {
             <Route path='/accountdump' element={<ExtensionAudit />} />
             <Route path='/notificationsaudit' element={<NotificationAudit />} />
             <Route path='/callqueues' element={<CallQueues />} />
+            <Route path='/deleteextensions' element={<ExtensionDeleter />} />
           </Routes>
         </div>
       </div>
