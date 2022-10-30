@@ -12,7 +12,7 @@ import UIDInputField from "./UIDInputField"
 import useGetAccessToken from "../rcapi/useGetAccessToken"
 
 const CreateCallQueues = () => {
-    let {messages, postMessage} = useMessageQueue()
+    let {messages, errors, postMessage, postError} = useMessageQueue()
     let [isPending, setIsPending] = useState(true)
     let [isReadyToSync, setIsReadyToSync] = useState(false)
     const [targetUID, setTargetUID] = useState('')
@@ -28,7 +28,7 @@ const CreateCallQueues = () => {
     // Progess bar
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
-    let {isCallQueueCreationPending, createQueues} = useCreateCallQueues(setProgressValue ,postMessage, postTimedMessage)
+    let {isCallQueueCreationPending, createQueues} = useCreateCallQueues(setProgressValue ,postMessage, postTimedMessage, postError)
 
     const handleFileSelect = () => {
         if (!selectedFile) return
@@ -77,7 +77,7 @@ const CreateCallQueues = () => {
             <FileSelect enabled={hasCustomerToken} accept=".xlsx" handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
             {isPending ? <></> : <Button variant="contained" onClick={handleSyncButtonClick}>Sync</Button>}
             {!(queues.length > 0) ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
-            {isQueueConvertPending ? <></> : <FeedbackArea tableHeader={['Name', 'Extension', 'Site', 'Status', 'Members']} tableData={queues} messages={messages} timedMessages={timedMessages} />}
+            {isQueueConvertPending ? <></> : <FeedbackArea tableHeader={['Name', 'Extension', 'Site', 'Status', 'Members']} tableData={queues} messages={messages} timedMessages={timedMessages} errors={errors} />}
         </div>
     )
 }

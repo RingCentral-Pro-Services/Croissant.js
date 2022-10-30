@@ -15,7 +15,7 @@ import useGetAudioPrompts from "../rcapi/useGetAudioPrompts";
 const DirectAuditMenus = () => {
     const [targetUID, setTargetUID] = useState('')
     const {fetchToken, hasCustomerToken} = useGetAccessToken()
-    const {postMessage, messages} = useMessageQueue()
+    const {postMessage, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const {fetchExtensions, extensionsList, isExtensionListPending} = useExtensionList(postMessage)
     const {fetchAudioPrompts, audioPromptList, isAudioPromptListPending} = useGetAudioPrompts(postMessage, postTimedMessage)
@@ -62,7 +62,7 @@ const DirectAuditMenus = () => {
             <UIDInputField disabled={hasCustomerToken} setTargetUID={setTargetUID} />
             <Button className='healthy-margin-right' disabled={!hasCustomerToken || isPending} variant="contained" onClick={handleClick}>Go</Button>
             {isPending ? <CircularProgress className="vertical-middle" /> : <></>}
-            {isIVRBeautificationPending ? <></> : <FeedbackArea tableHeader={['Name', 'Ext', 'Site', 'Prompt Mode', 'Prompt', 'Key 1', 'Key 2', 'Key 3', 'Key 4', 'Key 5', 'Key 6', 'Key 7', 'Key 8', 'Key 9', 'Key 0']} tableData={prettyIVRs} messages={messages} timedMessages={timedMessages} />}
+            {isIVRBeautificationPending ? <></> : <FeedbackArea tableHeader={['Name', 'Ext', 'Site', 'Prompt Mode', 'Prompt', 'Key 1', 'Key 2', 'Key 3', 'Key 4', 'Key 5', 'Key 6', 'Key 7', 'Key 8', 'Key 9', 'Key 0']} tableData={prettyIVRs} messages={messages} timedMessages={timedMessages} errors={errors} />}
         </div>
     )
 }

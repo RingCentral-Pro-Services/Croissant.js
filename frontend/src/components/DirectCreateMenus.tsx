@@ -23,7 +23,7 @@ const DirectCreateMenus = () => {
     let [isReadyToSync, setReadyToSync] = useState(false)
     let [isPending, setIsPending] = useState(false)
     const [menus, setMenus] = useState<IVRMenu[]>([])
-    let {messages, postMessage} = useMessageQueue()
+    let {messages, errors, postMessage} = useMessageQueue()
     const {fetchToken, hasCustomerToken} = useGetAccessToken()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     const [selectedFile, setSelectedFile] = useState<File | null>()
@@ -150,7 +150,7 @@ const DirectCreateMenus = () => {
             {timedMessages.map((timedMessage) => (
                 <p>{timedMessage.body}</p>
             ))}
-            {!(menus.length > 0) ? <></> : <FeedbackArea tableHeader={['Name', 'Ext', 'Site', 'Prompt Mode', 'Prompt', 'Key 1', 'Key 2', 'Key 3', 'Key 4', 'Key 5', 'Key 6', 'Key 7', 'Key 8', 'Key 9', 'Key 0']} tableData={menus} messages={messages} timedMessages={timedMessages} /> }
+            {!(menus.length > 0) ? <></> : <FeedbackArea tableHeader={['Name', 'Ext', 'Site', 'Prompt Mode', 'Prompt', 'Key 1', 'Key 2', 'Key 3', 'Key 4', 'Key 5', 'Key 6', 'Key 7', 'Key 8', 'Key 9', 'Key 0']} tableData={menus} messages={messages} timedMessages={timedMessages} errors={errors} /> }
         </ div>
     )
 }

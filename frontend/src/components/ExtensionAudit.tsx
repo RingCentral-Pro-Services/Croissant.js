@@ -13,7 +13,7 @@ const ExtensionAudit = () => {
     useLogin()
     let [targetUID, setTargetUID] = useState("")
     const {fetchToken, hasCustomerToken} = useGetAccessToken()
-    let {messages, postMessage} = useMessageQueue()
+    let {messages, errors, postMessage} = useMessageQueue()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     const {writeExcel} = useWriteExcelFile()
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
@@ -58,7 +58,7 @@ const ExtensionAudit = () => {
                 disabled={hasCustomerToken}
             ></TextField>
             <Button className='healthy-margin-right' disabled={!hasCustomerToken} variant='contained' onClick={handleClick}>Go</Button>
-            {extensionsList.length > 0 ? <FeedbackArea tableHeader={['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']} tableData={extensionsList} messages={messages} timedMessages={timedMessages} /> : <></>}
+            {extensionsList.length > 0 ? <FeedbackArea tableHeader={['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']} tableData={extensionsList} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
         </div>
         </>
     )

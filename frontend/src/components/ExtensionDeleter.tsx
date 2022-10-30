@@ -21,7 +21,7 @@ const ExtensionDeleter = () => {
     const [filteredExtensions, setFilteredExtensions] = useState<RCExtension[]>([])
     const prettyExtensionTypes = ['Announcement-Only', 'Call Queue', 'IVR Menu', 'Limited Extension', 'Message-Only', 'Paging Only', 'Shared Line Group']
 
-    const {postMessage, messages} = useMessageQueue()
+    const {postMessage, messages, errors} = useMessageQueue()
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
     const {fetchToken, hasCustomerToken} = useGetAccessToken()
     const {extensionsList, fetchExtensions, isExtensionListPending} = useExtensionList(postMessage)
@@ -89,7 +89,7 @@ const ExtensionDeleter = () => {
                     <AdditiveFilter options={sites} title='Sites' placeholder='Sites' setSelected={setSelectedSites} />
                     <Button className="vertical-middle" sx={{top: 9}} variant="contained" onClick={() => deleteExtensions(filteredExtensions)}>Delete</Button>
                     {filteredExtensions.length > 0 ? <progress className='healthy-margin-top' id='sync_progress' value={progressValue} max={maxProgressValue} /> : <></>}
-                    {filteredExtensions.length > 0 ? <FeedbackArea tableData={filteredExtensions} tableHeader={['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']} messages={messages} timedMessages={timedMessages} /> : <></>}
+                    {filteredExtensions.length > 0 ? <FeedbackArea tableData={filteredExtensions} tableHeader={['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
                 </div>
             </div>
         </>

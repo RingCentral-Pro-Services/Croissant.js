@@ -19,7 +19,7 @@ const NotificationAudit = () => {
     useLogin()
     let [targetUID, setTargetUID] = useState("")
     const {fetchToken, hasCustomerToken} = useGetAccessToken()
-    let {messages, postMessage} = useMessageQueue()
+    let {messages, errors, postMessage} = useMessageQueue()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     const [isPending, setIsPending] = useState(false)
     const {writeExcel} = useWriteExcelFile()
@@ -98,7 +98,7 @@ const NotificationAudit = () => {
             {isNotificationListPending ? <></> : <FileSelect isPending={false} enabled={true} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} accept='.xlsx' defaultSheet='Notifications' handleSubmit={handleFileSubmit}/>}
             {isEmailSwapPending ? <></> : <Button variant='contained' onClick={handleSyncButtonClick} >Sync</Button>}
             {false ? <></> : <progress className='healthy-margin-top' id='sync_progress' value={progressValue} max={maxProgressValue} />}
-            {isEmailSwapPending ? <></> : <FeedbackArea tableHeader={['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses']} tableData={adjustedNotifications} messages={messages} timedMessages={timedMessages} />}
+            {isEmailSwapPending ? <></> : <FeedbackArea tableHeader={['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses']} tableData={adjustedNotifications} messages={messages} timedMessages={timedMessages} errors={errors} />}
             </div>
         </>
     )

@@ -8,6 +8,7 @@ import Badge from '@mui/material/Badge';
 import MailIcon from '@mui/icons-material/Mail'
 import TableRowsIcon from '@mui/icons-material/TableRows';
 import { DataTableFormattable } from "../models/DataTableFormattable";
+import { SyncError } from "../models/SyncError";
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -15,7 +16,7 @@ interface TabPanelProps {
     value: number;
   }
 
-const FeedbackArea = (props: {tableHeader: string[], tableData: DataTableFormattable[], messages: Message[], timedMessages: Message[]}) => {
+const FeedbackArea = (props: {tableHeader: string[], tableData: DataTableFormattable[], messages: Message[], timedMessages: Message[], errors: SyncError[]}) => {
     const {tableData, tableHeader, messages, timedMessages} = props
     const [value, setValue] = React.useState(0);
 
