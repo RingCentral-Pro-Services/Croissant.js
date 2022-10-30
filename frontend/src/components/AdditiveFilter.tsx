@@ -11,11 +11,11 @@ const AdditiveFilter = (props: {options: string[], title: string, placeholder: s
 
     return (
         <Autocomplete
-        className='healthy-margin-top healthy-margin-left healthy-margin-right healthy-margin-bottom'
+        className='healthy-margin-top healthy-margin-left healthy-margin-right healthy-margin-bottom vertical-moddle'
         multiple
         size="small"
         id="tags-outlined"
-        sx={{width: 350}}
+        sx={{width: 350, display: 'inline-block'}}
         options={options}
         getOptionLabel={(option) => option}
         filterSelectedOptions
