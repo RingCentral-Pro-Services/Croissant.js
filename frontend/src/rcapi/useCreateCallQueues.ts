@@ -2,9 +2,10 @@ import { useEffect, useState } from "react"
 import CallQueue from "../models/CallQueue"
 import { Message } from "../models/Message";
 import RCExtension from "../models/RCExtension";
+import { SyncError } from "../models/SyncError";
 import { APIResponse, RestCentral } from "./RestCentral";
 
-const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void) => {
+const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
     const [queues, setQueues] = useState<CallQueue[]>([])
     let [shouldFetch, setShouldFetch] = useState(false)
     let [shouldUpdateQueues, setShouldUpdateQueues] = useState(false)
@@ -77,6 +78,7 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
                 increaseProgress()
                 setCurrentExtensionIndex(currentExtensionIndex + 1)
                 postMessage(new Message(`Failed to create queue '${queues[currentExtensionIndex].extension.name}' Platform response: ${e.error}`, 'error'))
+                postError(new SyncError(queues[currentExtensionIndex].extension.name, queues[currentExtensionIndex].extension.extensionNumber, ['Failed to create queue', ''], e.error))
                 createNext()
             }
         }, rateLimitInterval)
@@ -115,6 +117,7 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
                 increaseProgress()
                 setCurrentExtensionIndex(currentExtensionIndex + 1)
                 postMessage(new Message(`Failed to add members to queue '${queues[currentExtensionIndex].extension.name}.' Platform response: ${e.error}`, 'error'))
+                postError(new SyncError(queues[currentExtensionIndex].extension.name, queues[currentExtensionIndex].extension.extensionNumber, ['Failed to add queue members', ''], e.error))
                 updateNext()
             }
         }, rateLimitInterval)
