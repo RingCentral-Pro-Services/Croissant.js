@@ -22,13 +22,13 @@ const ExtensionDeleter = () => {
     const prettyExtensionTypes = ['Announcement-Only', 'Call Queue', 'IVR Menu', 'Limited Extension', 'Message-Only', 'Paging Only', 'Shared Line Group']
 
     const {postMessage, messages} = useMessageQueue()
-    const {timedMessages} = usePostTimedMessage()
+    const {timedMessages, postTimedMessage} = usePostTimedMessage()
     const {fetchToken, hasCustomerToken} = useGetAccessToken()
     const {extensionsList, fetchExtensions, isExtensionListPending} = useExtensionList(postMessage)
 
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
-    const {deleteExtensions, isExtensionDeletePending} = useDeleteExtensions(postMessage, setProgressValue, setMaxProgressValue)
+    const {deleteExtensions, isExtensionDeletePending} = useDeleteExtensions(postMessage, postTimedMessage, setProgressValue, setMaxProgressValue)
 
     useEffect(() => {
         if (targetUID.length < 5) return
