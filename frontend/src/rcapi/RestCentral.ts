@@ -21,7 +21,7 @@ export class RestCentral {
                 let response: APIResponse = {
                     data: res.response.data,
                     rateLimitInterval: rateLimit(res.response.headers),
-                    error: res.response.message
+                    error: res.response.data.message
                 }
                 reject(response)
             })
