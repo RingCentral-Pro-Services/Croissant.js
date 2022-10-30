@@ -18,6 +18,7 @@ const useDeleteExtensions = (postMessage: (message: Message) => void, setProgres
         setIsPending(true)
         setRateLimitInterval(0)
         setShouldDelete(true)
+        setMaxProgressValue(extensions.length)
     }
 
     useEffect(() => {
@@ -25,7 +26,8 @@ const useDeleteExtensions = (postMessage: (message: Message) => void, setProgres
         if (currentExtensionIndex >= extensions.length) return
         if (!accessToken) return
 
-        const url = baseURL.replace('extensionId', `${extensions[currentExtensionIndex].id}`)
+        let url = baseURL.replace('extensionId', `${extensions[currentExtensionIndex].id}`)
+        url += '?savePhoneNumbers=true&savePhoneLines=true'
         const headers = {
             "Accept": "application/json",
             "Content-Type": "application/json",
@@ -35,6 +37,7 @@ const useDeleteExtensions = (postMessage: (message: Message) => void, setProgres
         setTimeout(async () => {
             try {
                 let response = await RestCentral.delete(url, headers)
+                setRateLimitInterval(response.rateLimitInterval)
             }
             catch (e: any) {
                 console.log(`Failed to delete extension ${extensions[currentExtensionIndex].name}`)
