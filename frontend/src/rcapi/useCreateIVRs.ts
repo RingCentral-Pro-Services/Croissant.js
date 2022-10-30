@@ -66,7 +66,7 @@ const useCreateIVRs = (setProgressValue: (value: (any)) => void, postMessage: (m
                 })
                 .catch((error: any) => {
                     console.log(`Failed to create menu '${workingMenus[currentExtensionIndex]}'`)
-                    postMessage(new Message(`Failed to create menu '${workingMenus[currentExtensionIndex].data.name}.' ${error.message}`, 'error'))
+                    postMessage(new Message(`Failed to create menu '${workingMenus[currentExtensionIndex].data.name}.' ${error.response.data.message}`, 'error'))
                     setCurrentExtensionIndex(prev => prev + 1)
                     increaseProgress()
                 })
@@ -98,7 +98,7 @@ const useCreateIVRs = (setProgressValue: (value: (any)) => void, postMessage: (m
             })
             .catch((error: any) => {
                 console.log(`Failed to update menu '${workingMenus[currentExtensionIndex]}'`)
-                postMessage(new Message(`Failed to update menu '${workingMenus[currentExtensionIndex].data.name}.' ${error.message}`, 'error'))
+                postMessage(new Message(`Failed to update menu '${workingMenus[currentExtensionIndex].data.name}.' ${error.response.data.message}`, 'error'))
                 setCurrentExtensionIndex(prev => prev + 1)
                 increaseProgress()
             })
