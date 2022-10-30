@@ -3,7 +3,7 @@ import { Message } from "../models/Message"
 import RCExtension from "../models/RCExtension"
 import { RestCentral } from "./RestCentral"
 
-const useDeleteExtensions = (postMessage: (message: Message) => void, setProgressValue: (value: (any)) => void, setMaxProgressValue: (value: (any)) => void) => {
+const useDeleteExtensions = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, setProgressValue: (value: (any)) => void, setMaxProgressValue: (value: (any)) => void) => {
     const [extensions, setExtensions] = useState<RCExtension[]>([])
     let [shouldDelete, setShouldDelete] = useState(false)
     let [rateLimitInterval, setRateLimitInterval] = useState(0)
@@ -37,6 +37,7 @@ const useDeleteExtensions = (postMessage: (message: Message) => void, setProgres
         setTimeout(async () => {
             try {
                 let response = await RestCentral.delete(url, headers)
+                if (response.rateLimitInterval > 0) postTimedMessage(new Message(`Rate limit reached. Resuming in 60 seconds`, 'info'), 60000)
                 setRateLimitInterval(response.rateLimitInterval)
             }
             catch (e: any) {
@@ -66,6 +67,7 @@ const useDeleteExtensions = (postMessage: (message: Message) => void, setProgres
             increaseProgress()
             setProgressValue(extensions.length)
             console.log('Finished deleting extensions')
+            postMessage(new Message('Finished deleting extensions', 'success'))
         }
     }
 
