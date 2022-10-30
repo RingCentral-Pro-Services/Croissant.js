@@ -19,7 +19,7 @@ const ExtensionDeleter = () => {
     const [selectedSites, setSelectedSites] = useState<string[]>([])
     const [selectedExtensionTypes, setSelectedExtensionTypes] = useState<string[]>([])
     const [filteredExtensions, setFilteredExtensions] = useState<RCExtension[]>([])
-    const prettyExtensionTypes = ['Announcement-Only', 'Call Queue', 'IVR Menu', 'Message-Only', 'Paging Only', 'Shared Line Group']
+    const prettyExtensionTypes = ['Announcement-Only', 'Call Queue', 'IVR Menu', 'Limited Extension', 'Message-Only', 'Paging Only', 'Shared Line Group']
 
     const {postMessage, messages} = useMessageQueue()
     const {timedMessages} = usePostTimedMessage()
