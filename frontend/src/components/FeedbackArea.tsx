@@ -1,7 +1,8 @@
 import React from "react";
 import DataTable from "./DataTable";
 import MessagesArea from "./MessagesArea";
-import {Tabs, Tab, Box, Typography, Button} from '@mui/material'
+import {Tabs, Tab, Box, Typography, IconButton} from '@mui/material'
+import {FileDownload} from '@mui/icons-material'
 import ExcelFormattable from "../models/ExcelFormattable";
 import { Message } from "../models/Message";
 import Badge from '@mui/material/Badge';
@@ -43,7 +44,7 @@ const FeedbackArea = (props: {tableHeader: string[], tableData: DataTableFormatt
                 <DataTable header={tableHeader} data={tableData} />
             </TabPanel>
             <TabPanel value={value} index={1}>
-                <Button variant="contained" onClick={handleDownloadButtonClick}>Download</Button>
+                {errors.length > 0 ? <IconButton onClick={handleDownloadButtonClick}><FileDownload /></IconButton> : <></>}
                 <MessagesArea messages={timedMessages} />
                 <MessagesArea messages={messages} />
             </TabPanel>
