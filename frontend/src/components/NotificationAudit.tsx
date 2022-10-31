@@ -19,7 +19,7 @@ const NotificationAudit = () => {
     useLogin()
     let [targetUID, setTargetUID] = useState("")
     const {fetchToken, hasCustomerToken} = useGetAccessToken()
-    let {messages, errors, postMessage} = useMessageQueue()
+    let {messages, errors, postMessage, postError} = useMessageQueue()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     const [isPending, setIsPending] = useState(false)
     const {writeExcel} = useWriteExcelFile()
@@ -32,7 +32,7 @@ const NotificationAudit = () => {
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
     let {notifications, fetchNotificationSettings, isNotificationListPending} = useFetchNotifications(postMessage, setProgressValue, setMaxProgressValue)
-    const {updateNotifications, isNotificationUpdatePending} = useUpdateNotifications(setProgressValue, postMessage, postTimedMessage)
+    const {updateNotifications, isNotificationUpdatePending} = useUpdateNotifications(setProgressValue, postMessage, postTimedMessage, postError)
     const {adjustedNotifications, isEmailSwapPending} = useSwapNotificationEmails(notifications, excelData, isExcelDataPending)
 
     const handleClick = () => {

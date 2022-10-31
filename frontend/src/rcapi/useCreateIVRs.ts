@@ -4,6 +4,7 @@ import RCExtension from "../models/RCExtension"
 import rateLimit from "../helpers/rateLimit";
 import ExtensionContact from "../models/ExtensionContact";
 import { Message } from "../models/Message";
+import { SyncError } from "../models/SyncError";
 const axios = require('axios').default;
 
 interface response {
@@ -11,7 +12,7 @@ interface response {
     id: string
 }
 
-const useCreateIVRs = (setProgressValue: (value: (any)) => void, postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void) => {
+const useCreateIVRs = (setProgressValue: (value: (any)) => void, postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number,) => void, postError: (error: SyncError) => void) => {
     let [rateLimitInterval, setRateLimitInterval] = useState(0)
     const [workingMenus, setMenus] = useState<IVRMenu[]>([])
     let [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
@@ -67,6 +68,7 @@ const useCreateIVRs = (setProgressValue: (value: (any)) => void, postMessage: (m
                 .catch((error: any) => {
                     console.log(`Failed to create menu '${workingMenus[currentExtensionIndex]}'`)
                     postMessage(new Message(`Failed to create menu '${workingMenus[currentExtensionIndex].data.name}.' ${error.response.data.message}`, 'error'))
+                    postError(new SyncError(workingMenus[currentExtensionIndex].data.name, workingMenus[currentExtensionIndex].data.extensionNumber, ['Failed to create IVR', ''], error.response.data.message))
                     setCurrentExtensionIndex(prev => prev + 1)
                     increaseProgress()
                 })
@@ -99,6 +101,7 @@ const useCreateIVRs = (setProgressValue: (value: (any)) => void, postMessage: (m
             .catch((error: any) => {
                 console.log(`Failed to update menu '${workingMenus[currentExtensionIndex]}'`)
                 postMessage(new Message(`Failed to update menu '${workingMenus[currentExtensionIndex].data.name}.' ${error.response.data.message}`, 'error'))
+                postError(new SyncError(workingMenus[currentExtensionIndex].data.name, workingMenus[currentExtensionIndex].data.extensionNumber, ['Failed to update IVR', ''], error.response.data.message))
                 setCurrentExtensionIndex(prev => prev + 1)
                 increaseProgress()
             })
@@ -228,6 +231,7 @@ const useCreateIVRs = (setProgressValue: (value: (any)) => void, postMessage: (m
 
             if (removedKeypresses.length > 0) {
                 postMessage(new Message(`The following key presses were removed from menu '${menus[index].data.name}' due to invalid destinations: ${removedKeypresses.join(', ')}`, 'warning'))
+                postError(new SyncError(menus[index].data.name, menus[index].data.extensionNumber, ['Removed invalid key presses', removedKeypresses.join(', ')]))
             }
 
             menus[index].data.actions = validActions

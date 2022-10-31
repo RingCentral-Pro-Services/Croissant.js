@@ -21,14 +21,14 @@ const ExtensionDeleter = () => {
     const [filteredExtensions, setFilteredExtensions] = useState<RCExtension[]>([])
     const prettyExtensionTypes = ['Announcement-Only', 'Call Queue', 'IVR Menu', 'Limited Extension', 'Message-Only', 'Paging Only', 'Shared Line Group']
 
-    const {postMessage, messages, errors} = useMessageQueue()
+    const {postMessage, messages, errors, postError} = useMessageQueue()
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
     const {fetchToken, hasCustomerToken} = useGetAccessToken()
     const {extensionsList, fetchExtensions, isExtensionListPending} = useExtensionList(postMessage)
 
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
-    const {deleteExtensions, isExtensionDeletePending} = useDeleteExtensions(postMessage, postTimedMessage, setProgressValue, setMaxProgressValue)
+    const {deleteExtensions, isExtensionDeletePending} = useDeleteExtensions(postMessage, postTimedMessage, setProgressValue, setMaxProgressValue, postError)
 
     useEffect(() => {
         if (targetUID.length < 5) return

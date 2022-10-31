@@ -19,7 +19,7 @@ const CreateCallQueues = () => {
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     const [selectedFile, setSelectedFile] = useState<File | null>()
     const {readFile, excelData, isExcelDataPending} = useReadExcel()
-    let {convert, queues, isQueueConvertPending} = useExcelToQueues(postMessage)
+    let {convert, queues, isQueueConvertPending} = useExcelToQueues(postMessage, postError)
     const [selectedSheet, setSelectedSheet] = useState<string>('')
     const defaultSheet = "Queues"
     const {timedMessages, postTimedMessage} = usePostTimedMessage()

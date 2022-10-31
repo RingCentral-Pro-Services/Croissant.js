@@ -23,12 +23,12 @@ const DirectCreateMenus = () => {
     let [isReadyToSync, setReadyToSync] = useState(false)
     let [isPending, setIsPending] = useState(false)
     const [menus, setMenus] = useState<IVRMenu[]>([])
-    let {messages, errors, postMessage} = useMessageQueue()
+    let {messages, errors, postMessage, postError} = useMessageQueue()
     const {fetchToken, hasCustomerToken} = useGetAccessToken()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     const [selectedFile, setSelectedFile] = useState<File | null>()
     const {excelData, isExcelDataPending, readFile} = useReadExcel()
-    const {menus: excelMenus, isMenuConvertPending, converToMenus} = useExcelToIVRs(postMessage)
+    const {menus: excelMenus, isMenuConvertPending, converToMenus} = useExcelToIVRs(postMessage, postError)
     const {readLucidchart, isLucidchartPending, menus: lucidchartMenus, pages, setPages} = useReadLucidchart(postMessage)
     const defaultSheet = 'IVRs'
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
@@ -43,7 +43,7 @@ const DirectCreateMenus = () => {
     // Progress bar
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
-    const {createMenus} = useCreateIVRs(setProgressValue, postMessage, postTimedMessage)
+    const {createMenus} = useCreateIVRs(setProgressValue, postMessage, postTimedMessage, postError)
 
     const handleFileSelect = () => {
         if (!selectedFile) return

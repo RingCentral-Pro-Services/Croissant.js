@@ -3,8 +3,9 @@ import CallQueue from "../models/CallQueue"
 import RCExtension from "../models/RCExtension"
 import ExtensionContact from "../models/ExtensionContact"
 import { Message } from "../models/Message"
+import { SyncError } from "../models/SyncError"
 
-const useExcelToQueues = (postMessage: (message: Message) => void) => {
+const useExcelToQueues = (postMessage: (message: Message) => void, postError: (error: SyncError) => void) => {
     const [queues, setQueues] = useState<CallQueue[]>([])
     const [isQueueConvertPending, setIsQueueConvertPending] = useState(true)
 
@@ -44,6 +45,7 @@ const useExcelToQueues = (postMessage: (message: Message) => void) => {
 
             if (removedExtensions.length > 0) {
                 postMessage(new Message(`The following members were removed from ${contact.firstName} - Ext ${extension.extensionNumber} because they either don't exist or they are not valid queue members: ${removedExtensions.join(', ')}`, 'warning'))
+                postError(new SyncError(contact.firstName, extension.extensionNumber, ['Removed invalid queue members', removedExtensions.join(', ')]))
             }
 
             let queue = new CallQueue(extension, idForSite(extension.site, extensionsList), validMembers)

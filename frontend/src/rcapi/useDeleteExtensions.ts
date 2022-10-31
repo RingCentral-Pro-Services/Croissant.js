@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react"
 import { Message } from "../models/Message"
 import RCExtension from "../models/RCExtension"
+import { SyncError } from "../models/SyncError"
 import { RestCentral } from "./RestCentral"
 
-const useDeleteExtensions = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, setProgressValue: (value: (any)) => void, setMaxProgressValue: (value: (any)) => void) => {
+const useDeleteExtensions = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, setProgressValue: (value: (any)) => void, setMaxProgressValue: (value: (any)) => void, postError: (error: SyncError) => void) => {
     const [extensions, setExtensions] = useState<RCExtension[]>([])
     let [shouldDelete, setShouldDelete] = useState(false)
     let [rateLimitInterval, setRateLimitInterval] = useState(0)
@@ -42,7 +43,8 @@ const useDeleteExtensions = (postMessage: (message: Message) => void, postTimedM
             }
             catch (e: any) {
                 console.log(`Failed to delete extension ${extensions[currentExtensionIndex].name}`)
-                postMessage(new Message(`Failed to delete ${extensions[currentExtensionIndex].name} - Ext. ${extensions[currentExtensionIndex].extensionNumber}. ${e.message}`, 'error'))
+                postMessage(new Message(`Failed to delete ${extensions[currentExtensionIndex].name} - Ext. ${extensions[currentExtensionIndex].extensionNumber}. ${e.error}`, 'error'))
+                postError(new SyncError(extensions[currentExtensionIndex].name, extensions[currentExtensionIndex].extensionNumber, ['Failed to delete extension', ''], e.error))
             }
             deleteNext()
         }, rateLimitInterval)
