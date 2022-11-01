@@ -19,7 +19,10 @@ const useFetchCallQueueMembers = () => {
             return extension.type === 'Department'
         })
 
-        console.log(`Filtered extensions: ${filtered.length}`)
+        if (filtered.length === 0) {
+            setIsQueueListPending(false)
+            return
+        }
 
         setCallQueues([])
         setIsQueueListPending(true)
