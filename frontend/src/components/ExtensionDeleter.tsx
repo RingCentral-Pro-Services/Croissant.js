@@ -12,9 +12,11 @@ import usePostTimedMessage from "../hooks/usePostTimedMessage"
 import { Button } from "@mui/material"
 import useDeleteExtensions from "../rcapi/useDeleteExtensions"
 import Modal from "./Modal"
+import useAnalytics from "../hooks/useAnalytics"
 
 const ExtensionDeleter = () => {
     useLogin()
+    const {fireEvent} = useAnalytics()
     const [targetUID, setTargetUID] = useState('')
     const [sites, setSites] = useState<string[]>([])
     const [selectedSites, setSelectedSites] = useState<string[]>([])
@@ -76,6 +78,7 @@ const ExtensionDeleter = () => {
 
     const handleModalAcceptance = () => {
         deleteExtensions(filteredExtensions)
+        fireEvent('delete-extensions')
     }
 
     useEffect(() => {

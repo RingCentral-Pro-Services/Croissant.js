@@ -16,9 +16,11 @@ import {TextField, Button} from '@mui/material'
 import FeedbackArea from "./FeedbackArea";
 import usePostTimedMessage from "../hooks/usePostTimedMessage";
 import useGetAudioPrompts from "../rcapi/useGetAudioPrompts";
+import useAnalytics from "../hooks/useAnalytics";
 
 const DirectCreateMenus = () => {
     useLogin()
+    const {fireEvent} = useAnalytics()
     let [targetUID, setTargetUID] = useState("")
     let [isReadyToSync, setReadyToSync] = useState(false)
     let [isPending, setIsPending] = useState(false)
@@ -74,6 +76,7 @@ const DirectCreateMenus = () => {
             setMaxProgressValue(menus.length * 2)
             createMenus(menus, extensionsList)
         }
+        fireEvent('create-menu')
         // createMenus(menus, extensionsList)
     }
 

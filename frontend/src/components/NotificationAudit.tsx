@@ -14,9 +14,11 @@ import FileSelect from "./FileSelect"
 import useReadExcel from "../hooks/useReadExcel"
 import useSwapNotificationEmails from "../rcapi/useSwapNotificationEmails"
 import useUpdateNotifications from "../rcapi/useUpdateNotifications"
+import useAnalytics from "../hooks/useAnalytics"
 
 const NotificationAudit = () => {
     useLogin()
+    const {fireEvent} = useAnalytics()
     let [targetUID, setTargetUID] = useState("")
     const {fetchToken, hasCustomerToken} = useGetAccessToken()
     let {messages, errors, postMessage, postError} = useMessageQueue()
@@ -44,6 +46,7 @@ const NotificationAudit = () => {
         setMaxProgressValue(adjustedNotifications.length)
         setProgressValue(0)
         updateNotifications(adjustedNotifications)
+        fireEvent('notifications-update')
     }
 
     const handleFileSubmit = () => {
@@ -66,6 +69,7 @@ const NotificationAudit = () => {
     useEffect(() => {
         if (isExtensionListPending) return 
         fetchNotificationSettings(extensionsList)
+        fireEvent('notifications-audit')
     }, [isExtensionListPending, extensionsList])
 
     useEffect(() => {

@@ -8,9 +8,11 @@ import Header from './Header'
 import {TextField, Button, CircularProgress} from '@mui/material'
 import FeedbackArea from './FeedbackArea'
 import usePostTimedMessage from '../hooks/usePostTimedMessage'
+import useAnalytics from '../hooks/useAnalytics'
 
 const ExtensionAudit = () => {
     useLogin()
+    const {fireEvent} = useAnalytics()
     let [targetUID, setTargetUID] = useState("")
     const {fetchToken, hasCustomerToken} = useGetAccessToken()
     let {messages, errors, postMessage} = useMessageQueue()
@@ -20,6 +22,7 @@ const ExtensionAudit = () => {
 
     const handleClick = () => {
         fetchExtensions()
+        fireEvent('extension-audit')
     }
 
     useEffect(() => {

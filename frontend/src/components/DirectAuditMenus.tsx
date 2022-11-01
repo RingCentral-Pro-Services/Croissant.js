@@ -11,8 +11,10 @@ import usePostTimedMessage from "../hooks/usePostTimedMessage";
 import useWriteExcelFile from "../hooks/useWriteExcelFile";
 import useBeautifyIVRs from "../rcapi/useBeautifyIVRs";
 import useGetAudioPrompts from "../rcapi/useGetAudioPrompts";
+import useAnalytics from "../hooks/useAnalytics";
 
 const DirectAuditMenus = () => {
+    const {fireEvent} = useAnalytics()
     const [targetUID, setTargetUID] = useState('')
     const {fetchToken, hasCustomerToken} = useGetAccessToken()
     const {postMessage, messages, errors} = useMessageQueue()
@@ -28,6 +30,7 @@ const DirectAuditMenus = () => {
         console.log('Hey you clicked the button')
         setIsPending(true)
         fetchExtensions()
+        fireEvent('update-audit')
     }
 
     useEffect(() => {

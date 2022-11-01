@@ -10,8 +10,10 @@ import {Button} from '@mui/material'
 import FeedbackArea from "./FeedbackArea"
 import UIDInputField from "./UIDInputField"
 import useGetAccessToken from "../rcapi/useGetAccessToken"
+import useAnalytics from "../hooks/useAnalytics"
 
 const CreateCallQueues = () => {
+    const {fireEvent} = useAnalytics()
     let {messages, errors, postMessage, postError} = useMessageQueue()
     let [isPending, setIsPending] = useState(true)
     let [isReadyToSync, setIsReadyToSync] = useState(false)
@@ -38,6 +40,7 @@ const CreateCallQueues = () => {
 
     const handleSyncButtonClick = () => {
         setIsReadyToSync(true)
+        fireEvent('create-call-queues')
     }
 
     useEffect(() => {
