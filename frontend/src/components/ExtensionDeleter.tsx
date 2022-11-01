@@ -23,6 +23,7 @@ const ExtensionDeleter = () => {
     const [selectedExtensionTypes, setSelectedExtensionTypes] = useState<string[]>([])
     const [filteredExtensions, setFilteredExtensions] = useState<RCExtension[]>([])
     const [isShowingModal, setIsShowingModal] = useState(false)
+    const [isPending, setIsPending] = useState(false)
     const prettyExtensionTypes = ['Announcement-Only', 'Call Queue', 'IVR Menu', 'Limited Extension', 'Message-Only', 'Paging Only', 'Shared Line Group']
 
     const {postMessage, messages, errors, postError} = useMessageQueue()
@@ -77,6 +78,7 @@ const ExtensionDeleter = () => {
     }
 
     const handleModalAcceptance = () => {
+        setIsPending(true)
         deleteExtensions(filteredExtensions)
         fireEvent('delete-extensions')
     }
@@ -84,6 +86,7 @@ const ExtensionDeleter = () => {
     useEffect(() => {
         if (isExtensionDeletePending) return
         console.log('Done')
+        setIsPending(false)
     }, [isExtensionDeletePending])
 
     return (
@@ -97,7 +100,7 @@ const ExtensionDeleter = () => {
                     <AdditiveFilter options={prettyExtensionTypes} title='Extension Types' placeholder='Extension Types' setSelected={setSelectedExtensionTypes} />
                     <AdditiveFilter options={sites} title='Sites' placeholder='Sites' setSelected={setSelectedSites} />
                     {/* <Button className="vertical-middle" sx={{top: 9}} variant="contained" onClick={() => deleteExtensions(filteredExtensions)}>Delete</Button> */}
-                    <Button disabled={isExtensionDeletePending} className="vertical-middle" sx={{top: 9}} variant="contained" onClick={() => setIsShowingModal(true)}>Delete</Button>
+                    <Button disabled={isPending} className="vertical-middle" sx={{top: 9}} variant="contained" onClick={() => setIsShowingModal(true)}>Delete</Button>
                     <Modal open={isShowingModal} setOpen={setIsShowingModal} handleAccept={handleModalAcceptance} title='Are you sure about that?' body={`You're about to delete ${filteredExtensions.length} extensions. Be sure that you understand the implications of this.`} acceptLabel={`Yes, delete ${filteredExtensions.length} extensions`} rejectLabel='Go back' />
                     {filteredExtensions.length > 0 ? <progress className='healthy-margin-top' id='sync_progress' value={progressValue} max={maxProgressValue} /> : <></>}
                     {filteredExtensions.length > 0 ? <FeedbackArea tableData={filteredExtensions} tableHeader={['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
