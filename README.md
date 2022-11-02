@@ -1,7 +1,7 @@
 
 # About
 
-Croissant serves RingCentral Professional Services by allowing the user to create, update, and audit IVR menus and call queues in bulk using data collection methods already employed by the team.
+Croissant serves RingCentral Professional Services by streamlining commonly performed tasks.
 
   
 
@@ -21,6 +21,8 @@ Node 16.5.1
  - REACT_APP_CLIENT_ID = Croissant App Client ID
  - REACT_APP_AUTH_BASE = https://platform.ringcentral.com/restapi/oauth/authorize?response_type=code
  - REACT_APP_AUTH_REDIRECT = Croissant url followed by /oauth2callback
+ - REACT_APP_AWS_IDENTITY_POOL_ID = AWS Cognito Identity Pool with AmazonPollyFullAccess policy
+ - REACT_APP_AWS_REGION = AWS region
 
 ## Installation
 
