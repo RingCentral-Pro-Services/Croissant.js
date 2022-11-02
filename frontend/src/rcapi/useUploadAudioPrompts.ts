@@ -18,9 +18,11 @@ const useUploadAudioPrompts = (postMessage: (message: Message) => void, postTime
         setShouldUpload(true)
         setCurrentItemIndex(0)
         setRateLimitInterval(0)
+        setIsPending(true)
     }
 
     useEffect(() => {
+        if (!shouldUpload) return
         if (currentItemIndex >= prompts.length) {
             setIsPending(false)
             return
