@@ -14,12 +14,14 @@ import FileSelect from "./FileSelect"
 import useReadExcel from "../hooks/useReadExcel"
 import useSwapNotificationEmails from "../rcapi/useSwapNotificationEmails"
 import useUpdateNotifications from "../rcapi/useUpdateNotifications"
+import useAnalytics from "../hooks/useAnalytics"
 
 const NotificationAudit = () => {
     useLogin()
+    const {fireEvent} = useAnalytics()
     let [targetUID, setTargetUID] = useState("")
     const {fetchToken, hasCustomerToken} = useGetAccessToken()
-    let {messages, postMessage} = useMessageQueue()
+    let {messages, errors, postMessage, postError} = useMessageQueue()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     const [isPending, setIsPending] = useState(false)
     const {writeExcel} = useWriteExcelFile()
@@ -32,7 +34,7 @@ const NotificationAudit = () => {
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
     let {notifications, fetchNotificationSettings, isNotificationListPending} = useFetchNotifications(postMessage, setProgressValue, setMaxProgressValue)
-    const {updateNotifications, isNotificationUpdatePending} = useUpdateNotifications(setProgressValue, postMessage, postTimedMessage)
+    const {updateNotifications, isNotificationUpdatePending} = useUpdateNotifications(setProgressValue, postMessage, postTimedMessage, postError)
     const {adjustedNotifications, isEmailSwapPending} = useSwapNotificationEmails(notifications, excelData, isExcelDataPending)
 
     const handleClick = () => {
@@ -44,6 +46,7 @@ const NotificationAudit = () => {
         setMaxProgressValue(adjustedNotifications.length)
         setProgressValue(0)
         updateNotifications(adjustedNotifications)
+        fireEvent('notifications-update')
     }
 
     const handleFileSubmit = () => {
@@ -66,6 +69,7 @@ const NotificationAudit = () => {
     useEffect(() => {
         if (isExtensionListPending) return 
         fetchNotificationSettings(extensionsList)
+        fireEvent('notifications-audit')
     }, [isExtensionListPending, extensionsList])
 
     useEffect(() => {
@@ -86,6 +90,7 @@ const NotificationAudit = () => {
             <TextField 
                 className="vertical-middle healthy-margin-right"
                 required
+                autoComplete="off"
                 id="outline-required"
                 label="Account UID"
                 defaultValue=""
@@ -97,7 +102,7 @@ const NotificationAudit = () => {
             {isNotificationListPending ? <></> : <FileSelect isPending={false} enabled={true} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} accept='.xlsx' defaultSheet='Notifications' handleSubmit={handleFileSubmit}/>}
             {isEmailSwapPending ? <></> : <Button variant='contained' onClick={handleSyncButtonClick} >Sync</Button>}
             {false ? <></> : <progress className='healthy-margin-top' id='sync_progress' value={progressValue} max={maxProgressValue} />}
-            {isEmailSwapPending ? <></> : <FeedbackArea tableHeader={['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses']} tableData={adjustedNotifications} messages={messages} timedMessages={timedMessages} />}
+            {isEmailSwapPending ? <></> : <FeedbackArea tableHeader={['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses']} tableData={adjustedNotifications} messages={messages} timedMessages={timedMessages} errors={errors} />}
             </div>
         </>
     )

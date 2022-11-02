@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react"
 import { Message } from "../models/Message"
 import NotificationSettings from "../models/NotificationSettings"
+import { SyncError } from "../models/SyncError"
 import { RestCentral } from "./RestCentral"
 
-const useUpdateNotifications = (setProgressValue: (value: (any)) => void, postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void) => {
+const useUpdateNotifications = (setProgressValue: (value: (any)) => void, postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
     const [notifications, setNotifications] = useState<NotificationSettings[]>([])
     const [shouldUpdate, setShouldUpdate] = useState(false)
     let [rateLimitInterval, setRateLimitInterval] = useState(0)
@@ -42,10 +43,11 @@ const useUpdateNotifications = (setProgressValue: (value: (any)) => void, postMe
                 if (response.rateLimitInterval > 0) postTimedMessage(new Message(`Rate limit reached. Resuming in 60 seconds`, 'info'), 60000)
                 setRateLimitInterval(response.rateLimitInterval)
             }
-            catch (error) {
+            catch (error: any) {
                 console.log('Oh no! Something went wrong')
                 console.log(error)
-                postMessage(new Message(`Something went wrong updating notifications for ${notifications[currentExtensionIndex].extension.name} - Ext. ${notifications[currentExtensionIndex].extension.extensionNumber}`, 'error'))
+                postMessage(new Message(`Something went wrong updating notifications for ${notifications[currentExtensionIndex].extension.name} - Ext. ${notifications[currentExtensionIndex].extension.extensionNumber}. ${error.error}`, 'error'))
+                postError(new SyncError(notifications[currentExtensionIndex].extension.name, notifications[currentExtensionIndex].extension.extensionNumber, ['Failed to update notifications', ''], error.error))
             }
             increaseProgress()
             setCurrentExtensionIndex(currentExtensionIndex + 1)

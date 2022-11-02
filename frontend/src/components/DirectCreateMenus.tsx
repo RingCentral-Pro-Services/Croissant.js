@@ -16,19 +16,21 @@ import {TextField, Button} from '@mui/material'
 import FeedbackArea from "./FeedbackArea";
 import usePostTimedMessage from "../hooks/usePostTimedMessage";
 import useGetAudioPrompts from "../rcapi/useGetAudioPrompts";
+import useAnalytics from "../hooks/useAnalytics";
 
 const DirectCreateMenus = () => {
     useLogin()
+    const {fireEvent} = useAnalytics()
     let [targetUID, setTargetUID] = useState("")
     let [isReadyToSync, setReadyToSync] = useState(false)
     let [isPending, setIsPending] = useState(false)
     const [menus, setMenus] = useState<IVRMenu[]>([])
-    let {messages, postMessage} = useMessageQueue()
+    let {messages, errors, postMessage, postError} = useMessageQueue()
     const {fetchToken, hasCustomerToken} = useGetAccessToken()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     const [selectedFile, setSelectedFile] = useState<File | null>()
     const {excelData, isExcelDataPending, readFile} = useReadExcel()
-    const {menus: excelMenus, isMenuConvertPending, converToMenus} = useExcelToIVRs(postMessage)
+    const {menus: excelMenus, isMenuConvertPending, converToMenus} = useExcelToIVRs(postMessage, postError)
     const {readLucidchart, isLucidchartPending, menus: lucidchartMenus, pages, setPages} = useReadLucidchart(postMessage)
     const defaultSheet = 'IVRs'
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
@@ -43,7 +45,7 @@ const DirectCreateMenus = () => {
     // Progress bar
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
-    const {createMenus} = useCreateIVRs(setProgressValue, postMessage, postTimedMessage)
+    const {createMenus} = useCreateIVRs(setProgressValue, postMessage, postTimedMessage, postError)
 
     const handleFileSelect = () => {
         if (!selectedFile) return
@@ -74,6 +76,7 @@ const DirectCreateMenus = () => {
             setMaxProgressValue(menus.length * 2)
             createMenus(menus, extensionsList)
         }
+        fireEvent('create-menu')
         // createMenus(menus, extensionsList)
     }
 
@@ -135,6 +138,7 @@ const DirectCreateMenus = () => {
             <TextField 
                 className="vertical-middle"
                 required
+                autoComplete="off"
                 id="outline-required"
                 label="Account UID"
                 defaultValue=""
@@ -149,7 +153,7 @@ const DirectCreateMenus = () => {
             {timedMessages.map((timedMessage) => (
                 <p>{timedMessage.body}</p>
             ))}
-            {!(menus.length > 0) ? <></> : <FeedbackArea tableHeader={['Name', 'Ext', 'Site', 'Prompt Mode', 'Prompt', 'Key 1', 'Key 2', 'Key 3', 'Key 4', 'Key 5', 'Key 6', 'Key 7', 'Key 8', 'Key 9', 'Key 0']} tableData={menus} messages={messages} timedMessages={timedMessages} /> }
+            {!(menus.length > 0) ? <></> : <FeedbackArea tableHeader={['Name', 'Ext', 'Site', 'Prompt Mode', 'Prompt', 'Key 1', 'Key 2', 'Key 3', 'Key 4', 'Key 5', 'Key 6', 'Key 7', 'Key 8', 'Key 9', 'Key 0']} tableData={menus} messages={messages} timedMessages={timedMessages} errors={errors} /> }
         </ div>
     )
 }

@@ -9,9 +9,11 @@ import useWriteExcelFile from "../hooks/useWriteExcelFile"
 import CreateCallQueues from "./CreateCallQueues"
 import Header from "./Header"
 import {TextField, Button, CircularProgress} from '@mui/material'
+import useAnalytics from "../hooks/useAnalytics"
 
 const CallQueues = () => {
     useLogin()
+    const {fireEvent} = useAnalytics()
     let [targetUID, setTargetUID] = useState("")
     const {fetchToken, hasCustomerToken} = useGetAccessToken()
     let {messages, postMessage} = useMessageQueue()
@@ -35,6 +37,7 @@ const CallQueues = () => {
         if (isExtensionListPending) return
         
         fetchQueueMembers(extensionsList)
+        fireEvent('call-queue-audit')
     }, [extensionsList, isExtensionListPending])
 
     useEffect(() => {
@@ -53,6 +56,7 @@ const CallQueues = () => {
                 <TextField 
                     className="vertical-middle healthy-margin-right"
                     required
+                    autoComplete="off"
                     id="outline-required"
                     label="Account UID"
                     defaultValue=""

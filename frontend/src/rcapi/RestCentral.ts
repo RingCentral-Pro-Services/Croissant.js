@@ -21,7 +21,7 @@ export class RestCentral {
                 let response: APIResponse = {
                     data: res.response.data,
                     rateLimitInterval: rateLimit(res.response.headers),
-                    error: 'Drats. Something went wrong.'
+                    error: res.response.data.message
                 }
                 reject(response)
             })
@@ -48,7 +48,7 @@ export class RestCentral {
                 let response: APIResponse = {
                     data: res.response.data,
                     rateLimitInterval: rateLimit(res.response.headers),
-                    error: 'Drats. Something went wrong.'
+                    error: res.response.data.message
                 }
                 reject(response)
             })
@@ -74,7 +74,32 @@ export class RestCentral {
                 let response: APIResponse = {
                     data: res.response.data,
                     rateLimitInterval: rateLimit(res.response.headers),
-                    error: 'Drats. Something went wrong.'
+                    error: res.response.data.message
+                }
+                reject(response)
+            })
+        })
+    }
+
+    static delete = (url: string, headers: any) => {
+        return new Promise<APIResponse>((resolve, reject) => {
+            axios({
+                method: "DELETE",
+                url: url,
+                headers: headers,
+            })
+            .then((res: any) => {
+                const response: APIResponse = {
+                    data: res.data,
+                    rateLimitInterval: rateLimit(res.headers)
+                }
+                resolve(response)
+            })
+            .catch((res: any) => {
+                let response: APIResponse = {
+                    data: res.response.data,
+                    rateLimitInterval: rateLimit(res.response.headers),
+                    error: res.response.data.message
                 }
                 reject(response)
             })

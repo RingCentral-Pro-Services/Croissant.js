@@ -4,8 +4,9 @@ import { AudioPrompt } from "../models/AudioPrompt"
 import { IVRAction, IVRaudioPrompt, IVRDestination, IVRMenu, IVRMenuData, IVRPrompt, Site } from "../models/IVRMenu"
 import { Message } from "../models/Message"
 import RCExtension from "../models/RCExtension"
+import { SyncError } from "../models/SyncError"
 
-const useExcelToIVRs = (postMessage: (message: Message) => void) => {
+const useExcelToIVRs = (postMessage: (message: Message) => void, postError: (error: SyncError) => void) => {
     const [menus, setMenus] = useState<IVRMenu[]>([])
     const [isMenuConvertPending, setPending] = useState(true)
     const extensionIsolator = new ExtensionIsolator()
@@ -33,8 +34,7 @@ const useExcelToIVRs = (postMessage: (message: Message) => void) => {
             let currentItem = data[index]
             let actions = getActions(data[index], extensionList)
             let site = getSite(currentItem['Site'], extensionList)
-            console.log(`Getting prompt for ${currentItem['Menu Name']} - Raw Text |${currentItem['Prompt Name/Script']}|`)
-            let prompt = getPrompt(currentItem['Prompt Name/Script'], audioPromptList)
+            let prompt = getPrompt(currentItem['Menu Name'], currentItem['Menu Ext'], currentItem['Prompt Name/Script'], audioPromptList)
             let menuData: IVRMenuData = {
                 uri: "",
                 name: currentItem['Menu Name'],
@@ -70,7 +70,7 @@ const useExcelToIVRs = (postMessage: (message: Message) => void) => {
         return site
     }
 
-    const getPrompt = (rawText: string, audioPromptList: AudioPrompt[]) => {
+    const getPrompt = (menuName: string, extensionNumber: string, rawText: string, audioPromptList: AudioPrompt[]) => {
         let prompt: IVRPrompt = {
             mode: "",
             text: ""
@@ -85,6 +85,7 @@ const useExcelToIVRs = (postMessage: (message: Message) => void) => {
                 prompt.mode = 'TextToSpeech'
                 prompt.text = 'Thank you for calling.'
                 postMessage(new Message(`Audio prompt '${rawText}' could not be found in the account. Building with text-to-speech prompt instead`, 'warning'))
+                postError(new SyncError(menuName, parseInt(extensionNumber), ['Could not find audio prompt', rawText]))
             }
             else {
                 prompt.mode = 'Audio'
