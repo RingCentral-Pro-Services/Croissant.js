@@ -5,7 +5,7 @@ import { Message } from "../models/Message";
 import { SyncError } from "../models/SyncError";
 const axios = require('axios').default;
 
-const useUploadAudioPrompts = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
+const useUploadAudioPrompts = (setProgressValue: (value: (any)) => void, postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
     const [shouldUpload, setShouldUpload] = useState(false)
     const [isAudioPromptUploadPending, setIsPending] = useState(true)
     const [prompts, setPrompts] = useState<AmazonPollyPrompt[]>([])
@@ -59,6 +59,9 @@ const useUploadAudioPrompts = (postMessage: (message: Message) => void, postTime
                     postMessage(new Message(`Failed to upload audio prompt '${prompts[currentItemIndex].name}'`, 'error'))
                     postError(new SyncError(prompts[currentItemIndex].name, 0, ['Failed to upload audio prompt', ''], e.response.data.message))
                     console.log(e)
+                })
+                .finally(() => {
+                    setProgressValue(currentItemIndex)
                 })
 
             }

@@ -19,7 +19,8 @@ const PromptGeneration = () => {
     const [targetUID, setTargetUID] = useState('')
     const [selectedSheet, setSelectedSheet] = useState('')
     const [selectedFile, setSelectedFile] = useState<File | null>()
-
+    const [progressValue, setProgressValue] = useState(0)
+    const [maxProgressValue, setMaxProgressValue] = useState(0)
     
     const {fetchToken, hasCustomerToken} = useGetAccessToken()
     const {readFile, excelData, isExcelDataPending} = useReadExcel()
@@ -27,7 +28,7 @@ const PromptGeneration = () => {
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
     const {rawPrompts, isAudioPromptReadPending} = useReadAudioPrompts(excelData, isExcelDataPending)
     const {prompts, isPromptGenerationPending} = useGenerateAudioPrompts(rawPrompts, isAudioPromptReadPending)
-    const {uploadPrompts, isAudioPromptUploadPending} = useUploadAudioPrompts(postMessage, postTimedMessage, postError)
+    const {uploadPrompts, isAudioPromptUploadPending} = useUploadAudioPrompts(setProgressValue, postMessage, postTimedMessage, postError)
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -57,13 +58,14 @@ const PromptGeneration = () => {
     }, [isPromptGenerationPending])
 
     const handleSyncButtonClick = () => {
-        console.log('Syncing...')
+        setIsPending(true)
+        setMaxProgressValue(prompts.length)
         uploadPrompts(prompts)
     }
 
     useEffect(() => {
         if (isAudioPromptUploadPending) return
-        console.log('Done uploading prompts')
+        setProgressValue(maxProgressValue)
     }, [isAudioPromptUploadPending])
 
     return (
@@ -74,6 +76,7 @@ const PromptGeneration = () => {
                 <UIDInputField disabled={hasCustomerToken} setTargetUID={setTargetUID} />
                 <FileSelect enabled={hasCustomerToken} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx'  handleSubmit={handleFileSelect}/>
                 {isPromptGenerationPending ? <></> : <Button variant="contained" onClick={handleSyncButtonClick}>Sync</Button>}
+                {isPending ? <progress className='healthy-margin-top' id='sync_progress' value={progressValue} max={maxProgressValue} /> : <></>}
                 {isAudioPromptReadPending ? <></> : <FeedbackArea tableHeader={['Prompt Name', 'Prompt Text']} tableData={rawPrompts} messages={messages} timedMessages={timedMessages} errors={errors} />}
             </div>
         </>
