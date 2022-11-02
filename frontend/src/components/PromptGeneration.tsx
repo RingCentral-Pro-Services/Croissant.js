@@ -1,0 +1,83 @@
+import React, { useEffect, useState } from "react";
+import Header from "./Header";
+import { Button } from "@mui/material";
+import UIDInputField from "./UIDInputField";
+import useGetAccessToken from "../rcapi/useGetAccessToken";
+import FileSelect from "./FileSelect";
+import useReadExcel from "../hooks/useReadExcel";
+import useReadAudioPrompts from "../hooks/useReadAudioPrompts";
+import useGenerateAudioPrompts from "../hooks/useGenerateAudioPrompts";
+import FeedbackArea from "./FeedbackArea";
+import useMessageQueue from "../hooks/useMessageQueue";
+import usePostTimedMessage from "../hooks/usePostTimedMessage";
+import useUploadAudioPrompts from "../rcapi/useUploadAudioPrompts";
+
+const PromptGeneration = () => {
+    const defaultSheet = 'Prompts'
+
+    const [isPending, setIsPending] = useState(false)
+    const [targetUID, setTargetUID] = useState('')
+    const [selectedSheet, setSelectedSheet] = useState('')
+    const [selectedFile, setSelectedFile] = useState<File | null>()
+
+    
+    const {fetchToken, hasCustomerToken} = useGetAccessToken()
+    const {readFile, excelData, isExcelDataPending} = useReadExcel()
+    const {messages, errors, postMessage, postError} = useMessageQueue()
+    const {timedMessages, postTimedMessage} = usePostTimedMessage()
+    const {rawPrompts, isAudioPromptReadPending} = useReadAudioPrompts(excelData, isExcelDataPending)
+    const {prompts, isPromptGenerationPending} = useGenerateAudioPrompts(rawPrompts, isAudioPromptReadPending)
+    const {uploadPrompts, isAudioPromptUploadPending} = useUploadAudioPrompts(postMessage, postTimedMessage, postError)
+
+    useEffect(() => {
+        if (targetUID.length < 5) return
+        fetchToken(targetUID)
+    }, [targetUID])
+
+    const handleFileSelect = () => {
+        if (!selectedFile) return
+        readFile(selectedFile, selectedSheet)
+    }
+
+    useEffect(() => {
+        if (isExcelDataPending) return
+        console.log(excelData)
+    }, [isExcelDataPending])
+
+    useEffect(() => {
+        if (isAudioPromptReadPending) return
+        console.log('Read Audio Prompts')
+        console.log(rawPrompts)
+    }, [isAudioPromptReadPending])
+
+    useEffect(() => {
+        if (isPromptGenerationPending) return 
+        console.log('Done generating prompts')
+        console.log(prompts)
+    }, [isPromptGenerationPending])
+
+    const handleSyncButtonClick = () => {
+        console.log('Syncing...')
+        uploadPrompts(prompts)
+    }
+
+    useEffect(() => {
+        if (isAudioPromptUploadPending) return
+        console.log('Done uploading prompts')
+    }, [isAudioPromptUploadPending])
+
+    return (
+        <>
+            <Header title="Generate Prompts" body="Generate prompt media using Amazon Polly"/>
+            <div className="tool-card">
+                <h2>Generate Prompts</h2>
+                <UIDInputField disabled={hasCustomerToken} setTargetUID={setTargetUID} />
+                <FileSelect enabled={hasCustomerToken} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx'  handleSubmit={handleFileSelect}/>
+                {isPromptGenerationPending ? <></> : <Button variant="contained" onClick={handleSyncButtonClick}>Sync</Button>}
+                {isAudioPromptReadPending ? <></> : <FeedbackArea tableHeader={['Prompt Name', 'Prompt Text']} tableData={rawPrompts} messages={messages} timedMessages={timedMessages} errors={errors} />}
+            </div>
+        </>
+    )
+}
+
+export default PromptGeneration
