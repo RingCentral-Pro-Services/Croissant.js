@@ -77,4 +77,27 @@ export const ivrSchema = z.object({
     'Key 0 Destination': z.string({
         invalid_type_error: 'Key 0 Destination data type invalid',
     }).optional(),
-}) 
+})
+
+export const callQueueSchema = z.object({
+    'Queue Name': z.string({
+        required_error: 'Missing queue name',
+        invalid_type_error: 'Queue name data type invalid'
+    }),
+    'Extension': z.string({
+        required_error: 'Missing extension number',
+        invalid_type_error: 'Extension number data type invalid'
+    }),
+    'Email': z.string({
+        required_error: 'Missing email',
+        invalid_type_error: 'Email data type invalid'
+    }),
+    'Site': z.string({
+        required_error: 'Missing site',
+        invalid_type_error: 'Site data type invalid'
+    }),
+    'Members (Ext)': z.string({
+        required_error: 'Missing members',
+        invalid_type_error: 'Members data type invalid'
+    })
+})
