@@ -101,3 +101,14 @@ export const callQueueSchema = z.object({
         invalid_type_error: 'Members data type invalid'
     })
 })
+
+export const notificationSchema = z.object({
+    'Mailbox ID': z.string({
+        required_error: 'Missing Mailbox ID',
+        invalid_type_error: 'Mailbox ID type invalid'
+    }),
+    'Email Addresses': z.string({
+        required_error: 'Missing email addresses',
+        invalid_type_error: 'Email addresses type invalid'
+    }),
+})
