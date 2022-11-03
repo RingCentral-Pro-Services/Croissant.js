@@ -17,6 +17,9 @@ import FeedbackArea from "./FeedbackArea";
 import usePostTimedMessage from "../hooks/usePostTimedMessage";
 import useGetAudioPrompts from "../rcapi/useGetAudioPrompts";
 import useAnalytics from "../hooks/useAnalytics";
+import z from 'zod'
+import useValidateExcelData from "../hooks/useValidateExcelData";
+import { ivrSchema } from "../helpers/schemas";
 
 const DirectCreateMenus = () => {
     useLogin()
@@ -41,6 +44,8 @@ const DirectCreateMenus = () => {
     const [filteredPages, setFilteredPages] = useState(null)
     const {handleFilterClick, handleInput, selectAll} = useFilterServices(pages, setPages, filteredPages, setFilteredPages)
     const [selectedSheet, setSelectedSheet] = useState<string>('')
+
+    const {validatedData, validate, isDataValidationPending} = useValidateExcelData(ivrSchema, postMessage, postError)
 
     // Progress bar
     const [progressValue, setProgressValue] = useState(0)
@@ -102,9 +107,15 @@ const DirectCreateMenus = () => {
     }, [isExtensionListPending, selectedFile])
 
     useEffect(() => {
+        if (isDataValidationPending) return
+        converToMenus(validatedData, extensionsList, audioPromptList)
+    }, [isDataValidationPending])
+
+    useEffect(() => {
         if (isExcelDataPending) return
 
-        converToMenus(excelData, extensionsList, audioPromptList)
+        validate(excelData)
+        // converToMenus(excelData, extensionsList, audioPromptList)
     }, [isExcelDataPending, excelData, extensionsList])
 
     useEffect(() => {
@@ -153,7 +164,7 @@ const DirectCreateMenus = () => {
             {timedMessages.map((timedMessage) => (
                 <p>{timedMessage.body}</p>
             ))}
-            {!(menus.length > 0) ? <></> : <FeedbackArea tableHeader={['Name', 'Ext', 'Site', 'Prompt Mode', 'Prompt', 'Key 1', 'Key 2', 'Key 3', 'Key 4', 'Key 5', 'Key 6', 'Key 7', 'Key 8', 'Key 9', 'Key 0']} tableData={menus} messages={messages} timedMessages={timedMessages} errors={errors} /> }
+            {!(menus.length > 0 || messages.length > 0 || timedMessages.length > 0) ? <></> : <FeedbackArea tableHeader={['Name', 'Ext', 'Site', 'Prompt Mode', 'Prompt', 'Key 1', 'Key 2', 'Key 3', 'Key 4', 'Key 5', 'Key 6', 'Key 7', 'Key 8', 'Key 9', 'Key 0']} tableData={menus} messages={messages} timedMessages={timedMessages} errors={errors} /> }
         </ div>
     )
 }

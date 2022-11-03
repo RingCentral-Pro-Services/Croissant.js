@@ -26,7 +26,7 @@ const PromptGeneration = () => {
     const {readFile, excelData, isExcelDataPending} = useReadExcel()
     const {messages, errors, postMessage, postError} = useMessageQueue()
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
-    const {rawPrompts, isAudioPromptReadPending} = useReadAudioPrompts(excelData, isExcelDataPending)
+    const {rawPrompts, isAudioPromptReadPending} = useReadAudioPrompts(excelData, isExcelDataPending, postMessage, postError)
     const {prompts, isPromptGenerationPending} = useGenerateAudioPrompts(rawPrompts, isAudioPromptReadPending)
     const {uploadPrompts, isAudioPromptUploadPending} = useUploadAudioPrompts(setProgressValue, postMessage, postTimedMessage, postError)
 
