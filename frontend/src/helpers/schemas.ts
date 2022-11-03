@@ -112,3 +112,14 @@ export const notificationSchema = z.object({
         invalid_type_error: 'Email addresses type invalid'
     }),
 })
+
+export const promptSchema = z.object({
+    'Prompt Name': z.string({
+        required_error: 'Missing prompt name',
+        invalid_type_error: 'Prompt name data type invalid'
+    }),
+    'Prompt Text': z.string({
+        required_error: 'Missing prompt text',
+        invalid_type_error: 'Prompt text data type invalid'
+    })
+})

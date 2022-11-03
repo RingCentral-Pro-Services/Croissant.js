@@ -11,6 +11,8 @@ import FeedbackArea from "./FeedbackArea"
 import UIDInputField from "./UIDInputField"
 import useGetAccessToken from "../rcapi/useGetAccessToken"
 import useAnalytics from "../hooks/useAnalytics"
+import useValidateExcelData from "../hooks/useValidateExcelData"
+import { callQueueSchema } from "../helpers/schemas"
 
 const CreateCallQueues = () => {
     const {fireEvent} = useAnalytics()
@@ -31,6 +33,7 @@ const CreateCallQueues = () => {
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
     let {isCallQueueCreationPending, createQueues} = useCreateCallQueues(setProgressValue ,postMessage, postTimedMessage, postError)
+    const {validatedData, isDataValidationPending, validate} = useValidateExcelData(callQueueSchema, postMessage, postError)
 
     const handleFileSelect = () => {
         if (!selectedFile) return
@@ -57,8 +60,14 @@ const CreateCallQueues = () => {
 
     useEffect(() => {
         if (isExcelDataPending) return
-        convert(excelData, extensionsList)
+        validate(excelData)
+        // convert(excelData, extensionsList)
     }, [isExcelDataPending, excelData, extensionsList])
+
+    useEffect(() => {
+        if (isDataValidationPending) return
+        convert(validatedData, extensionsList)
+    }, [isDataValidationPending])
 
     useEffect(() => {
         if (isQueueConvertPending) return

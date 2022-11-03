@@ -15,6 +15,8 @@ import useReadExcel from "../hooks/useReadExcel"
 import useSwapNotificationEmails from "../rcapi/useSwapNotificationEmails"
 import useUpdateNotifications from "../rcapi/useUpdateNotifications"
 import useAnalytics from "../hooks/useAnalytics"
+import useValidateExcelData from "../hooks/useValidateExcelData"
+import { notificationSchema } from "../helpers/schemas"
 
 const NotificationAudit = () => {
     useLogin()
@@ -35,7 +37,7 @@ const NotificationAudit = () => {
     const [maxProgressValue, setMaxProgressValue] = useState(0)
     let {notifications, fetchNotificationSettings, isNotificationListPending} = useFetchNotifications(postMessage, setProgressValue, setMaxProgressValue)
     const {updateNotifications, isNotificationUpdatePending} = useUpdateNotifications(setProgressValue, postMessage, postTimedMessage, postError)
-    const {adjustedNotifications, isEmailSwapPending} = useSwapNotificationEmails(notifications, excelData, isExcelDataPending)
+    const {adjustedNotifications, isEmailSwapPending} = useSwapNotificationEmails(notifications, excelData, isExcelDataPending, postMessage, postError)
 
     const handleClick = () => {
         setIsPending(true)
