@@ -10,9 +10,11 @@ import AdditiveFilter from "./AdditiveFilter"
 import FeedbackArea from "./FeedbackArea"
 import usePostTimedMessage from "../hooks/usePostTimedMessage"
 import { Button } from "@mui/material"
+import {FileDownload} from '@mui/icons-material'
 import useDeleteExtensions from "../rcapi/useDeleteExtensions"
 import Modal from "./Modal"
 import useAnalytics from "../hooks/useAnalytics"
+import useWriteExcelFile from "../hooks/useWriteExcelFile"
 
 const ExtensionDeleter = () => {
     useLogin()
@@ -34,6 +36,7 @@ const ExtensionDeleter = () => {
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
     const {deleteExtensions, isExtensionDeletePending} = useDeleteExtensions(postMessage, postTimedMessage, setProgressValue, setMaxProgressValue, postError)
+    const {writeExcel} = useWriteExcelFile()
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -105,6 +108,11 @@ const ExtensionDeleter = () => {
         fireEvent('delete-extensions')
     }
 
+    const handleDownloadButtonClick = () => {
+        const header = ['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']
+        writeExcel(header, filteredExtensions, 'deleted-extensions.xlsx')
+    }
+
     useEffect(() => {
         if (isExtensionDeletePending) return
         console.log('Done')
@@ -123,6 +131,7 @@ const ExtensionDeleter = () => {
                     <AdditiveFilter options={sites} title='Sites' placeholder='Sites' setSelected={setSelectedSites} />
                     {/* <Button className="vertical-middle" sx={{top: 9}} variant="contained" onClick={() => deleteExtensions(filteredExtensions)}>Delete</Button> */}
                     <Button disabled={isPending || filteredExtensions.length === 0} className="vertical-middle" sx={{top: 9}} variant="contained" onClick={() => setIsShowingModal(true)}>Delete</Button>
+                    <Button disabled={filteredExtensions.length === 0} className="vertical-middle healthy-margin-left" sx={{top: 9}} variant="outlined" startIcon={ <FileDownload/>} onClick={handleDownloadButtonClick} >Download</Button>
                     <Modal open={isShowingModal} setOpen={setIsShowingModal} handleAccept={handleModalAcceptance} title='Are you sure about that?' body={`You're about to delete ${filteredExtensions.length} extensions. Be sure that you understand the implications of this.`} acceptLabel={`Yes, delete ${filteredExtensions.length} extensions`} rejectLabel='Go back' />
                     {filteredExtensions.length > 0 ? <progress className='healthy-margin-top' id='sync_progress' value={progressValue} max={maxProgressValue} /> : <></>}
                     {filteredExtensions.length > 0 ? <FeedbackArea tableData={filteredExtensions} tableHeader={['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
