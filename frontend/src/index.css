@@ -115,6 +115,10 @@ button:hover {
   margin-bottom: 10px!important;
 }
 
+.healthy-margin-left {
+  margin-left: 10px!important;
+}
+
 .link-icon {
   width: 10px;
   height: 10px;
