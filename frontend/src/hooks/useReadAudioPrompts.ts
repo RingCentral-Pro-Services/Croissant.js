@@ -20,8 +20,8 @@ const useReadAudioPrompts = (excelData: any[], isExcelDataPending: boolean, post
         if (isDataValidationPending) return
 
         let promptList: AmazonPollyPrompt[] = []
-        for (let index = 0; index < excelData.length; index++) {
-            const prompt = new AmazonPollyPrompt(excelData[index]['Prompt Name'], excelData[index]['Prompt Text'])
+        for (let index = 0; index < validatedData.length; index++) {
+            const prompt = new AmazonPollyPrompt(validatedData[index]['Prompt Name'], excelData[index]['Prompt Text'])
             promptList.push(prompt)
         }
         setPrompts(promptList)
