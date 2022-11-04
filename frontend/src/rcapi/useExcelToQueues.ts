@@ -45,7 +45,7 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
 
             if (removedExtensions.length > 0) {
                 postMessage(new Message(`The following members were removed from ${contact.firstName} - Ext ${extension.extensionNumber} because they either don't exist or they are not valid queue members: ${removedExtensions.join(', ')}`, 'warning'))
-                postError(new SyncError(contact.firstName, extension.extensionNumber, ['Removed invalid queue members', removedExtensions.join(', ')]))
+                postError(new SyncError(contact.firstName, extension.extensionNumber, ['Invalid queue members', removedExtensions.join(', ')]))
             }
 
             let queue = new CallQueue(extension, idForSite(extension.site, extensionsList), validMembers)

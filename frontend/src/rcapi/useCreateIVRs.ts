@@ -231,7 +231,7 @@ const useCreateIVRs = (setProgressValue: (value: (any)) => void, postMessage: (m
 
             if (removedKeypresses.length > 0) {
                 postMessage(new Message(`The following key presses were removed from menu '${menus[index].data.name}' due to invalid destinations: ${removedKeypresses.join(', ')}`, 'warning'))
-                postError(new SyncError(menus[index].data.name, menus[index].data.extensionNumber, ['Removed invalid key presses', removedKeypresses.join(', ')]))
+                postError(new SyncError(menus[index].data.name, menus[index].data.extensionNumber, ['Invalid key presses', removedKeypresses.join(', ')]))
             }
 
             menus[index].data.actions = validActions

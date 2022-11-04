@@ -20,7 +20,7 @@ const useValidateExcelData = (scehema: z.Schema, postMessage: (message: Message)
             catch(error: any) {
                 for (let errorIndex = 0; errorIndex < error.issues.length; errorIndex++) {
                     postMessage(new Message(`Validation: Row ${excelData[index]['__rowNum__'] + 1} - ${error.issues[errorIndex].message}`, 'error'))
-                    postError(new SyncError('', 0, ['Failed validation', error.issues[errorIndex].message]))
+                    postError(new SyncError(`Excel Row ${excelData[index]['__rowNum__'] + 1}`, 0, ['Failed validation', error.issues[errorIndex].message]))
                 }
             }
         }
