@@ -11,7 +11,7 @@ const AdditiveFilter = (props: {options: string[], title: string, placeholder: s
 
     return (
         <Autocomplete
-        className='healthy-margin-top healthy-margin-left healthy-margin-right healthy-margin-bottom vertical-moddle'
+        className='healthy-margin-top healthy-margin-right healthy-margin-bottom vertical-moddle'
         multiple
         size="small"
         id="tags-outlined"
