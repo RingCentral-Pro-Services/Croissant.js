@@ -24,7 +24,7 @@ const ExtensionDeleter = () => {
     const [filteredExtensions, setFilteredExtensions] = useState<RCExtension[]>([])
     const [isShowingModal, setIsShowingModal] = useState(false)
     const [isPending, setIsPending] = useState(false)
-    const prettyExtensionTypes = ['Announcement-Only', 'Call Queue', 'IVR Menu', 'Limited Extension', 'Message-Only', 'Paging Only', 'Shared Line Group']
+    const prettyExtensionTypes = ['Announcement-Only', 'Call Queue', 'IVR Menu', 'Limited Extension', 'Message-Only', 'Paging Group', 'Park Location', 'Shared Line Group']
 
     const {postMessage, messages, errors, postError} = useMessageQueue()
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
@@ -70,11 +70,33 @@ const ExtensionDeleter = () => {
     }, [selectedSites, selectedExtensionTypes])
 
     const filterExtensions = () => {
+        let result: RCExtension[] = []
+
+        // Look for park locations first; they're not assigned to sites
+        if (selectedExtensionTypes.includes('Park Location')) {
+            const parkLocations = extensionsList.filter((extension) => {
+                return extension.prettyType[extension.type] === 'Park Location'
+            })
+            result = [...result, ...parkLocations]
+        }
+
+        // Now look for paging groups
+        if (selectedExtensionTypes.includes('Paging Group')) {
+            const pagingGroups = extensionsList.filter((extension) => {
+                return extension.prettyType[extension.type] === 'Paging Group'
+            })
+            result = [...result, ...pagingGroups]
+        }
+
+        // Filter extensions assigned to sites
         const selected = extensionsList.filter((extension) => {
             return selectedExtensionTypes.includes(extension.prettyType[extension.type]) && selectedSites.includes(extension.site)
         })
-        setFilteredExtensions(selected)
-        console.log(selected)
+
+        result = [...result, ...selected]
+
+        setFilteredExtensions(result)
+        console.log(result)
     }
 
     const handleModalAcceptance = () => {
@@ -100,7 +122,7 @@ const ExtensionDeleter = () => {
                     <AdditiveFilter options={prettyExtensionTypes} title='Extension Types' placeholder='Extension Types' setSelected={setSelectedExtensionTypes} />
                     <AdditiveFilter options={sites} title='Sites' placeholder='Sites' setSelected={setSelectedSites} />
                     {/* <Button className="vertical-middle" sx={{top: 9}} variant="contained" onClick={() => deleteExtensions(filteredExtensions)}>Delete</Button> */}
-                    <Button disabled={isPending} className="vertical-middle" sx={{top: 9}} variant="contained" onClick={() => setIsShowingModal(true)}>Delete</Button>
+                    <Button disabled={isPending || filteredExtensions.length === 0} className="vertical-middle" sx={{top: 9}} variant="contained" onClick={() => setIsShowingModal(true)}>Delete</Button>
                     <Modal open={isShowingModal} setOpen={setIsShowingModal} handleAccept={handleModalAcceptance} title='Are you sure about that?' body={`You're about to delete ${filteredExtensions.length} extensions. Be sure that you understand the implications of this.`} acceptLabel={`Yes, delete ${filteredExtensions.length} extensions`} rejectLabel='Go back' />
                     {filteredExtensions.length > 0 ? <progress className='healthy-margin-top' id='sync_progress' value={progressValue} max={maxProgressValue} /> : <></>}
                     {filteredExtensions.length > 0 ? <FeedbackArea tableData={filteredExtensions} tableHeader={['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
