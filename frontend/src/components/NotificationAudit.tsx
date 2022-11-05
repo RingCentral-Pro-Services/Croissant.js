@@ -7,7 +7,7 @@ import useMessageQueue from "../hooks/useMessageQueue"
 import useFetchNotifications from "../rcapi/useFetchNotifications"
 import useWriteExcelFile from "../hooks/useWriteExcelFile"
 import Header from "./Header"
-import {TextField, Button} from '@mui/material'
+import {Button} from '@mui/material'
 import FeedbackArea from "./FeedbackArea"
 import usePostTimedMessage from "../hooks/usePostTimedMessage"
 import FileSelect from "./FileSelect"
@@ -15,8 +15,6 @@ import useReadExcel from "../hooks/useReadExcel"
 import useSwapNotificationEmails from "../rcapi/useSwapNotificationEmails"
 import useUpdateNotifications from "../rcapi/useUpdateNotifications"
 import useAnalytics from "../hooks/useAnalytics"
-import useValidateExcelData from "../hooks/useValidateExcelData"
-import { notificationSchema } from "../helpers/schemas"
 import UIDInputField from "./UIDInputField"
 
 const NotificationAudit = () => {
@@ -90,17 +88,6 @@ const NotificationAudit = () => {
             <Header title="Notifications" body="Audit and update notification emails"/>
             <div className="tool-card">
             <h2>Extension Notifications</h2>
-            {/* <TextField 
-                className="vertical-middle healthy-margin-right"
-                required
-                autoComplete="off"
-                id="outline-required"
-                label="Account UID"
-                defaultValue=""
-                size="small"
-                onChange={(e) => setTargetUID(e.target.value)}
-                disabled={hasCustomerToken}
-            ></TextField> */}
             <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} />
             <Button disabled={!hasCustomerToken || isPending} variant="contained" onClick={handleClick}>Go</Button>
             {isNotificationListPending ? <></> : <FileSelect isPending={false} enabled={true} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} accept='.xlsx' defaultSheet='Notifications' handleSubmit={handleFileSubmit}/>}
