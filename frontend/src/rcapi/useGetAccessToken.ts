@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import useGetCompanyName from "./useGetCompanyName";
 
 const sign = require('jwt-encode');
 const axios = require('axios').default;
 
 const useGetAccessToken = () => {
     const [hasCustomerToken, setHasToken] = useState(false)
+    const {companyName, isCompanyNamePending, getCompanyName} = useGetCompanyName()
 
     const fetchToken = (uid: string) => {
         let rc_access_token = localStorage.getItem('rc_access_token')
@@ -31,14 +33,20 @@ const useGetAccessToken = () => {
         })
         .then((res: any) => {
             localStorage.setItem('cs_access_token', res.data['access_token'])
-            setHasToken(true)
+            getCompanyName()
+            // setHasToken(true)
         })
         .catch((res: any) => {
             console.log(res)
         })
     }
 
-    return {fetchToken, hasCustomerToken}
+    useEffect(() => {
+        if (isCompanyNamePending) return
+        setHasToken(true)
+    }, [isCompanyNamePending])
+
+    return {fetchToken, hasCustomerToken, companyName}
 }
 
 export default useGetAccessToken

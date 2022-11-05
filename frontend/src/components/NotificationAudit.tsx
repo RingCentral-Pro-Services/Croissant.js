@@ -17,12 +17,13 @@ import useUpdateNotifications from "../rcapi/useUpdateNotifications"
 import useAnalytics from "../hooks/useAnalytics"
 import useValidateExcelData from "../hooks/useValidateExcelData"
 import { notificationSchema } from "../helpers/schemas"
+import UIDInputField from "./UIDInputField"
 
 const NotificationAudit = () => {
     useLogin()
     const {fireEvent} = useAnalytics()
     let [targetUID, setTargetUID] = useState("")
-    const {fetchToken, hasCustomerToken} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
     let {messages, errors, postMessage, postError} = useMessageQueue()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     const [isPending, setIsPending] = useState(false)
@@ -89,7 +90,7 @@ const NotificationAudit = () => {
             <Header title="Notifications" body="Audit and update notification emails"/>
             <div className="tool-card">
             <h2>Extension Notifications</h2>
-            <TextField 
+            {/* <TextField 
                 className="vertical-middle healthy-margin-right"
                 required
                 autoComplete="off"
@@ -99,7 +100,8 @@ const NotificationAudit = () => {
                 size="small"
                 onChange={(e) => setTargetUID(e.target.value)}
                 disabled={hasCustomerToken}
-            ></TextField>
+            ></TextField> */}
+            <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} />
             <Button disabled={!hasCustomerToken || isPending} variant="contained" onClick={handleClick}>Go</Button>
             {isNotificationListPending ? <></> : <FileSelect isPending={false} enabled={true} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} accept='.xlsx' defaultSheet='Notifications' handleSubmit={handleFileSubmit}/>}
             {isEmailSwapPending ? <></> : <Button variant='contained' onClick={handleSyncButtonClick} >Sync</Button>}

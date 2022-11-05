@@ -10,12 +10,13 @@ import CreateCallQueues from "./CreateCallQueues"
 import Header from "./Header"
 import {TextField, Button, CircularProgress} from '@mui/material'
 import useAnalytics from "../hooks/useAnalytics"
+import UIDInputField from "./UIDInputField"
 
 const CallQueues = () => {
     useLogin()
     const {fireEvent} = useAnalytics()
     let [targetUID, setTargetUID] = useState("")
-    const {fetchToken, hasCustomerToken} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
     let {messages, postMessage} = useMessageQueue()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     let {callQueues, isQueueListPending, fetchQueueMembers} = useFetchCallQueueMembers()
@@ -53,17 +54,7 @@ const CallQueues = () => {
         <Header title='Call Queues' body='Do some stuff with call queues' />
             <div className="tool-card">
                 <h2>Export Call Queues</h2>
-                <TextField 
-                    className="vertical-middle healthy-margin-right"
-                    required
-                    autoComplete="off"
-                    id="outline-required"
-                    label="Account UID"
-                    defaultValue=""
-                    size="small"
-                    onChange={(e) => setTargetUID(e.target.value)}
-                    disabled={hasCustomerToken}
-                ></TextField>
+                <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} />
                 <Button className='healthy-margin-right' disabled={!hasCustomerToken || isPending} variant="contained" onClick={handleClick}>Go</Button>
                 {isPending ? <CircularProgress className="vertical-middle" /> : <></>}
             </div>

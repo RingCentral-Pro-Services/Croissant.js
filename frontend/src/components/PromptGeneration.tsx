@@ -22,7 +22,7 @@ const PromptGeneration = () => {
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
     
-    const {fetchToken, hasCustomerToken} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
     const {readFile, excelData, isExcelDataPending} = useReadExcel()
     const {messages, errors, postMessage, postError} = useMessageQueue()
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
@@ -73,7 +73,7 @@ const PromptGeneration = () => {
             <Header title="Generate Prompts" body="Generate prompt media using Amazon Polly"/>
             <div className="tool-card">
                 <h2>Generate Prompts</h2>
-                <UIDInputField disabled={hasCustomerToken} setTargetUID={setTargetUID} />
+                <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} />
                 <FileSelect enabled={hasCustomerToken} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx'  handleSubmit={handleFileSelect}/>
                 {isPromptGenerationPending ? <></> : <Button variant="contained" onClick={handleSyncButtonClick}>Sync</Button>}
                 {isPending ? <progress className='healthy-margin-top' id='sync_progress' value={progressValue} max={maxProgressValue} /> : <></>}

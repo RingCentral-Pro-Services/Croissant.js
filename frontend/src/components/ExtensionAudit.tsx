@@ -9,12 +9,13 @@ import {TextField, Button, CircularProgress} from '@mui/material'
 import FeedbackArea from './FeedbackArea'
 import usePostTimedMessage from '../hooks/usePostTimedMessage'
 import useAnalytics from '../hooks/useAnalytics'
+import UIDInputField from './UIDInputField'
 
 const ExtensionAudit = () => {
     useLogin()
     const {fireEvent} = useAnalytics()
     let [targetUID, setTargetUID] = useState("")
-    const {fetchToken, hasCustomerToken} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
     let {messages, errors, postMessage} = useMessageQueue()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     const {writeExcel} = useWriteExcelFile()
@@ -49,7 +50,7 @@ const ExtensionAudit = () => {
             <div className='tool-card'>
             <h2>Account Dump</h2>
             {/* <input type="text" className="input-field" value={targetUID} onChange={(e) => setTargetUID(e.target.value)}/> */}
-            <TextField 
+            {/* <TextField 
                 className="vertical-middle healthy-margin-right"
                 required
                 autoComplete="off"
@@ -59,7 +60,8 @@ const ExtensionAudit = () => {
                 size='small'
                 onChange={(e) => setTargetUID(e.target.value)}
                 disabled={hasCustomerToken}
-            ></TextField>
+            ></TextField> */}
+            <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} />
             <Button className='healthy-margin-right' disabled={!hasCustomerToken} variant='contained' onClick={handleClick}>Go</Button>
             {extensionsList.length > 0 ? <FeedbackArea tableHeader={['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']} tableData={extensionsList} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
         </div>

@@ -30,7 +30,7 @@ const ExtensionDeleter = () => {
 
     const {postMessage, messages, errors, postError} = useMessageQueue()
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
-    const {fetchToken, hasCustomerToken} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
     const {extensionsList, fetchExtensions, isExtensionListPending} = useExtensionList(postMessage)
 
     const [progressValue, setProgressValue] = useState(0)
@@ -124,7 +124,7 @@ const ExtensionDeleter = () => {
             <Header title="Delete Extensions" body="Delete extensions in bulk"/>
             <div className="tool-card">
                 <h2>Delete Extensions</h2>
-                <UIDInputField disabled={hasCustomerToken} setTargetUID={setTargetUID}/>
+                <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID}/>
                 <br />
                 <div hidden={isExtensionListPending}>
                     <AdditiveFilter options={prettyExtensionTypes} title='Extension Types' placeholder='Extension Types' setSelected={setSelectedExtensionTypes} />

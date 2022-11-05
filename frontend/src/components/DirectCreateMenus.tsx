@@ -17,9 +17,9 @@ import FeedbackArea from "./FeedbackArea";
 import usePostTimedMessage from "../hooks/usePostTimedMessage";
 import useGetAudioPrompts from "../rcapi/useGetAudioPrompts";
 import useAnalytics from "../hooks/useAnalytics";
-import z from 'zod'
 import useValidateExcelData from "../hooks/useValidateExcelData";
 import { ivrSchema } from "../helpers/schemas";
+import UIDInputField from "./UIDInputField";
 
 const DirectCreateMenus = () => {
     useLogin()
@@ -29,7 +29,7 @@ const DirectCreateMenus = () => {
     let [isPending, setIsPending] = useState(false)
     const [menus, setMenus] = useState<IVRMenu[]>([])
     let {messages, errors, postMessage, postError} = useMessageQueue()
-    const {fetchToken, hasCustomerToken} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     const [selectedFile, setSelectedFile] = useState<File | null>()
     const {excelData, isExcelDataPending, readFile} = useReadExcel()
@@ -146,17 +146,7 @@ const DirectCreateMenus = () => {
     
     return (
         <div>
-            <TextField 
-                className="vertical-middle"
-                required
-                autoComplete="off"
-                id="outline-required"
-                label="Account UID"
-                defaultValue=""
-                size="small"
-                onChange={(e) => setTargetUID(e.target.value)}
-                disabled={hasCustomerToken}
-            ></TextField>
+            <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} />
             <FileSelect enabled={hasCustomerToken} accept=".xlsx, .csv" handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={isPending} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
             {isDisplayingFilterBox ? <PageFilter pages={filteredPages ? filteredPages : pages} selectAll={selectAll} handleFilterClick={handleFilterClick} handleInput={handleInput} /> : <></>}
             {!isReadyToSync ? <></> : <Button variant="contained" className="inline" onClick={handleSyncButtonClick}>Sync</Button>}
