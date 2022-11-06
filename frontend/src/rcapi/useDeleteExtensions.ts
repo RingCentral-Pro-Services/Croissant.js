@@ -10,7 +10,6 @@ const useDeleteExtensions = (postMessage: (message: Message) => void, postTimedM
     let [rateLimitInterval, setRateLimitInterval] = useState(0)
     let [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
     const [isExtensionDeletePending, setIsPending] = useState(true)
-    const accessToken = localStorage.getItem('cs_access_token')
     const baseURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId'
 
     const deleteExtensions = (extensions: RCExtension[]) => {
@@ -23,6 +22,7 @@ const useDeleteExtensions = (postMessage: (message: Message) => void, postTimedM
     }
 
     useEffect(() => {
+        const accessToken = localStorage.getItem('cs_access_token')
         if (!shouldDelete) return
         if (currentExtensionIndex >= extensions.length) return
         if (!accessToken) return
