@@ -6,10 +6,12 @@ const useGetCompanyName = () => {
     const [rateLimitInterval, setRateLimitInterval] = useState(0)
     const [isCompanyNamePending, setIsCompanyNamePending] = useState(true)
     const url = 'https://platform.ringcentral.com/restapi/v1.0/account/~/business-address'
-    const accessToken = localStorage.getItem('cs_access_token')
 
     const getCompanyName = () => {
+        const accessToken = localStorage.getItem('cs_access_token')
         if (!accessToken) return
+        setCompantName('')
+        setIsCompanyNamePending(true)
 
         setTimeout(async () => {
             try {
@@ -28,7 +30,11 @@ const useGetCompanyName = () => {
         }, rateLimitInterval)
     }
 
-    return {companyName, isCompanyNamePending, getCompanyName}
+    const reset = () => {
+        setIsCompanyNamePending(true)
+    }
+
+    return {companyName, isCompanyNamePending, getCompanyName, reset}
 }
 
 export default useGetCompanyName
