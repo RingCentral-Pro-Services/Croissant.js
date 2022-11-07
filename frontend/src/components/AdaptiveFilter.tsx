@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from "react";
-import {Autocomplete, TextField, Checkbox} from '@mui/material'
+import {Autocomplete, TextField, Checkbox, Typography} from '@mui/material'
 import {CheckBox, CheckBoxOutlineBlank} from '@mui/icons-material'
 
-const AdaptiveFilter = (props: {options: string[], title: string, placeholder: string, disabled: boolean, defaultSelected: string[], showAllOption: boolean, setSelected: (values: string[]) => void}) => {
-    const {options, title, placeholder, defaultSelected, showAllOption, setSelected} = props
+const AdaptiveFilter = (props: {options: string[], title: string, placeholder: string, disabled: boolean, defaultSelected: string[], showAllOption: boolean, setSelected: (values: string[]) => void, width: number}) => {
+    const {options, title, placeholder, defaultSelected, showAllOption, width, setSelected} = props
+    const [nOptions, setOptions] = useState<string[]>([])
     const [value, setValue] = useState(defaultSelected)
+
+    useEffect(() => {
+        setOptions(options)
+    }, [])
 
     useEffect(() => {
         if (defaultSelected.length > 0) {
@@ -15,7 +20,7 @@ const AdaptiveFilter = (props: {options: string[], title: string, placeholder: s
                 setValue(defaultSelected)
             }
         }
-    }, [options])
+    }, [nOptions])
 
     const change = (e: any, values: string[]) => {
         if (value.includes('All') && !values.includes('All')) {
@@ -30,14 +35,14 @@ const AdaptiveFilter = (props: {options: string[], title: string, placeholder: s
                 setValue(newValues)
             }
             else {
-                setSelected(options)
-                setValue(['All', ...options])
+                setSelected(nOptions)
+                setValue(['All', ...nOptions])
             }
         }
         else {
-            if (values.length === options.length) {
-                setSelected(options)
-                setValue(['All', ...options])
+            if (values.length === nOptions.length) {
+                setSelected(nOptions)
+                setValue(['All', ...nOptions])
             }
             else {
                 setSelected(values)
@@ -47,15 +52,18 @@ const AdaptiveFilter = (props: {options: string[], title: string, placeholder: s
     }
 
     return (
-        <div className="inline">
+        <div className="inline healthy-margin-right">
             <Autocomplete
                 multiple
                 id="adaptive-filter"
                 title={title}
-                options={['All', ...options]}
-                ChipProps={{sx: {display: 'none'}}}
+                options={['All', ...nOptions]}
+                size='small'
+                // ChipProps={{sx: {display: 'none'}}}
+                limitTags={1}
                 disableCloseOnSelect
                 value={value}
+                sx={{width: width}}
                 onChange={change}
                 getOptionLabel={(option) => option}
                 renderOption={(props, option, { selected }) => (
@@ -69,10 +77,17 @@ const AdaptiveFilter = (props: {options: string[], title: string, placeholder: s
                     {option}
                     </li>
                 )}
-                style={{ width: 500 }}
+                // style={{ width: 500 }}
                 renderInput={(params) => (
                     <TextField {...params} label={title} placeholder={placeholder} />
                 )}
+                renderTags={(currentValue, getTagProps) => {
+                    return (
+                      <Typography variant="body2">
+                        {(currentValue.length - 1) === nOptions.length ? `All selected` : `${currentValue.length} selected`}
+                      </Typography>
+                    );
+                  }}
             />
         </div>
     )
@@ -81,7 +96,8 @@ const AdaptiveFilter = (props: {options: string[], title: string, placeholder: s
 AdaptiveFilter.defaultProps = {
     disabled: false,
     showAllOption: true,
-    defaultSelected: []
+    defaultSelected: [],
+    width: 275
 }
 
 export default AdaptiveFilter
