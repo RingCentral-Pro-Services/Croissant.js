@@ -1,6 +1,5 @@
 import React from "react";
 import {Autocomplete, TextField} from '@mui/material'
-import RCExtension from "../models/RCExtension";
 
 const AdditiveFilter = (props: {options: string[], title: string, placeholder: string, setSelected: (values: string[]) => void}) => {
     const {options, placeholder, title, setSelected} = props
