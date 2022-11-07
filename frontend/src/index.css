@@ -119,6 +119,22 @@ button:hover {
   margin-left: 10px!important;
 }
 
+.mega-margin-right {
+  margin-right: 20px!important;
+}
+
+.mega-margin-top {
+  margin-top: 20px!important;
+}
+
+.mega-margin-bottom {
+  margin-bottom: 20px!important;
+}
+
+.mega-margin-left {
+  margin-left: 20px!important;
+}
+
 .link-icon {
   width: 10px;
   height: 10px;
