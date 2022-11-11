@@ -133,23 +133,23 @@ export class IVRMenu implements CSVFormattable, ExcelFormattable, DataTableForma
         for (let actionIndex = 0; actionIndex < this.data.actions.length; actionIndex++) {
             if (this.data.actions[actionIndex].input === `0`) {
                 if (this.data.actions[actionIndex].action === 'Transfer') {
-                    let cellText = `${this.data.actions[actionIndex].action} to ${this.data.actions[actionIndex].phoneNumber}`
-                    result.push(cellText)
+                    result.push(prettyType(this.data.actions[actionIndex].action))
+                    result.push(this.data.actions[actionIndex].phoneNumber!)
                     zeroKeyFound = true
                 }
                 else if (this.data.actions[actionIndex].action === 'Connect') {
-                    let cellText = `${this.data.actions[actionIndex].action} to ${this.data.actions[actionIndex].extension?.id}`
-                    result.push(cellText)
+                    result.push(prettyType(this.data.actions[actionIndex].action))
+                    result.push(this.data.actions[actionIndex].extension!.id)
                     zeroKeyFound = true
                 }
                 else if (this.data.actions[actionIndex].action === 'Voicemail') {
-                    let cellText = `${this.data.actions[actionIndex].action} of ${this.data.actions[actionIndex].extension?.id}`
-                    result.push(cellText)
+                    result.push(prettyType(this.data.actions[actionIndex].action))
+                    result.push(this.data.actions[actionIndex].extension!.id)
                     zeroKeyFound = true
                 }
                 else {
-                    let cellText = `${this.data.actions[actionIndex].action}`
-                    result.push(cellText)
+                    result.push(prettyType(this.data.actions[actionIndex].action))
+                    result.push('')
                     zeroKeyFound = true
                 }
                 zeroKeyFound = true
