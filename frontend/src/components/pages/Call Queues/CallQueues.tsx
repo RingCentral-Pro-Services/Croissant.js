@@ -1,16 +1,16 @@
 import React, {useState, useEffect} from "react"
-import useLogin from "../hooks/useLogin"
-import useGetAccessToken from "../rcapi/useGetAccessToken"
-import useMessageQueue from "../hooks/useMessageQueue"
-import useExtensionList from "../rcapi/useExtensionList"
-import { Message } from "../models/Message"
-import useFetchCallQueueMembers from "../rcapi/useFetchCallQueueMembers"
-import useWriteExcelFile from "../hooks/useWriteExcelFile"
+import useLogin from "../../../hooks/useLogin"
+import useGetAccessToken from "../../../rcapi/useGetAccessToken"
+import useMessageQueue from "../../../hooks/useMessageQueue"
+import useExtensionList from "../../../rcapi/useExtensionList"
+import { Message } from "../../../models/Message"
+import useFetchCallQueueMembers from "../../../rcapi/useFetchCallQueueMembers"
+import useWriteExcelFile from "../../../hooks/useWriteExcelFile"
 import CreateCallQueues from "./CreateCallQueues"
-import Header from "./Header"
+import Header from "../../shared/Header"
 import {TextField, Button, CircularProgress} from '@mui/material'
-import useAnalytics from "../hooks/useAnalytics"
-import UIDInputField from "./UIDInputField"
+import useAnalytics from "../../../hooks/useAnalytics"
+import UIDInputField from "../../shared/UIDInputField"
 
 const CallQueues = () => {
     useLogin()

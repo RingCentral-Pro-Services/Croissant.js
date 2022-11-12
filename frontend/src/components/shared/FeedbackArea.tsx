@@ -3,14 +3,14 @@ import DataTable from "./DataTable";
 import MessagesArea from "./MessagesArea";
 import {Tabs, Tab, Box, Typography, IconButton} from '@mui/material'
 import {FileDownload} from '@mui/icons-material'
-import ExcelFormattable from "../models/ExcelFormattable";
-import { Message } from "../models/Message";
+import ExcelFormattable from "../../models/ExcelFormattable";
+import { Message } from "../../models/Message";
 import Badge from '@mui/material/Badge';
 import MailIcon from '@mui/icons-material/Mail'
 import TableRowsIcon from '@mui/icons-material/TableRows';
-import { DataTableFormattable } from "../models/DataTableFormattable";
-import { SyncError } from "../models/SyncError";
-import useWriteExcelFile from "../hooks/useWriteExcelFile";
+import { DataTableFormattable } from "../../models/DataTableFormattable";
+import { SyncError } from "../../models/SyncError";
+import useWriteExcelFile from "../../hooks/useWriteExcelFile";
 
 interface TabPanelProps {
     children?: React.ReactNode;

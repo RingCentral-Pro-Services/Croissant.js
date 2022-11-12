@@ -1,12 +1,12 @@
 import React from 'react'
 import { useState } from 'react'
-import PageFilter from './PageFilter';
-import ResourcesArea from './ResourcesArea';
-import usePageExtractor from '../hooks/usePageExtractor';
-import useFilterServices from '../hooks/useFilterServices';
-import useFileSave from '../hooks/useFileSave';
-import useAnalytics from '../hooks/useAnalytics';
-import LucidchartFilterPage from '../models/LucidchartFilterPage';
+import PageFilter from '../../shared/PageFilter';
+import ResourcesArea from '../../shared/ResourcesArea';
+import usePageExtractor from '../../../hooks/usePageExtractor';
+import useFilterServices from '../../../hooks/useFilterServices';
+import useFileSave from '../../../hooks/useFileSave';
+import useAnalytics from '../../../hooks/useAnalytics';
+import LucidchartFilterPage from '../../../models/LucidchartFilterPage';
 import {Button} from '@mui/material'
 const axios = require('axios').default;
 

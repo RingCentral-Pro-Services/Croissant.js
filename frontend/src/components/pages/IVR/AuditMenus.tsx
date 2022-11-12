@@ -1,6 +1,6 @@
 import React from 'react'
 import { useState } from "react";
-import Header from './Header';
+import Header from '../../shared/Header';
 import {ToggleButtonGroup, ToggleButton} from '@mui/material'
 import LegactyAuditMenus from './LegacyAuditMenus';
 import DirectAuditMenus from './DirectAuditMenus';

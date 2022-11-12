@@ -1,5 +1,5 @@
 import React from "react";
-import { Message } from "../models/Message";
+import { Message } from "../../models/Message";
 import { Alert } from '@mui/material'
 
 const MessagesArea = (props: {messages: Message[]}) => {

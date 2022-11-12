@@ -20,7 +20,7 @@ const Sidebar = () => {
             <NavItem text="Generate Prompts" destination="/generateprompts" isSelected={selectedItem === "Generate Prompts"} handleClick={handleClick} />
             <NavItem text="Account Dump" destination="/accountdump" isSelected={selectedItem === "Account Dump"} handleClick={handleClick} />
             <NavItem text="Delete Extensions" destination="/deleteextensions" isSelected={selectedItem === "Delete Extensions"} handleClick={handleClick} />
-            <NavItem text="Notifications" destination="/notificationsaudit" isSelected={selectedItem === "Notifications Audit"} handleClick={handleClick} />
+            <NavItem text="Notifications" destination="/notificationsaudit" isSelected={selectedItem === "Notifications"} handleClick={handleClick} />
             <NavItem text="Call Queues" destination="/callqueues" isSelected={selectedItem === "Call Queues"} handleClick={handleClick} />
         </div>
      );

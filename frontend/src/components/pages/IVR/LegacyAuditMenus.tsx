@@ -1,9 +1,9 @@
 import React from 'react'
 import { useState } from "react";
-import useFileSave from "../hooks/useFileSave";
-import ResourcesArea from './ResourcesArea';
-import useAnalytics from "../hooks/useAnalytics";
-import Header from './Header';
+import useFileSave from "../../../hooks/useFileSave";
+import ResourcesArea from '../../shared/ResourcesArea';
+import useAnalytics from "../../../hooks/useAnalytics";
+import Header from '../../shared/Header';
 import {Button} from '@mui/material'
 const axios = require('axios').default;
 

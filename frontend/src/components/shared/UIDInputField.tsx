@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {TextField, Autocomplete} from '@mui/material'
-import { AccountUID } from "../models/AccountUID";
+import { AccountUID } from "../../models/AccountUID";
 
 const UIDInputField = (props: {setTargetUID: (value: string) => void, disabled: boolean, disabledText: string}) => {
     const {setTargetUID, disabled, disabledText} = props

@@ -1,6 +1,6 @@
 import React from 'react';
 // @ts-ignore
-import linkIcon from '../link.png'
+import linkIcon from '../../link.png'
 
 const ResourcesArea = (props: any) => {
     const { title, links } = props

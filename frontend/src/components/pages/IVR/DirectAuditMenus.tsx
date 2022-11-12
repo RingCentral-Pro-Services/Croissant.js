@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
-import Header from "./Header";
-import UIDInputField from "./UIDInputField";
-import useGetAccessToken from "../rcapi/useGetAccessToken";
+import Header from "../../shared/Header";
+import UIDInputField from "../../shared/UIDInputField";
+import useGetAccessToken from "../../../rcapi/useGetAccessToken";
 import {Button, CircularProgress} from '@mui/material'
-import useExtensionList from "../rcapi/useExtensionList";
-import useMessageQueue from "../hooks/useMessageQueue";
-import useFetchIVRs from "../rcapi/useFetchIVRs";
-import FeedbackArea from "./FeedbackArea";
-import usePostTimedMessage from "../hooks/usePostTimedMessage";
-import useWriteExcelFile from "../hooks/useWriteExcelFile";
-import useBeautifyIVRs from "../rcapi/useBeautifyIVRs";
-import useGetAudioPrompts from "../rcapi/useGetAudioPrompts";
-import useAnalytics from "../hooks/useAnalytics";
+import useExtensionList from "../../../rcapi/useExtensionList";
+import useMessageQueue from "../../../hooks/useMessageQueue";
+import useFetchIVRs from "../../../rcapi/useFetchIVRs";
+import FeedbackArea from "../../shared/FeedbackArea";
+import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
+import useWriteExcelFile from "../../../hooks/useWriteExcelFile";
+import useBeautifyIVRs from "../../../rcapi/useBeautifyIVRs";
+import useGetAudioPrompts from "../../../rcapi/useGetAudioPrompts";
+import useAnalytics from "../../../hooks/useAnalytics";
 
 const DirectAuditMenus = () => {
     const {fireEvent} = useAnalytics()

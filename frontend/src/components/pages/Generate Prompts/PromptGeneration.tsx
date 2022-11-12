@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
-import Header from "./Header";
+import Header from "../../shared/Header";
 import { Button } from "@mui/material";
-import UIDInputField from "./UIDInputField";
-import useGetAccessToken from "../rcapi/useGetAccessToken";
-import FileSelect from "./FileSelect";
-import useReadExcel from "../hooks/useReadExcel";
-import useReadAudioPrompts from "../hooks/useReadAudioPrompts";
-import useGenerateAudioPrompts from "../hooks/useGenerateAudioPrompts";
-import FeedbackArea from "./FeedbackArea";
-import useMessageQueue from "../hooks/useMessageQueue";
-import usePostTimedMessage from "../hooks/usePostTimedMessage";
-import useUploadAudioPrompts from "../rcapi/useUploadAudioPrompts";
+import UIDInputField from "../../shared/UIDInputField";
+import useGetAccessToken from "../../../rcapi/useGetAccessToken";
+import FileSelect from "../../shared/FileSelect";
+import useReadExcel from "../../../hooks/useReadExcel";
+import useReadAudioPrompts from "../../../hooks/useReadAudioPrompts";
+import useGenerateAudioPrompts from "../../../hooks/useGenerateAudioPrompts";
+import FeedbackArea from "../../shared/FeedbackArea";
+import useMessageQueue from "../../../hooks/useMessageQueue";
+import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
+import useUploadAudioPrompts from "../../../rcapi/useUploadAudioPrompts";
 
 const PromptGeneration = () => {
     const defaultSheet = 'Prompts'

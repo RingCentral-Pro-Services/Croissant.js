@@ -1,15 +1,15 @@
 import React from 'react'
 import { useEffect } from 'react';
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom'
-import AuditMenus from './components/AuditMenus';
-import CallQueues from './components/CallQueues';
-import CreateMenus from './components/CreateMenus';
-import ExtensionAudit from './components/ExtensionAudit';
-import ExtensionDeleter from './components/ExtensionDeleter';
-import NotificationAudit from './components/NotificationAudit';
-import PromptGeneration from './components/PromptGeneration';
-import Sidebar from './components/Sidebar';
-import Token from './components/Token';
+import AuditMenus from './components/pages/IVR/AuditMenus';
+import CallQueues from './components/pages/Call Queues/CallQueues';
+import CreateMenus from './components/pages/IVR/CreateMenus';
+import ExtensionAudit from './components/pages/Account Dump/ExtensionAudit';
+import ExtensionDeleter from './components/pages/Delete Extensions/ExtensionDeleter';
+import NotificationAudit from './components/pages/Notifications/NotificationAudit';
+import PromptGeneration from './components/pages/Generate Prompts/PromptGeneration';
+import Sidebar from './components/shared/Sidebar';
+import Token from './components/shared/Token';
 
 function App() {
 

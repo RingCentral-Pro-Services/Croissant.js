@@ -1,6 +1,7 @@
 import React from "react";
 import {Autocomplete, Checkbox, TextField} from '@mui/material'
-import LucidchartFilterPage from "../models/LucidchartFilterPage";
+// import LucidchartFilterPage from "../../models/LucidchartFilterPage";
+import LucidchartFilterPage from '../../models/LucidchartFilterPage'
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 

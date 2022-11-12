@@ -1,5 +1,5 @@
 import React from "react";
-import { DataTableFormattable } from "../models/DataTableFormattable";
+import { DataTableFormattable } from "../../models/DataTableFormattable";
 import DataTableRow from "./DataTableRow";
 import {Table, TableHead, TableRow, TableCell, TableBody} from '@mui/material'
 
