@@ -107,8 +107,8 @@ const NotificationAudit = () => {
         console.log(notifications)
         let header = ['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses']
         writeExcel(header, notifications, 'notifications.xlsx')
-        setIsPending(false)
-    }, [isNotificationListPending, notifications, writeExcel, isPending])
+        // setIsPending(false)
+    }, [isNotificationListPending, notifications, isPending])
 
     useEffect(() => {
         console.log(selectedExtensionTypes)
