@@ -52,7 +52,7 @@ const AdaptiveFilter = (props: {options: string[], title: string, placeholder: s
     }
 
     return (
-        <div className="inline healthy-margin-right">
+        <div className="inline healthy-margin-right vertical-middle">
             <Autocomplete
                 multiple
                 id="adaptive-filter"
