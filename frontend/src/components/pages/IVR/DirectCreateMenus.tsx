@@ -20,6 +20,7 @@ import useAnalytics from "../../../hooks/useAnalytics";
 import useValidateExcelData from "../../../hooks/useValidateExcelData";
 import { ivrSchema } from "../../../helpers/schemas";
 import UIDInputField from "../../shared/UIDInputField";
+import AdaptiveFilter from "../../shared/AdaptiveFilter";
 
 const DirectCreateMenus = () => {
     useLogin()
@@ -44,6 +45,8 @@ const DirectCreateMenus = () => {
     const [filteredPages, setFilteredPages] = useState(null)
     const {handleFilterClick, handleInput, selectAll} = useFilterServices(pages, setPages, filteredPages, setFilteredPages)
     const [selectedSheet, setSelectedSheet] = useState<string>('')
+    const [selectedSites, setSelectedSites] = useState<string[]>([])
+    const [filterMenus, setFilteredMenus] = useState<IVRMenu[]>([])
 
     const {validatedData, validate, isDataValidationPending} = useValidateExcelData(ivrSchema, postMessage, postError)
 
@@ -62,25 +65,8 @@ const DirectCreateMenus = () => {
     const handleSyncButtonClick = () => {
         setProgressValue(0)
         setReadyToSync(true)
-        if (lucidchartMenus.length !== 0) {
-            const selectedPages = pages.filter((page: LucidchartFilterPage) => {
-                return page.isChecked
-            })
-            let filteredMenus = menus.filter((menu: IVRMenu) => {
-                for (let index = 0; index < selectedPages.length; index++) {
-                    if (menu.page === selectedPages[index].label) {
-                        return true
-                    }
-                }
-                return false
-            })
-            setMaxProgressValue(filteredMenus.length * 2)
-            createMenus(filteredMenus, extensionsList)
-        }
-        else {
-            setMaxProgressValue(menus.length * 2)
-            createMenus(menus, extensionsList)
-        }
+        setMaxProgressValue(filterMenus.length * 2)
+        createMenus(filterMenus, extensionsList)
         fireEvent('create-menu')
         // createMenus(menus, extensionsList)
     }
@@ -126,6 +112,7 @@ const DirectCreateMenus = () => {
         setIsPending(false)
         setReadyToSync(true)
         setDisplayFilterBox(true)
+        setSelectedSites(pages.map((page) => page.label))
     }, [lucidchartMenus, isLucidchartPending])
 
     useEffect(() => {
@@ -135,6 +122,7 @@ const DirectCreateMenus = () => {
         setMenus(excelMenus)
         setReadyToSync(true)
         setIsPending(false)
+        setFilteredMenus(excelMenus)
         // createMenus(excelMenus, extensionsList)
     }, [isReadyToSync, isMenuConvertPending, excelMenus])
 
@@ -143,18 +131,29 @@ const DirectCreateMenus = () => {
         localStorage.setItem('target_uid', targetUID)
         fetchToken(targetUID)
     },[targetUID])
+
+    useEffect(() => {
+        console.log('Selected Sites:')
+        console.log(selectedSites)
+        const filtered = menus.filter((menu) => {
+            if (!menu.page) return false
+            return selectedSites.includes(menu.page)
+        })
+        console.log(filtered)
+        setFilteredMenus(filtered)
+    }, [pages, selectedSites])
     
     return (
         <div>
             <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} />
             <FileSelect enabled={hasCustomerToken} accept=".xlsx, .csv" handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={isPending} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
-            {isDisplayingFilterBox ? <PageFilter pages={filteredPages ? filteredPages : pages} selectAll={selectAll} handleFilterClick={handleFilterClick} handleInput={handleInput} /> : <></>}
+            {isDisplayingFilterBox ? <AdaptiveFilter title='Pages' placeholder='Search...' setSelected={setSelectedSites} options={pages.map((page) => page.label)} defaultSelected={pages.map((page) => page.label)} /> : <></>}
             {!isReadyToSync ? <></> : <Button variant="contained" className="inline" onClick={handleSyncButtonClick}>Sync</Button>}
             {!(menus.length > 0) ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
             {timedMessages.map((timedMessage) => (
                 <p>{timedMessage.body}</p>
             ))}
-            {!(menus.length > 0 || messages.length > 0 || timedMessages.length > 0) ? <></> : <FeedbackArea tableHeader={['Name', 'Ext', 'Site', 'Prompt Mode', 'Prompt', 'Key 1', 'Key 2', 'Key 3', 'Key 4', 'Key 5', 'Key 6', 'Key 7', 'Key 8', 'Key 9', 'Key 0']} tableData={menus} messages={messages} timedMessages={timedMessages} errors={errors} /> }
+            {!(menus.length > 0 || messages.length > 0 || timedMessages.length > 0) ? <></> : <FeedbackArea tableHeader={['Name', 'Ext', 'Site', 'Prompt Mode', 'Prompt', 'Key 1', 'Key 2', 'Key 3', 'Key 4', 'Key 5', 'Key 6', 'Key 7', 'Key 8', 'Key 9', 'Key 0']} tableData={filterMenus} messages={messages} timedMessages={timedMessages} errors={errors} /> }
         </ div>
     )
 }
