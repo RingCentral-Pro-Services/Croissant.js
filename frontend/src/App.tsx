@@ -10,6 +10,7 @@ import NotificationAudit from './components/pages/Notifications/NotificationAudi
 import PromptGeneration from './components/pages/Generate Prompts/PromptGeneration';
 import Sidebar from './components/shared/Sidebar';
 import Token from './components/shared/Token';
+import EditSites from './components/pages/Edit Sites/EditSites';
 
 function App() {
 
@@ -31,6 +32,7 @@ function App() {
             <Route path='/callqueues' element={<CallQueues />} />
             <Route path='/deleteextensions' element={<ExtensionDeleter />} />
             <Route path='/generateprompts' element={<PromptGeneration />} />
+            <Route path='/editsites' element={<EditSites />} />
           </Routes>
         </div>
       </div>
