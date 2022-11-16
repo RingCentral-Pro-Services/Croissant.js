@@ -1,6 +1,8 @@
 import { Button } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { siteSchema } from "../../../helpers/schemas";
+import useAnalytics from "../../../hooks/useAnalytics";
+import useLogin from "../../../hooks/useLogin";
 import useMessageQueue from "../../../hooks/useMessageQueue";
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
 import useReadExcel from "../../../hooks/useReadExcel";
@@ -26,6 +28,8 @@ const EditSites = () => {
     const [maxProgressValue, setMaxProgressValue] = useState(0)
     const defaultSheet = 'Sites'
 
+    useLogin()
+    const {fireEvent} = useAnalytics()
     const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
@@ -87,6 +91,7 @@ const EditSites = () => {
     }
 
     const handleSyncButtonClick = () => {
+        fireEvent('edit-sites')
         updateSites(validatedSites)
     }
 
