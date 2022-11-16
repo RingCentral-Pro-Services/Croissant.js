@@ -123,3 +123,19 @@ export const promptSchema = z.object({
         invalid_type_error: 'Prompt text data type invalid'
     })
 })
+
+export const siteSchema = z.object({
+    'ID': z.string({
+        required_error: 'Missing ID',
+        invalid_type_error: 'ID data type invalid'
+    }).or(z.number()),
+    'Name': z.string({
+        required_error: 'Missing name',
+        invalid_type_error: 'Name data type invalid'
+    }),
+    'Ext': z.string({
+        required_error: 'Missing extension number',
+        invalid_type_error: 'Extension number data type invalid'
+    }).or(z.number())
+
+})
