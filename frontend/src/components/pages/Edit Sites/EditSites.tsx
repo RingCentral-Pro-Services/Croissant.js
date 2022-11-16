@@ -99,6 +99,7 @@ const EditSites = () => {
                 <Button disabled={isExtensionListPending} variant='contained' onClick={handleDownloadButtonClick}>Download</Button>
                 <FileSelect enabled={!isExtensionListPending} handleSubmit={handleFileSubmit} setSelectedFile={setSelectedFile} isPending={false} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
                 <Button variant='contained' disabled={isDataValidationPending} onClick={handleSyncButtonClick}>Sync</Button>
+                {isDataValidationPending ? <></> : <progress max={maxProgressValue} value={progressValue} />}
                 {isDataValidationPending ? <></> : <FeedbackArea tableHeader={['ID', 'Name', 'Ext']} tableData={validatedSites} messages={messages} timedMessages={timedMessages} errors={errors} />}
             </div>
         </>
