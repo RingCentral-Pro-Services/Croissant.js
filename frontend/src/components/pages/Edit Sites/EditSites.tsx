@@ -26,6 +26,7 @@ const EditSites = () => {
     const [selectedSheet, setSelectedSheet] = useState('')
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
+    const [isSyncing, setIsSyncing] = useState(false)
     const defaultSheet = 'Sites'
 
     useLogin()
@@ -91,9 +92,15 @@ const EditSites = () => {
     }
 
     const handleSyncButtonClick = () => {
+        setIsSyncing(true)
         fireEvent('edit-sites')
         updateSites(validatedSites)
     }
+
+    useEffect(() => {
+        if (isSiteUpdatePending) return
+        setIsSyncing(false)
+    }, [isSiteUpdatePending])
 
     return (
         <>
@@ -103,7 +110,7 @@ const EditSites = () => {
                 <UIDInputField disabledText={companyName} disabled={hasCustomerToken} setTargetUID={setTargetUID} />
                 <Button disabled={isExtensionListPending} variant='contained' onClick={handleDownloadButtonClick}>Download</Button>
                 <FileSelect enabled={!isExtensionListPending} handleSubmit={handleFileSubmit} setSelectedFile={setSelectedFile} isPending={false} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
-                <Button variant='contained' disabled={isDataValidationPending} onClick={handleSyncButtonClick}>Sync</Button>
+                <Button variant='contained' disabled={isDataValidationPending || isSyncing} onClick={handleSyncButtonClick}>Sync</Button>
                 {isDataValidationPending ? <></> : <progress max={maxProgressValue} value={progressValue} />}
                 {isDataValidationPending ? <></> : <FeedbackArea tableHeader={['ID', 'Name', 'Ext']} tableData={validatedSites} messages={messages} timedMessages={timedMessages} errors={errors} />}
             </div>
