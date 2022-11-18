@@ -7,7 +7,8 @@ const DataTable = (props: {header: string[], data: DataTableFormattable[]}) => {
     const {header, data} = props
 
     return (
-        <Table stickyHeader>
+        <div className="data-table">
+            <Table stickyHeader>
             <TableHead>
                 <TableRow>
                     {header.map((column) => (
@@ -21,6 +22,7 @@ const DataTable = (props: {header: string[], data: DataTableFormattable[]}) => {
                 ))}
             </TableBody>
         </Table>
+        </div>
     )
 }
 
