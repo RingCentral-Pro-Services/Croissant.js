@@ -4,6 +4,7 @@ import RCExtension from "../models/RCExtension"
 import ExtensionContact from "../models/ExtensionContact"
 import { Message } from "../models/Message"
 import { SyncError } from "../models/SyncError"
+import ExtensionIsolator from "../helpers/ExtensionIsolator"
 
 const useExcelToQueues = (postMessage: (message: Message) => void, postError: (error: SyncError) => void) => {
     const [queues, setQueues] = useState<CallQueue[]>([])
@@ -22,6 +23,7 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
             let extension = new RCExtension(idForQueue(currentItem['Extension'], extensionsList), currentItem['Extension'], currentItem['Queue Name'], contact, currentItem['Site'], 'Department', '', false, '')
             let memberString: string = currentItem['Members (Ext)']
             let membersExtensions = memberString.split(',')
+            membersExtensions = isolateExtensions(membersExtensions)
             let members: string[] = []
             let removedExtensions: string[] = []
 
@@ -34,6 +36,7 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
             membersExtensions = membersExtensions.filter((extension) => {
                 return isValidQueueMember(extension.trim(), extensionsList)
             })
+
 
             for (let memberIndex = 0; memberIndex < membersExtensions.length; memberIndex++) {
                 members.push(`${idForExtension(membersExtensions[memberIndex].trim(), extensionsList)}`)
@@ -89,6 +92,20 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
             }
         }
         return false
+    }
+
+    const isolateExtensions = (rawMembers: string[]) => {
+        const isolator = new ExtensionIsolator()
+        const result: string[] = []
+        for (let index = 0; index < rawMembers.length; index++) {
+            let member = isolator.isolateExtension(rawMembers[index])
+            if (member) {
+                result.push(member)
+            }
+        }
+        console.log('Isolated Members')
+        console.log(result)
+        return result
     }
 
     return {convert, queues, isQueueConvertPending}
