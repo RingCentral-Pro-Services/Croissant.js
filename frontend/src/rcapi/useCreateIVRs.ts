@@ -18,6 +18,7 @@ const useCreateIVRs = (setProgressValue: (value: (any)) => void, postMessage: (m
     let [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
     const [shouldCreateMenus, setShoudCreateMenus] = useState(false)
     const [shouldUpdateMenus, setShouldUpdateMenus] = useState(false)
+    const [isSyncing, setIsSyncing] = useState(false)
     const accessToken = localStorage.getItem('cs_access_token')
     const url = 'https://platform.ringcentral.com/restapi/v1.0/account/~/ivr-menus'
     const [exts, setExtensionList] = useState<RCExtension[]>([])
@@ -28,6 +29,7 @@ const useCreateIVRs = (setProgressValue: (value: (any)) => void, postMessage: (m
         setShouldUpdateMenus(false)
         setMenus(menus)
         setExtensionList(extensionList)
+        setIsSyncing(true)
     }
 
     // Create menus
@@ -95,6 +97,7 @@ const useCreateIVRs = (setProgressValue: (value: (any)) => void, postMessage: (m
                     setShoudCreateMenus(false)
                     setCurrentExtensionIndex(0)
                     setProgressValue(workingMenus.length * 2)
+                    setIsSyncing(false)
                     console.log('Done')
                 }
             })
@@ -256,7 +259,7 @@ const useCreateIVRs = (setProgressValue: (value: (any)) => void, postMessage: (m
         return false
     }
 
-    return {createMenus}
+    return {createMenus, isSyncing}
 }
 
 export default useCreateIVRs

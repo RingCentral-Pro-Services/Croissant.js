@@ -53,7 +53,7 @@ const DirectCreateMenus = () => {
     // Progress bar
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
-    const {createMenus} = useCreateIVRs(setProgressValue, postMessage, postTimedMessage, postError)
+    const {createMenus, isSyncing} = useCreateIVRs(setProgressValue, postMessage, postTimedMessage, postError)
 
     const handleFileSelect = () => {
         if (!selectedFile) return
@@ -148,7 +148,7 @@ const DirectCreateMenus = () => {
             <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} />
             <FileSelect enabled={hasCustomerToken} accept=".xlsx, .csv" handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={isPending} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
             {isDisplayingFilterBox ? <AdaptiveFilter title='Pages' placeholder='Search...' setSelected={setSelectedSites} options={pages.map((page) => page.label)} defaultSelected={pages.map((page) => page.label)} /> : <></>}
-            {!isReadyToSync ? <></> : <Button variant="contained" className="inline" onClick={handleSyncButtonClick}>Sync</Button>}
+            {!isReadyToSync ? <></> : <Button disabled={isSyncing} variant="contained" className="inline" onClick={handleSyncButtonClick}>Sync</Button>}
             {!(menus.length > 0) ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
             {timedMessages.map((timedMessage) => (
                 <p>{timedMessage.body}</p>
