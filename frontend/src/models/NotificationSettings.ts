@@ -12,11 +12,13 @@ class NotificationSettings implements CSVFormattable, ExcelFormattable, DataTabl
     }
 
     toExcelRow(): string[] {
-        return [`${this.extension.id}`, this.extension.name, `${this.extension.extensionNumber}`, this.extension.prettyType[this.extension.type] ?? this.extension.type, `${this.data.emailAddresses ?? ''}`]
+        return [`${this.extension.id}`, this.extension.name, `${this.extension.extensionNumber}`, this.extension.prettyType[this.extension.type] ?? this.extension.type,
+                `${this.data.emailAddresses ?? ''}`, `${this.data.advancedMode}`, `${this.data.voicemails.advancedEmailAddresses ?? ''}`, `${this.data.inboundFaxes.advancedEmailAddresses ?? ''}`,
+                `${this.data.outboundFaxes.advancedEmailAddresses ?? ''}`, `${this.data.inboundTexts.advancedEmailAddresses ?? ''}`, `${this.data.missedCalls.advancedEmailAddresses ?? ''}`]
     }
 
     toDataTableRow(): string[] {
-        return [`${this.extension.id}`, this.extension.name, `${this.extension.extensionNumber}`, this.extension.prettyType[this.extension.type] ?? this.extension.type, `${this.data.emailAddresses ?? ''}`]
+        return this.toExcelRow()
     }
 }
 
