@@ -67,9 +67,10 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
                 let response = await RestCentral.post(extensionURL, headers, body)
                 console.log(response)
 
-                queues[currentExtensionIndex].extension.id = response.data.id
                 if (response.rateLimitInterval > 0) postTimedMessage(new Message(`Rate limit reached. Resuming in 60 seconds`, 'info'), 60000)
                 setRateLimitInterval(response.rateLimitInterval)
+
+                queues[currentExtensionIndex].extension.id = response.data.id
                 createNext()
             }
             catch (e: any) {
@@ -105,10 +106,11 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
                 }
                 const body = {addedExtensionIds: queues[currentExtensionIndex].members}
                 let response = await RestCentral.post(queueURL, headers, body)
-                console.log(response)
 
                 if (response.rateLimitInterval > 0) postTimedMessage(new Message(`Rate limit reached 😩. Resuming in 60 seconds`, 'info'), 60000)
                 setRateLimitInterval(response.rateLimitInterval)
+
+                console.log(response)
                 updateNext()
             }
             catch (e: any) {
