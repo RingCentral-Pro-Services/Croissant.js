@@ -7,7 +7,6 @@ import CreateMenus from './components/pages/IVR/CreateMenus';
 import ExtensionAudit from './components/pages/Account Dump/ExtensionAudit';
 import ExtensionDeleter from './components/pages/Delete Extensions/ExtensionDeleter';
 import NotificationAudit from './components/pages/Notifications/NotificationAudit';
-import PromptGeneration from './components/pages/Generate Prompts/PromptGeneration';
 import Sidebar from './components/shared/Sidebar';
 import Token from './components/shared/Token';
 import EditSites from './components/pages/Edit Sites/EditSites';
@@ -31,7 +30,7 @@ function App() {
             <Route path='/notificationsaudit' element={<NotificationAudit />} />
             <Route path='/callqueues' element={<CallQueues />} />
             <Route path='/deleteextensions' element={<ExtensionDeleter />} />
-            <Route path='/generateprompts' element={<PromptGeneration />} />
+            {/* <Route path='/generateprompts' element={<PromptGeneration />} /> */}
             <Route path='/editsites' element={<EditSites />} />
           </Routes>
         </div>
