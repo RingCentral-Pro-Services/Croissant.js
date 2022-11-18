@@ -20,6 +20,11 @@ const useReadLucidchart = (postMessage: (message: Message) => void) => {
     const [audioPromptList, setAudioPromptList] = useState<AudioPrompt[]>([])
     const [pages, setPages] = useState<LucidchartFilterPage[]>([])
 
+    const menuShapes = ['IVR', 'IVR Menu', 'Predefined Process']
+    const externalTransferShapes = ['External Transfer', 'External Transfer/CCRN', 'Paper Tape']
+    const messageOnlyShapes = ['Message Only Extension', 'Message Only', 'Message-Only', 'Data']
+    const dialByNameShapes = ['Dial-by-Name', 'Dial by Name DIR', 'Dial-by-Name Directory', 'Merge']
+
     useEffect(() => {
         addKeyPresses()
     }, [shouldAddKeyPresses])
@@ -58,7 +63,7 @@ const useReadLucidchart = (postMessage: (message: Message) => void) => {
         let newMenus: IVRMenu[] = []
         
         for (let index = 0; index < csvData.length; index++) {
-            if (csvData[index]["Name"] === "IVR") {
+            if (menuShapes.includes(csvData[index]["Name"])) {
                 let shapeText = csvData[index]["Text Area 1"]
 
                 let extensionNumber = isolator.isolateExtension(shapeText.toString()) ?? ""
@@ -110,7 +115,7 @@ const useReadLucidchart = (postMessage: (message: Message) => void) => {
                         let destinationType = getExtensionTypeForID(lineDestinationID)
                         let extensionNumber = getExtensionNumberForID(lineDestinationID)
 
-                        if (destinationType === "External Transfer") {
+                        if (externalTransferShapes.includes(destinationType)) {
                             // Create an external transfer action and add it to the menu
                             let externalNumber = getExternalNumberForID(lineDestinationID)
                             let action: IVRAction = {
@@ -120,7 +125,7 @@ const useReadLucidchart = (postMessage: (message: Message) => void) => {
                             }
                             newMenus[menuIndex].data.actions.push(action)
                         }
-                        else if (destinationType === "Dial-by-Name") {
+                        else if (dialByNameShapes.includes(destinationType)) {
                             // Create a dial-by-name action and add it to the menu
                             let action: IVRAction = {
                                 input: key,
@@ -128,7 +133,7 @@ const useReadLucidchart = (postMessage: (message: Message) => void) => {
                             }
                             newMenus[menuIndex].data.actions.push(action)
                         }
-                        else if (destinationType === "Message Only Extension") {
+                        else if (messageOnlyShapes.includes(destinationType)) {
                             let action: IVRAction = {
                                 input: key,
                                 action: 'Voicemail',
