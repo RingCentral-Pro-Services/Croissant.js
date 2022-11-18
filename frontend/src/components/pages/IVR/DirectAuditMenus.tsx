@@ -12,16 +12,19 @@ import useWriteExcelFile from "../../../hooks/useWriteExcelFile";
 import useBeautifyIVRs from "../../../rcapi/useBeautifyIVRs";
 import useGetAudioPrompts from "../../../rcapi/useGetAudioPrompts";
 import useAnalytics from "../../../hooks/useAnalytics";
+import MessagesArea from "../../shared/MessagesArea";
 
 const DirectAuditMenus = () => {
     const {fireEvent} = useAnalytics()
+    const [progressValue, setProgressValue] = useState(0)
+    const [maxProgressValue, setMaxProgressValue] = useState(0)
     const [targetUID, setTargetUID] = useState('')
     const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
-    const {postMessage, messages, errors} = useMessageQueue()
+    const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const {fetchExtensions, extensionsList, isExtensionListPending} = useExtensionList(postMessage)
     const {fetchAudioPrompts, audioPromptList, isAudioPromptListPending} = useGetAudioPrompts(postMessage, postTimedMessage)
-    const {fetchIVRs, ivrsList, isIVRsListPending} = useFetchIVRs()
+    const {fetchIVRs, ivrsList, isIVRsListPending} = useFetchIVRs(setProgressValue, setMaxProgressValue, postMessage, postTimedMessage, postError)
     const {writeExcel} = useWriteExcelFile()
     const [isPending, setIsPending] = useState(false)
     const {prettyIVRs, isIVRBeautificationPending} = useBeautifyIVRs(isIVRsListPending, ivrsList, extensionsList, audioPromptList)
@@ -65,6 +68,8 @@ const DirectAuditMenus = () => {
             <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} />
             <Button className='healthy-margin-right' disabled={!hasCustomerToken || isPending} variant="contained" onClick={handleClick}>Go</Button>
             {isPending ? <CircularProgress className="vertical-middle" /> : <></>}
+            {isPending ? <progress className='healthy-margin-top' value={progressValue} max={maxProgressValue} /> : <></>}
+            {timedMessages.length > 0 ? <MessagesArea messages={timedMessages} /> : <></>}
             {isIVRBeautificationPending ? <></> : <FeedbackArea tableHeader={['Name', 'Ext', 'Site', 'Prompt Mode', 'Prompt', 'Key 1', 'Key 2', 'Key 3', 'Key 4', 'Key 5', 'Key 6', 'Key 7', 'Key 8', 'Key 9', 'Key 0']} tableData={prettyIVRs} messages={messages} timedMessages={timedMessages} errors={errors} />}
         </div>
     )

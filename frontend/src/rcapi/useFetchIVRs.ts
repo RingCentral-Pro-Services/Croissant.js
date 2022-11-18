@@ -3,8 +3,10 @@ import { IVRMenu, IVRMenuData } from "../models/IVRMenu"
 import RCExtension from "../models/RCExtension"
 import { RestCentral } from "./RestCentral"
 import { IVRPrompt } from "../models/IVRMenu"
+import { Message } from "../models/Message"
+import { SyncError } from "../models/SyncError"
 
-const useFetchIVRs = () => {
+const useFetchIVRs = (setProgressValue: (value: (any)) => void, setMaxProgressValue: (value: any) => void, postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
     const [isIVRsListPending, setIsIVRsListPending] = useState(true)
     const [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
     const [ivrsList, setIvrsList] = useState<IVRMenu[]>([])
@@ -18,6 +20,7 @@ const useFetchIVRs = () => {
         const ivrs = extensionList.filter((extension) => {
             return extension.type === 'IvrMenu'
         })
+        setMaxProgressValue(ivrs.length)
         setIvrExtensions(ivrs)
         setIsIVRsListPending(true)
         setCurrentExtensionIndex(0)
@@ -30,6 +33,7 @@ const useFetchIVRs = () => {
         if (currentExtensionIndex >= ivrExtensions.length) {
             console.log('Done fetching IVRs')
             console.log(ivrsList)
+            setProgressValue(ivrExtensions.length)
             setIsIVRsListPending(false)
             setShouldFetch(false)
             return
@@ -46,6 +50,10 @@ const useFetchIVRs = () => {
                 }
                 let response = await RestCentral.get(ivrURL, headers)
                 console.log(response)
+
+                if (response.rateLimitInterval > 0) postTimedMessage(new Message(`Rate limit reached. Resuming in 60 seconds`, 'info'), 60000)
+                setRateLimitInterval(response.rateLimitInterval)
+
                 const menuData: IVRMenuData = response.data
                 if (menuData.prompt === undefined) {
                     const prompt: IVRPrompt = {
@@ -62,9 +70,9 @@ const useFetchIVRs = () => {
                 }
                 const menu = new IVRMenu(menuData)
                 setIvrsList(prev => [...prev, menu])
-                // setRateLimitInterval(response.rateLimitInterval)
+                
                 if (currentExtensionIndex != ivrExtensions.length) {
-                    setRateLimitInterval(response.rateLimitInterval)
+                    increaseProgress()
                     setCurrentExtensionIndex(currentExtensionIndex + 1)
                 }
                 else {
@@ -81,6 +89,10 @@ const useFetchIVRs = () => {
             }
         }, rateLimitInterval)
     }, [currentExtensionIndex, rateLimitInterval, shouldFetch])
+
+    const increaseProgress = () => {
+        setProgressValue((prev: any) => prev + 1)
+    }
 
     return {ivrsList, isIVRsListPending, fetchIVRs}
 }
