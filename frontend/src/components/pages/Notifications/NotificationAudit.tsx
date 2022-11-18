@@ -105,7 +105,7 @@ const NotificationAudit = () => {
         if (!isPending) return
 
         console.log(notifications)
-        let header = ['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses']
+        let header = ['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses', 'Advanced Mode', 'Advanced Voicemail Emails', 'Advanced Inbound Fax Emails', 'Advanced Outbound Fax Emails', 'Advanced Outbound Fax Emails', 'Advanced Missed Calls Emails']
         writeExcel(header, notifications, 'notifications.xlsx')
         // setIsPending(false)
     }, [isNotificationListPending, notifications, isPending])
@@ -137,7 +137,7 @@ const NotificationAudit = () => {
                 {sites.length > 0 ? <AdaptiveFilter options={sites} defaultSelected={sites} title='Sites' placeholder='Search...' setSelected={setSelectedSites} /> : <></>}
             </div>
             {isPending ? <progress className='healthy-margin-top' id='sync_progress' value={progressValue} max={maxProgressValue} /> : <></>}
-            {isEmailSwapPending ? <></> : <FeedbackArea tableHeader={['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses']} tableData={adjustedNotifications} messages={messages} timedMessages={timedMessages} errors={errors} />}
+            {isEmailSwapPending ? <></> : <FeedbackArea tableHeader={['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses', 'Advanced Mode', 'Advanced Voicemail Emails', 'Advanced Inbound Fax Emails', 'Advanced Outbound Fax Emails', 'Advanced Outbound Fax Emails', 'Advanced Missed Calls Emails']} tableData={adjustedNotifications} messages={messages} timedMessages={timedMessages} errors={errors} />}
             </div>
         </>
     )
