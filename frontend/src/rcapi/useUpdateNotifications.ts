@@ -46,6 +46,8 @@ const useUpdateNotifications = (setProgressValue: (value: (any)) => void, postMe
             catch (error: any) {
                 console.log('Oh no! Something went wrong')
                 console.log(error)
+                if (error.rateLimitInterval > 0) postTimedMessage(new Message(`Rate limit reached. Resuming in 60 seconds`, 'info'), 60000)
+                setRateLimitInterval(error.rateLimitInterval)
                 postMessage(new Message(`Something went wrong updating notifications for ${notifications[currentExtensionIndex].extension.name} - Ext. ${notifications[currentExtensionIndex].extension.extensionNumber}. ${error.error}`, 'error'))
                 postError(new SyncError(notifications[currentExtensionIndex].extension.name, notifications[currentExtensionIndex].extension.extensionNumber, ['Failed to update notifications', ''], error.error))
             }
