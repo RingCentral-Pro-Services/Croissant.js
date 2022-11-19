@@ -111,6 +111,11 @@ export const notificationSchema = z.object({
         required_error: 'Missing email addresses',
         invalid_type_error: 'Email addresses type invalid'
     }),
+    'Advanced Voicemail Emails': z.string().optional(),
+    'Advanced Inbound Fax Emails': z.string().optional(),
+    'Advanced Outbound Fax Emails': z.string().optional(),
+    'Advanced Inbound Texts Emails': z.string().optional(),
+    'Advanced Missed Calls Emails': z.string().optional()
 })
 
 export const promptSchema = z.object({
