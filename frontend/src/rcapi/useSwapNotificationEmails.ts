@@ -30,7 +30,7 @@ const useSwapNotificationEmails = (notifications: NotificationSettings[], excelD
             for (let notification of validNotifications) {
                 if (notification.extension.id == targetID) {
                     notification.data.emailAddresses = newEmailAddresses
-                    if (isUsingAdvancedMode(data)) updateAdvancedEmails(notification, data)
+                    handleAdvancedMode(notification, data)
                     workingNotications.push(notification)
                 }
             }
@@ -38,6 +38,20 @@ const useSwapNotificationEmails = (notifications: NotificationSettings[], excelD
         setAdjustedNotifications(workingNotications)
         setIsEmailSwapPending(false)
     }, [isDataValidationPending])
+
+    const handleAdvancedMode = (notification: NotificationSettings, data: any) => {
+        if (isUsingAdvancedMode(data)) {
+            updateAdvancedEmails(notification, data)
+        }
+        else {
+            notification.data.advancedMode = false
+            notification.data.voicemails.advancedEmailAddresses = []
+            notification.data.inboundFaxes.advancedEmailAddresses = []
+            notification.data.outboundFaxes.advancedEmailAddresses = []
+            notification.data.inboundTexts.advancedEmailAddresses = []
+            notification.data.missedCalls.advancedEmailAddresses = []
+        }
+    }
 
     const isUsingAdvancedMode = (data: any) => {
         if ('Advanced Voicemail Emails' in data && data['Advanced Voicemail Emails'] != '') return true
@@ -58,7 +72,13 @@ const useSwapNotificationEmails = (notifications: NotificationSettings[], excelD
     }
 
     const updateAdvancedVoicemailEmails = (notification: NotificationSettings, data: any) => {
-        if (!('Advanced Voicemail Emails' in data)) return
+        if (!('Advanced Voicemail Emails' in data) || data['Advanced Voicemail Emails'] === '') {
+            notification.data.voicemails.notifyByEmail = false
+            notification.data.voicemails.markAsRead = false
+            notification.data.voicemails.includeAttachment = false
+            notification.data.voicemails.advancedEmailAddresses = []
+            return
+        }
 
         const emails = data['Advanced Voicemail Emails'].toString().split(',')
         if (emails.length === 0) return
@@ -67,7 +87,13 @@ const useSwapNotificationEmails = (notifications: NotificationSettings[], excelD
     }
 
     const updateAdvancedInboundFaxEmails = (notification: NotificationSettings, data: any) => {
-        if (!('Advanced Inbound Fax Emails' in data)) return
+        if (!('Advanced Inbound Fax Emails' in data) || data['Advanced Inbound Fax Emails'] === '') {
+            notification.data.inboundFaxes.notifyByEmail = false
+            notification.data.inboundFaxes.markAsRead = false
+            notification.data.inboundFaxes.includeAttachment = false
+            notification.data.inboundFaxes.advancedEmailAddresses = []
+            return
+        }
 
         const emails = data['Advanced Inbound Fax Emails'].toString().split(',')
         if (emails.length === 0) return
@@ -76,7 +102,11 @@ const useSwapNotificationEmails = (notifications: NotificationSettings[], excelD
     }
 
     const updateAdvancedOutboundFaxEmails = (notification: NotificationSettings, data: any) => {
-        if (!('Advanced Outbound Fax Emails' in data)) return
+        if (!('Advanced Outbound Fax Emails' in data) || data['Advanced Outbound Fax Emails'] === '') {
+            notification.data.outboundFaxes.notifyByEmail = false
+            notification.data.outboundFaxes.advancedEmailAddresses = []
+            return
+        }
 
         const emails = data['Advanced Outbound Fax Emails'].toString().split(',')
         if (emails.length === 0) return
@@ -85,7 +115,11 @@ const useSwapNotificationEmails = (notifications: NotificationSettings[], excelD
     }
 
     const updateAdvancedInboundTextEmails = (notification: NotificationSettings, data: any) => {
-        if (!('Advanced Inbound Texts Emails' in data)) return
+        if (!('Advanced Inbound Texts Emails' in data) || data['Advanced Inbound Texts Emails'] === '') {
+            notification.data.inboundTexts.notifyByEmail = false
+            notification.data.inboundTexts.advancedEmailAddresses = []
+            return
+        }
 
         const emails = data['Advanced Inbound Texts Emails'].toString().split(',')
         if (emails.length === 0) return
@@ -94,7 +128,11 @@ const useSwapNotificationEmails = (notifications: NotificationSettings[], excelD
     }
 
     const updateAdvancedMissedCallstEmails = (notification: NotificationSettings, data: any) => {
-        if (!('Advanced Missed Calls Emails' in data)) return
+        if (!('Advanced Missed Calls Emails' in data) || data['Advanced Missed Calls Emails'] === '') {
+            notification.data.missedCalls.notifyByEmail = false
+            notification.data.missedCalls.advancedEmailAddresses = []
+            return
+        }
 
         const emails = data['Advanced Missed Calls Emails'].toString().split(',')
         if (emails.length === 0) return
