@@ -52,6 +52,7 @@ const useFetchNotifications = (postMessage: (message: Message) => void, setProgr
                if (res.status === 200) {
                     // Do something with the response
                     console.log(res)
+                    setRateLimitInterval(rateLimit(res.headers))
                     let resData = res.data
                     let bundle: NotificationSettingsPayload = resData
                     let notification = new NotificationSettings(filteredExtensions[currentExtensionIndex], bundle)
@@ -59,8 +60,6 @@ const useFetchNotifications = (postMessage: (message: Message) => void, setProgr
                     setNotifications(newNotifications)
                     console.log(bundle)
 
-                    // Rate limiting
-                    setRateLimitInterval(rateLimit(res.headers))
                     fetchNext()
                }
                else {
