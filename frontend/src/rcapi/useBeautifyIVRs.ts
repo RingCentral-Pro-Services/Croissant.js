@@ -9,11 +9,9 @@ const useBeautifyIVRs = (isIVRsListPending: boolean, ivrsList: IVRMenu[], extens
 
     useEffect(() => {
         if (isIVRsListPending) return
-        console.log('IVRS: ')
-        console.log(ivrsList)
+
         let ivrs: IVRMenu[] = []
         for (const ivr of ivrsList) {
-            console.log(`Beautifying ${ivr.data.name}`)
             for (let action of ivr.data.actions) {
                 if (action.extension?.id) {
                     action.extension.id = `${extensionNumberForID(action.extension.id)}`
@@ -27,8 +25,6 @@ const useBeautifyIVRs = (isIVRsListPending: boolean, ivrsList: IVRMenu[], extens
             ivrs.push(ivr)
         }
 
-        console.log('Beautified menus')
-        console.log(ivrs)
         setPrettyIVRs(ivrs)
         setIsIVRBeautificationPending(false)
     }, [isIVRsListPending, extensionList, ivrsList])

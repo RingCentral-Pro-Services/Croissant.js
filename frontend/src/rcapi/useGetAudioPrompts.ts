@@ -33,17 +33,16 @@ const useGetAudioPrompts = (postMessage: (message: Message) => void, postTimedMe
                 }
                 let response = await RestCentral.get(pageURL, headers)
                 console.log(response)
+                setRateLimitInterval(response.rateLimitInterval)
 
                 let prompts: AudioPrompt[] = []
                 for (const record of response.data.records) {
                     const prompt = record
-                    console.log(`Filename: ${record.filename}`)
                     prompts.push(prompt)
                 }
                 setAudioPromptList(prev => [...prev, ...prompts])
 
                 if (response.data.navigation.nextPage) {
-                    setRateLimitInterval(response.rateLimitInterval)
                     setPage(page + 1)
                 }
                 else {
@@ -53,9 +52,10 @@ const useGetAudioPrompts = (postMessage: (message: Message) => void, postTimedMe
                     setPage(1)
                 }
             }
-            catch (e) {
+            catch (e: any) {
                 console.log('Failed to fetch audio prompts')
                 postMessage(new Message('Failed to fetch audio prompts', 'error'))
+                setRateLimitInterval(e.rateLimitInterval)
             }
         }, rateLimitInterval, page)
     })
