@@ -11,15 +11,19 @@ import Header from "../../shared/Header"
 import {TextField, Button, CircularProgress} from '@mui/material'
 import useAnalytics from "../../../hooks/useAnalytics"
 import UIDInputField from "../../shared/UIDInputField"
+import useGetCallQueueSettings from "../../../rcapi/useGetCallQueueSettings"
+import usePostTimedMessage from "../../../hooks/usePostTimedMessage"
 
 const CallQueues = () => {
     useLogin()
     const {fireEvent} = useAnalytics()
     let [targetUID, setTargetUID] = useState("")
     const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
-    let {messages, postMessage} = useMessageQueue()
+    let {messages, postMessage, postError} = useMessageQueue()
+    const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     let {callQueues, isQueueListPending, fetchQueueMembers} = useFetchCallQueueMembers()
+    const {fetchCallQueueSettings, queues: adjsutedQueues, isCallQueueSettingsPending} = useGetCallQueueSettings(postMessage, postTimedMessage, postError)
     let {writeExcel} = useWriteExcelFile()
     const [isPending, setisPending] = useState(false)
 
@@ -44,10 +48,15 @@ const CallQueues = () => {
     useEffect(() => {
         if (isQueueListPending) return
 
-        const header = ['Queue Name', 'Extension', 'Site', 'Status', 'Members (Ext)']
-        writeExcel(header, callQueues, 'queues.xlsx')
-        setisPending(false)
+        fetchCallQueueSettings(callQueues, extensionsList)
     }, [isQueueListPending, callQueues])
+
+    useEffect(() => {
+        if (isCallQueueSettingsPending) return
+        const header = ['Queue Name', 'Extension', 'Site', 'Status', 'Members (Ext)', 'Greeting', 'Audio While Connecting', 'Hold Music', 'Voicemail', 'Interrupt Audio', 'Interrupt Prompt', 'Ring type', 'Total Ring Time', 'User Ring Time' , 'Max Wait Time Action', 'No Answer Action', 'Wrap Up Time']
+        writeExcel(header, adjsutedQueues, 'queues.xlsx')
+        setisPending(false)
+    }, [isCallQueueSettingsPending])
 
     return (
         <>
