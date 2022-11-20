@@ -9,12 +9,14 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
     const [queues, setQueues] = useState<CallQueue[]>([])
     let [shouldFetch, setShouldFetch] = useState(false)
     let [shouldUpdateQueues, setShouldUpdateQueues] = useState(false)
+    const [shouldUpdateCallHandling, setShouldUpdateCallHandling] = useState(false)
     let [rateLimitInterval, setRateLimitInterval] = useState(0)
     let [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
     let [isCallQueueCreationPending, setIsPending] = useState(true)
     const accessToken = localStorage.getItem('cs_access_token')
     const url = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension'
     const baseUpdateURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId/bulk-assign'
+    const baseCallHandlingURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/answering-rule/business-hours-rule'
     const [extensionList, setExtensionList] = useState<RCExtension[]>([])
 
     const createQueues = (callQueues: CallQueue[], extensions: RCExtension[]) => {
@@ -89,7 +91,11 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
     // Add queue members
     useEffect(() => {
         if (!shouldUpdateQueues) return
-        if (currentExtensionIndex === queues.length) return
+        if (currentExtensionIndex >= queues.length) {
+            setShouldUpdateQueues(false)
+            setCurrentExtensionIndex(0)
+            setShouldUpdateCallHandling(true)
+        }
 
         let targetUID = localStorage.getItem('target_uid')
         if (!targetUID) return
@@ -126,6 +132,41 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
 
     }, [shouldUpdateQueues, accessToken, currentExtensionIndex, queues, rateLimitInterval])
 
+    // Update Call Handling Settings
+    useEffect(() => {
+        if (!shouldUpdateCallHandling) return
+        if (currentExtensionIndex >= queues.length) {
+            setShouldUpdateCallHandling(false)
+            console.log('Done updating queue call handling')
+            return
+        }
+
+        const headers = {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`
+        }
+
+        setTimeout(async () => {
+            try {
+                console.log('Updating call handling')
+                const body = {
+                    queue: queues[currentExtensionIndex].handlingRules
+                }
+                let url = baseCallHandlingURL.replace('extensionId', `${queues[currentExtensionIndex].extension.id}`)
+                let response = await RestCentral.put(url, headers, body)
+                updateCallHandlingNext()
+            }
+            catch(error: any) {
+                console.log(`Someting went wrong uppdating call handling for ${queues[currentExtensionIndex].extension.name}`)
+                postError(new SyncError(queues[currentExtensionIndex].extension.name, queues[currentExtensionIndex].extension.extensionNumber, ['Call handling failed', '']))
+                postMessage(new Message(`Failed to update call handling for ${queues[currentExtensionIndex].extension.name} - ${queues[currentExtensionIndex].extension.extensionNumber}. ${error.error}`, 'error'))
+                updateCallHandlingNext()
+            }
+        }, rateLimitInterval)
+
+    }, [shouldUpdateCallHandling, queues, rateLimitInterval, currentExtensionIndex])
+
     const extensionExists = (extensionNumber: number, extensionList: RCExtension[]) => {
         for (let index = 0; index < extensionList.length; index++) {
             if (extensionList[index].extensionNumber == extensionNumber) return true
@@ -157,13 +198,27 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
             setCurrentExtensionIndex(currentExtensionIndex + 1)
         }
         else {
-            setIsPending(false)
             setShouldFetch(false)
             setShouldUpdateQueues(false)
             setRateLimitInterval(0)
             setCurrentExtensionIndex(0)
             setProgressValue(queues.length * 2)
+            setShouldUpdateCallHandling(true)
             console.log('Finished updating queues')
+        }
+    }
+
+    const updateCallHandlingNext = () => {
+        if (currentExtensionIndex != queues.length -1) {
+            increaseProgress()
+            setCurrentExtensionIndex(currentExtensionIndex + 1)
+        }
+        else {
+            setIsPending(false)
+            setShouldUpdateCallHandling(false)
+            setRateLimitInterval(0)
+            setProgressValue(queues.length * 3)
+            console.log('Finished updateing call handling')
         }
     }
 
