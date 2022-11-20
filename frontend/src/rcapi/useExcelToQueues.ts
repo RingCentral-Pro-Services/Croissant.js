@@ -148,7 +148,7 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
             audioWhileConnecting.preset = Presets.presetForSelection(data[CallQueueKeys.audioWhileConnecting].toString())
         }
         if (CallQueueKeys.holdMusic in data) {
-            holdMusic.preset = Presets.presetForSelection(data[CallQueueKeys.holdMusic].toString)
+            holdMusic.preset = Presets.presetForSelection(data[CallQueueKeys.holdMusic].toString())
         }
 
         return [voicemailGreeting, audioWhileConnecting, holdMusic, greeting, interruptAudio]
