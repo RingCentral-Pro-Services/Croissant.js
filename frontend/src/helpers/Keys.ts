@@ -1,4 +1,4 @@
-const CallQueueKeys = {
+export const CallQueueKeys = {
     'queueName': 'Queue Name',
     'extension': 'Extension',
     'email': 'Email',
