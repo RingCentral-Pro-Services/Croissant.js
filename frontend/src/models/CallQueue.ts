@@ -14,7 +14,7 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
 
     toExcelRow(): string[] {
         // Header: ['Queue Name', 'Extension', 'Site', 'Status', 'Members (Ext)', 'Greeting', 'Audio While Connecting', 'Hold Music', 'Voicemail', 'Interrupt Audio', 'Interrupt Prompt', 'Ring type', 'Total Ring Time', 'User Ring Time' , 'Max Wait Time Action', 'No Answer Action', 'Wrap Up Time']
-        return [this.extension.name, `${this.extension.extensionNumber}`, this.extension.site, this.extension.status, `${this.members}`, this.greeting('Introductory'), this.greeting('ConnectingAudio'), this.greeting('HoldMusic'), this.greeting('Voicemail') , `${this.handlingRules?.holdAudioInterruptionPeriod ?? 'Disabled'}`, this.handlingRules?.holdAudioInterruptionPeriod ? this.greeting('InterruptPrompt') : '' , this.handlingRules?.transferMode ?? '', `${this.handlingRules?.holdTime}`, `${this.handlingRules?.agentTimeout ?? ''}` , this.handlingRules?.holdTimeExpirationAction ?? '' , this.handlingRules?.noAnswerAction ?? '', `${this.handlingRules?.wrapUpTime ?? ''}`]
+        return [this.extension.name, `${this.extension.extensionNumber}`, this.extension.site, this.extension.status, `${this.members}`, this.prettyGreeting(this.greeting('Introductory')), this.prettyGreeting(this.greeting('ConnectingAudio')), this.prettyGreeting(this.greeting('HoldMusic')), this.prettyGreeting(this.greeting('Voicemail')), this.prettyInterruptPeriod(this.handlingRules?.holdAudioInterruptionMode ?? '', this.handlingRules?.holdAudioInterruptionPeriod ?? 0), this.handlingRules?.holdAudioInterruptionPeriod ? this.greeting('InterruptPrompt') : '' , this.prettyRingType(this.handlingRules?.transferMode ?? ''), this.prettyTime(this.handlingRules?.holdTime ?? 0), this.prettyTime(this.handlingRules?.agentTimeout ?? 0) , this.handlingRules?.holdTimeExpirationAction ?? '' , this.handlingRules?.noAnswerAction ?? '', this.prettyTime(this.handlingRules?.wrapUpTime ?? 0)]
     }
 
     toDataTableRow(): string[] {
@@ -28,6 +28,47 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
             }
         }
         return ''
+    }
+
+    prettyRingType(rawType: string) {
+        if (rawType === 'FixedOrder') {
+            return 'Sequential'
+        }
+        return rawType
+    }
+
+    prettyInterruptPeriod(interruptMode: string, interruptPeriod: number) {
+        console.log(`Interrupt Mode: ${interruptMode}`)
+        console.log(`Interrupt Perdiod: ${interruptPeriod}`)
+
+        if (interruptMode === 'Never') return 'Never'
+        else if (interruptMode === 'Periodically') {
+            return this.prettyTime(interruptPeriod)
+        }
+        else {
+            return 'Only when music ends'
+        }
+    }
+
+    prettyTime(time: number) {
+        let result = ''
+
+        if (time >= 60) {
+            result = `${time / 60} min`
+        }
+        else {
+            result = `${time} secs`
+        }
+
+        return result
+    }
+
+    prettyGreeting(value: string) {
+        if (value === 'Default' || value === 'Ring Tones') return value
+        else if (value === 'None') return 'Off'
+        else {
+            return `Music (${value})`
+        }
     }
 }
 

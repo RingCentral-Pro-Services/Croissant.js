@@ -101,7 +101,7 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
             if (value.toLowerCase() === 'never') {
                 settings.holdAudioInterruptionMode = 'Never'
             }
-            else if (value.toLowerCase() === 'Only when music ends') {
+            else if (value.toLowerCase() === 'only when music ends') {
                 settings.holdAudioInterruptionMode = 'WhenMusicEnds'
             }
             else {
@@ -156,6 +156,7 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
     }
 
     const translatedRingType = (text: string) => {
+        console.log(`Raw ring type: ${text}`)
         if (text === 'Sequential') return 'FixedOrder'
         return text
     }

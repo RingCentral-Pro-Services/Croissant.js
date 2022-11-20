@@ -276,6 +276,7 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
             setIsPending(false)
             setShouldUpdateGreetings(false)
             setRateLimitInterval(0)
+            setProgressValue(queues.length * 4)
             console.log('Finished updating call queue greetings')
         }
     }

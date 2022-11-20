@@ -88,10 +88,7 @@ export const callQueueSchema = z.object({
         required_error: 'Missing extension number',
         invalid_type_error: 'Extension number data type invalid'
     }).or(z.number()),
-    'Email': z.string({
-        required_error: 'Missing email',
-        invalid_type_error: 'Email data type invalid'
-    }),
+    'Email': z.string().optional(),
     'Site': z.string({
         required_error: 'Missing site',
         invalid_type_error: 'Site data type invalid'

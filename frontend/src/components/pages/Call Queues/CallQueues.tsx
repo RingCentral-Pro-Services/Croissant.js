@@ -53,7 +53,9 @@ const CallQueues = () => {
 
     useEffect(() => {
         if (isCallQueueSettingsPending) return
-        const header = ['Queue Name', 'Extension', 'Site', 'Status', 'Members (Ext)', 'Greeting', 'Audio While Connecting', 'Hold Music', 'Voicemail', 'Interrupt Audio', 'Interrupt Prompt', 'Ring type', 'Total Ring Time', 'User Ring Time' , 'Max Wait Time Action', 'No Answer Action', 'Wrap Up Time']
+        console.log('Queues')
+        console.log(adjsutedQueues)
+        const header = ['Queue Name', 'Extension', 'Site', 'Status', 'Members (Ext)', 'Greeting', 'Audio While Connecting', 'Hold Music', 'Voicemail', 'Interrupt Audio', 'Interrupt Prompt', 'Ring Type', 'Total Ring Time', 'User Ring Time' , 'Max Wait Time Action', 'No Answer Action', 'Wrap Up Time']
         writeExcel(header, adjsutedQueues, 'queues.xlsx')
         setisPending(false)
     }, [isCallQueueSettingsPending])
