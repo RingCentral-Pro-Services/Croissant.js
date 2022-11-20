@@ -10,6 +10,7 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
     let [shouldFetch, setShouldFetch] = useState(false)
     let [shouldUpdateQueues, setShouldUpdateQueues] = useState(false)
     const [shouldUpdateCallHandling, setShouldUpdateCallHandling] = useState(false)
+    const [shouldUpdateGreetings, setShouldUpdateGreetings] = useState(false)
     let [rateLimitInterval, setRateLimitInterval] = useState(0)
     let [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
     let [isCallQueueCreationPending, setIsPending] = useState(true)
@@ -155,6 +156,10 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
                 }
                 let url = baseCallHandlingURL.replace('extensionId', `${queues[currentExtensionIndex].extension.id}`)
                 let response = await RestCentral.put(url, headers, body)
+
+                if (response.rateLimitInterval > 0) postTimedMessage(new Message(`Rate limit reached 😩. Resuming in 60 seconds`, 'info'), 60000)
+                setRateLimitInterval(response.rateLimitInterval)
+
                 updateCallHandlingNext()
             }
             catch(error: any) {
@@ -166,6 +171,46 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
         }, rateLimitInterval)
 
     }, [shouldUpdateCallHandling, queues, rateLimitInterval, currentExtensionIndex])
+
+    // Update Call Queue greetings
+    useEffect(() => {
+        if (!shouldUpdateGreetings) return
+        if (currentExtensionIndex >= queues.length) {
+            setShouldUpdateGreetings(false)
+            setIsPending(false)
+            return
+        }
+
+        const headers = {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`
+        }
+
+        setTimeout(async () => {
+            console.log('Updating greetings')
+            try {
+                let url = baseCallHandlingURL.replace('extensionId', `${queues[currentExtensionIndex].extension.id}`)
+                let body = {
+                    greetings: queues[currentExtensionIndex].greetings
+                }
+
+                let response = await RestCentral.put(url, headers, body)
+
+                if (response.rateLimitInterval > 0) postTimedMessage(new Message(`Rate limit reached 😩. Resuming in 60 seconds`, 'info'), 60000)
+                setRateLimitInterval(response.rateLimitInterval)
+
+                updateGreetingNext()
+            }
+            catch(error: any) {
+                console.log(`Someting went wrong uppdating call greetings for ${queues[currentExtensionIndex].extension.name}`)
+                postError(new SyncError(queues[currentExtensionIndex].extension.name, queues[currentExtensionIndex].extension.extensionNumber, ['Greetings failed', '']))
+                postMessage(new Message(`Failed to update greetings for ${queues[currentExtensionIndex].extension.name} - ${queues[currentExtensionIndex].extension.extensionNumber}. ${error.error}`, 'error'))
+                updateGreetingNext()
+            }
+        }, rateLimitInterval)
+
+    }, [currentExtensionIndex, shouldUpdateGreetings, queues, rateLimitInterval])
 
     const extensionExists = (extensionNumber: number, extensionList: RCExtension[]) => {
         for (let index = 0; index < extensionList.length; index++) {
@@ -202,7 +247,6 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
             setShouldUpdateQueues(false)
             setRateLimitInterval(0)
             setCurrentExtensionIndex(0)
-            setProgressValue(queues.length * 2)
             setShouldUpdateCallHandling(true)
             console.log('Finished updating queues')
         }
@@ -216,9 +260,23 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
         else {
             setIsPending(false)
             setShouldUpdateCallHandling(false)
+            setCurrentExtensionIndex(0)
             setRateLimitInterval(0)
-            setProgressValue(queues.length * 3)
+            setShouldUpdateGreetings(true)
             console.log('Finished updateing call handling')
+        }
+    }
+
+    const updateGreetingNext = () => {
+        if (currentExtensionIndex != queues.length -1) {
+            increaseProgress()
+            setCurrentExtensionIndex(currentExtensionIndex + 1)
+        }
+        else {
+            setIsPending(false)
+            setShouldUpdateGreetings(false)
+            setRateLimitInterval(0)
+            console.log('Finished updating call queue greetings')
         }
     }
 
