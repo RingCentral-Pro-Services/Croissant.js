@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import RCExtension from "../models/RCExtension";
 import CallQueue from "../models/CallQueue";
 import rateLimit from "../helpers/rateLimit";
+import { Message } from "../models/Message";
 const axios = require('axios').default;
 
-const useFetchCallQueueMembers = () => {
+const useFetchCallQueueMembers = (setProgressValue: (value: (any)) => void, setMaxProgressValue: (value: (any)) => void, postTimedMessage: (message: Message, duration: number) => void) => {
     let [callQueues, setCallQueues] = useState<CallQueue[]>([])
     const accessToken = localStorage.getItem('cs_access_token')
     let [shouldFetch, setShouldFetch] = useState(false)
@@ -24,6 +25,7 @@ const useFetchCallQueueMembers = () => {
             return
         }
 
+        setMaxProgressValue(filtered.length * 2)
         setCallQueues([])
         setIsQueueListPending(true)
         setFilteredExtensions(filtered)
@@ -53,6 +55,9 @@ const useFetchCallQueueMembers = () => {
                 if (res.status === 200) {
                     // process response
                     console.log(res)
+                    if (rateLimit(res.headers) > 0) postTimedMessage(new Message(`Rate limit reached. Resuming in 60 seconds`, 'info'), 60000)
+                    setRateLimitInterval(rateLimit(res.headers))
+
                     let records = res.data.records
                     let extensions: string[] = []
 
@@ -64,9 +69,9 @@ const useFetchCallQueueMembers = () => {
                     let newCallQueues = [...callQueues, queue]
                     setCallQueues(newCallQueues)
 
-                    setRateLimitInterval(rateLimit(res.headers))
                     if (currentExtensionIndex !== filteredExtensions.length - 1) {
                         setCurrentExtensionIndex(currentExtensionIndex + 1)
+                        setProgressValue(currentExtensionIndex + 1)
                     }
                     else {
                         setIsQueueListPending(false)
@@ -82,9 +87,10 @@ const useFetchCallQueueMembers = () => {
                     setShouldFetch(false)
                 }
             })
-            .catch((error: Error) => {
-                console.log('An error occurred', error)
-                setShouldFetch(false)
+            .catch((error: any) => {
+                if (rateLimit(error.headers) > 0) postTimedMessage(new Message(`Rate limit reached. Resuming in 60 seconds`, 'info'), 60000)
+                setRateLimitInterval(rateLimit(error.headers))
+                setCurrentExtensionIndex(currentExtensionIndex + 1)
             })
         }, rateLimitInterval)
 

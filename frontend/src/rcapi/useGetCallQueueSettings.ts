@@ -7,7 +7,7 @@ import RCExtension from "../models/RCExtension"
 import { SyncError } from "../models/SyncError"
 import { RestCentral } from "./RestCentral"
 
-const useGetCallQueueSettings = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
+const useGetCallQueueSettings = (setProgressValue: (value: (any)) => void, postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
     const [queues, setQueues] = useState<CallQueue[]>([])
     const [isCallQueueSettingsPending, setIsPending] = useState(true)
     const [shouldFetch, setShouldFetch] = useState(false)
@@ -63,6 +63,7 @@ const useGetCallQueueSettings = (postMessage: (message: Message) => void, postTi
                     queues[currentExtensionIndex].greetings = greetings
                 }
                 setCurrentExtensionIndex(currentExtensionIndex + 1)
+                setProgressValue(queues.length + currentExtensionIndex)
             }
             catch(error: any) {
                 console.log(`Oh no! Something went wrong fetching settings for ${queues[currentExtensionIndex].extension.name} - Ext. ${queues[currentExtensionIndex].extension.extensionNumber}`)
@@ -70,6 +71,7 @@ const useGetCallQueueSettings = (postMessage: (message: Message) => void, postTi
                 if (error.rateLimitInterval > 0) postTimedMessage(new Message(`Rate limit reached. Resuming in 60 seconds`, 'info'), 60000)
                 setRateLimitInterval(error.rateLimitInterval)
                 postError(new SyncError(queues[currentExtensionIndex].extension.name, queues[currentExtensionIndex].extension.extensionNumber, ['Failed to get settings', '']))
+                setProgressValue(queues.length + currentExtensionIndex)
             }
         }, rateLimitInterval)
 

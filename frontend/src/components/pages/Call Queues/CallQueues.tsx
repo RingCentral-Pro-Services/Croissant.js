@@ -13,6 +13,7 @@ import useAnalytics from "../../../hooks/useAnalytics"
 import UIDInputField from "../../shared/UIDInputField"
 import useGetCallQueueSettings from "../../../rcapi/useGetCallQueueSettings"
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage"
+import MessagesArea from "../../shared/MessagesArea"
 
 const CallQueues = () => {
     useLogin()
@@ -22,8 +23,10 @@ const CallQueues = () => {
     let {messages, postMessage, postError} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
-    let {callQueues, isQueueListPending, fetchQueueMembers} = useFetchCallQueueMembers()
-    const {fetchCallQueueSettings, queues: adjsutedQueues, isCallQueueSettingsPending} = useGetCallQueueSettings(postMessage, postTimedMessage, postError)
+    const [progressValue, setProgressValue] = useState(0)
+    const [maxProgressValue, setMaxProgressValue] = useState(0)
+    let {callQueues, isQueueListPending, fetchQueueMembers} = useFetchCallQueueMembers(setProgressValue, setMaxProgressValue, postTimedMessage)
+    const {fetchCallQueueSettings, queues: adjsutedQueues, isCallQueueSettingsPending} = useGetCallQueueSettings(setProgressValue, postMessage, postTimedMessage, postError)
     let {writeExcel} = useWriteExcelFile()
     const [isPending, setisPending] = useState(false)
 
@@ -58,6 +61,7 @@ const CallQueues = () => {
         const header = ['Queue Name', 'Extension', 'Site', 'Status', 'Members (Ext)', 'Greeting', 'Audio While Connecting', 'Hold Music', 'Voicemail', 'Interrupt Audio', 'Interrupt Prompt', 'Ring Type', 'Total Ring Time', 'User Ring Time' , 'Max Wait Time Action', 'No Answer Action', 'Wrap Up Time']
         writeExcel(header, adjsutedQueues, 'queues.xlsx')
         setisPending(false)
+        setProgressValue(adjsutedQueues.length * 2)
     }, [isCallQueueSettingsPending])
 
     return (
@@ -67,14 +71,10 @@ const CallQueues = () => {
                 <h2>Export Call Queues</h2>
                 <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} />
                 <Button className='healthy-margin-right' disabled={!hasCustomerToken || isPending} variant="contained" onClick={handleClick}>Go</Button>
-                {isPending ? <CircularProgress className="vertical-middle" /> : <></>}
+                {isPending ? <progress className='healthy-margin-top' value={progressValue} max={maxProgressValue} /> : <></>}
+                {timedMessages.length > 0 ? <MessagesArea messages={timedMessages} /> : <></>}
             </div>
             <CreateCallQueues />
-            {messages.map((message: Message) => (
-                <div key={message.body}>
-                    <p className={message.type}>{message.body}</p>
-                </div>
-            ))}
         </>
     )
 }
