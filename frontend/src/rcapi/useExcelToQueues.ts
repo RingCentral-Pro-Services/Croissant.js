@@ -83,11 +83,18 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
             settings.agentTimeout = time
         }
         if (CallQueueKeys.totalRingTime in data) {
-            const timeString = data[CallQueueKeys.totalRingTime].toString().replace(/\D/g, '')
-            let time = parseInt(timeString)
-
-            if (time < 10) time = time * 60
-            settings.holdTime = time
+            if (data[CallQueueKeys.totalRingTime] === '10 min' || data[CallQueueKeys.totalRingTime] === '15 min') {
+                const timeString = data[CallQueueKeys.totalRingTime].toString().replace(/\D/g, '')
+                let time = parseInt(timeString) * 60
+                settings.holdTime = time
+            }
+            else {
+                const timeString = data[CallQueueKeys.totalRingTime].toString().replace(/\D/g, '')
+                let time = parseInt(timeString)
+    
+                if (time < 10) time = time * 60
+                settings.holdTime = time
+            }
         }
         if (CallQueueKeys.wrapUpTime in data) {
             const timeString = data[CallQueueKeys.wrapUpTime].toString().replace(/\D/g, '')
