@@ -99,7 +99,17 @@ export const callQueueSchema = z.object({
     'Members (Ext)': z.string({
         required_error: 'Missing members',
         invalid_type_error: 'Members data type invalid'
-    })
+    }),
+    'Greeting': z.string().optional(),
+    'Audio While Connecting': z.string().optional(),
+    'Hold Music': z.string().optional(),
+    'Interrupt Audio': z.string().optional(),
+    'Interrupt Prompt': z.string().optional(),
+    'Ring Type': z.string().optional(),
+    'User Ring Time': z.string().optional(),
+    'Total Ring Time': z.string().optional(),
+    'Wrap Up Time': z.string().optional(),
+    'Voicemail Greeting': z.string().optional()
 })
 
 export const notificationSchema = z.object({
