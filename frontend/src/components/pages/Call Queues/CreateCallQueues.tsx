@@ -78,7 +78,7 @@ const CreateCallQueues = () => {
         if (isQueueConvertPending) return
         if (!isReadyToSync) return
 
-        setMaxProgressValue(queues.length * 2)
+        setMaxProgressValue(queues.length * 4)
         createQueues(queues, extensionsList)
     }, [isQueueConvertPending, isReadyToSync, extensionsList, queues])
 
