@@ -7,6 +7,7 @@ import { SyncError } from "../models/SyncError"
 import ExtensionIsolator from "../helpers/ExtensionIsolator"
 import { CallHandlingRules } from "../models/CallHandlingRules"
 import {CallQueueKeys} from '../helpers/Keys'
+import { Greeting, Presets } from "../models/Greetings"
 
 const useExcelToQueues = (postMessage: (message: Message) => void, postError: (error: SyncError) => void) => {
     const [queues, setQueues] = useState<CallQueue[]>([])
@@ -53,7 +54,7 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
                 postError(new SyncError(contact.firstName, extension.extensionNumber, ['Invalid queue members', removedExtensions.join(', ')]))
             }
 
-            let queue = new CallQueue(extension, idForSite(extension.site, extensionsList), validMembers, getCallHandling(data[index]))
+            let queue = new CallQueue(extension, idForSite(extension.site, extensionsList), validMembers, getCallHandling(data[index]), getGreetings(data[index]))
             records.push(queue)
         }
         setQueues(records)
@@ -114,6 +115,44 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
         }
 
         return settings
+    }
+
+    const getGreetings = (data: any) => {
+        let voicemailGreeting: Greeting = {
+            type: "Voicemail",
+            preset: Presets.defaultVoicemail
+        }
+        let audioWhileConnecting: Greeting = {
+            type: 'ConnectingAudio',
+            preset: Presets.acousticMusic
+        }
+        let holdMusic: Greeting = {
+            type: 'HoldMusic',
+            preset: Presets.acousticMusic
+        }
+        let greeting: Greeting = {
+            type: 'Introductory',
+            preset: Presets.greetingEnabled
+        }
+        let interruptAudio: Greeting = {
+            type: 'InterruptPrompt',
+            preset: Presets.stayOnTheLine
+        }
+
+        if (CallQueueKeys.greeting in data) {
+            if (data[CallQueueKeys.greeting] === 'Off') {
+                greeting.preset = Presets.greetingDisabled
+            }
+        }
+        if (CallQueueKeys.audioWhileConnecting in data) {
+            audioWhileConnecting.preset = Presets.presetForSelection(data[CallQueueKeys.audioWhileConnecting].toString())
+        }
+        if (CallQueueKeys.holdMusic in data) {
+            holdMusic.preset = Presets.presetForSelection(data[CallQueueKeys.holdMusic].toString)
+        }
+
+        return [voicemailGreeting, audioWhileConnecting, holdMusic, greeting, interruptAudio]
+
     }
 
     const translatedRingType = (text: string) => {
