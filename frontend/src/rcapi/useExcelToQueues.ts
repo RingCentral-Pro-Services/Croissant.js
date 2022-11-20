@@ -5,6 +5,8 @@ import ExtensionContact from "../models/ExtensionContact"
 import { Message } from "../models/Message"
 import { SyncError } from "../models/SyncError"
 import ExtensionIsolator from "../helpers/ExtensionIsolator"
+import { CallHandlingRules } from "../models/CallHandlingRules"
+import {CallQueueKeys} from '../helpers/Keys'
 
 const useExcelToQueues = (postMessage: (message: Message) => void, postError: (error: SyncError) => void) => {
     const [queues, setQueues] = useState<CallQueue[]>([])
@@ -51,11 +53,72 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
                 postError(new SyncError(contact.firstName, extension.extensionNumber, ['Invalid queue members', removedExtensions.join(', ')]))
             }
 
-            let queue = new CallQueue(extension, idForSite(extension.site, extensionsList), validMembers)
+            let queue = new CallQueue(extension, idForSite(extension.site, extensionsList), validMembers, getCallHandling(data[index]))
             records.push(queue)
         }
         setQueues(records)
         setIsQueueConvertPending(false)
+    }
+
+    const getCallHandling = (data: any) => {
+        let settings: CallHandlingRules = {
+            transferMode: "Rotating",
+            noAnswerAction: "WaitPrimaryMembers",
+            holdAudioInterruptionMode: "Never",
+            holdTimeExpirationAction: "Voicemail",
+            holdTime: 180,
+            agentTimeout: 20,
+            wrapUpTime: 15
+        }
+
+        if (CallQueueKeys.ringType in data) {
+            settings.transferMode = translatedRingType(data[CallQueueKeys.ringType])
+        }
+        if (settings.transferMode != 'Simultaneous' && CallQueueKeys.userRingTime in data) {
+            const timeString = data[CallQueueKeys.userRingTime].toString().replace(/\D/g, '')
+            let time = parseInt(timeString)
+
+            if (time < 10) time = time * 60
+            settings.agentTimeout = time
+        }
+        if (CallQueueKeys.totalRingTime in data) {
+            const timeString = data[CallQueueKeys.totalRingTime].toString().replace(/\D/g, '')
+            let time = parseInt(timeString)
+
+            if (time < 10) time = time * 60
+            settings.holdTime = time
+        }
+        if (CallQueueKeys.wrapUpTime in data) {
+            const timeString = data[CallQueueKeys.wrapUpTime].toString().replace(/\D/g, '')
+            let time = parseInt(timeString)
+
+            if (time < 10) time = time * 60
+            settings.wrapUpTime = time
+        }
+        if (CallQueueKeys.interruptAudio in data) {
+            const value = data[CallQueueKeys.interruptAudio].toString()
+            if (value.toLowerCase() === 'never') {
+                settings.holdAudioInterruptionMode = 'Never'
+            }
+            else if (value.toLowerCase() === 'Only when music ends') {
+                settings.holdAudioInterruptionMode = 'WhenMusicEnds'
+            }
+            else {
+                settings.holdAudioInterruptionMode = 'Periodically'
+                const timeString = data[CallQueueKeys.interruptAudio].toString().replace(/\D/g, '')
+                let time = parseInt(timeString)
+                
+                if (time < 10) time = time * 60
+                settings.holdAudioInterruptionPeriod = time
+            }
+        }
+
+        return settings
+    }
+
+    const translatedRingType = (text: string) => {
+        if (text === 'Sequential') return 'FixedOrder'
+        return text
     }
 
     const idForQueue = (extension: string, extensionsList: RCExtension[]) => {
@@ -103,8 +166,6 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
                 result.push(member)
             }
         }
-        console.log('Isolated Members')
-        console.log(result)
         return result
     }
 
