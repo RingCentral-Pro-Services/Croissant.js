@@ -118,6 +118,7 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
     }
 
     const getGreetings = (data: any) => {
+        let greetings: Greeting[] = []
         let voicemailGreeting: Greeting = {
             type: "Voicemail",
             preset: Presets.defaultVoicemail
@@ -143,16 +144,24 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
             if (data[CallQueueKeys.greeting] === 'Off') {
                 greeting.preset = Presets.greetingDisabled
             }
+            greetings.push(greeting)
         }
         if (CallQueueKeys.audioWhileConnecting in data) {
             audioWhileConnecting.preset = Presets.presetForSelection(data[CallQueueKeys.audioWhileConnecting].toString())
+            if (audioWhileConnecting.preset.name != 'Custom') greetings.push(audioWhileConnecting)
         }
         if (CallQueueKeys.holdMusic in data) {
             holdMusic.preset = HoldPresets.presetForSelection(data[CallQueueKeys.holdMusic].toString())
+            if (holdMusic.preset.name != 'Custom') greetings.push(holdMusic)
+        }
+        if (CallQueueKeys.voicemailGreeting in data) {
+            if (!data[CallQueueKeys.voicemailGreeting].toString().includes('Custom')) {
+                greetings.push(voicemailGreeting)
+            }
         }
 
-        return [voicemailGreeting, audioWhileConnecting, holdMusic, greeting, interruptAudio]
-
+        greetings.push(interruptAudio)
+        return greetings
     }
 
     const translatedRingType = (text: string) => {

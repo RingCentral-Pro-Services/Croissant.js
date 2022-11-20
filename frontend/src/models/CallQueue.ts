@@ -24,7 +24,12 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
     greeting(name: string) {
         for (const greeting of this.greetings ?? []) {
             if (greeting.type === name) {
-                return greeting.preset.name
+                if ('preset' in greeting) {
+                    return greeting.preset.name    
+                }
+                else {
+                    return 'Custom'
+                }
             }
         }
         return ''

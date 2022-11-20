@@ -99,6 +99,11 @@ export namespace Presets {
         id: '131840',
         name: 'None'
     }
+    export const custom: GreetingPreset = {
+        uri: '',
+        id: '',
+        name: 'Custom'
+    }
 
     export const presetForSelection = (selection: string) => {
         switch (selection) {
@@ -126,6 +131,10 @@ export namespace Presets {
                 return reggaeMusic
             case 'Music (World)':
                 return worldMusic
+            case 'Music (Custom)':
+                return custom
+            case 'Custom':
+                return custom
             case 'None':
                 return musicDisabled
             default:
@@ -143,8 +152,8 @@ export namespace HoldPresets {
         name: 'Default'
     }
     export const ringtones: GreetingPreset = {
-        uri: 'https://platform.ringcentral.com/restapi/v1.0/dictionary/greeting/131843',
-        id: '131843',
+        uri: 'https://platform.ringcentral.com/restapi/v1.0/dictionary/greeting/197379',
+        id: '197379',
         name: 'Ring Tones'
     }
     export const acousticMusic: GreetingPreset = {
@@ -207,6 +216,11 @@ export namespace HoldPresets {
         id: '197376',
         name: 'None'
     }
+    export const custom: GreetingPreset = {
+        uri: '',
+        id: '',
+        name: 'Custom'
+    }
 
     export const presetForSelection = (selection: string) => {
         switch (selection) {
@@ -234,6 +248,10 @@ export namespace HoldPresets {
                 return reggaeMusic
             case 'Music (World)':
                 return worldMusic
+            case 'Music (Custom)':
+                return custom
+            case 'Custom':
+                return custom
             case 'None':
                 return musicDisabled
             default:
