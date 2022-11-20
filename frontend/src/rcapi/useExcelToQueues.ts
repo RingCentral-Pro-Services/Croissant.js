@@ -7,7 +7,7 @@ import { SyncError } from "../models/SyncError"
 import ExtensionIsolator from "../helpers/ExtensionIsolator"
 import { CallHandlingRules } from "../models/CallHandlingRules"
 import {CallQueueKeys} from '../helpers/Keys'
-import { Greeting, Presets } from "../models/Greetings"
+import { Greeting, Presets, HoldPresets } from "../models/Greetings"
 
 const useExcelToQueues = (postMessage: (message: Message) => void, postError: (error: SyncError) => void) => {
     const [queues, setQueues] = useState<CallQueue[]>([])
@@ -128,7 +128,7 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
         }
         let holdMusic: Greeting = {
             type: 'HoldMusic',
-            preset: Presets.acousticMusic
+            preset: HoldPresets.acousticMusic
         }
         let greeting: Greeting = {
             type: 'Introductory',
@@ -148,7 +148,7 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
             audioWhileConnecting.preset = Presets.presetForSelection(data[CallQueueKeys.audioWhileConnecting].toString())
         }
         if (CallQueueKeys.holdMusic in data) {
-            holdMusic.preset = Presets.presetForSelection(data[CallQueueKeys.holdMusic].toString())
+            holdMusic.preset = HoldPresets.presetForSelection(data[CallQueueKeys.holdMusic].toString())
         }
 
         return [voicemailGreeting, audioWhileConnecting, holdMusic, greeting, interruptAudio]
