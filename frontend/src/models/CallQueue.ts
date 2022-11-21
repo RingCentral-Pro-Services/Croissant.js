@@ -18,7 +18,7 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
     }
 
     toDataTableRow(): string[] {
-        return [this.extension.name, `${this.extension.extensionNumber}`, this.extension.site, this.extension.status, `${this.members}`]
+        return [this.extension.name, `${this.extension.extensionNumber}`, this.extension.site, `${this.members}`, this.prettyRingType(this.handlingRules?.transferMode ?? ''), this.prettyTime(this.handlingRules?.holdTime ?? 0), this.prettyTime(this.handlingRules?.wrapUpTime ?? 0)]
     }
 
     greeting(name: string) {
