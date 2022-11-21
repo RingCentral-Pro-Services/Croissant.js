@@ -15,5 +15,11 @@ export const CallQueueKeys = {
     'totalRingTime': 'Total Ring Time',
     'wrapUpTime': 'Wrap Up Time',
     'voicemailGreeting': 'Voicemail Greeting',
-    'afterHoursBehavior': 'After Hours Behavior'
+    'afterHoursBehavior': 'After Hours Behavior',
+    'maxWaitTimeAction': 'Max Wait Time Action',
+    'maxWaitTimeDestination': 'Max Wait Time Destination',
+    'maxCallersAction': 'Max Callers Action',
+    'maxCallersDestination': 'Max Callers Action',
+    'voicemailRecipient': 'Voicemail Recipient',
+    'voicemailRecipientExt': 'Voicemail Recipient Ext'
 }
