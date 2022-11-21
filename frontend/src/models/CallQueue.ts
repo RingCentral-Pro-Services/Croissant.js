@@ -58,6 +58,9 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
     prettyTime(time: number) {
         let result = ''
 
+        if (time === 1) {
+            return `Don't Wait`
+        }
         if (time >= 60) {
             result = `${time / 60} min`
         }

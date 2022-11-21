@@ -89,6 +89,9 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
                 let time = parseInt(timeString) * 60
                 settings.holdTime = time
             }
+            else if (data[CallQueueKeys.totalRingTime] === "Don't Wait" || data[CallQueueKeys.totalRingTime] === '1 secs') {
+                settings.holdTime = 1
+            }
             else {
                 const timeString = data[CallQueueKeys.totalRingTime].toString().replace(/\D/g, '')
                 let time = parseInt(timeString)
