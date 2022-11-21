@@ -151,9 +151,10 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
         setTimeout(async () => {
             try {
                 console.log('Updating call handling')
-                const body = {
+                let body = {
                     queue: queues[currentExtensionIndex].handlingRules
                 }
+
                 let url = baseCallHandlingURL.replace('extensionId', `${queues[currentExtensionIndex].extension.id}`)
                 let response = await RestCentral.put(url, headers, body)
 

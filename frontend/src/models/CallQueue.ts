@@ -6,7 +6,7 @@ import { CallHandlingRules } from "./CallHandlingRules";
 import { Greeting } from "./Greetings";
 
 class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattable {
-    constructor(public extension: RCExtension, public siteID: number, public members: string[], public handlingRules?: CallHandlingRules, public greetings?: Greeting[]) {}
+    constructor(public extension: RCExtension, public siteID: number, public members: string[], public handlingRules?: CallHandlingRules, public greetings?: Greeting[], public transferExtension?: string, public unconditionalForwardNumber?: string) {}
 
     toRow(): string {
         return `${this.extension.name},${this.extension.extensionNumber},${this.extension.site},${this.extension.status},"${this.members}"`

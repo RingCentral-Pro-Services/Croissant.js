@@ -7,5 +7,6 @@ export interface CallHandlingRules {
     holdTimeExpirationAction: string
     agentTimeout?: number
     holdTime: number
-    wrapUpTime?: number 
+    wrapUpTime?: number
+    maxCallersAction?: string
 }
