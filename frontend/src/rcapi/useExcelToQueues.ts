@@ -54,7 +54,7 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
                 postError(new SyncError(contact.firstName, extension.extensionNumber, ['Invalid queue members', removedExtensions.join(', ')]))
             }
 
-            let queue = new CallQueue(extension, idForSite(extension.site, extensionsList), validMembers, getCallHandling(data[index], extensionsList), getGreetings(data[index]), getTransferExtension(data[index], extensionsList), getTransferPhoneNumber(data[index], extensionsList))
+            let queue = new CallQueue(extension, idForSite(extension.site, extensionsList), validMembers, getCallHandling(data[index], extensionsList), getGreetings(data[index]), getTransferExtension(data[index], extensionsList), getTransferPhoneNumber(data[index], extensionsList), getMaxWaitDestination(data[index], extensionsList), getMaxCallersDestination(data[index], extensionsList))
             records.push(queue)
         }
         setQueues(records)
@@ -124,8 +124,73 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
                 settings.holdAudioInterruptionPeriod = time
             }
         }
+        if (CallQueueKeys.maxWaitTimeAction in data) {
+            const action = data[CallQueueKeys.maxWaitTimeAction]
+
+            if (action === 'Transfer to Extension') {
+                settings.holdTimeExpirationAction = 'TransferToExtension'
+            }
+            else if (action === 'Forward to External') {
+                settings.holdTimeExpirationAction = 'UnconditionalForwarding'
+            }
+        }
+        if (CallQueueKeys.maxCallersAction in data) {
+            const action = data[CallQueueKeys.maxCallersAction]
+
+            if (action === 'Transfer to Extension') {
+                settings.maxCallersAction = 'TransferToExtension'
+            }
+            else if (action === 'Forward to External') {
+                settings.maxCallersAction = 'UnconditionalForwarding'
+            }
+            else if (action === 'Play Greeting and Disconnect') {
+                settings.maxCallersAction = 'Announcement'
+            }
+        }
 
         return settings
+    }
+
+    const getMaxWaitDestination = (data: any, extensionList: RCExtension[]) => {
+        if (CallQueueKeys.maxWaitTimeAction in data) {
+            const action = data[CallQueueKeys.maxWaitTimeAction] as string
+            
+            if (CallQueueKeys.maxWaitTimeDestination in data && action === 'Transfer to Extension') {
+                const isolator = new ExtensionIsolator()
+                const rawDestination = data[CallQueueKeys.maxWaitTimeDestination] as string
+                const extension = isolator.isolateExtension(rawDestination)
+                if (extension) {
+                    return `${idForExtension(extension, extensionList)}`    
+                }
+            }
+            else if (CallQueueKeys.maxWaitTimeDestination in data && action === 'Forward to External') {
+                const isolator = new ExtensionIsolator()
+                const rawDestination = data[CallQueueKeys.maxWaitTimeDestination] as string
+                const phoneNumber = isolator.isolatePhoneNumber(rawDestination)
+                return phoneNumber
+            }
+        }
+    }
+
+    const getMaxCallersDestination = (data: any, extensionList: RCExtension[]) => {
+        if (CallQueueKeys.maxCallersAction in data) {
+            const action = data[CallQueueKeys.maxCallersAction] as string
+            
+            if (CallQueueKeys.maxCallersDestination in data && action === 'Transfer to Extension') {
+                const isolator = new ExtensionIsolator()
+                const rawDestination = data[CallQueueKeys.maxCallersDestination] as string
+                const extension = isolator.isolateExtension(rawDestination)
+                if (extension) {
+                    return `${idForExtension(extension, extensionList)}`
+                }
+            }
+            else if (CallQueueKeys.maxCallersDestination in data && action === 'Forward to External') {
+                const isolator = new ExtensionIsolator()
+                const rawDestination = data[CallQueueKeys.maxCallersDestination] as string
+                const phoneNumber = isolator.isolatePhoneNumber(rawDestination)
+                return phoneNumber
+            }
+        }
     }
 
     const getTransferExtension = (data: any, extensionList: RCExtension[]) => {
@@ -157,7 +222,6 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
 
                 if (action === 'Transfer to External') {
                     const phoneNumber = isolator.isolatePhoneNumber(rawDestination)
-                    console.log(`Max Wait Time Destination: ${phoneNumber}`)
                     return phoneNumber
                 }
             }
@@ -212,7 +276,6 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
     }
 
     const translatedRingType = (text: string) => {
-        console.log(`Raw ring type: ${text}`)
         if (text === 'Sequential') return 'FixedOrder'
         return text
     }

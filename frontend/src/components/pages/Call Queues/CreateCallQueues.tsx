@@ -79,6 +79,10 @@ const CreateCallQueues = () => {
         if (!isReadyToSync) return
 
         setMaxProgressValue(queues.length * 4)
+        console.log('payload')
+        for (const queue of queues) {
+            console.log(queue.payload())
+        }
         createQueues(queues, extensionsList)
     }, [isQueueConvertPending, isReadyToSync, extensionsList, queues])
 

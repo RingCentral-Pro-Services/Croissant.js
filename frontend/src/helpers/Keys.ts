@@ -19,7 +19,7 @@ export const CallQueueKeys = {
     'maxWaitTimeAction': 'Max Wait Time Action',
     'maxWaitTimeDestination': 'Max Wait Time Destination',
     'maxCallersAction': 'Max Callers Action',
-    'maxCallersDestination': 'Max Callers Action',
+    'maxCallersDestination': 'Max Callers Destination',
     'voicemailRecipient': 'Voicemail Recipient',
     'voicemailRecipientExt': 'Voicemail Recipient Ext'
 }

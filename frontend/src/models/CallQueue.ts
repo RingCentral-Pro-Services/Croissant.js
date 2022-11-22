@@ -4,9 +4,10 @@ import { DataTableFormattable } from "./DataTableFormattable";
 import RCExtension from "./RCExtension";
 import { CallHandlingRules } from "./CallHandlingRules";
 import { Greeting } from "./Greetings";
+import { TransferPayload, UnconditionalForwardingPayload } from "./TransferPayload";
 
 class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattable {
-    constructor(public extension: RCExtension, public siteID: number, public members: string[], public handlingRules?: CallHandlingRules, public greetings?: Greeting[], public transferExtension?: string, public unconditionalForwardNumber?: string) {}
+    constructor(public extension: RCExtension, public siteID: number, public members: string[], public handlingRules?: CallHandlingRules, public greetings?: Greeting[], public transferExtension?: string, public unconditionalForwardNumber?: string, public maxWaitTimeDestination?: string, public maxCallersDestination?: string) {}
 
     toRow(): string {
         return `${this.extension.name},${this.extension.extensionNumber},${this.extension.site},${this.extension.status},"${this.members}"`
@@ -77,6 +78,53 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
         else {
             return `Music (${value})`
         }
+    }
+
+    payload() {
+        let transferActions: TransferPayload[] = []
+        let forwardActions: UnconditionalForwardingPayload[] = []
+
+        if (this.maxWaitTimeDestination) {
+            if (this.handlingRules?.holdTimeExpirationAction === 'TransferToExtension') {
+                const action: TransferPayload = {
+                    extension: {
+                        id: this.maxWaitTimeDestination
+                    },
+                    action: "HoldTimeExpiration"
+                }
+                transferActions.push(action)
+            }
+            else if (this.handlingRules?.holdTimeExpirationAction === 'UnconditionalForwarding') {
+                const action: UnconditionalForwardingPayload = {
+                    phoneNumber: this.maxWaitTimeDestination,
+                    action: "HoldTimeExpiration"
+                }
+                forwardActions.push(action)
+            }
+        }
+        if (this.maxCallersDestination) {
+            if (this.handlingRules?.maxCallersAction === 'TransferToExtension') {
+                const action: TransferPayload = {
+                    extension: {
+                        id: this.maxCallersDestination
+                    },
+                    action: "MaxCallers"
+                }
+                transferActions.push(action)
+            }
+            else if (this.handlingRules?.maxCallersAction === 'UnconditionalForwarding') {
+                const action: UnconditionalForwardingPayload = {
+                    phoneNumber: this.maxCallersDestination,
+                    action: 'MaxCallers'
+                }
+                forwardActions.push(action)
+            }
+        } 
+
+        const payload = {
+            queue: {...this.handlingRules, ...(transferActions.length > 0 && {transfer: [...transferActions]}), ...(forwardActions.length > 0 && {unconditionalForwarding: [...forwardActions]})}
+        }
+        return payload
     }
 }
 

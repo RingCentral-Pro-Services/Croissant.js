@@ -150,13 +150,8 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
 
         setTimeout(async () => {
             try {
-                console.log('Updating call handling')
-                let body = {
-                    queue: queues[currentExtensionIndex].handlingRules
-                }
-
                 let url = baseCallHandlingURL.replace('extensionId', `${queues[currentExtensionIndex].extension.id}`)
-                let response = await RestCentral.put(url, headers, body)
+                let response = await RestCentral.put(url, headers, queues[currentExtensionIndex].payload())
 
                 if (response.rateLimitInterval > 0) postTimedMessage(new Message(`Rate limit reached 😩. Resuming in 60 seconds`, 'info'), 60000)
                 setRateLimitInterval(response.rateLimitInterval)
@@ -165,6 +160,7 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
             }
             catch(error: any) {
                 console.log(`Someting went wrong uppdating call handling for ${queues[currentExtensionIndex].extension.name}`)
+                console.log(error)
                 postError(new SyncError(queues[currentExtensionIndex].extension.name, queues[currentExtensionIndex].extension.extensionNumber, ['Call handling failed', '']))
                 postMessage(new Message(`Failed to update call handling for ${queues[currentExtensionIndex].extension.name} - ${queues[currentExtensionIndex].extension.extensionNumber}. ${error.error}`, 'error'))
                 updateCallHandlingNext()
@@ -189,7 +185,6 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
         }
 
         setTimeout(async () => {
-            console.log('Updating greetings')
             try {
                 let url = baseCallHandlingURL.replace('extensionId', `${queues[currentExtensionIndex].extension.id}`)
                 let body = {
