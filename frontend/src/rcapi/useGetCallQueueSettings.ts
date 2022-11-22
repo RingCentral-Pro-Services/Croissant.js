@@ -45,6 +45,8 @@ const useGetCallQueueSettings = (setProgressValue: (value: (any)) => void, postM
                 let response = await RestCentral.get(url, headers)
                 if (response.rateLimitInterval > 0) postTimedMessage(new Message(`Rate limit reached. Resuming in 60 seconds`, 'info'), 60000)
                 setRateLimitInterval(response.rateLimitInterval)
+                console.log('Queue settings')
+                console.log(response)
 
                 const records = response.data.records as Array<any>
 
@@ -58,7 +60,6 @@ const useGetCallQueueSettings = (setProgressValue: (value: (any)) => void, postM
                 if (businessHoursData.length > 0) {
                     const callHandling: CallHandlingRules = businessHoursData[0].queue
                     const greetings: Greeting[] = businessHoursData[0].greetings
-                    console.log(greetings)
                     queues[currentExtensionIndex].handlingRules = callHandling
                     queues[currentExtensionIndex].greetings = greetings
                 }

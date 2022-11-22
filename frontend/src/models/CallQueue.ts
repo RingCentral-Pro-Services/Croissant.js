@@ -15,11 +15,83 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
 
     toExcelRow(): string[] {
         // Header: ['Queue Name', 'Extension', 'Site', 'Status', 'Members (Ext)', 'Greeting', 'Audio While Connecting', 'Hold Music', 'Voicemail', 'Interrupt Audio', 'Interrupt Prompt', 'Ring type', 'Total Ring Time', 'User Ring Time' , 'Max Wait Time Action', 'No Answer Action', 'Wrap Up Time']
-        return [this.extension.name, `${this.extension.extensionNumber}`, this.extension.site, this.extension.status, `${this.members}`, this.prettyGreeting(this.greeting('Introductory')), this.prettyGreeting(this.greeting('ConnectingAudio')), this.prettyGreeting(this.greeting('HoldMusic')), this.prettyGreeting(this.greeting('Voicemail')), this.prettyInterruptPeriod(this.handlingRules?.holdAudioInterruptionMode ?? '', this.handlingRules?.holdAudioInterruptionPeriod ?? 0), this.handlingRules?.holdAudioInterruptionPeriod ? this.greeting('InterruptPrompt') : '' , this.prettyRingType(this.handlingRules?.transferMode ?? ''), this.prettyTime(this.handlingRules?.holdTime ?? 0), this.prettyTime(this.handlingRules?.agentTimeout ?? 0) , this.handlingRules?.holdTimeExpirationAction ?? '' , this.handlingRules?.noAnswerAction ?? '', this.prettyTime(this.handlingRules?.wrapUpTime ?? 0)]
+        return [this.extension.name, `${this.extension.extensionNumber}`, this.extension.site, this.extension.status, `${this.members}`, this.prettyGreeting(this.greeting('Introductory')), this.prettyGreeting(this.greeting('ConnectingAudio')), this.prettyGreeting(this.greeting('HoldMusic')), this.prettyGreeting(this.greeting('Voicemail')), this.prettyInterruptPeriod(this.handlingRules?.holdAudioInterruptionMode ?? '', this.handlingRules?.holdAudioInterruptionPeriod ?? 0), this.handlingRules?.holdAudioInterruptionPeriod ? this.greeting('InterruptPrompt') : '' , this.prettyRingType(this.handlingRules?.transferMode ?? ''), this.prettyTime(this.handlingRules?.holdTime ?? 0), this.prettyTime(this.handlingRules?.agentTimeout ?? 0) , this.prettyWaitTimeAction() , this.prettyWaitTimeDestination() ?? '', this.prettyMaxCallersAction(), this.prettyMaxCallersDestination() ?? '' ,this.handlingRules?.noAnswerAction ?? '', this.prettyTime(this.handlingRules?.wrapUpTime ?? 0)]
     }
 
     toDataTableRow(): string[] {
         return [this.extension.name, `${this.extension.extensionNumber}`, this.extension.site, `${this.members}`, this.prettyRingType(this.handlingRules?.transferMode ?? ''), this.prettyTime(this.handlingRules?.holdTime ?? 0), this.prettyTime(this.handlingRules?.wrapUpTime ?? 0)]
+    }
+
+    prettyWaitTimeDestination() {
+        if (this.handlingRules?.holdTimeExpirationAction === 'TransferToExtension') {
+            if (this.handlingRules.transfer) {
+                for (const transfer of this.handlingRules.transfer) {
+                    if (transfer.action === 'HoldTimeExpiration') {
+                        return transfer.extension.extensionNumber
+                    }
+                }
+            }
+        }
+        else if (this.handlingRules?.holdTimeExpirationAction === 'UnconditionalForwarding') {
+            if (this.handlingRules.unconditionalForwarding) {
+                for (const transfer of this.handlingRules.unconditionalForwarding) {
+                    if (transfer.action === 'HoldTimeExpiration') {
+                        return transfer.phoneNumber
+                    }
+                }
+            }
+        }
+        return ''
+    }
+
+    prettyWaitTimeAction() {
+        switch (this.handlingRules?.holdTimeExpirationAction) {
+            case 'TransferToExtension':
+                return 'Transfer to Extension'
+            case 'UnconditionalForwarding':
+                return 'Forward to External'
+            case 'Voicemail':
+                return 'Voicemail'
+            default:
+                return ''
+        }
+    }
+
+    prettyMaxCallersAction() {
+        switch (this.handlingRules?.maxCallersAction) {
+            case 'TransferToExtension':
+                return 'Transfer to Extension'
+            case 'UnconditionalForwarding':
+                return 'Forward to External'
+            case 'Voicemail':
+                return 'Voicemail'
+            case 'Announcement':
+                return 'Play Greeting and Disconnect'
+            default:
+                return ''
+        }
+    }
+
+    prettyMaxCallersDestination() {
+        if (this.handlingRules?.maxCallersAction === 'TransferToExtension') {
+            if (this.handlingRules.transfer) {
+                for (const transfer of this.handlingRules.transfer) {
+                    if (transfer.action === 'MaxCallers') {
+                        return transfer.extension.extensionNumber
+                    }
+                }
+            }
+        }
+        else if (this.handlingRules?.maxCallersAction === 'UnconditionalForwarding') {
+            if (this.handlingRules.unconditionalForwarding) {
+                for (const transfer of this.handlingRules.unconditionalForwarding) {
+                    if (transfer.action === 'MaxCallers') {
+                        return transfer.phoneNumber
+                    }
+                }
+            }
+        }
+        return ''
     }
 
     greeting(name: string) {

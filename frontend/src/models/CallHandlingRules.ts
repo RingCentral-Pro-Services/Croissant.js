@@ -1,3 +1,5 @@
+import { TransferPayload, UnconditionalForwardingPayload } from "./TransferPayload"
+
 export interface CallHandlingRules {
     transferMode: string
     noAnswerAction: string
@@ -9,4 +11,6 @@ export interface CallHandlingRules {
     holdTime: number
     wrapUpTime?: number
     maxCallersAction?: string
+    transfer?: TransferPayload[]
+    unconditionalForwarding?: UnconditionalForwardingPayload[]
 }

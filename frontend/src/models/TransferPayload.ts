@@ -1,6 +1,8 @@
 export interface TransferPayload {
     extension: {
         id: string
+        name?: string
+        extensionNumber?: string
     }
     action: string
 }
