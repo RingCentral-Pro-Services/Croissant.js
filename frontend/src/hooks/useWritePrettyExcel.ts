@@ -20,7 +20,6 @@ const useWritePrettyExcel = () => {
     }
 
     const writeTemplatedXLSX = (excelData: string[][], sheetname: string, filename: string, templatePath: string) => {
-        console.log('Writing templated XLSX')
         const workbook = new Excel.Workbook()
 
         fetch(templatePath)
