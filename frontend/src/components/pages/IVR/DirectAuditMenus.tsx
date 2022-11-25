@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Header from "../../shared/Header";
 import UIDInputField from "../../shared/UIDInputField";
 import useGetAccessToken from "../../../rcapi/useGetAccessToken";
 import {Button, CircularProgress} from '@mui/material'
@@ -13,6 +12,7 @@ import useBeautifyIVRs from "../../../rcapi/useBeautifyIVRs";
 import useGetAudioPrompts from "../../../rcapi/useGetAudioPrompts";
 import useAnalytics from "../../../hooks/useAnalytics";
 import MessagesArea from "../../shared/MessagesArea";
+import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel";
 
 const DirectAuditMenus = () => {
     const {fireEvent} = useAnalytics()
@@ -26,6 +26,7 @@ const DirectAuditMenus = () => {
     const {fetchAudioPrompts, audioPromptList, isAudioPromptListPending} = useGetAudioPrompts(postMessage, postTimedMessage)
     const {fetchIVRs, ivrsList, isIVRsListPending} = useFetchIVRs(setProgressValue, setMaxProgressValue, postMessage, postTimedMessage, postError)
     const {writeExcel} = useWriteExcelFile()
+    const {writePrettyExcel} = useWritePrettyExcel()
     const [isPending, setIsPending] = useState(false)
     const {prettyIVRs, isIVRBeautificationPending} = useBeautifyIVRs(isIVRsListPending, ivrsList, extensionsList, audioPromptList)
 
@@ -58,9 +59,7 @@ const DirectAuditMenus = () => {
         let header = ['Menu Name', 'Menu Ext', 'Site', 'Prompt Mode', 'Prompt Name/Script', 'Key 1 Action', 'Key 1 Destination', 'Key 2 Action', 'Key 2 Destination', 'Key 3 Action', 'Key 3 Destination',
                      'Key 4 Action', 'Key 4 Destination', 'Key 5 Action', 'Key 5 Destination', 'Key 6 Action', 'Key 6 Destination', 'Key 7 Action', 'Key 7 Destination',
                      'Key 8 Action', 'Key 8 Destination', 'Key 9 Action', 'Key 9 Destination', 'Key 0 Action', 'Key 0 Destination']
-        console.log('Writing')
-        console.log(ivrsList)
-        writeExcel(header, prettyIVRs, 'ivrs.xlsx')
+        writePrettyExcel(header, prettyIVRs, 'IVRs', 'ivrs.xlsx', '/ivrs-brd.xlsx')
     }, [isIVRBeautificationPending, prettyIVRs])
     
     return (

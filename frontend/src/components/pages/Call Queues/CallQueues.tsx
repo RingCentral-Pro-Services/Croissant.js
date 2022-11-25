@@ -3,17 +3,17 @@ import useLogin from "../../../hooks/useLogin"
 import useGetAccessToken from "../../../rcapi/useGetAccessToken"
 import useMessageQueue from "../../../hooks/useMessageQueue"
 import useExtensionList from "../../../rcapi/useExtensionList"
-import { Message } from "../../../models/Message"
 import useFetchCallQueueMembers from "../../../rcapi/useFetchCallQueueMembers"
 import useWriteExcelFile from "../../../hooks/useWriteExcelFile"
 import CreateCallQueues from "./CreateCallQueues"
 import Header from "../../shared/Header"
-import {TextField, Button, CircularProgress} from '@mui/material'
+import {Button} from '@mui/material'
 import useAnalytics from "../../../hooks/useAnalytics"
 import UIDInputField from "../../shared/UIDInputField"
 import useGetCallQueueSettings from "../../../rcapi/useGetCallQueueSettings"
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage"
 import MessagesArea from "../../shared/MessagesArea"
+import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel"
 
 const CallQueues = () => {
     useLogin()
@@ -29,6 +29,7 @@ const CallQueues = () => {
     const {fetchCallQueueSettings, queues: adjsutedQueues, isCallQueueSettingsPending} = useGetCallQueueSettings(setProgressValue, postMessage, postTimedMessage, postError)
     let {writeExcel} = useWriteExcelFile()
     const [isPending, setisPending] = useState(false)
+    const {writePrettyExcel} = useWritePrettyExcel()
 
     const handleClick = () => {
         setisPending(true)
@@ -59,7 +60,7 @@ const CallQueues = () => {
         console.log('Queues')
         console.log(adjsutedQueues)
         const header = ['Queue Name', 'Extension', 'Site', 'Status', 'Members (Ext)', 'Greeting', 'Audio While Connecting', 'Hold Music', 'Voicemail', 'Interrupt Audio', 'Interrupt Prompt', 'Ring Type', 'Total Ring Time', 'User Ring Time' , 'Max Wait Time Action', 'Max Wait Time Destination', 'Max Callers Action', 'Max Callers Destination', 'No Answer Action', 'Wrap Up Time']
-        writeExcel(header, adjsutedQueues, 'queues.xlsx')
+        writePrettyExcel(header, adjsutedQueues, 'Call Queues', 'pretty-queues.xlsx', '/call-queue-template.xlsx')
         setisPending(false)
         setProgressValue(adjsutedQueues.length * 2)
     }, [isCallQueueSettingsPending])
