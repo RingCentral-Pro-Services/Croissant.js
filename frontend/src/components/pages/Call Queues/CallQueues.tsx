@@ -60,7 +60,7 @@ const CallQueues = () => {
         console.log('Queues')
         console.log(adjsutedQueues)
         const header = ['Queue Name', 'Extension', 'Site', 'Status', 'Members (Ext)', 'Greeting', 'Audio While Connecting', 'Hold Music', 'Voicemail', 'Interrupt Audio', 'Interrupt Prompt', 'Ring Type', 'Total Ring Time', 'User Ring Time' , 'Max Wait Time Action', 'Max Wait Time Destination', 'Max Callers Action', 'Max Callers Destination', 'No Answer Action', 'Wrap Up Time']
-        writePrettyExcel(header, adjsutedQueues, 'Call Queues', 'pretty-queues.xlsx', '/call-queue-template.xlsx')
+        writePrettyExcel(header, adjsutedQueues, 'Call Queues', 'queues.xlsx', '/call-queue-template.xlsx')
         setisPending(false)
         setProgressValue(adjsutedQueues.length * 2)
     }, [isCallQueueSettingsPending])
