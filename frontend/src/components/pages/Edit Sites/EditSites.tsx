@@ -7,7 +7,7 @@ import useMessageQueue from "../../../hooks/useMessageQueue";
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
 import useReadExcel from "../../../hooks/useReadExcel";
 import useValidateExcelData from "../../../hooks/useValidateExcelData";
-import useWriteExcelFile from "../../../hooks/useWriteExcelFile";
+import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel";
 import RCExtension from "../../../models/RCExtension";
 import { Site } from "../../../models/Site";
 import useEditSites from "../../../rcapi/useEditSites";
@@ -35,7 +35,7 @@ const EditSites = () => {
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const {fetchExtensions, extensionsList, isExtensionListPending} = useExtensionList(postMessage)
-    const {writeExcel} = useWriteExcelFile()
+    const {writePrettyExcel} = useWritePrettyExcel()
     const {readFile, isExcelDataPending, excelData} = useReadExcel()
     const {validate, validatedData, isDataValidationPending} = useValidateExcelData(siteSchema, postMessage, postError)
     const {updateSites, isSiteUpdatePending} = useEditSites(postMessage, postTimedMessage, setProgressValue, setMaxProgressValue, postError)
@@ -83,7 +83,7 @@ const EditSites = () => {
             return new Site(`${site.id}`, site.name, site.extensionNumber)
         })
         const header = ['ID', 'Name', 'Ext']
-        writeExcel(header, siteData, 'sites.xlsx')
+        writePrettyExcel(header, siteData, 'Sites', 'sites.xlsx')
     }
 
     const handleFileSubmit = () => {

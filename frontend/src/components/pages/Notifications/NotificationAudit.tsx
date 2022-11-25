@@ -5,7 +5,6 @@ import useExtensionList from "../../../rcapi/useExtensionList"
 import useGetAccessToken from "../../../rcapi/useGetAccessToken"
 import useMessageQueue from "../../../hooks/useMessageQueue"
 import useFetchNotifications from "../../../rcapi/useFetchNotifications"
-import useWriteExcelFile from "../../../hooks/useWriteExcelFile"
 import Header from "../../shared/Header"
 import {Button} from '@mui/material'
 import FeedbackArea from "../../shared/FeedbackArea"
@@ -18,6 +17,7 @@ import useAnalytics from "../../../hooks/useAnalytics"
 import UIDInputField from "../../shared/UIDInputField"
 import AdaptiveFilter from "../../shared/AdaptiveFilter"
 import RCExtension from "../../../models/RCExtension"
+import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel"
 
 const NotificationAudit = () => {
     useLogin()
@@ -27,7 +27,7 @@ const NotificationAudit = () => {
     let {messages, errors, postMessage, postError} = useMessageQueue()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     const [isPending, setIsPending] = useState(false)
-    const {writeExcel} = useWriteExcelFile()
+    const {writePrettyExcel} = useWritePrettyExcel()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const [selectedFile, setSelectedFile] = useState<File | null>()
     const [selectedSheet, setSelectedSheet] = useState('')
@@ -106,7 +106,7 @@ const NotificationAudit = () => {
 
         console.log(notifications)
         let header = ['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses', 'Advanced Mode', 'Advanced Voicemail Emails', 'Advanced Inbound Fax Emails', 'Advanced Outbound Fax Emails', 'Advanced Inbound Texts Emails', 'Advanced Missed Calls Emails']
-        writeExcel(header, notifications, 'notifications.xlsx')
+        writePrettyExcel(header, notifications, 'Notifications', 'notifications.xlsx')
         // setIsPending(false)
     }, [isNotificationListPending, notifications, isPending])
 
