@@ -72,6 +72,10 @@ const useGetAccessToken = () => {
                 accountList.push(accountData)
             }
             else {
+                accountList[4] = accountList[3]
+                accountList[3] = accountList[2]
+                accountList[2] = accountList[1]
+                accountList[1] = accountList[0]
                 accountList[0] = accountData
             }
             localStorage.setItem('accounts', JSON.stringify(accountList))
