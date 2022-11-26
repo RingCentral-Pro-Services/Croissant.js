@@ -67,7 +67,7 @@ const CallQueues = () => {
 
     return (
         <>
-        <Header title='Call Queues' body='Do some stuff with call queues' />
+        <Header title='Call Queues' body='Create, update, and audit call queues' />
             <div className="tool-card">
                 <h2>Export Call Queues</h2>
                 <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} />
