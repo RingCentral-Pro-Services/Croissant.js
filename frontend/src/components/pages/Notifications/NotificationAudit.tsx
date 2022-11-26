@@ -37,6 +37,7 @@ const NotificationAudit = () => {
     const [selectedExtensionTypes, setSelectedExtensionTypes] = useState<string[]>(prettyExtensionTypes)
     const [selectedSites, setSelectedSites] = useState<string[]>([])
     const [sites, setSites] = useState<string[]>([])
+    const [adjustedExtensionList, setAdjustedExtensionList] = useState<RCExtension[]>([])
     const [filteredExtensions, setFilteredExtensions] = useState<RCExtension[]>([])
 
     // Progess bar
@@ -91,13 +92,22 @@ const NotificationAudit = () => {
             return site.name
         })
 
+        // The account is not in multi-site mode. Set all extensions to main site
+        if (siteNames.length === 0) {
+            let extensions = extensionsList.map((extension) => {
+                extension.site = 'Main Site'
+                return extension
+            })
+            setAdjustedExtensionList(extensions)
+        }
+        else {
+            setAdjustedExtensionList(extensionsList)
+        }
+
         siteNames = ['Main Site', ...siteNames]
 
         setSites(siteNames)
         setSelectedSites(siteNames)
-
-        // fetchNotificationSettings(extensionsList)
-        // fireEvent('notifications-audit')
     }, [isExtensionListPending, extensionsList])
 
     useEffect(() => {
@@ -111,13 +121,9 @@ const NotificationAudit = () => {
     }, [isNotificationListPending, notifications, isPending])
 
     useEffect(() => {
-        console.log(selectedExtensionTypes)
-        console.log(selectedSites)
-
-        const filtered = extensionsList.filter((extension) => {
+        const filtered = adjustedExtensionList.filter((extension) => {
             return selectedExtensionTypes.includes(extension.prettyType[extension.type]) && selectedSites.includes(extension.site)
         })
-        console.log(filtered)
 
         setFilteredExtensions(filtered)
     }, [selectedExtensionTypes, selectedSites])

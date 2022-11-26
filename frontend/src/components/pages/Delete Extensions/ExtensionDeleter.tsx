@@ -32,6 +32,7 @@ const ExtensionDeleter = () => {
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
     const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
     const {extensionsList, fetchExtensions, isExtensionListPending} = useExtensionList(postMessage)
+    const [adjustedExtensionList, setAdjustedExtensionList] = useState<RCExtension[]>([])
 
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
@@ -60,6 +61,18 @@ const ExtensionDeleter = () => {
             return site.name
         })
 
+        // The account is not in multi-site mode. Assign all extensions to main site
+        if (siteNames.length === 0) {
+            let extensions = extensionsList.map((extension) => {
+                extension.site = 'Main Site'
+                return extension
+            })
+            setAdjustedExtensionList(extensions)
+        }
+        else {
+            setAdjustedExtensionList(extensionsList)
+        }
+
         siteNames = ['Main Site', ...siteNames]
 
         setSites(siteNames)
@@ -77,7 +90,7 @@ const ExtensionDeleter = () => {
 
         // Look for park locations first; they're not assigned to sites
         if (selectedExtensionTypes.includes('Park Location')) {
-            const parkLocations = extensionsList.filter((extension) => {
+            const parkLocations = adjustedExtensionList.filter((extension) => {
                 return extension.prettyType[extension.type] === 'Park Location'
             })
             result = [...result, ...parkLocations]
@@ -85,14 +98,14 @@ const ExtensionDeleter = () => {
 
         // Now look for paging groups
         if (selectedExtensionTypes.includes('Paging Group')) {
-            const pagingGroups = extensionsList.filter((extension) => {
+            const pagingGroups = adjustedExtensionList.filter((extension) => {
                 return extension.prettyType[extension.type] === 'Paging Group'
             })
             result = [...result, ...pagingGroups]
         }
 
         // Filter extensions assigned to sites
-        const selected = extensionsList.filter((extension) => {
+        const selected = adjustedExtensionList.filter((extension) => {
             return selectedExtensionTypes.includes(extension.prettyType[extension.type]) && selectedSites.includes(extension.site)
         })
 
