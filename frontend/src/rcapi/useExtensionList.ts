@@ -25,7 +25,7 @@ const useExtensionList = (postMessage: (message: Message) => void) => {
 
         let targetUID = localStorage.getItem('target_uid')
         if (!targetUID) return
-        let extensionsURL = `${baseExtensionsURL}?page=${page}&perPage=100`;
+        let extensionsURL = `${baseExtensionsURL}?page=${page}&perPage=1000`;
 
             setTimeout(async () => {
                 try {

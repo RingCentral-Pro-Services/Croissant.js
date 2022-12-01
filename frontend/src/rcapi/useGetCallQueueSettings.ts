@@ -11,7 +11,7 @@ const useGetCallQueueSettings = (setProgressValue: (value: (any)) => void, postM
     const [queues, setQueues] = useState<CallQueue[]>([])
     const [isCallQueueSettingsPending, setIsPending] = useState(true)
     const [shouldFetch, setShouldFetch] = useState(false)
-    const [rateLimitInterval, setRateLimitInterval] = useState(0)
+    const [rateLimitInterval, setRateLimitInterval] = useState(250)
     const [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
     const baseURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/answering-rule'
 
@@ -44,7 +44,12 @@ const useGetCallQueueSettings = (setProgressValue: (value: (any)) => void, postM
             try {
                 let response = await RestCentral.get(url, headers)
                 if (response.rateLimitInterval > 0) postTimedMessage(new Message(`Rate limit reached. Resuming in 60 seconds`, 'info'), 60000)
-                setRateLimitInterval(response.rateLimitInterval)
+                if (response.rateLimitInterval > 0) {
+                    setRateLimitInterval(response.rateLimitInterval)
+                }
+                else {
+                    setRateLimitInterval(250)
+                }
                 console.log('Queue settings')
                 console.log(response)
 

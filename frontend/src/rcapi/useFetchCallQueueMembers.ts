@@ -9,7 +9,7 @@ const useFetchCallQueueMembers = (setProgressValue: (value: (any)) => void, setM
     let [callQueues, setCallQueues] = useState<CallQueue[]>([])
     const accessToken = localStorage.getItem('cs_access_token')
     let [shouldFetch, setShouldFetch] = useState(false)
-    let [rateLimitInterval, setRateLimitInterval] = useState(0)
+    let [rateLimitInterval, setRateLimitInterval] = useState(250)
     let [filteredExtensions, setFilteredExtensions] = useState<RCExtension[]>([])
     let [isQueueListPending, setIsQueueListPending] = useState(true)
     let baseURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId/members'
@@ -56,7 +56,12 @@ const useFetchCallQueueMembers = (setProgressValue: (value: (any)) => void, setM
                     // process response
                     console.log(res)
                     if (rateLimit(res.headers) > 0) postTimedMessage(new Message(`Rate limit reached. Resuming in 60 seconds`, 'info'), 60000)
-                    setRateLimitInterval(rateLimit(res.headers))
+                    if (rateLimit(res.headers) > 0) {
+                        setRateLimitInterval(rateLimit(res.headers))
+                    }
+                    else {
+                        setRateLimitInterval(250)
+                    }
 
                     let records = res.data.records
                     let extensions: string[] = []

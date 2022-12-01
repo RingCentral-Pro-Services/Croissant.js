@@ -12,7 +12,7 @@ const useFetchIVRs = (setProgressValue: (value: (any)) => void, setMaxProgressVa
     const [ivrsList, setIvrsList] = useState<IVRMenu[]>([])
     const [ivrExtensions, setIvrExtensions] = useState<RCExtension[]>([])
     let [shouldFetch, setShouldFetch] = useState(false)
-    let [rateLimitInterval, setRateLimitInterval] = useState(0)
+    let [rateLimitInterval, setRateLimitInterval] = useState(250)
     const baseURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/ivr-menus/ivrMenuId'
     const accessToken = localStorage.getItem('cs_access_token')
 
@@ -52,7 +52,12 @@ const useFetchIVRs = (setProgressValue: (value: (any)) => void, setMaxProgressVa
                 console.log(response)
 
                 if (response.rateLimitInterval > 0) postTimedMessage(new Message(`Rate limit reached. Resuming in 60 seconds`, 'info'), 60000)
-                setRateLimitInterval(response.rateLimitInterval)
+                if (response.rateLimitInterval > 0) {
+                    setRateLimitInterval(response.rateLimitInterval)
+                }
+                else {
+                    setRateLimitInterval(250)
+                }
 
                 const menuData: IVRMenuData = response.data
                 if (menuData.prompt === undefined) {

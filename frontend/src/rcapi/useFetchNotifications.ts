@@ -9,7 +9,7 @@ const useFetchNotifications = (postMessage: (message: Message) => void, setProgr
     let [notifications, setNotifications] = useState<NotificationSettings[]>([])
     const accessToken = localStorage.getItem('cs_access_token')
     let [shouldFetch, setShouldFetch] = useState(false)
-    let [rateLimitInterval, setRateLimitInterval] = useState(0)
+    let [rateLimitInterval, setRateLimitInterval] = useState(250)
     let [filteredExtensions, setFilteredExtensions] = useState<RCExtension[]>([])
     let [isNotificationListPending, setIsNotificationListPending] = useState(true)
     const baseURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/notification-settings'
@@ -52,7 +52,13 @@ const useFetchNotifications = (postMessage: (message: Message) => void, setProgr
                if (res.status === 200) {
                     // Do something with the response
                     console.log(res)
-                    setRateLimitInterval(rateLimit(res.headers))
+                    if (rateLimit(res.headers) > 0) {
+                        setRateLimitInterval(rateLimit(res.headers))
+                    }
+                    else {
+                        setRateLimitInterval(250)
+                    }
+                    
                     let resData = res.data
                     let bundle: NotificationSettingsPayload = resData
                     let notification = new NotificationSettings(filteredExtensions[currentExtensionIndex], bundle)
