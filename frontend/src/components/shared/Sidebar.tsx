@@ -18,6 +18,7 @@ const Sidebar = () => {
             <NavItem text="Create Menus" destination="/" isSelected={selectedItem === "Create Menus"} handleClick={handleClick}/>
             <NavItem text="Audit Menus" destination="/auditmenus" isSelected={selectedItem === "Audit Menus"} handleClick={handleClick} />
             <NavItem text="Edit Sites" destination="/editsites" isSelected={selectedItem === "Edit Sites"} handleClick={handleClick} />
+            <NavItem text="Edit Extensions" destination="/editextensions" isSelected={selectedItem === "Edit Extensions"} handleClick={handleClick} />
             {/* <NavItem text="Generate Prompts" destination="/generateprompts" isSelected={selectedItem === "Generate Prompts"} handleClick={handleClick} /> */}
             <NavItem text="Account Dump" destination="/accountdump" isSelected={selectedItem === "Account Dump"} handleClick={handleClick} />
             <NavItem text="Delete Extensions" destination="/deleteextensions" isSelected={selectedItem === "Delete Extensions"} handleClick={handleClick} />
