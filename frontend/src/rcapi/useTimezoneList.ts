@@ -40,7 +40,7 @@ const useTimezoneList = () => {
                     else return -1
                 })
                 setTimezones(result)
-                setIsTimezonListPending(0)
+                setIsTimezonListPending(false)
             }
             catch (e: any) {
                 console.log('Something went wrong fetching timezones')
