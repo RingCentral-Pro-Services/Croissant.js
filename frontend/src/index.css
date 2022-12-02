@@ -336,3 +336,7 @@ progress::-webkit-progress-value {
   overflow-y: auto;
   margin-bottom: 10px;
 }
+
+.simple-select {
+  margin-right: 30px;
+}
