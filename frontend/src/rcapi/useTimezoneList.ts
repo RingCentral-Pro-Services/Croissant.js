@@ -65,7 +65,7 @@ const useTimezoneList = () => {
         return result
     }
 
-    return {fetchTimezones, timezones}
+    return {fetchTimezones, timezones, isTimezonListPending}
 }
 
 export default useTimezoneList
