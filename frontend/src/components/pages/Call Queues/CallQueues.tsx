@@ -14,6 +14,7 @@ import useGetCallQueueSettings from "../../../rcapi/useGetCallQueueSettings"
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage"
 import MessagesArea from "../../shared/MessagesArea"
 import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel"
+import CallQueueTemplates from "./CallQueueTemplates"
 
 const CallQueues = () => {
     useLogin()
@@ -75,6 +76,7 @@ const CallQueues = () => {
                 {isPending ? <progress className='healthy-margin-top' value={progressValue} max={maxProgressValue} /> : <></>}
                 {timedMessages.length > 0 ? <MessagesArea messages={timedMessages} /> : <></>}
             </div>
+            <CallQueueTemplates />
             <CreateCallQueues />
         </>
     )
