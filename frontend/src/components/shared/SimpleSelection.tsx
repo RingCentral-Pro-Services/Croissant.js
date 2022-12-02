@@ -6,13 +6,8 @@ const SimpleSelection = (props: {label: string, placeholder: string, options: st
     const {placeholder, label, options, defaultSelected} = props
     const [selection, setSelection] = useState(defaultSelected)
 
-    useEffect(() => {
-        console.log(`Selection: ${selection}`)
-    }, [])
-
     const handleChange = (event: SelectChangeEvent) => {
         setSelection(event.target.value as string)
-        console.log(`Delection: ${event.target.value}`)
     }
     
     return (
