@@ -22,9 +22,10 @@ const useApplyRegionalSettings = (setProgressValue: (value: (any)) => void, post
     useEffect(() => {
         const accessToken = localStorage.getItem('cs_access_token')
         if (!shouldUpdate || !accessToken) return
-        if (currentExtensionIndex >= extensions.length) {
+        if (currentExtensionIndex >= extensions.length || Object.keys(payload).length === 0) {
             setProgressValue(extensions.length)
             setShouldUpdate(false)
+            setIsRegionalSettingApplicationPending(false)
             return
         }
 
@@ -35,11 +36,9 @@ const useApplyRegionalSettings = (setProgressValue: (value: (any)) => void, post
         }
 
         setTimeout(async () => {
-            console.log(extensions[currentExtensionIndex].name)
             const url = baseURL.replace('extensionId', `${extensions[currentExtensionIndex].id}`)
             try {
                 const response = await RestCentral.put(url, headers, {regionalSettings: payload})
-                console.log(response)
                 if (response.rateLimitInterval > 0) postTimedMessage(new Message(`Rate limit reached. Resuming in 60 seconds`, 'info'), 60000)
                 if (response.rateLimitInterval > 0) {
                     setRateLimitInterval(response.rateLimitInterval)
