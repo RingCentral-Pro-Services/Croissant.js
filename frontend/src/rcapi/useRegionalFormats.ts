@@ -4,6 +4,7 @@ import { RestCentral } from "./RestCentral"
 
 const useRegionalFormats = () => {
     const [regionalFormats, setRegionalFormats] = useState<RegionalFormat[]>([])
+    const [regionalFormatMap, setRegionalFormatMap] = useState<Map<string, RegionalFormat>>(new Map())
     const [shouldFetch, setShouldFetch] = useState(false)
     const [rateLimitInterval, setRateLimitInterval] = useState(250)
     const [isRegionalFormatListPenging, setIsRegionalFormatListPenging] = useState(true)
@@ -31,6 +32,7 @@ const useRegionalFormats = () => {
                     if (a.name < b.name) return -1
                     else return 1
                 })
+                createMap(formats)
                 setRegionalFormats(formats)
                 setIsRegionalFormatListPenging(false)
             }
@@ -41,7 +43,15 @@ const useRegionalFormats = () => {
         }, rateLimitInterval)
     }, [shouldFetch, rateLimitInterval, url])
 
-    return {fetchRegionalFormats, regionalFormats, isRegionalFormatListPenging}
+    const createMap = (formats: RegionalFormat[]) => {
+        let map = new Map<string, RegionalFormat>()
+        for (const format of formats) {
+            map.set(format.name, format)
+        }
+        setRegionalFormatMap(map)
+    }
+
+    return {fetchRegionalFormats, regionalFormats, isRegionalFormatListPenging, regionalFormatMap}
 }
 
 export default useRegionalFormats

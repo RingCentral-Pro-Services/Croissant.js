@@ -4,6 +4,7 @@ import { RestCentral } from "./RestCentral"
 
 const useTimezoneList = () => {
     const [timezones, setTimezones] = useState<Timezone[]>([])
+    const [timezoneMap, setTimezoneMap] = useState<Map<string, Timezone>>(new Map())
     const [shouldFetch, setShouldFetch] = useState(false)
     const [rateLimitInterval, setRateLimitInterval] = useState(250)
     const [isTimezonListPending, setIsTimezonListPending] = useState(true)
@@ -39,6 +40,7 @@ const useTimezoneList = () => {
                     if (parseInt(a.bias) < parseInt(b.bias)) return 1
                     else return -1
                 })
+                createMap(result)
                 setTimezones(result)
                 setIsTimezonListPending(false)
             }
@@ -65,7 +67,15 @@ const useTimezoneList = () => {
         return result
     }
 
-    return {fetchTimezones, timezones, isTimezonListPending}
+    const createMap = (zones: Timezone[]) => {
+        let map = new Map<string, Timezone>()
+        for (const zone of zones) {
+            map.set(zone.prettyName, zone)
+        }
+        setTimezoneMap(map)
+    }
+
+    return {fetchTimezones, timezones, isTimezonListPending, timezoneMap}
 }
 
 export default useTimezoneList
