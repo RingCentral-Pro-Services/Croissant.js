@@ -2,12 +2,13 @@ import { CheckBoxOutlineBlank, CheckBox } from "@mui/icons-material";
 import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 
-const SimpleSelection = (props: {label: string, placeholder: string, options: string[], defaultSelected: string}) => {
-    const {placeholder, label, options, defaultSelected} = props
+const SimpleSelection = (props: {label: string, placeholder: string, options: string[], defaultSelected: string, onSelect: (value: string) => void}) => {
+    const {placeholder, label, options, defaultSelected, onSelect} = props
     const [selection, setSelection] = useState(defaultSelected)
 
     const handleChange = (event: SelectChangeEvent) => {
         setSelection(event.target.value as string)
+        onSelect(event.target.value as string)
     }
     
     return (
