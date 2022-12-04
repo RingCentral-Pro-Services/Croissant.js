@@ -93,7 +93,7 @@ const CallQueueTemplates = () => {
         <div className="tool-card">
             <h2>Call Queue Templates</h2>
             <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} />
-            <Button variant="contained" onClick={handleSyncButtonClick} >Sync</Button>
+            <Button disabled={isRegionalFormatListPenging} variant="contained" onClick={handleSyncButtonClick} >Sync</Button>
             {isSyncing ? <progress value={progressValue} max={maxProgressValue} /> : <></>}
             <div className="healthy-margin-bottom"></div>
             <div hidden={isRegionalFormatListPenging}>
