@@ -12,12 +12,13 @@ const SimpleSelection = (props: {label: string, placeholder: string, options: st
     }
     
     return (
-        <div className="healthy-margin-top simple-select">
+        <div className="healthy-margin-top mega-margin-bottom simple-select">
             <Typography sx={{marginBottom: 1}}>{label}</Typography>
             <FormControl className="vertical-middle" sx={{display: 'block'}}>
                 <InputLabel id="demo-simple-select-label">{placeholder}</InputLabel>
                 <Select
-                    autoWidth
+                    // autoWidth
+                    sx={{minWidth: 150}}
                     size="small"
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
