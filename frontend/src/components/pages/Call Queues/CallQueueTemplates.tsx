@@ -16,6 +16,11 @@ import useRegionalFormats from "../../../rcapi/useRegionalFormats";
 import useBuildRegionalSettings from "../../../hooks/useBuildRegionalSettings";
 import RCExtension from "../../../models/RCExtension";
 import useApplyRegionalSettings from "../../../rcapi/useApplyRegionalSettings";
+import useGreetingList from "../../../rcapi/useGrettingList";
+import useBuildGreetingSettings from "../../../hooks/useBuildGreetingSettings";
+import useUpdateCallHandling from "../../../rcapi/useUpdateCallHandling";
+import useBuildCallHandlingSettings from "../../../hooks/useBuildCallHandlingSettings";
+import FreeResponse from "../../shared/FreeResponse";
 
 const CallQueueTemplates = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -31,8 +36,12 @@ const CallQueueTemplates = () => {
     const {fetchExtensions, extensionsList, isExtensionListPending} = useExtensionList(postMessage)
     const {fetchTimezones, timezones, isTimezonListPending, timezoneMap} = useTimezoneList()
     const {fetchRegionalFormats, isRegionalFormatListPenging, regionalFormats, regionalFormatMap} = useRegionalFormats()
-    const {setGreetingsLanguage, setRegionalFormat, setTimeFormat, setTimezone, setUserLanguage, payload} = useBuildRegionalSettings(regionalFormatMap, timezoneMap)
+    const {setGreetingsLanguage, setRegionalFormat, setTimeFormat, setTimezone, setUserLanguage, payload: regionalSettingsPayload} = useBuildRegionalSettings(regionalFormatMap, timezoneMap)
     const {applyRegionalSettings, isRegionalSettingApplicationPending} = useApplyRegionalSettings(setProgressValue, postMessage, postTimedMessage, postError)
+    const {fetchGreetings, callQueueConnectingAudio, holdMusicAudio, callQueueGreetingAudio, callQueueInterruptAudio, connectingAudioMap, greetingAudioMap, interruptAudioMap, holdMusicMap} = useGreetingList()
+    const {setIntroGreeting, setAudioWhileConnecting, setHoldMusic, setInterruptAudio, greetings} = useBuildGreetingSettings(connectingAudioMap, interruptAudioMap, greetingAudioMap, holdMusicMap)
+    const {updateCallHandling, isCallHandlingUpdatePending} = useUpdateCallHandling(setProgressValue, postMessage, postTimedMessage, postError)
+    const {setRingType, setMaxCallersInQueue, setMaxWaitTime, setMaxWaitTimeAction, setMaxWaitTimeDestination, setQueueFullAction, setQueueFullDestination, setUserRingTime, setWrapUpTime, setInterruptPeriod, payload: callHandlingPayload} = useBuildCallHandlingSettings(extensionsList)
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -59,17 +68,25 @@ const CallQueueTemplates = () => {
         fetchRegionalFormats()
     }, [isTimezonListPending])
 
+    useEffect(() => {
+        if (isRegionalFormatListPenging) return
+        fetchGreetings()
+    }, [isRegionalFormatListPenging])
+
+    useEffect(() => {
+        if (isRegionalSettingApplicationPending) return
+        const payload = {
+            ...(greetings.length != 0 && {greetings: greetings}),
+            ...(Object.keys(callHandlingPayload).length != 0 && {queue: callHandlingPayload})
+        }
+        updateCallHandling(filteredExtensions, payload)
+    }, [isRegionalSettingApplicationPending])
+
     const handleSyncButtonClick = () => {
         if (filteredExtensions.length === 0) return
-
-        console.log('IDs')
-        for (const extension of filteredExtensions) {
-            console.log(extension.id)
-        }
-
         setIsSyncing(true)
-        setMaxProgressValue(filteredExtensions.length)
-        applyRegionalSettings(filteredExtensions, payload)
+        setMaxProgressValue(filteredExtensions.length * 2)
+        applyRegionalSettings(filteredExtensions, regionalSettingsPayload)
     }
 
     return (
@@ -102,13 +119,13 @@ const CallQueueTemplates = () => {
                 </AccordionSummary>
                 <AccordionDetails>
                     <div className="inline">
-                        <SimpleSelection label="Call Queue Greeting" placeholder="greeting" options={['Default', 'Disabled']} defaultSelected='Default' onSelect={setGreetingsLanguage} />
-                        <SimpleSelection label="Audio While Connecting" placeholder="audio while connecting" options={['Music (Acoustic)', 'Music (Beautiful)', 'Music (Classical)']} defaultSelected='Music (Acoustic)' onSelect={setGreetingsLanguage} />
-                        <SimpleSelection label="Hold Music" placeholder="hold music" options={['Music (Acoustic)', 'Music (Beautiful)', 'Music (Classical)']} defaultSelected='Music (Acoustic)' onSelect={setGreetingsLanguage} />
+                        <SimpleSelection label="Call Queue Greeting" placeholder="" options={callQueueGreetingAudio} defaultSelected='' onSelect={setIntroGreeting} />
+                        <SimpleSelection label="Audio While Connecting" placeholder="" options={callQueueConnectingAudio} defaultSelected='' onSelect={setAudioWhileConnecting} />
+                        <SimpleSelection label="Hold Music" placeholder="" options={holdMusicAudio} defaultSelected='Music (Acoustic)' onSelect={setHoldMusic} />
                     </div>
                     <div className="inline">
-                        <SimpleSelection label="Interrupt Audio" placeholder="" options={['Never', 'Only when music ends', 'Every 15 seconds']} defaultSelected='Never' onSelect={setGreetingsLanguage} />
-                        <SimpleSelection label="Interrupt Prompt" placeholder="" options={['Thank you, Stay on the line', 'Appreciate Patience, Stay on the line', 'Thank you, Wait for Agent']} defaultSelected='Thank you, Stay on the line' onSelect={setGreetingsLanguage} />
+                        <SimpleSelection label="Interrupt Audio" placeholder="" options={['Never', 'Only when music ends', 'Every 15 seconds']} defaultSelected='' onSelect={setInterruptPeriod} />
+                        <SimpleSelection label="Interrupt Prompt" placeholder="" options={callQueueInterruptAudio} defaultSelected='e' onSelect={setInterruptAudio} />
                     </div>
                 </AccordionDetails>
             </Accordion>
@@ -118,18 +135,21 @@ const CallQueueTemplates = () => {
                 </AccordionSummary>
                 <AccordionDetails>
                     <div className="inline">
-                        <SimpleSelection label="Route calls to members" placeholder="" options={['Rotating', 'Sequential', 'Simultaneous']} defaultSelected='Rotating' onSelect={setGreetingsLanguage} />
-                        <SimpleSelection label="Number of rings before trying next member" placeholder="" options={['2 Rings / 10 Seconds', '3 Rings / 15 Seconds', '4 Rings / 20 Seconds']} defaultSelected='4 Rings / 20 Seconds' onSelect={setGreetingsLanguage} />
-                        <SimpleSelection label="After call wrap-up time" placeholder="" options={['0 Seconds', '10 Seconds', '15 Seconds']} defaultSelected='15 Seconds' onSelect={setGreetingsLanguage} />
+                        <SimpleSelection label="Route calls to members" placeholder="" options={['Rotating', 'Sequential', 'Simultaneous']} defaultSelected='' onSelect={setRingType} />
+                        <SimpleSelection label="Number of rings before trying next member" placeholder="" options={['2 Rings / 10 Seconds', '3 Rings / 15 Seconds', '4 Rings / 20 Seconds', '5 Rings / 25 Seconds', '6 Rings / 30 Seconds', '9 Rings / 45 Seconds', '12 Rings / 1 Minute', '24 Rings / 2 Minutes', '60 Rings / 5 Minutes']} defaultSelected='' onSelect={setUserRingTime} />
+                        <SimpleSelection label="After call wrap-up time" placeholder="" options={['0 Seconds', '10 Seconds', '15 Seconds', '20 Seconds', '25 Seconds', '30 Seconds', '45 Seconds', '1 Minute', '3 Minutes', '5 Minutes']} defaultSelected='' onSelect={setWrapUpTime} />
                     </div>
                     <div className="inline">
-                        <SimpleSelection label="Number of callers allowed in queue" placeholder="" options={['5 Callers', '10 Callers', '15 Callers']} defaultSelected='10 Callers' onSelect={setGreetingsLanguage} />
-                        <SimpleSelection label="When queue is full" placeholder="" options={['Voicemail', 'Play message, disconnect', 'Transfer to extension']} defaultSelected='Voicemail' onSelect={setGreetingsLanguage} />
-                        <SimpleSelection label="Queue full destination" placeholder="" options={['Needs new conponent', 'Needs new conponent', 'Needs new conponent']} defaultSelected='Needs new conponent' onSelect={setGreetingsLanguage} />
+                        <SimpleSelection label="Number of callers allowed in queue" placeholder="" options={['5 Callers', '10 Callers', '15 Callers', '20 Callers', '25 Callers']} defaultSelected='' onSelect={setMaxCallersInQueue} />
+                        <SimpleSelection label="When queue is full" placeholder="" options={['Send new callers to voicemail', 'Advise callers of heavy call volume and disconnect', 'Send new callers to extension', 'Forward new callers to external number']} defaultSelected='' onSelect={setQueueFullAction} />
+                        {/* <SimpleSelection label="Queue full destination" placeholder="" options={['Needs new conponent', 'Needs new conponent', 'Needs new conponent']} defaultSelected='Needs new conponent' onSelect={setQueueFullDestination} /> */}
+                        <FreeResponse label="Queue full destination" onInput={setQueueFullDestination} />
                     </div>
                     <div className="inline">
-                        <SimpleSelection label="Maximum caller wait time in queue" placeholder="" options={["Don't Wait", '3 Minutes', '5 Minutes']} defaultSelected='3 Minutes' onSelect={setGreetingsLanguage} />
-                        <SimpleSelection label="Max wait time destination" placeholder="" options={['Needs new conponent', 'Needs new conponent', 'Needs new conponent']} defaultSelected='Needs new conponent' onSelect={setGreetingsLanguage} />
+                        <SimpleSelection label="Maximum caller wait time in queue" placeholder="" options={["Don't Wait", '10 Seconds', '15 Seconds', '20 Seconds', '25 Seconds', '30 Seconds', '1 Minute', '2 Minutes', '3 Minutes', '4 Minutes', '5 Minutes', '10 Minutes', '15 Minutes']} defaultSelected='' onSelect={setMaxWaitTime} />
+                        <SimpleSelection label="When max wait time reached, send caller to" placeholder="" options={['Voicemail', 'Extension', 'External number']} defaultSelected='' onSelect={setMaxWaitTimeAction} />
+                        {/* <SimpleSelection label="Max wait time destination" placeholder="" options={['Needs new conponent', 'Needs new conponent', 'Needs new conponent']} defaultSelected='Needs new conponent' onSelect={setMaxWaitTimeDestination} /> */}
+                        <FreeResponse label="Max wait time destination" onInput={setMaxWaitTimeDestination} />
                     </div>
                 </AccordionDetails>
             </Accordion>
