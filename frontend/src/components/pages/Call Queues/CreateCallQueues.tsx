@@ -13,6 +13,7 @@ import useGetAccessToken from "../../../rcapi/useGetAccessToken"
 import useAnalytics from "../../../hooks/useAnalytics"
 import useValidateExcelData from "../../../hooks/useValidateExcelData"
 import { callQueueSchema } from "../../../helpers/schemas"
+import Header from "../../shared/Header"
 
 const CreateCallQueues = () => {
     const {fireEvent} = useAnalytics()
@@ -87,14 +88,17 @@ const CreateCallQueues = () => {
     }, [isQueueConvertPending, isReadyToSync, extensionsList, queues])
 
     return (
-        <div className="tool-card">
-            <h2>Create Call Queues</h2>
-            <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} />
-            <FileSelect enabled={hasCustomerToken} accept=".xlsx" handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
-            {isPending ? <></> : <Button variant="contained" onClick={handleSyncButtonClick}>Sync</Button>}
-            {!(queues.length > 0) ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
-            {isQueueConvertPending ? <></> : <FeedbackArea tableHeader={['Name', 'Extension', 'Site', 'Members', 'Ring Type', 'Wait time', 'Wrap-up time']} tableData={queues} messages={messages} timedMessages={timedMessages} errors={errors} />}
-        </div>
+        <>
+            <Header title="Create Call Queues" body="Create and update call queues in bulk" />
+            <div className="tool-card">
+                <h2>Create Call Queues</h2>
+                <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} />
+                <FileSelect enabled={hasCustomerToken} accept=".xlsx" handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
+                {isPending ? <></> : <Button variant="contained" onClick={handleSyncButtonClick}>Sync</Button>}
+                {!(queues.length > 0) ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
+                {isQueueConvertPending ? <></> : <FeedbackArea tableHeader={['Name', 'Extension', 'Site', 'Members', 'Ring Type', 'Wait time', 'Wrap-up time']} tableData={queues} messages={messages} timedMessages={timedMessages} errors={errors} />}
+            </div>
+        </>
     )
 }
 

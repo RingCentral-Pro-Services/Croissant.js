@@ -50,6 +50,10 @@ body {
   outline: 0;
 }
 
+.nav-toolbar {
+  padding-left: 16px!important;
+}
+
 .nav-item:hover {
   background-color: #ccc;
   color: black;

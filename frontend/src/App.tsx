@@ -11,6 +11,8 @@ import Sidebar from './components/shared/Sidebar';
 import Token from './components/shared/Token';
 import EditSites from './components/pages/Edit Sites/EditSites';
 import ExtensionEditor from './components/pages/Extension Editor/ExtensionEditor';
+import CallQueueTemplates from './components/pages/Call Queues/CallQueueTemplates';
+import CreateCallQueues from './components/pages/Call Queues/CreateCallQueues';
 
 function App() {
 
@@ -30,6 +32,9 @@ function App() {
             <Route path='/accountdump' element={<ExtensionAudit />} />
             <Route path='/notificationsaudit' element={<NotificationAudit />} />
             <Route path='/callqueues' element={<CallQueues />} />
+            <Route path='/auditcallqueues' element={<CallQueues />} />
+            <Route path='/createcallqueues' element={<CreateCallQueues />} />
+            <Route path='/callqueuetemplates' element={<CallQueueTemplates />} />
             <Route path='/deleteextensions' element={<ExtensionDeleter />} />
             {/* <Route path='/generateprompts' element={<PromptGeneration />} /> */}
             <Route path='/editsites' element={<EditSites />} />

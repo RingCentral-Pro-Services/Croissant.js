@@ -5,7 +5,6 @@ import useMessageQueue from "../../../hooks/useMessageQueue"
 import useExtensionList from "../../../rcapi/useExtensionList"
 import useFetchCallQueueMembers from "../../../rcapi/useFetchCallQueueMembers"
 import useWriteExcelFile from "../../../hooks/useWriteExcelFile"
-import CreateCallQueues from "./CreateCallQueues"
 import Header from "../../shared/Header"
 import {Button} from '@mui/material'
 import useAnalytics from "../../../hooks/useAnalytics"
@@ -14,7 +13,6 @@ import useGetCallQueueSettings from "../../../rcapi/useGetCallQueueSettings"
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage"
 import MessagesArea from "../../shared/MessagesArea"
 import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel"
-import CallQueueTemplates from "./CallQueueTemplates"
 
 const CallQueues = () => {
     useLogin()
@@ -68,7 +66,7 @@ const CallQueues = () => {
 
     return (
         <>
-        <Header title='Call Queues' body='Create, update, and audit call queues' />
+            <Header title='Audit Call Queues' body='Export a spreadsheet of all queues in an account' />
             <div className="tool-card">
                 <h2>Export Call Queues</h2>
                 <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} />
@@ -76,8 +74,6 @@ const CallQueues = () => {
                 {isPending ? <progress className='healthy-margin-top' value={progressValue} max={maxProgressValue} /> : <></>}
                 {timedMessages.length > 0 ? <MessagesArea messages={timedMessages} /> : <></>}
             </div>
-            <CallQueueTemplates />
-            <CreateCallQueues />
         </>
     )
 }
