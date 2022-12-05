@@ -62,6 +62,14 @@ const useBuildCallHandlingSettings = (extensions: RCExtension[]) => {
         ['15 Callers', 15],
         ['20 Callers', 20],
         ['25 Callers', 25],
+
+        ['Every 15 seconds', 15],
+        ['Every 20 seconds', 20],
+        ['Every 25 seconds', 25],
+        ['Every 30 seconds', 30],
+        ['Every 40 seconds', 40],
+        ['Every 50 seconds', 50],
+        ['Every 60 seconds', 60],
     ])
 
     const actionMap: Map<string, string> = new Map([
@@ -254,6 +262,30 @@ const useBuildCallHandlingSettings = (extensions: RCExtension[]) => {
         }
     }, [queueFullDestination])
 
+    useEffect(() => {
+        if (interruptPeriod === '' || !interruptPeriod) {
+            let newCallHandling = {...callHandling}
+            newCallHandling.holdAudioInterruptionPeriod = -1
+            setCallHandling(newCallHandling)
+            return
+        }
+
+        let newCallHandling = {...callHandling}
+        if (interruptPeriod === 'Never') {
+            newCallHandling.holdAudioInterruptionMode = 'Never'
+            newCallHandling.holdAudioInterruptionPeriod = -1
+        }
+        else if (interruptPeriod === 'Only when music ends') {
+            newCallHandling.holdAudioInterruptionMode = 'WhenMusicEnds'
+            newCallHandling.holdAudioInterruptionPeriod = -1
+        }
+        else {
+            newCallHandling.holdAudioInterruptionMode = 'Periodically'
+            newCallHandling.holdAudioInterruptionPeriod = map.get(interruptPeriod)!
+        }
+        setCallHandling(newCallHandling)
+    }, [interruptPeriod])
+
     const addTransfer = (action: string, id: string) => {
         let newCallHandling = {...callHandling}
         let transfers = newCallHandling.transfer
@@ -310,8 +342,12 @@ const useBuildCallHandlingSettings = (extensions: RCExtension[]) => {
             ...(callHandling.holdTime != -1 && {holdTime: callHandling.holdTime}),
             ...(callHandling.holdTimeExpirationAction != '' && {holdTimeExpirationAction: callHandling.holdTimeExpirationAction}),
             ...(callHandling.unconditionalForwarding?.length != 0 && {unconditionalForwarding: callHandling.unconditionalForwarding}),
-            ...(callHandling.transfer!.length > 0 && {transfer: callHandling.transfer})
+            ...(callHandling.transfer!.length > 0 && {transfer: callHandling.transfer}),
+            ...(callHandling.holdAudioInterruptionMode != '' && {holdAudioInterruptionMode: callHandling.holdAudioInterruptionMode}),
+            ...(callHandling.holdAudioInterruptionPeriod != -1 && {holdAudioInterruptionPeriod: callHandling.holdAudioInterruptionPeriod})
         }
+        console.log('Payload')
+        console.log(newPayload)
 
         setPayload(newPayload)
     }, [callHandling])

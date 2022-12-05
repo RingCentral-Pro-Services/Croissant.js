@@ -153,7 +153,7 @@ const CallQueueTemplates = () => {
                                 <SimpleSelection label="Hold Music" placeholder="" options={holdMusicAudio} defaultSelected='Music (Acoustic)' onSelect={setHoldMusic} />
                             </div>
                             <div className="inline">
-                                <SimpleSelection label="Interrupt Audio" placeholder="" options={['Never', 'Only when music ends', 'Every 15 seconds']} defaultSelected='' onSelect={setInterruptPeriod} />
+                                <SimpleSelection label="Interrupt Audio" placeholder="" options={['Never', 'Only when music ends', 'Every 15 seconds', 'Every 20 seconds', 'Every 25 seconds', 'Every 30 seconds', 'Every 40 seconds', 'Every 50 seconds', 'Every 60 seconds']} defaultSelected='' onSelect={setInterruptPeriod} />
                                 <SimpleSelection label="Interrupt Prompt" placeholder="" options={callQueueInterruptAudio} defaultSelected='e' onSelect={setInterruptAudio} />
                             </div>
                         </AccordionDetails>
