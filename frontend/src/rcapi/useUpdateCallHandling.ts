@@ -14,6 +14,13 @@ const useUpdateCallHandling = (setProgressValue: (value: (any)) => void, postMes
     const baseURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/answering-rule/business-hours-rule'
 
     const updateCallHandling = (extensionList: RCExtension[], payload: any) => {
+
+        if (Object.keys(payload).length === 0) {
+            setProgressValue(Number.MAX_SAFE_INTEGER)
+            setIsCallHandlingUpdatePending(false)
+            return
+        }
+
         setExtensions(extensionList)
         setPayload(payload)
         setShouldUpdate(true)
