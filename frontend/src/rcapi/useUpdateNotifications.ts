@@ -26,6 +26,7 @@ const useUpdateNotifications = (setProgressValue: (value: (any)) => void, postMe
         if (currentExtensionIndex >= notifications.length) {
             setShouldUpdate(false)
             setProgressValue(notifications.length)
+            postMessage(new Message('Finished updating extensions', 'success'))
             return
         }
 

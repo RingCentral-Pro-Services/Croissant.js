@@ -24,6 +24,7 @@ import FreeResponse from "../../shared/FreeResponse";
 import Header from "../../shared/Header";
 import FeedbackArea from "../../shared/FeedbackArea";
 import AdaptiveFilter from "../../shared/AdaptiveFilter";
+import { Message } from "../../../models/Message";
 
 const CallQueueTemplates = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -94,6 +95,11 @@ const CallQueueTemplates = () => {
         })
         setFilteredExtensions(extensions)
     }, [selectedSites])
+
+    useEffect(() => {
+        if (isCallHandlingUpdatePending) return
+        postMessage(new Message('Finished applying template', 'success'))
+    }, [isCallHandlingUpdatePending])
 
     const handleSyncButtonClick = () => {
         if (filteredExtensions.length === 0) return
