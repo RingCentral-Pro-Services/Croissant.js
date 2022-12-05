@@ -51,7 +51,7 @@ const useApplyRegionalSettings = (setProgressValue: (value: (any)) => void, post
             catch (e: any) {
                 console.log(`Something went wrong updating regional settings for ${extensions[currentExtensionIndex].name}`)
                 console.log(e)
-                postMessage(new Message(`Failed to update regional settings for ${extensions[currentExtensionIndex].name} Ext. ${extensions[currentExtensionIndex].extensionNumber}`, 'error'))
+                postMessage(new Message(`Failed to update regional settings for ${extensions[currentExtensionIndex].name} Ext. ${extensions[currentExtensionIndex].extensionNumber}. ${e.error}`, 'error'))
                 postError(new SyncError(extensions[currentExtensionIndex].name, extensions[currentExtensionIndex].extensionNumber, ['Regional settings update failed', ''], e.error))
                 updateNext()
             }
