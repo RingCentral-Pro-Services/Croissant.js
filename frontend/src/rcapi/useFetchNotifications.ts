@@ -5,7 +5,7 @@ import RCExtension from "../models/RCExtension";
 import rateLimit from "../helpers/rateLimit";
 const axios = require('axios').default;
 
-const useFetchNotifications = (postMessage: (message: Message) => void, setProgressValue: (value: (any)) => void, setMaxProgressValue: (value: (any)) => void) => {
+const useFetchNotifications = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, setProgressValue: (value: (any)) => void, setMaxProgressValue: (value: (any)) => void) => {
     let [notifications, setNotifications] = useState<NotificationSettings[]>([])
     const accessToken = localStorage.getItem('cs_access_token')
     let [shouldFetch, setShouldFetch] = useState(false)
@@ -54,6 +54,7 @@ const useFetchNotifications = (postMessage: (message: Message) => void, setProgr
                     console.log(res)
                     if (rateLimit(res.headers) > 0) {
                         setRateLimitInterval(rateLimit(res.headers))
+                        postTimedMessage(new Message(`Rate limit exceeded. Waiting 60 seconds before continuing...`, 'info'), 60000)
                     }
                     else {
                         setRateLimitInterval(250)

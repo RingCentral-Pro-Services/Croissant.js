@@ -18,6 +18,7 @@ import UIDInputField from "../../shared/UIDInputField"
 import AdaptiveFilter from "../../shared/AdaptiveFilter"
 import RCExtension from "../../../models/RCExtension"
 import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel"
+import MessagesArea from "../../shared/MessagesArea"
 
 const NotificationAudit = () => {
     useLogin()
@@ -43,7 +44,7 @@ const NotificationAudit = () => {
     // Progess bar
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
-    let {notifications, fetchNotificationSettings, isNotificationListPending} = useFetchNotifications(postMessage, setProgressValue, setMaxProgressValue)
+    let {notifications, fetchNotificationSettings, isNotificationListPending} = useFetchNotifications(postMessage, postTimedMessage, setProgressValue, setMaxProgressValue)
     const {updateNotifications, isNotificationUpdatePending} = useUpdateNotifications(setProgressValue, postMessage, postTimedMessage, postError)
     const {adjustedNotifications, isEmailSwapPending} = useSwapNotificationEmails(notifications, excelData, isExcelDataPending, postMessage, postError)
 
@@ -143,6 +144,7 @@ const NotificationAudit = () => {
                 {sites.length > 0 ? <AdaptiveFilter options={sites} defaultSelected={sites} title='Sites' placeholder='Search...' setSelected={setSelectedSites} /> : <></>}
             </div>
             {isPending ? <progress className='healthy-margin-top' id='sync_progress' value={progressValue} max={maxProgressValue} /> : <></>}
+            {timedMessages.length > 0 ? <MessagesArea messages={timedMessages} /> : <></>}
             {isEmailSwapPending ? <></> : <FeedbackArea tableHeader={['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses', 'Advanced Mode', 'Advanced Voicemail Emails', 'Advanced Inbound Fax Emails', 'Advanced Outbound Fax Emails', 'Advanced Inbound Texts Emails', 'Advanced Missed Calls Emails']} tableData={adjustedNotifications} messages={messages} timedMessages={timedMessages} errors={errors} />}
             </div>
         </>
