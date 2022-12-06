@@ -152,6 +152,19 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
         }
     }
 
+    createPayload(isMultiSiteEnabled: boolean = true) {
+        const payload = {
+            extensionNumber: this.extension.extensionNumber,
+            type: 'Department',
+            contact: {
+                firstName: this.extension.name,
+                email: this.extension.contact.email,
+            },
+            ...(isMultiSiteEnabled && {site: {id: this.siteID}}),
+        }
+        return payload
+    }
+
     payload() {
         let transferActions: TransferPayload[] = []
         let forwardActions: UnconditionalForwardingPayload[] = []

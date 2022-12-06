@@ -21,7 +21,7 @@ const CreateCallQueues = () => {
     let [isPending, setIsPending] = useState(true)
     let [isReadyToSync, setIsReadyToSync] = useState(false)
     const [targetUID, setTargetUID] = useState('')
-    const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
+    const { extensionsList, isExtensionListPending, isMultiSiteEnabled, fetchExtensions } = useExtensionList(postMessage)
     const [selectedFile, setSelectedFile] = useState<File | null>()
     const {readFile, excelData, isExcelDataPending} = useReadExcel()
     let {convert, queues, isQueueConvertPending} = useExcelToQueues(postMessage, postError)
@@ -33,7 +33,7 @@ const CreateCallQueues = () => {
     // Progess bar
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
-    let {isCallQueueCreationPending, createQueues} = useCreateCallQueues(setProgressValue ,postMessage, postTimedMessage, postError)
+    let {isCallQueueCreationPending, createQueues} = useCreateCallQueues(setProgressValue ,postMessage, postTimedMessage, postError, isMultiSiteEnabled)
     const {validatedData, isDataValidationPending, validate} = useValidateExcelData(callQueueSchema, postMessage, postError)
 
     const handleFileSelect = () => {
@@ -80,10 +80,6 @@ const CreateCallQueues = () => {
         if (!isReadyToSync) return
 
         setMaxProgressValue(queues.length * 4)
-        console.log('payload')
-        for (const queue of queues) {
-            console.log(queue.payload())
-        }
         createQueues(queues, extensionsList)
     }, [isQueueConvertPending, isReadyToSync, extensionsList, queues])
 

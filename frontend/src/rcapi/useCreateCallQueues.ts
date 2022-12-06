@@ -5,7 +5,7 @@ import RCExtension from "../models/RCExtension";
 import { SyncError } from "../models/SyncError";
 import { APIResponse, RestCentral } from "./RestCentral";
 
-const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
+const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void, isMultiSiteEnabled: boolean) => {
     const [queues, setQueues] = useState<CallQueue[]>([])
     let [shouldFetch, setShouldFetch] = useState(false)
     let [shouldUpdateQueues, setShouldUpdateQueues] = useState(false)
@@ -56,18 +56,7 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${accessToken}`
                 }
-                const body = {
-                    extensionNumber: queues[currentExtensionIndex].extension.extensionNumber,
-                    type: 'Department',
-                    site: {
-                        id: queues[currentExtensionIndex].siteID
-                    },
-                    contact: {
-                        firstName: queues[currentExtensionIndex].extension.name,
-                        email: queues[currentExtensionIndex].extension.contact.email
-                    }
-                }
-                let response = await RestCentral.post(extensionURL, headers, body)
+                let response = await RestCentral.post(extensionURL, headers, queues[currentExtensionIndex].createPayload(isMultiSiteEnabled))
                 console.log(response)
 
                 if (response.rateLimitInterval > 0) postTimedMessage(new Message(`Rate limit reached. Resuming in 60 seconds`, 'info'), 60000)
