@@ -5,6 +5,7 @@ import { Message } from "../models/Message";
 
 const useExtensionList = (postMessage: (message: Message) => void) => {
     let [isExtensionListPending, setisExtensionListPending] = useState(true)
+    const [isMultiSiteEnabled, setIsMultiSiteEnabled] = useState(false)
     let error = ""
     const baseExtensionsURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension'
     const accessToken = localStorage.getItem('cs_access_token')
@@ -54,6 +55,7 @@ const useExtensionList = (postMessage: (message: Message) => void) => {
                         setPage(page + 1)
                     }
                     else {
+                        determineMode(newRecords)
                         setisExtensionListPending(false)
                         setShouldFetch(false)
                         setRateLimitInterval(0)
@@ -67,8 +69,15 @@ const useExtensionList = (postMessage: (message: Message) => void) => {
                 }
             }, rateLimitInterval)
     }, [page, shouldFetch, accessToken, extensionsList, rateLimitInterval, postMessage])
+
+    const determineMode = (extensions: RCExtension[]) => {
+        const sites = extensions.filter((extension) => extension.prettyType[extension.type] === 'Site')
+        console.log('sites')
+        console.log(sites)
+        setIsMultiSiteEnabled(sites.length > 0)
+    }
     
-    return {extensionsList, isExtensionListPending, error, fetchExtensions}
+    return {extensionsList, isExtensionListPending, error, isMultiSiteEnabled, fetchExtensions}
 }
 
 export default useExtensionList
