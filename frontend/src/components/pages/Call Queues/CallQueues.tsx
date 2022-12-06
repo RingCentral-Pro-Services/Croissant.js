@@ -13,13 +13,14 @@ import useGetCallQueueSettings from "../../../rcapi/useGetCallQueueSettings"
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage"
 import MessagesArea from "../../shared/MessagesArea"
 import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel"
+import FeedbackArea from "../../shared/FeedbackArea"
 
 const CallQueues = () => {
     useLogin()
     const {fireEvent} = useAnalytics()
     let [targetUID, setTargetUID] = useState("")
     const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
-    let {messages, postMessage, postError} = useMessageQueue()
+    let {messages, errors, postMessage, postError} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     const [progressValue, setProgressValue] = useState(0)
@@ -73,6 +74,7 @@ const CallQueues = () => {
                 <Button className='healthy-margin-right' disabled={!hasCustomerToken || isPending} variant="contained" onClick={handleClick}>Go</Button>
                 {isPending ? <progress className='healthy-margin-top' value={progressValue} max={maxProgressValue} /> : <></>}
                 {timedMessages.length > 0 ? <MessagesArea messages={timedMessages} /> : <></>}
+                {!isCallQueueSettingsPending ? <FeedbackArea tableHeader={['Queue Name', 'Extension', 'Site', 'Status', 'Members (Ext)', 'Wait time', 'Wrap-up time']} tableData={callQueues} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
             </div>
         </>
     )
