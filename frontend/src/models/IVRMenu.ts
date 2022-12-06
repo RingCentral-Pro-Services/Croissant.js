@@ -27,6 +27,16 @@ export class IVRMenu implements CSVFormattable, ExcelFormattable, DataTableForma
         return result
     }
 
+    payload(isMultiSiteEnabled: boolean = true, includeActions: boolean = true) {
+        return {
+            name: this.data.name,
+            extensionNumber: this.data.extensionNumber,
+            prompt: this.data.prompt,
+            ...(includeActions && { actions: this.data.actions }),
+            ...(isMultiSiteEnabled && {site: {id: this.data.site.id}})
+        }
+    }
+
     actionsToRow(): string[] {
         let result: string[] = []
 

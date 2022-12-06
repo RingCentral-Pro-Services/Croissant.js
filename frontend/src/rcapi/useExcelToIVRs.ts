@@ -111,8 +111,6 @@ const useExcelToIVRs = (postMessage: (message: Message) => void, postError: (err
 
             if (actionKey in data) {
                 const translatedAction = actionMap[data[actionKey]]
-                console.log(`Raw Action: |${data[actionKey]}|`)
-                console.log(`Translated Action: ${translatedAction}`)
 
                 if (translatedAction!= undefined && translatedAction !== "") {
                     if (translatedAction !== 'DialByName') {

@@ -12,7 +12,7 @@ interface response {
     id: string
 }
 
-const useCreateIVRs = (setProgressValue: (value: (any)) => void, postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number,) => void, postError: (error: SyncError) => void) => {
+const useCreateIVRs = (setProgressValue: (value: (any)) => void, postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number,) => void, postError: (error: SyncError) => void, isMultiSiteEnabled: boolean) => {
     let [rateLimitInterval, setRateLimitInterval] = useState(0)
     const [workingMenus, setMenus] = useState<IVRMenu[]>([])
     let [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
@@ -124,12 +124,7 @@ const useCreateIVRs = (setProgressValue: (value: (any)) => void, postMessage: (m
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${accessToken}`
                 },
-                data: {
-                    name: menu.data.name,
-                    extensionNumber: menu.data.extensionNumber,
-                    site: menu.data.site,
-                    prompt: menu.data.prompt
-                },
+                data: menu.payload(isMultiSiteEnabled, false),
               })
               .then((res: any) => {
                 console.log(res)
@@ -163,9 +158,6 @@ const useCreateIVRs = (setProgressValue: (value: (any)) => void, postMessage: (m
                     "Authorization": `Bearer ${accessToken}`
                 },
                 data: {
-                    name: menu.data.name,
-                    site: menu.data.site,
-                    prompt: menu.data.prompt,
                     actions: menu.data.actions
                 },
                 })

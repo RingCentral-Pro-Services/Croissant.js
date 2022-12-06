@@ -31,7 +31,7 @@ const DirectCreateMenus = () => {
     const [menus, setMenus] = useState<IVRMenu[]>([])
     let {messages, errors, postMessage, postError} = useMessageQueue()
     const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
-    const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
+    const { extensionsList, isExtensionListPending, isMultiSiteEnabled, fetchExtensions } = useExtensionList(postMessage)
     const [selectedFile, setSelectedFile] = useState<File | null>()
     const {excelData, isExcelDataPending, readFile} = useReadExcel()
     const {menus: excelMenus, isMenuConvertPending, converToMenus} = useExcelToIVRs(postMessage, postError)
@@ -53,7 +53,7 @@ const DirectCreateMenus = () => {
     // Progress bar
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
-    const {createMenus, isSyncing} = useCreateIVRs(setProgressValue, postMessage, postTimedMessage, postError)
+    const {createMenus, isSyncing} = useCreateIVRs(setProgressValue, postMessage, postTimedMessage, postError, isMultiSiteEnabled)
 
     const handleFileSelect = () => {
         if (!selectedFile) return
