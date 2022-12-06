@@ -25,6 +25,7 @@ import Header from "../../shared/Header";
 import FeedbackArea from "../../shared/FeedbackArea";
 import AdaptiveFilter from "../../shared/AdaptiveFilter";
 import { Message } from "../../../models/Message";
+import useAnalytics from "../../../hooks/useAnalytics";
 
 const CallQueueTemplates = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -36,6 +37,7 @@ const CallQueueTemplates = () => {
     const [selectedSites, setSelectedSites] = useState<string[]>([])
 
     useLogin()
+    const {fireEvent} = useAnalytics()
     const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
@@ -103,6 +105,7 @@ const CallQueueTemplates = () => {
 
     const handleSyncButtonClick = () => {
         if (filteredExtensions.length === 0) return
+        fireEvent('call-queue-templates')
         setIsSyncing(true)
         setMaxProgressValue(filteredExtensions.length * 2)
         applyRegionalSettings(filteredExtensions, regionalSettingsPayload)

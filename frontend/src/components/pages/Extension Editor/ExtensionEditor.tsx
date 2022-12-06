@@ -1,5 +1,6 @@
 import { Button } from "@mui/material";
 import React, { useEffect, useState } from "react";
+import useAnalytics from "../../../hooks/useAnalytics";
 import useExtensionEditing from "../../../hooks/useExtensionEditing";
 import useLogin from "../../../hooks/useLogin";
 import useMessageQueue from "../../../hooks/useMessageQueue";
@@ -21,6 +22,7 @@ const ExtensionEditor = () => {
     const [isSyncing, setIsSyncing] = useState(false)
 
     useLogin()
+    const {fireEvent} = useAnalytics()
     const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
@@ -45,6 +47,7 @@ const ExtensionEditor = () => {
     }, [isExtensionListPending])
 
     const handleSyncbuttonClick = () => {
+        fireEvent('edit-extensions')
         setIsSyncing(true)
         setMaxProgressValue(editedExtensions.length)
         updateExtensions(editedExtensions)
