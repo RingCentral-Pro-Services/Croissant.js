@@ -52,6 +52,7 @@ body {
 
 .nav-toolbar {
   padding-left: 16px!important;
+  user-select: none;
 }
 
 .nav-item:hover {
