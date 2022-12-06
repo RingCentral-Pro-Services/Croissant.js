@@ -52,7 +52,7 @@ const ExtensionEditor = () => {
 
     return (
         <>
-            <Header title="Edit Extensions" body="Edit extension data in bulk"/>
+            <Header title="Edit Extensions" body="Find & replace in extension names and email addresses"/>
             <div className="tool-card">
                 <h2>Edit Extensions</h2>
                 <div className="mega-mergin-top">
