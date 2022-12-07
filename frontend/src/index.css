@@ -345,3 +345,20 @@ progress::-webkit-progress-value {
 .simple-select {
   margin-right: 30px;
 }
+
+.schedule-builder {
+  width: 800px!important;
+  height: 500px;
+  box-sizing: border-box;
+  padding: 10px;
+}
+
+.schedule-builder-item {
+  display: block;
+  padding: 10px;
+}
+
+.schedule-builder-toggle-box {
+  width: 200px;
+  display: inline-block;
+}

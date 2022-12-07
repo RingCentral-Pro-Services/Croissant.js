@@ -26,15 +26,27 @@ import FeedbackArea from "../../shared/FeedbackArea";
 import AdaptiveFilter from "../../shared/AdaptiveFilter";
 import { Message } from "../../../models/Message";
 import useAnalytics from "../../../hooks/useAnalytics";
+import ScheduleBuilder from "../../shared/ScheduleBuilder";
+import useUpdateSchedule from "../../../rcapi/useUpdateSchedule";
 
 const CallQueueTemplates = () => {
     const [targetUID, setTargetUID] = useState('')
     const [filteredExtensions, setFilteredExtensions] = useState<RCExtension[]>([])
-    const [progressValue, setProgressValue] = useState(0)
-    const [maxProgressValue, setMaxProgressValue] = useState(0)
     const [isSyncing, setIsSyncing] = useState(false)
     const [siteNames, setSiteNames] = useState<string[]>([])
     const [selectedSites, setSelectedSites] = useState<string[]>([])
+    const [isShowingHours, setIsShowingHours] = useState(false)
+    const [schedulePayload, setSchedulePayload] = useState({})
+
+    const [willUpdateRegionalSettings, setWillUpdateRegionalSettings] = useState(false)
+    const [willUpdateCallHandlingSettings, setWillUpdateCallHandlingSettings] = useState(false)
+    const [willUpdateSchedule, setWillUpdateSchedule] = useState(false)
+    const [regionalSettingsProgress, setRegionalSettingsProgress] = useState(0)
+    const [callHandlingSettingsProgress, setCallHandlingSettingsProgress] = useState(0)
+    const [scheduleProgress, setScheduleProgress] = useState(0)
+    const [regionalSettingsMaxProgress, setRegionalSettingsMaxProgress] = useState(0)
+    const [callHandlingSettingsMaxProgress, setCallHandlingSettingsMaxProgress] = useState(0)
+    const [scheduleMaxProgress, setScheduleMaxProgress] = useState(0)
 
     useLogin()
     const {fireEvent} = useAnalytics()
@@ -45,11 +57,12 @@ const CallQueueTemplates = () => {
     const {fetchTimezones, timezones, isTimezonListPending, timezoneMap} = useTimezoneList()
     const {fetchRegionalFormats, isRegionalFormatListPenging, regionalFormats, regionalFormatMap} = useRegionalFormats()
     const {setGreetingsLanguage, setRegionalFormat, setTimeFormat, setTimezone, setUserLanguage, payload: regionalSettingsPayload} = useBuildRegionalSettings(regionalFormatMap, timezoneMap)
-    const {applyRegionalSettings, isRegionalSettingApplicationPending} = useApplyRegionalSettings(setProgressValue, postMessage, postTimedMessage, postError)
+    const {applyRegionalSettings, isRegionalSettingApplicationPending} = useApplyRegionalSettings(setRegionalSettingsProgress, postMessage, postTimedMessage, postError)
     const {fetchGreetings, callQueueConnectingAudio, holdMusicAudio, callQueueGreetingAudio, callQueueInterruptAudio, connectingAudioMap, greetingAudioMap, interruptAudioMap, holdMusicMap} = useGreetingList()
     const {setIntroGreeting, setAudioWhileConnecting, setHoldMusic, setInterruptAudio, greetings} = useBuildGreetingSettings(connectingAudioMap, interruptAudioMap, greetingAudioMap, holdMusicMap)
-    const {updateCallHandling, isCallHandlingUpdatePending} = useUpdateCallHandling(setProgressValue, postMessage, postTimedMessage, postError)
+    const {updateCallHandling, isCallHandlingUpdatePending} = useUpdateCallHandling(setCallHandlingSettingsProgress, postMessage, postTimedMessage, postError)
     const {setRingType, setMaxCallersInQueue, setMaxWaitTime, setMaxWaitTimeAction, setMaxWaitTimeDestination, setQueueFullAction, setQueueFullDestination, setUserRingTime, setWrapUpTime, setInterruptPeriod, payload: callHandlingPayload} = useBuildCallHandlingSettings(extensionsList)
+    const {updateSchedule, isScheduleUpdatePending} = useUpdateSchedule(setScheduleProgress, postMessage, postTimedMessage, postError)
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -86,7 +99,7 @@ const CallQueueTemplates = () => {
         if (isRegionalSettingApplicationPending) return
         const payload = {
             ...(greetings.length != 0 && {greetings: greetings}),
-            ...(Object.keys(callHandlingPayload).length != 0 && {queue: callHandlingPayload})
+            ...(Object.keys(callHandlingPayload).length != 0 && {queue: callHandlingPayload}),
         }
         updateCallHandling(filteredExtensions, payload)
     }, [isRegionalSettingApplicationPending])
@@ -100,14 +113,36 @@ const CallQueueTemplates = () => {
 
     useEffect(() => {
         if (isCallHandlingUpdatePending) return
-        postMessage(new Message('Finished applying template', 'success'))
+        const payload = {
+            ...(Object.keys(schedulePayload).length != 0 && {schedule: {weeklyRanges: schedulePayload}})
+        }
+        updateSchedule(filteredExtensions, payload)
     }, [isCallHandlingUpdatePending])
+
+    useEffect(() => {
+        if (isScheduleUpdatePending) return
+        postMessage(new Message('Finished applying template', 'success'))
+    }, [isScheduleUpdatePending])
 
     const handleSyncButtonClick = () => {
         if (filteredExtensions.length === 0) return
+        // Filtering stuff
+        setRegionalSettingsMaxProgress(filteredExtensions.length)
+        setCallHandlingSettingsMaxProgress(filteredExtensions.length)
+        setScheduleMaxProgress(filteredExtensions.length)
+
+        if (Object.keys(regionalSettingsPayload).length != 0) {
+            setWillUpdateRegionalSettings(true)
+        }
+        if (Object.keys(callHandlingPayload).length != 0 || Object.keys(greetings).length != 0) {
+            setWillUpdateCallHandlingSettings(true)
+        }
+        if (Object.keys(schedulePayload).length != 0) {
+            setWillUpdateSchedule(true)
+        }
+
         fireEvent('call-queue-templates')
         setIsSyncing(true)
-        setMaxProgressValue(filteredExtensions.length * 2)
         applyRegionalSettings(filteredExtensions, regionalSettingsPayload)
     }
 
@@ -131,10 +166,13 @@ const CallQueueTemplates = () => {
                 <h2>Call Queue Templates</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} />
                 {isRegionalFormatListPenging ? <></> : <AdaptiveFilter options={siteNames} showAllOption={true} setSelected={setSelectedSites} title='Sites' placeholder='Search' disabled={isRegionalFormatListPenging || isSyncing} defaultSelected={siteNames}  />}
-                <Button disabled={isRegionalFormatListPenging} variant="contained" onClick={handleSyncButtonClick} >Sync</Button>
-                {isSyncing ? <progress value={progressValue} max={maxProgressValue} /> : <></>}
+                <Button disabled={isRegionalFormatListPenging || isSyncing} variant="contained" onClick={handleSyncButtonClick} >Sync</Button>
+                <ScheduleBuilder isOpen={isShowingHours} setIsOpen={setIsShowingHours} setPayload={setSchedulePayload} />
+                {isSyncing && willUpdateRegionalSettings ? <> <Typography>Regional settings</Typography> <progress value={regionalSettingsProgress} max={regionalSettingsMaxProgress} /> </> : <></>}
+                {isSyncing && willUpdateCallHandlingSettings ? <> <Typography>Call Handling & Greetings</Typography> <progress value={callHandlingSettingsProgress} max={callHandlingSettingsMaxProgress} /> </> : <></>}
+                {isSyncing && willUpdateSchedule ? <> <Typography>Schedule</Typography> <progress value={scheduleProgress} max={scheduleMaxProgress} /> </> : <></>}
                 <div className="healthy-margin-bottom"></div>
-                <div hidden={isRegionalFormatListPenging}>
+                <div hidden={isRegionalFormatListPenging || isSyncing}>
                     <Accordion>
                         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                             <Typography>Call Queue Details</Typography>
@@ -146,6 +184,7 @@ const CallQueueTemplates = () => {
                                 <SimpleSelection label="User Language" placeholder="" options={regionalFormats.map((format) => format.name)} defaultSelected='' onSelect={setUserLanguage} />
                             </div>
                             <div className="inline">
+                                <Button sx={{marginBottom: 2}} onClick={() => setIsShowingHours(true)}>Edit Schedule</Button>
                                 <SimpleSelection label="Greetings Language" placeholder="" options={regionalFormats.map((format) => format.name)} defaultSelected='' onSelect={setGreetingsLanguage} />
                                 <SimpleSelection label="Regional Format" placeholder="" options={regionalFormats.map((format) => format.name)} defaultSelected='' onSelect={setRegionalFormat} />
                             </div>

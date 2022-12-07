@@ -32,6 +32,7 @@ const useUpdateCallHandling = (setProgressValue: (value: (any)) => void, postMes
         if (currentExtensionIndex >= extensions.length) {
             setShouldUpdate(false)
             setProgressValue(extensions.length * 2)
+            setIsCallHandlingUpdatePending(false)
             return
         }
 
@@ -68,10 +69,12 @@ const useUpdateCallHandling = (setProgressValue: (value: (any)) => void, postMes
     const updateNext = () => {
         if (currentExtensionIndex >= extensions.length) {
             setShouldUpdate(false)
+            setProgressValue(Number.MAX_SAFE_INTEGER)
+            setIsCallHandlingUpdatePending(false)
         }
         else {
             setCurrentExtensionIndex(currentExtensionIndex + 1)
-            setProgressValue(currentExtensionIndex + extensions.length)
+            setProgressValue(currentExtensionIndex)
         }
     }
 
