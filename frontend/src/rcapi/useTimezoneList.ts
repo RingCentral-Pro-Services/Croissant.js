@@ -29,7 +29,7 @@ const useTimezoneList = () => {
             }
 
             try {
-                const response = await RestCentral.get(url, headers)
+                const response = await RestCentral.getAsync(url, headers)
                 const workingTimezones = response.data.records as Timezone[]
                 let result: Timezone[] = []
                 for (let timezone of workingTimezones) {

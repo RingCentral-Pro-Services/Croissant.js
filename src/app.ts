@@ -57,9 +57,32 @@ app.get('/oauth2callback', (req: any, res: any) => {
     redirectUri: process.env.RC_REDIRECT_URI
   })
   .then((data: any) => {
+    const refreshToken = data["_json"]["refresh_token"]
     const accessToken = data["_json"]["access_token"]
-    res.redirect(`/token?access_token=${accessToken}&state=${state}`)
+    res.redirect(`/token?access_token=${accessToken}&state=${state}&refresh_token=${refreshToken}`)
   })
+})
+
+app.get('/refresh', (req: any, res: any) => {
+  const refreshToken = req.query.refresh_token
+  const header = {
+    "Content-type": "application/x-www-form-urlencoded",
+    "Authorization": "Basic " + Buffer.from(process.env.RC_CLIENT_ID + ":" + process.env.RC_CLIENT_SECRET).toString('base64')
+  }
+
+  axios.post(`${process.env.RC_PLATFORM_URL}/restapi/oauth/token`, `grant_type=refresh_token&refresh_token=${refreshToken}&client_id=${process.env.RC_CLIENT_ID}`, {headers: header})
+  .then((response: any) => {
+    const accessToken = response.data.access_token
+    console.log(`Access token: ${accessToken}`)
+    res.send(accessToken)
+    }
+  )
+  .catch((error: any) => {
+    console.log('Error refreshing token')
+    console.log(error)
+  }
+  )
+  
 })
 
 app.post('/fileupload', (req: any, res: any) => {
