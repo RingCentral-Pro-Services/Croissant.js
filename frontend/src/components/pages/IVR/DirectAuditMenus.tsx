@@ -13,8 +13,10 @@ import useGetAudioPrompts from "../../../rcapi/useGetAudioPrompts";
 import useAnalytics from "../../../hooks/useAnalytics";
 import MessagesArea from "../../shared/MessagesArea";
 import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel";
+import useLogin from "../../../hooks/useLogin";
 
 const DirectAuditMenus = () => {
+    useLogin('auditmenus')
     const {fireEvent} = useAnalytics()
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)

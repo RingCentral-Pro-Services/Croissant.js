@@ -12,7 +12,7 @@ import UIDInputField from '../../shared/UIDInputField'
 import useWritePrettyExcel from '../../../hooks/useWritePrettyExcel'
 
 const ExtensionAudit = () => {
-    useLogin()
+    useLogin('accountdump')
     const {fireEvent} = useAnalytics()
     let [targetUID, setTargetUID] = useState("")
     const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()

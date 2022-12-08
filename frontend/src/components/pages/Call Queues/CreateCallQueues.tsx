@@ -14,8 +14,10 @@ import useAnalytics from "../../../hooks/useAnalytics"
 import useValidateExcelData from "../../../hooks/useValidateExcelData"
 import { callQueueSchema } from "../../../helpers/schemas"
 import Header from "../../shared/Header"
+import useLogin from "../../../hooks/useLogin"
 
 const CreateCallQueues = () => {
+    useLogin('createcallqueues')
     const {fireEvent} = useAnalytics()
     let {messages, errors, postMessage, postError} = useMessageQueue()
     let [isPending, setIsPending] = useState(true)

@@ -16,7 +16,7 @@ import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel"
 import FeedbackArea from "../../shared/FeedbackArea"
 
 const CallQueues = () => {
-    useLogin()
+    useLogin('auditcallqueues')
     const {fireEvent} = useAnalytics()
     let [targetUID, setTargetUID] = useState("")
     const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()

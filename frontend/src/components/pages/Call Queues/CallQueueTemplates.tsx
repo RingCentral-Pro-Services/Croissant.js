@@ -48,7 +48,7 @@ const CallQueueTemplates = () => {
     const [callHandlingSettingsMaxProgress, setCallHandlingSettingsMaxProgress] = useState(0)
     const [scheduleMaxProgress, setScheduleMaxProgress] = useState(0)
 
-    useLogin()
+    useLogin('callqueuetemplates')
     const {fireEvent} = useAnalytics()
     const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
     const {postMessage, postError, messages, errors} = useMessageQueue()

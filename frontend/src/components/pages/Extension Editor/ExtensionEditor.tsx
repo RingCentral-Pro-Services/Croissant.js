@@ -21,7 +21,7 @@ const ExtensionEditor = () => {
     const [maxProgressValue, setMaxProgressValue] = useState(0)
     const [isSyncing, setIsSyncing] = useState(false)
 
-    useLogin()
+    useLogin('editextensions')
     const {fireEvent} = useAnalytics()
     const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
     const {postMessage, postError, messages, errors} = useMessageQueue()

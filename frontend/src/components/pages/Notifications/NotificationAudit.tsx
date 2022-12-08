@@ -21,7 +21,7 @@ import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel"
 import MessagesArea from "../../shared/MessagesArea"
 
 const NotificationAudit = () => {
-    useLogin()
+    useLogin('notificationsaudit')
     const {fireEvent} = useAnalytics()
     let [targetUID, setTargetUID] = useState("")
     const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()

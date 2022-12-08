@@ -23,7 +23,7 @@ import UIDInputField from "../../shared/UIDInputField";
 import AdaptiveFilter from "../../shared/AdaptiveFilter";
 
 const DirectCreateMenus = () => {
-    useLogin()
+    useLogin('create-ivr')
     const {fireEvent} = useAnalytics()
     let [targetUID, setTargetUID] = useState("")
     let [isReadyToSync, setReadyToSync] = useState(false)

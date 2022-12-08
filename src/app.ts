@@ -29,13 +29,15 @@ app.listen(PORT, () => {
 app.use(express.static(path.resolve(__dirname, '../frontend/build')))
 
 app.get('/login', (req: any, res: any) => {
+  const state = req.query.state
+  console.log(`State: ${state}`)
   rcsdk = new ringcentral({
     server: process.env.RC_PLATFORM_URL,
     appKey: process.env.RC_CLIENT_ID,
     appSecret: process.env.RC_CLIENT_SECRET
   })
   let platform = rcsdk.platform()
-  let loginURL = platform.loginUrl({"state": "1234567890"})
+  let loginURL = platform.loginUrl({"state": state})
   res.redirect(loginURL)
 })
 
@@ -56,7 +58,7 @@ app.get('/oauth2callback', (req: any, res: any) => {
   })
   .then((data: any) => {
     const accessToken = data["_json"]["access_token"]
-    res.redirect(`/token?access_token=${accessToken}`)
+    res.redirect(`/token?access_token=${accessToken}&state=${state}`)
   })
 })
 

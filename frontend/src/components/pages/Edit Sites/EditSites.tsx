@@ -29,7 +29,7 @@ const EditSites = () => {
     const [isSyncing, setIsSyncing] = useState(false)
     const defaultSheet = 'Sites'
 
-    useLogin()
+    useLogin('editsites')
     const {fireEvent} = useAnalytics()
     const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
     const {postMessage, postError, messages, errors} = useMessageQueue()

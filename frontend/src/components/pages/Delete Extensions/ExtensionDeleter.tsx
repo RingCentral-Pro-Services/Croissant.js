@@ -17,7 +17,7 @@ import useAnalytics from "../../../hooks/useAnalytics"
 import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel"
 
 const ExtensionDeleter = () => {
-    useLogin()
+    useLogin('deleteextensions')
     const {fireEvent} = useAnalytics()
     const [targetUID, setTargetUID] = useState('')
     const [sites, setSites] = useState<string[]>([])
