@@ -30,7 +30,6 @@ app.use(express.static(path.resolve(__dirname, '../frontend/build')))
 
 app.get('/login', (req: any, res: any) => {
   const state = req.query.state
-  console.log(`State: ${state}`)
   rcsdk = new ringcentral({
     server: process.env.RC_PLATFORM_URL,
     appKey: process.env.RC_CLIENT_ID,
@@ -73,7 +72,6 @@ app.get('/refresh', (req: any, res: any) => {
   axios.post(`${process.env.RC_PLATFORM_URL}/restapi/oauth/token`, `grant_type=refresh_token&refresh_token=${refreshToken}&client_id=${process.env.RC_CLIENT_ID}`, {headers: header})
   .then((response: any) => {
     const accessToken = response.data.access_token
-    console.log(`Access token: ${accessToken}`)
     res.send(accessToken)
     }
   )

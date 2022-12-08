@@ -14,7 +14,6 @@ const Token = () => {
             return
         }
 
-        console.log(`State: ${destination}`)
         let date = new Date()
         date.setTime(date.getTime() + 1 * 60 * 60 * 1000)
 
