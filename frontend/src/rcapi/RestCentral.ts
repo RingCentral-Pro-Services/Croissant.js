@@ -5,31 +5,7 @@ const sign = require('jwt-encode');
 
 export class RestCentral {
 
-    static get = (url: string, headers: any) => {
-        return new Promise<APIResponse>((resolve, reject) => {
-            axios
-            .get(url, {
-                headers: headers
-            })
-            .then((res: any) => {
-                const response: APIResponse = {
-                    data: res.data,
-                    rateLimitInterval: rateLimit(res.headers)
-                }
-                resolve(response)
-            })
-            .catch ((res: any) => { 
-                let response: APIResponse = {
-                    data: res.response.data,
-                    rateLimitInterval: rateLimit(res.response.headers),
-                    error: res.response.data.message
-                }
-                reject(response)
-            })
-        })
-    }
-
-    static getAsync = async (url: string, headers: any) => {
+    static get = async (url: string, headers: any) => {
         if (this.isCustomerTokenAboutToExpire()) {
             console.log('Customer token is about to expire. Fetching new token.')
             await this.fetchCustomerTokenAsync()
@@ -58,92 +34,99 @@ export class RestCentral {
         }
     }
 
-    static post = (url: string, headers: any, body: any) => {
-        return new Promise<APIResponse>((resolve, reject) => {
-            axios({
+    static post = async (url: string, headers: any, body: any) => {
+        if (this.isCustomerTokenAboutToExpire()) {
+            console.log('Customer token is about to expire. Fetching new token.')
+            await this.fetchCustomerTokenAsync()
+        }
+        else if (this.isRCTokenAboutToExpire()) {
+            console.log('RC token is about to expire. Fetching new token.')
+            await this.refreshRCRokenAsync()
+        }
+
+        try {
+            const res = await axios({
                 method: "POST",
                 url: url,
                 headers: headers,
                 data: body
             })
-            .then((res: any) => {
-                console.log(res)
-                const response: APIResponse = {
-                    data: res.data,
-                    rateLimitInterval: rateLimit(res.headers)
-                }
-                resolve(response)
-            })
-            .catch((res: any) => {
-                let response: APIResponse = {
-                    data: res.response.data,
-                    rateLimitInterval: rateLimit(res.response.headers),
-                    error: res.response.data.message
-                }
-                reject(response)
-            })
-        })
+            const response: APIResponse = {
+                data: res.data,
+                rateLimitInterval: rateLimit(res.headers)
+            }
+            return response
+        } catch (res: any) {
+            let response: APIResponse = {
+                data: res.response.data,
+                rateLimitInterval: rateLimit(res.response.headers),
+                error: res.response.data.message
+            }
+            return response
+        }
     }
 
-    static put = (url: string, headers: any, body: any) => {
-        return new Promise<APIResponse>((resolve, reject) => {
-            axios({
+    static put = async (url: string, headers: any, body: any) => {
+        if (this.isCustomerTokenAboutToExpire()) {
+            console.log('Customer token is about to expire. Fetching new token.')
+            await this.fetchCustomerTokenAsync()
+        }
+        else if (this.isRCTokenAboutToExpire()) {
+            console.log('RC token is about to expire. Fetching new token.')
+            await this.refreshRCRokenAsync()
+        }
+
+        try {
+            const res = await axios({
                 method: "PUT",
                 url: url,
                 headers: headers,
                 data: body
             })
-            .then((res: any) => {
-                const response: APIResponse = {
-                    data: res.data,
-                    rateLimitInterval: rateLimit(res.headers)
-                }
-                resolve(response)
-            })
-            .catch((res: any) => {
-                let response: APIResponse = {
-                    data: res.response.data,
-                    rateLimitInterval: rateLimit(res.response.headers),
-                    error: res.response.data.message
-                }
-                reject(response)
-            })
-        })
+            const response: APIResponse = {
+                data: res.data,
+                rateLimitInterval: rateLimit(res.headers)
+            }
+            return response
+        } catch (res: any) {
+            let response: APIResponse = {
+                data: res.response.data,
+                rateLimitInterval: rateLimit(res.response.headers),
+                error: res.response.data.message
+            }
+            return response
+        }
     }
 
-    static delete = (url: string, headers: any) => {
-        return new Promise<APIResponse>((resolve, reject) => {
-            axios({
+    static delete = async (url: string, headers: any) => {
+        if (this.isCustomerTokenAboutToExpire()) {
+            console.log('Customer token is about to expire. Fetching new token.')
+            await this.fetchCustomerTokenAsync()
+        }
+        else if (this.isRCTokenAboutToExpire()) {
+            console.log('RC token is about to expire. Fetching new token.')
+            await this.refreshRCRokenAsync()
+        }
+
+        try {
+            const res = await axios({
                 method: "DELETE",
                 url: url,
                 headers: headers,
             })
-            .then((res: any) => {
-                const response: APIResponse = {
-                    data: res.data,
-                    rateLimitInterval: rateLimit(res.headers)
-                }
-                resolve(response)
-            })
-            .catch((res: any) => {
-                let response: APIResponse = {
-                    data: res.response.data,
-                    rateLimitInterval: rateLimit(res.response.headers),
-                    error: res.response.data.message
-                }
-                reject(response)
-            })
-        })
-    }
-
-    static isCustomerTokenExpired = () => {
-        const token = localStorage.getItem('cs_access_token')
-        const tokenExpiration = localStorage.getItem('cs_token_expiry')
-        if (!token || !tokenExpiration) return true
-
-        let expirationTime = new Date(parseInt(tokenExpiration))
-        let currentTime = new Date()
-        if (currentTime >= expirationTime) return true
+            const response: APIResponse = {
+                data: res.data,
+                rateLimitInterval: rateLimit(res.headers)
+            }
+            return response
+        } catch (res: any) {
+            let response: APIResponse = {
+                data: res.response.data,
+                rateLimitInterval: rateLimit(res.response.headers),
+                error: res.response.data.message
+            }
+            return response
+        }
     }
 
     static refreshRCRokenAsync = async () => {
@@ -212,16 +195,6 @@ export class RestCentral {
         let currentTime = new Date()
         let timeToExpire = expirationTime.getTime() - currentTime.getTime()
         if (timeToExpire <= 300) return true
-    }
-
-    static isRCTokenExpired = () => {
-        const token = localStorage.getItem('rc_access_token')
-        const tokenExpiration = localStorage.getItem('rc_token_expiry')
-        if (!token || !tokenExpiration) return true
-
-        let expirationTime = new Date(parseInt(tokenExpiration))
-        let currentTime = new Date()
-        if (currentTime >= expirationTime) return true
     }
 
     static isRCTokenAboutToExpire = () => {

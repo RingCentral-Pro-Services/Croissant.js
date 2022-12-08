@@ -35,7 +35,7 @@ const useGetAccessToken = () => {
         })
         .then((res: any) => {
             let date = new Date()
-            // date.setTime(date.getTime() + 1 * 60 * 60 * 1000)
+            date.setTime(date.getTime() + 1 * 60 * 60 * 1000)
             localStorage.setItem('cs_token_expiry', `${date.getTime()}`)
             localStorage.setItem('cs_access_token', res.data['access_token'])
             localStorage.setItem('cs_refresh_token', res.data['refresh_token'])
