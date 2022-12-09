@@ -57,14 +57,10 @@ const Deskphones = () => {
         if (isMultiSiteEnabled) {
             const sites = extensionsList.filter((extension) => extension.prettyType[extension.type] === 'Site')
             const names = sites.map((site) => site.name)
-            console.log('Site Names: ')
-            console.log(names)
             setSiteNames(['Main Site', ...names])
             setSelectedSites(['Main Site', ...names])
         }
         else {
-            console.log('Site Names: ')
-            console.log(['Main Site'])
             setSiteNames(['Main Site'])
             setSelectedSites(['Main Site'])
         }
@@ -73,8 +69,6 @@ const Deskphones = () => {
     useEffect(() => {
         const filtered = extensionsList.filter((extension) => selectedSites.includes(extension.site) && extension.prettyType[extension.type] === 'User')
         setFilteredExtensions(filtered)
-        console.log('Filtered Extensions: ')
-        console.log(filtered)
     }, [selectedSites])
 
     useEffect(() => {
@@ -82,11 +76,7 @@ const Deskphones = () => {
         
         const filteredSettings = originalForwardingSettings.filter((setting) => 'rules' in setting.forwarding)
         setCallForwardingSettings(filteredSettings)
-        console.log('Call Forwarding Settings: ')
-        console.log(filteredSettings)
         const adjustedSettings = adjustCallForwardingSettings(filteredSettings)
-        console.log('Adjusted Call Forwarding Settings: ')
-        console.log(adjustedSettings)
         setCallForwardingUpdateProgressMax(adjustedSettings.length)
         adjustCallForwarding(adjustedSettings)
     }, [isCallForwardingSettingsPending])
@@ -100,8 +90,8 @@ const Deskphones = () => {
             const setting = newForwardingSettings[index];
             for (let ruleIndex = 0; ruleIndex < setting.forwarding.rules.length; ruleIndex++) {
                 const types = newForwardingSettings[index].forwarding.rules[ruleIndex].forwardingNumbers.map((forward) => forward.type)
-                console.log('Types: ')
-                console.log(types)
+
+                // Only adjust ring time for deskphones or ring groups without external forwarding numbers
                 if (!types.includes('Other')) {
                     newForwardingSettings[index].forwarding.rules[ruleIndex].ringCount = ringsNumber
                 }
@@ -126,8 +116,8 @@ const Deskphones = () => {
                 {siteNames.length === 0 ? <></> : <AdaptiveFilter title='Sites' placeholder="Sites" options={siteNames} defaultSelected={siteNames} disabled={false} showAllOption={true} setSelected={setSelectedSites} />}
                 {siteNames.length === 0 ? <></> : <SimpleSelection options={ringTimes} onSelect={setSelectedRingTime} defaultSelected='4 Rings / 20 Seconds' label='' placeholder='' /> }
                 {isExtensionListPending ? <></> : <Button disabled={isSyncing} variant="contained" onClick={handleSyncButtonClicked}>Sync</Button>}
-                {!isExtensionListPending ? <> <Typography>Fetching Call Handling</Typography> <progress value={callForwardingProgressValue} max={callForwardingProgressMax} /> </> : <></>}
-                {!isExtensionListPending ? <> <Typography>Updating Call Handling</Typography> <progress value={callforwardingUpdateProgress} max={callForwardingUpdateProgressMax} /> </> : <></>}
+                {isSyncing ? <> <Typography>Fetching Call Handling</Typography> <progress value={callForwardingProgressValue} max={callForwardingProgressMax} /> </> : <></>}
+                {isSyncing ? <> <Typography>Updating Call Handling</Typography> <progress value={callforwardingUpdateProgress} max={callForwardingUpdateProgressMax} /> </> : <></>}
                 {filteredExtensions.length > 0 ? <FeedbackArea tableHeader={[]} tableData={filteredExtensions} messages={messages} errors={errors} timedMessages={timedMessages} /> : <></>}
             </div>
         </>
