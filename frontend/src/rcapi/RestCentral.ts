@@ -135,7 +135,6 @@ export class RestCentral {
         if (!refreshToken) return
 
         try {
-            if (this.isRCTokenAboutToExpire()) await this.refreshRCRokenAsync()
             const res = await axios({
                 method: "GET",
                 url: `/refresh?refresh_token=${refreshToken}`,
