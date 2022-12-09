@@ -160,7 +160,7 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
                 firstName: this.extension.name,
                 email: this.extension.contact.email,
             },
-            ...(isMultiSiteEnabled && {site: {id: this.siteID}}),
+            ...(isMultiSiteEnabled && {site: {id: this.siteID === 0 ? 'main-site' : this.siteID}}),
         }
         return payload
     }
