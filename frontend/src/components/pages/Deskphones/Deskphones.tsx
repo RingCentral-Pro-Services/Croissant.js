@@ -121,7 +121,7 @@ const Deskphones = () => {
                 {isExtensionListPending ? <></> : <Button disabled={isSyncing} variant="contained" onClick={handleSyncButtonClicked}>Sync</Button>}
                 {isSyncing ? <> <Typography>Fetching Call Handling</Typography> <progress value={callForwardingProgressValue} max={callForwardingProgressMax} /> </> : <></>}
                 {isSyncing ? <> <Typography>Updating Call Handling</Typography> <progress value={callforwardingUpdateProgress} max={callForwardingUpdateProgressMax} /> </> : <></>}
-                {filteredExtensions.length > 0 ? <FeedbackArea tableHeader={[]} tableData={filteredExtensions} messages={messages} errors={errors} timedMessages={timedMessages} /> : <></>}
+                {filteredExtensions.length > 0 ? <FeedbackArea tableHeader={['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']} tableData={filteredExtensions} messages={messages} errors={errors} timedMessages={timedMessages} /> : <></>}
             </div>
         </>
     )
