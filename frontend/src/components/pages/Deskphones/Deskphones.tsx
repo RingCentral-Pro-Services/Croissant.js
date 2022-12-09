@@ -61,6 +61,9 @@ const Deskphones = () => {
             setSelectedSites(['Main Site', ...names])
         }
         else {
+            for (let index = 0; index < extensionsList.length; index++) {
+                extensionsList[index].site = 'Main Site'
+            }
             setSiteNames(['Main Site'])
             setSelectedSites(['Main Site'])
         }
