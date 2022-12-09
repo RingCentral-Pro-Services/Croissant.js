@@ -30,7 +30,7 @@ export class RestCentral {
                 rateLimitInterval: rateLimit(res.response.headers),
                 error: res.response.data.message
             }
-            return response
+            throw response
         }
     }
 
@@ -62,7 +62,7 @@ export class RestCentral {
                 rateLimitInterval: rateLimit(res.response.headers),
                 error: res.response.data.message
             }
-            return response
+            throw response
         }
     }
 
@@ -89,12 +89,14 @@ export class RestCentral {
             }
             return response
         } catch (res: any) {
+            console.log('RestCentral PUT error')
             let response: APIResponse = {
                 data: res.response.data,
                 rateLimitInterval: rateLimit(res.response.headers),
                 error: res.response.data.message
             }
-            return response
+            console.log('returning response')
+            throw response
         }
     }
 
@@ -125,7 +127,7 @@ export class RestCentral {
                 rateLimitInterval: rateLimit(res.response.headers),
                 error: res.response.data.message
             }
-            return response
+            throw response
         }
     }
 
