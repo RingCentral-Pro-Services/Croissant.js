@@ -23,6 +23,7 @@ const Sidebar = () => {
         {label: 'Account Dump', destination: '/accountdump'},
         {label: 'Delete Extensions', destination: '/deleteextensions'},
         {label: 'Notifications', destination: '/notificationsaudit'},
+        {label: 'Deskphones', destination: '/deskphones'},
     ]
 
     const ivrItems: SidebarItem[] = [

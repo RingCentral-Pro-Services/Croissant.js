@@ -13,6 +13,7 @@ import EditSites from './components/pages/Edit Sites/EditSites';
 import ExtensionEditor from './components/pages/Extension Editor/ExtensionEditor';
 import CallQueueTemplates from './components/pages/Call Queues/CallQueueTemplates';
 import CreateCallQueues from './components/pages/Call Queues/CreateCallQueues';
+import Deskphones from './components/pages/Deskphones/Deskphones';
 
 function App() {
 
@@ -39,6 +40,7 @@ function App() {
             {/* <Route path='/generateprompts' element={<PromptGeneration />} /> */}
             <Route path='/editsites' element={<EditSites />} />
             <Route path='/editextensions' element={<ExtensionEditor />} />
+            <Route path='/deskphones' element={<Deskphones />} />
           </Routes>
         </div>
       </div>

@@ -12,12 +12,12 @@ const SimpleSelection = (props: {label: string, placeholder: string, options: st
     }
     
     return (
-        <div className="healthy-margin-top mega-margin-bottom simple-select">
-            <Typography sx={{marginBottom: 1}}>{label}</Typography>
+        <div className={`healthy-margin-top ${label === '' ? 'inline healthy-margin-right vertical-middle' : 'mega-margin-bottom simple-select'}`}>
+            {label !== '' ? <Typography sx={{marginBottom: 1}}>{label}</Typography> : <></>}
             <FormControl className="vertical-middle" sx={{display: 'block'}}>
                 <InputLabel id="demo-simple-select-label">{placeholder}</InputLabel>
                 <Select
-                    // autoWidth
+                    className={label === '' ? 'inline' : ''}
                     sx={{minWidth: 150}}
                     size="small"
                     labelId="demo-simple-select-label"
