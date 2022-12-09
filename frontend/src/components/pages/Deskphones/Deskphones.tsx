@@ -114,7 +114,7 @@ const Deskphones = () => {
         <>
             <Header title="Deskphones" body="Set ring time for physical phones in bulk" />
             <div className="tool-card">
-                <h2>Deskhpones</h2>
+                <h2>Deskphones</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} />
                 {siteNames.length === 0 ? <></> : <AdaptiveFilter title='Sites' placeholder="Sites" options={siteNames} defaultSelected={siteNames} disabled={false} showAllOption={true} setSelected={setSelectedSites} />}
                 {siteNames.length === 0 ? <></> : <SimpleSelection options={ringTimes} onSelect={setSelectedRingTime} defaultSelected='4 Rings / 20 Seconds' label='' placeholder='' /> }
