@@ -72,7 +72,12 @@ app.get('/refresh', (req: any, res: any) => {
   axios.post(`${process.env.RC_PLATFORM_URL}/restapi/oauth/token`, `grant_type=refresh_token&refresh_token=${refreshToken}&client_id=${process.env.RC_CLIENT_ID}`, {headers: header})
   .then((response: any) => {
     const accessToken = response.data.access_token
-    res.send(accessToken)
+    const refreshToken = response.data.refresh_token
+    const result = {
+      "access_token": accessToken,
+      "refresh_token": refreshToken
+    }
+    res.send(result)
     }
   )
   .catch((error: any) => {

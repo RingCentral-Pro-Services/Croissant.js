@@ -142,10 +142,12 @@ export class RestCentral {
                 url: `/refresh?refresh_token=${refreshToken}`,
             })
             console.log('Successfully refreshed token')
+            console.log(res)
             let date = new Date()
             date.setTime(date.getTime() + 1 * 60 * 60 * 1000)
             localStorage.setItem('rc_token_expiry', date.getTime().toString())
             localStorage.setItem('rc_access_token', res.data.access_token)
+            localStorage.setItem('rc_refresh_token', res.data.refresh_token)
         } catch (res: any) {
             console.log('Failed to refresh token')
         }
