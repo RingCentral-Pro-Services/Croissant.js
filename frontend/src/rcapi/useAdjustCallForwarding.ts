@@ -38,10 +38,10 @@ const useAdjustCallForwarding = (setProgressValue: (value: (any)) => void, postM
 
             try {
                 const response = await RestCentral.put(url, headers, {forwarding: callHandlingSettings[currentExtensionIndex].forwarding})
-                console.log(response)
 
                 if (response.rateLimitInterval > 0) {
                     setRateLimitInterval(response.rateLimitInterval)
+                    postTimedMessage(new Message(`Rate limit reached. Waiting 60 seconds before continuing`, 'info'), response.rateLimitInterval)
                 }
                 else {
                     setRateLimitInterval(250)
@@ -52,7 +52,8 @@ const useAdjustCallForwarding = (setProgressValue: (value: (any)) => void, postM
             catch (e: any) {
                 console.log('Something went horibly wrong')
                 console.log(e)
-                postMessage(new Message(`Something went wrong while adjusting call forwarding settings for extension ${callHandlingSettings[currentExtensionIndex].extensionID}`, 'error'))
+                postMessage(new Message(`Something went wrong while adjusting call forwarding settings for extension ${callHandlingSettings[currentExtensionIndex].extensionID}. ${e.error}`, 'error'))
+                postError(new SyncError(callHandlingSettings[currentExtensionIndex].extensionName, callHandlingSettings[currentExtensionIndex].extensionNumber, ['Forwarding rules update failed', ''], e.error ?? ''))
                 updateNext()
             }
         }, rateLimitInterval)
