@@ -25,8 +25,8 @@ const Deskphones = () => {
     const [callforwardingUpdateProgress, setCallForwardingUpdateProgress] = useState(0)
     const [callForwardingUpdateProgressMax, setCallForwardingUpdateProgressMax] = useState(0)
     const [callForwardingSettings, setCallForwardingSettings] = useState<CallForwardingSettings[]>([])
-    const [adjustedCallForwardingSettings, setAdjustedCallForwardingSettings] = useState<CallForwardingSettings[]>([])
     const [selectedRingTime, setSelectedRingTime] = useState('4 Rings / 20 Seconds')
+    const [isSyncing, setIsSyncing] = useState(false)
     const ringTimes = ['1 Ring / 5 Seconds', '2 Rings / 10 Seconds', '3 Rings / 15 Seconds', '4 Rings / 20 Seconds', '5 Rings / 25 Seconds', '6 Rings / 20 Seconds',
                        '7 Rings / 35 Seconds', '8 Rings / 40 Seconds', '9 Rings / 45 Seconds', '10 Rings / 50 Seconds', '11 Rings / 55 Seconds', '12 Rings / 60 Seconds',
                        '13 Rings / 65 Seconds', '14 Rings / 70 Seconds', '15 Rings / 75 Seconds']
@@ -112,7 +112,7 @@ const Deskphones = () => {
     }
 
     const handleSyncButtonClicked = () => {
-        console.log('Sync Button Clicked')
+        setIsSyncing(true)
         setCallForwardingProgressMax(filteredExtensions.length)
         fetchCallForwardingSettings(filteredExtensions)
     }
@@ -125,7 +125,7 @@ const Deskphones = () => {
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} />
                 {siteNames.length === 0 ? <></> : <AdaptiveFilter title='Sites' placeholder="Sites" options={siteNames} defaultSelected={siteNames} disabled={false} showAllOption={true} setSelected={setSelectedSites} />}
                 {siteNames.length === 0 ? <></> : <SimpleSelection options={ringTimes} onSelect={setSelectedRingTime} defaultSelected='4 Rings / 20 Seconds' label='' placeholder='' /> }
-                {isExtensionListPending ? <></> : <Button variant="contained" onClick={handleSyncButtonClicked}>Sync</Button>}
+                {isExtensionListPending ? <></> : <Button disabled={isSyncing} variant="contained" onClick={handleSyncButtonClicked}>Sync</Button>}
                 {!isExtensionListPending ? <> <Typography>Fetching Call Handling</Typography> <progress value={callForwardingProgressValue} max={callForwardingProgressMax} /> </> : <></>}
                 {!isExtensionListPending ? <> <Typography>Updating Call Handling</Typography> <progress value={callforwardingUpdateProgress} max={callForwardingUpdateProgressMax} /> </> : <></>}
                 {filteredExtensions.length > 0 ? <FeedbackArea tableHeader={[]} tableData={filteredExtensions} messages={messages} errors={errors} timedMessages={timedMessages} /> : <></>}

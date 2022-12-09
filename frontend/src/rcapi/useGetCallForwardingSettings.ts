@@ -65,6 +65,7 @@ const useGetCallForwardingSettings = (setProgressValue: (value: (any)) => void, 
                 console.log(`Failed to get call handling for ${extensions[currentExtensionIndex].name}`)
                 postMessage(new Message(`Failed to get call handling for ${extensions[currentExtensionIndex].name}. ${e.error}`, 'error'))
                 postError(new SyncError(extensions[currentExtensionIndex].name, extensions[currentExtensionIndex].extensionNumber, ['Failed to get call handling', '', e.error ?? '']))
+                updateNext()
             }
         }, rateLimitInterval)
 

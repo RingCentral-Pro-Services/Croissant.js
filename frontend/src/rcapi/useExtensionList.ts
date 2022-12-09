@@ -22,10 +22,8 @@ const useExtensionList = (postMessage: (message: Message) => void) => {
     }
 
     useEffect(() => {
-        if (!shouldFetch) return
-
-        let targetUID = localStorage.getItem('target_uid')
-        if (!targetUID) return
+        if (!accessToken || !shouldFetch) return
+        
         let extensionsURL = `${baseExtensionsURL}?page=${page}&perPage=1000`;
 
             setTimeout(async () => {
