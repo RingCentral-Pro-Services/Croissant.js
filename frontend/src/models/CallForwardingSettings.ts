@@ -1,5 +1,7 @@
 export interface CallForwardingSettings {
     extensionID: string
+    extensionName: string
+    extensionNumber: number
     forwarding: CallForwardingSettingsPayload
 }
 

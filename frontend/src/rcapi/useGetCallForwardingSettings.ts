@@ -52,6 +52,8 @@ const useGetCallForwardingSettings = (setProgressValue: (value: (any)) => void, 
                 let settingsList: CallForwardingSettings[] = [...callForwardingSettings]
                 const settings: CallForwardingSettings = {
                     extensionID: `${extensions[currentExtensionIndex].id}`,
+                    extensionName: extensions[currentExtensionIndex].name,
+                    extensionNumber: extensions[currentExtensionIndex].extensionNumber,
                     forwarding: response.data.forwarding
                 }
                 settingsList.push(settings)
