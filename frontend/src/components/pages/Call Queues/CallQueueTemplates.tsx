@@ -28,6 +28,8 @@ import { Message } from "../../../models/Message";
 import useAnalytics from "../../../hooks/useAnalytics";
 import ScheduleBuilder from "../../shared/ScheduleBuilder";
 import useUpdateSchedule from "../../../rcapi/useUpdateSchedule";
+import useBuildCustomGreetings from "../../../hooks/useBuildCustomGreetings";
+import useUploadCustomGreetings from "../../../rcapi/useUploadCustomGreetings";
 
 const CallQueueTemplates = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -41,12 +43,15 @@ const CallQueueTemplates = () => {
     const [willUpdateRegionalSettings, setWillUpdateRegionalSettings] = useState(false)
     const [willUpdateCallHandlingSettings, setWillUpdateCallHandlingSettings] = useState(false)
     const [willUpdateSchedule, setWillUpdateSchedule] = useState(false)
+    const [willUploadGreetings, setWillUploadGreetings] = useState(false)
     const [regionalSettingsProgress, setRegionalSettingsProgress] = useState(0)
     const [callHandlingSettingsProgress, setCallHandlingSettingsProgress] = useState(0)
     const [scheduleProgress, setScheduleProgress] = useState(0)
+    const [greetingUploadProgress, setGreetingUploadProgress] = useState(0)
     const [regionalSettingsMaxProgress, setRegionalSettingsMaxProgress] = useState(0)
     const [callHandlingSettingsMaxProgress, setCallHandlingSettingsMaxProgress] = useState(0)
     const [scheduleMaxProgress, setScheduleMaxProgress] = useState(0)
+    const [greetingUploadMaxProgress, setGreetingUploadMaxProgress] = useState(0)
 
     useLogin('callqueuetemplates')
     const {fireEvent} = useAnalytics()
@@ -63,6 +68,8 @@ const CallQueueTemplates = () => {
     const {updateCallHandling, isCallHandlingUpdatePending} = useUpdateCallHandling(setCallHandlingSettingsProgress, postMessage, postTimedMessage, postError)
     const {setRingType, setMaxCallersInQueue, setMaxWaitTime, setMaxWaitTimeAction, setMaxWaitTimeDestination, setQueueFullAction, setQueueFullDestination, setUserRingTime, setWrapUpTime, setInterruptPeriod, payload: callHandlingPayload} = useBuildCallHandlingSettings(extensionsList)
     const {updateSchedule, isScheduleUpdatePending} = useUpdateSchedule(setScheduleProgress, postMessage, postTimedMessage, postError)
+    const {setIntroGreetingFile, setConnectingGreetingFile, setIntterruptGreetingFile, setOnHoldGreetingFile, introGreetingPayload, connectingGreetingPayload, onHoldGreetingPayload, intterruptGreetingPayload, progressMultiplier} = useBuildCustomGreetings()
+    const {uploadGreetings} = useUploadCustomGreetings(setGreetingUploadProgress, postMessage, postTimedMessage, postError)
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -122,6 +129,7 @@ const CallQueueTemplates = () => {
     useEffect(() => {
         if (isScheduleUpdatePending) return
         postMessage(new Message('Finished applying template', 'success'))
+        uploadGreetings(filteredExtensions, introGreetingPayload, connectingGreetingPayload, onHoldGreetingPayload, intterruptGreetingPayload)
     }, [isScheduleUpdatePending])
 
     const handleSyncButtonClick = () => {
@@ -130,6 +138,9 @@ const CallQueueTemplates = () => {
         setRegionalSettingsMaxProgress(filteredExtensions.length)
         setCallHandlingSettingsMaxProgress(filteredExtensions.length)
         setScheduleMaxProgress(filteredExtensions.length)
+        setGreetingUploadMaxProgress(filteredExtensions.length * progressMultiplier)
+        console.log(`Progress Multiplier: ${progressMultiplier}`)
+        console.log(`Greeting Upload Max Progress: ${filteredExtensions.length * progressMultiplier}`)
 
         if (Object.keys(regionalSettingsPayload).length != 0) {
             setWillUpdateRegionalSettings(true)
@@ -139,6 +150,9 @@ const CallQueueTemplates = () => {
         }
         if (Object.keys(schedulePayload).length != 0) {
             setWillUpdateSchedule(true)
+        }
+        if (introGreetingPayload.has('binary') || connectingGreetingPayload.has('binary') || onHoldGreetingPayload.has('binary') || intterruptGreetingPayload.has('binary')) {
+            setWillUploadGreetings(true)
         }
 
         fireEvent('call-queue-templates')
@@ -171,6 +185,7 @@ const CallQueueTemplates = () => {
                 {isSyncing && willUpdateRegionalSettings ? <> <Typography>Regional settings</Typography> <progress value={regionalSettingsProgress} max={regionalSettingsMaxProgress} /> </> : <></>}
                 {isSyncing && willUpdateCallHandlingSettings ? <> <Typography>Call Handling & Greetings</Typography> <progress value={callHandlingSettingsProgress} max={callHandlingSettingsMaxProgress} /> </> : <></>}
                 {isSyncing && willUpdateSchedule ? <> <Typography>Schedule</Typography> <progress value={scheduleProgress} max={scheduleMaxProgress} /> </> : <></>}
+                {isSyncing && willUploadGreetings ? <> <Typography>Custom Greetings</Typography> <progress value={greetingUploadProgress} max={greetingUploadMaxProgress} /> </> : <></>}
                 <div className="healthy-margin-bottom"></div>
                 <div hidden={isRegionalFormatListPenging || isSyncing}>
                     <Accordion>
@@ -196,13 +211,13 @@ const CallQueueTemplates = () => {
                         </AccordionSummary>
                         <AccordionDetails>
                             <div className="inline">
-                                <SimpleSelection label="Call Queue Greeting" placeholder="" options={callQueueGreetingAudio} defaultSelected='' onSelect={setIntroGreeting} />
-                                <SimpleSelection label="Audio While Connecting" placeholder="" options={callQueueConnectingAudio} defaultSelected='' onSelect={setAudioWhileConnecting} />
-                                <SimpleSelection label="Hold Music" placeholder="" options={holdMusicAudio} defaultSelected='Music (Acoustic)' onSelect={setHoldMusic} />
+                                <SimpleSelection label="Call Queue Greeting" placeholder="" allowFileSelection={true} options={callQueueGreetingAudio} defaultSelected='' onSelect={setIntroGreeting} onFileSelect={setIntroGreetingFile} />
+                                <SimpleSelection label="Audio While Connecting" placeholder="" allowFileSelection={true} options={callQueueConnectingAudio} defaultSelected='' onSelect={setAudioWhileConnecting} onFileSelect={setConnectingGreetingFile} />
+                                <SimpleSelection label="Hold Music" placeholder="" allowFileSelection={true} options={holdMusicAudio} defaultSelected='Music (Acoustic)' onSelect={setHoldMusic} onFileSelect={setOnHoldGreetingFile} />
                             </div>
                             <div className="inline">
                                 <SimpleSelection label="Interrupt Audio" placeholder="" options={['Never', 'Only when music ends', 'Every 15 seconds', 'Every 20 seconds', 'Every 25 seconds', 'Every 30 seconds', 'Every 40 seconds', 'Every 50 seconds', 'Every 60 seconds']} defaultSelected='' onSelect={setInterruptPeriod} />
-                                <SimpleSelection label="Interrupt Prompt" placeholder="" options={callQueueInterruptAudio} defaultSelected='e' onSelect={setInterruptAudio} />
+                                <SimpleSelection label="Interrupt Prompt" placeholder=""  allowFileSelection={true} options={callQueueInterruptAudio} defaultSelected='e' onSelect={setInterruptAudio} onFileSelect={setIntterruptGreetingFile} />
                             </div>
                         </AccordionDetails>
                     </Accordion>

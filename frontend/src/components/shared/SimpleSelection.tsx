@@ -1,15 +1,43 @@
-import { CheckBoxOutlineBlank, CheckBox } from "@mui/icons-material";
 import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-const SimpleSelection = (props: {label: string, placeholder: string, options: string[], defaultSelected: string, onSelect: (value: string) => void}) => {
-    const {placeholder, label, options, defaultSelected, onSelect} = props
+interface SimpleSelectionProps {
+    label: string,
+    placeholder: string,
+    options: string[],
+    defaultSelected: string,
+    allowFileSelection?: boolean,
+    onSelect: (value: string) => void
+    onFileSelect?: (file: File) => void
+}
+
+const SimpleSelection: React.FC<SimpleSelectionProps> = ({label, placeholder, options, defaultSelected, allowFileSelection = false, onSelect, onFileSelect = undefined}) => {
     const [selection, setSelection] = useState(defaultSelected)
+    const [selectedFile, setSelectedFile] = useState<File | null>()
 
     const handleChange = (event: SelectChangeEvent) => {
         setSelection(event.target.value as string)
-        onSelect(event.target.value as string)
+        if (event.target.value === 'Custom') {
+            openFileSelect()
+        }
+        else {
+            onSelect(event.target.value as string)
+        }   
     }
+
+    const handleFileInput = (e: any) => {
+        setSelectedFile((e.target as HTMLInputElement).files![0])
+    }
+
+    const openFileSelect = () => {
+        document.getElementById(`${label}-file-select`)?.click()
+    }
+
+    useEffect(() => {
+        if (selectedFile && onFileSelect) {
+            onFileSelect(selectedFile)
+        }
+    }, [selectedFile])
     
     return (
         <div className={`healthy-margin-top ${label === '' ? 'inline healthy-margin-right vertical-middle' : 'mega-margin-bottom simple-select'}`}>
@@ -27,11 +55,12 @@ const SimpleSelection = (props: {label: string, placeholder: string, options: st
                     label={placeholder}
                     onChange={handleChange}
                 >
-                    {options.map((option, index) => (
+                    {[...options, ...allowFileSelection ? ['Custom'] : []].map((option, index) => (
                         <MenuItem value={option}>{option}</MenuItem>
                     ))}
                 </Select>
             </FormControl>
+            <input id={`${label}-file-select`} type="file" onInput={(e) => handleFileInput(e)} accept='.mp3, .wav' hidden/>
         </div>
     )
 
