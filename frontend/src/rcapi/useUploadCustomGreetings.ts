@@ -6,6 +6,7 @@ import { RestCentral } from "./RestCentral"
 
 const useUploadCustomGreetings = (setProgressValue: (value: (any)) => void, postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
     const [extensions, setExtensions] = useState<RCExtension[]>([])
+    const [isGreetingsUploadPending, setIsGreetingsUploadPending] = useState(true)
     const [introGreetingPayload, setIntroGreetingPayload] = useState<FormData>(new FormData())
     const [connectingGreetingPayload, setConnectingGreetingPayload] = useState<FormData>(new FormData())
     const [onHoldGreetingPayload, setOnHoldGreetingPayload] = useState<FormData>(new FormData())
@@ -164,6 +165,7 @@ const useUploadCustomGreetings = (setProgressValue: (value: (any)) => void, post
             setCurrentExtensionIndex(0)
             setShouldUploadIntterruptGreeting(false)
             setProgressValue(Number.MAX_SAFE_INTEGER)
+            setIsGreetingsUploadPending(false)
             return
         }
 
@@ -212,7 +214,7 @@ const useUploadCustomGreetings = (setProgressValue: (value: (any)) => void, post
         }
     }
 
-    return { uploadGreetings }
+    return { uploadGreetings, isGreetingsUploadPending }
 }
 
 export default useUploadCustomGreetings

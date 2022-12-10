@@ -69,7 +69,7 @@ const CallQueueTemplates = () => {
     const {setRingType, setMaxCallersInQueue, setMaxWaitTime, setMaxWaitTimeAction, setMaxWaitTimeDestination, setQueueFullAction, setQueueFullDestination, setUserRingTime, setWrapUpTime, setInterruptPeriod, payload: callHandlingPayload} = useBuildCallHandlingSettings(extensionsList)
     const {updateSchedule, isScheduleUpdatePending} = useUpdateSchedule(setScheduleProgress, postMessage, postTimedMessage, postError)
     const {setIntroGreetingFile, setConnectingGreetingFile, setIntterruptGreetingFile, setOnHoldGreetingFile, introGreetingPayload, connectingGreetingPayload, onHoldGreetingPayload, intterruptGreetingPayload, progressMultiplier} = useBuildCustomGreetings()
-    const {uploadGreetings} = useUploadCustomGreetings(setGreetingUploadProgress, postMessage, postTimedMessage, postError)
+    const {uploadGreetings, isGreetingsUploadPending} = useUploadCustomGreetings(setGreetingUploadProgress, postMessage, postTimedMessage, postError)
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -128,9 +128,13 @@ const CallQueueTemplates = () => {
 
     useEffect(() => {
         if (isScheduleUpdatePending) return
-        postMessage(new Message('Finished applying template', 'success'))
         uploadGreetings(filteredExtensions, introGreetingPayload, connectingGreetingPayload, onHoldGreetingPayload, intterruptGreetingPayload)
     }, [isScheduleUpdatePending])
+
+    useEffect(() => {
+        if (isGreetingsUploadPending) return
+        postMessage(new Message('Finished applying template', 'success'))
+    }, [isGreetingsUploadPending])
 
     const handleSyncButtonClick = () => {
         if (filteredExtensions.length === 0) return
