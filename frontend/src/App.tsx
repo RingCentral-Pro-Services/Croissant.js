@@ -14,6 +14,7 @@ import ExtensionEditor from './components/pages/Extension Editor/ExtensionEditor
 import CallQueueTemplates from './components/pages/Call Queues/CallQueueTemplates';
 import CreateCallQueues from './components/pages/Call Queues/CreateCallQueues';
 import Deskphones from './components/pages/Deskphones/Deskphones';
+import CustomRules from './components/pages/Custom Rules/CustomRules';
 
 function App() {
 
@@ -41,6 +42,7 @@ function App() {
             <Route path='/editsites' element={<EditSites />} />
             <Route path='/editextensions' element={<ExtensionEditor />} />
             <Route path='/deskphones' element={<Deskphones />} />
+            <Route path='/copycustomrules' element={<CustomRules />} />
           </Routes>
         </div>
       </div>
