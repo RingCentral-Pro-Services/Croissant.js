@@ -2,6 +2,7 @@ import CSVFormattable from "./CSVFormattable"
 import { DataTableFormattable } from "./DataTableFormattable"
 import ExcelFormattable from "./ExcelFormattable"
 import ExtensionContact from "./ExtensionContact"
+import { SimpleHandlingRule } from "./SimpleHandlingRule"
 
 class RCExtension implements CSVFormattable, ExcelFormattable, DataTableFormattable {
 
@@ -27,7 +28,7 @@ class RCExtension implements CSVFormattable, ExcelFormattable, DataTableFormatta
         "GroupCallPickup": "Group Call Pickup"
     }
 
-    constructor(public id: number, public extensionNumber: number, public name: string, public contact: ExtensionContact, public site: string, public type: string, public status: string, public hidden: boolean , public uri: string) {}
+    constructor(public id: number, public extensionNumber: number, public name: string, public contact: ExtensionContact, public site: string, public type: string, public status: string, public hidden: boolean , public uri: string, public customRules?: SimpleHandlingRule[]) {}
 
     toRow() {
         return `${this.name},${this.extensionNumber ?? 'N/A'},${this.contact?.email ?? ""},${this.site ?? 'N/A'},${this.prettyType[this.type] ?? this.type},${this.status},${this.hidden}`

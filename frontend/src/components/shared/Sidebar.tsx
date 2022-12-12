@@ -10,6 +10,7 @@ const Sidebar = () => {
     const [selectedItem, setSelectedItem] = useState("Create IVRs")
     const [isIVRListOpen, setIsIVRListOpen] = useState(true)
     const [isCallQueueListOpen, setIsCallQueueListOpen] = useState(false)
+    const [isCustomRuleListOpen, setIsCustomRuleListOpen] = useState(false)
     const navigate = useNavigate()
 
     const handleClick = (text: string, destination: string) => {
@@ -23,8 +24,7 @@ const Sidebar = () => {
         {label: 'Account Dump', destination: '/accountdump'},
         {label: 'Delete Extensions', destination: '/deleteextensions'},
         {label: 'Notifications', destination: '/notificationsaudit'},
-        {label: 'Desk Phones', destination: '/deskphones'},
-        {label: 'Copy Custom Rules', destination: '/copycustomrules'},
+        {label: 'Desk Phones', destination: '/deskphones'}
     ]
 
     const ivrItems: SidebarItem[] = [
@@ -38,12 +38,21 @@ const Sidebar = () => {
         {label: 'Call Queue Templates', destination: '/callqueuetemplates'},
     ]
 
+    const customRuleItems: SidebarItem[] = [
+        {label: 'Copy Custom Rules', destination: '/copycustomrules'},
+        {label: 'Enable / Disable Custom Rules', destination: '/customruleedit'}
+    ]
+
     const handleToggle = () => {
         setIsIVRListOpen(!isIVRListOpen)
     }
 
     const handleCallQueueToggle = () => {
         setIsCallQueueListOpen(!isCallQueueListOpen)
+    }
+
+    const handleCustomRuleToggle = () => {
+        setIsCustomRuleListOpen(!isCustomRuleListOpen)
     }
 
     return ( 
@@ -87,6 +96,22 @@ const Sidebar = () => {
             <Collapse in={isCallQueueListOpen} timeout='auto' unmountOnExit>
                 <List>
                     {callQueueItems.map((item) => (
+                        <ListItem className={selectedItem === item.label ? 'nav-item-selected' : ''} key={item.label} disablePadding>
+                        <ListItemButton onClick={() => handleClick(item.label, item.destination)}>
+                        <ListItemText primary={item.label} />
+                        </ListItemButton>
+                    </ListItem>
+                    ))}
+                </List>
+            </Collapse>
+            <Divider />
+            <ListItemButton onClick={handleCustomRuleToggle}>
+                <ListItemText primary="Custom Rules" />
+                {isCustomRuleListOpen ? <ExpandLess /> : <ExpandMore />}
+            </ListItemButton>
+            <Collapse in={isCustomRuleListOpen} timeout='auto' unmountOnExit>
+                <List>
+                    {customRuleItems.map((item) => (
                         <ListItem className={selectedItem === item.label ? 'nav-item-selected' : ''} key={item.label} disablePadding>
                         <ListItemButton onClick={() => handleClick(item.label, item.destination)}>
                         <ListItemText primary={item.label} />
