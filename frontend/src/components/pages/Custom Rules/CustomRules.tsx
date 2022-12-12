@@ -96,6 +96,7 @@ const CustomRules = () => {
         setIsSyncing(true)
         setProgressMax(filteredExtensions.length)
         createCustomRule(filteredExtensions, selectedRule!, voicemailDestinationOption === 'maintainDestination')
+        setActiveStep(10)
     }
 
     const isRuleRoutingToVoicemail = () => {
@@ -157,7 +158,7 @@ const CustomRules = () => {
                                 <AdditiveFilter title="Site" placeholder="Select" options={siteNames} setSelected={setSelectedSiteNames} />
                                 <div className='healthy-margin-top'>
                                     <Button className='healthy-margin-right' variant='contained' onClick={() => setActiveStep((prev) => prev - 1)} >Back</Button>
-                                    <Button variant='contained' disabled={filteredExtensions.length === 0} onClick={handleSyncButtonClick} >Sync</Button>
+                                    <Button variant='contained' disabled={filteredExtensions.length === 0 || isSyncing} onClick={handleSyncButtonClick} >Sync</Button>
                                 </div>
                             </StepContent>
                         </Step>

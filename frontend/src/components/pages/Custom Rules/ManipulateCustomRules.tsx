@@ -83,6 +83,7 @@ const ManipulateCustomRules = () => {
         setIsSyncing(true)
         setFetchRulesProgressMax(filteredExtensions.length)
         fetchRules(filteredExtensions)
+        setActiveStep(10)
     }
 
     return (
