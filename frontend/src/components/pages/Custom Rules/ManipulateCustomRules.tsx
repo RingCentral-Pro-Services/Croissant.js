@@ -33,7 +33,7 @@ const ManipulateCustomRules = () => {
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
-    const {fetchExtensions, extensionsList, isExtensionListPending} = useExtensionList(postMessage)
+    const {fetchExtensions, extensionsList, isExtensionListPending, isMultiSiteEnabled} = useExtensionList(postMessage)
     const {fetchRules, isRuleListPending, adjustedExtensions} = useSimpleRuleList(setFetchRulesProgress, postMessage, postTimedMessage, postError)
     const {manipulateRules, isRuleManipulationPending} = useManipulateRules(setManipulateRulesProgress, postMessage, postTimedMessage, postError)
 
@@ -51,12 +51,17 @@ const ManipulateCustomRules = () => {
     useEffect(() => {
         if (isExtensionListPending) return
         const sites = extensionsList.filter((extension) => extension.type === 'Site').map((extension) => extension.name)
-        console.log(sites)
         setSiteNames(['Main Site', ...sites])
     }, [isExtensionListPending])
 
     useEffect(() => {
-        const filtered = extensionsList.filter((extension) => selectedExtensionTypes.includes(extension.prettyType[extension.type]) && selectedSiteNames.includes(extension.site))
+        let filtered: RCExtension[] = []
+        if (isMultiSiteEnabled) {
+            filtered = extensionsList.filter((extension) => selectedExtensionTypes.includes(extension.prettyType[extension.type]) && selectedSiteNames.includes(extension.site))
+        }
+        else {
+            filtered = extensionsList.filter((extension) => selectedExtensionTypes.includes(extension.prettyType[extension.type]))
+        }
         console.log('Filtered Extension')
         console.log(filtered)
         setFilteredExtensions(filtered)
@@ -124,7 +129,7 @@ const ManipulateCustomRules = () => {
                             <StepLabel>Choose extensions</StepLabel>
                             <StepContent>
                                 <AdditiveFilter title="Extension Type" placeholder="Select" options={extensionTypes} setSelected={setSelectedExtensionTypes} />
-                                <AdditiveFilter title="Site" placeholder="Select" options={siteNames} setSelected={setSelectedSiteNames} />
+                                {isMultiSiteEnabled ? <AdditiveFilter title="Site" placeholder="Select" options={siteNames} setSelected={setSelectedSiteNames} /> : <></>}
                                 <div className='healthy-margin-top'>
                                     <Button className='healthy-margin-right' variant='contained' onClick={() => setActiveStep((prev) => prev - 1)} >Back</Button>
                                     <Button variant='contained' disabled={filteredExtensions.length === 0 || isSyncing} onClick={handleSync} >Sync</Button>
