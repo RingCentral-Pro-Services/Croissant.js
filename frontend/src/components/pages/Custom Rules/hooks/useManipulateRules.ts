@@ -46,6 +46,7 @@ const useManipulateRules = (setProgressValue: (value: (any)) => void, postMessag
 
                     if (response.rateLimitInterval > 0) {
                         setRateLimitInterval(response.rateLimitInterval)
+                        postTimedMessage(new Message('Rate limit exceeded. Waiting 60 seconds before continuing...', 'info'), 60000)
                     }
                     else {
                         setRateLimitInterval(250)
@@ -58,6 +59,7 @@ const useManipulateRules = (setProgressValue: (value: (any)) => void, postMessag
 
                     if (response.rateLimitInterval > 0) {
                         setRateLimitInterval(response.rateLimitInterval)
+                        postTimedMessage(new Message('Rate limit exceeded. Waiting 60 seconds before continuing...', 'info'), 60000)
                     }
                     else {
                         setRateLimitInterval(250)
@@ -70,6 +72,7 @@ const useManipulateRules = (setProgressValue: (value: (any)) => void, postMessag
 
                     if (response.rateLimitInterval > 0) {
                         setRateLimitInterval(response.rateLimitInterval)
+                        postTimedMessage(new Message('Rate limit exceeded. Waiting 60 seconds before continuing...', 'info'), 60000)
                     }
                     else {
                         setRateLimitInterval(250)
