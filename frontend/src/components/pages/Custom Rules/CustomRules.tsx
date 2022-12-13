@@ -161,7 +161,7 @@ const CustomRules = () => {
                             <StepLabel>Filter Extensions</StepLabel>
                             <StepContent>
                                 <AdditiveFilter title="Extension Type" placeholder="Select" options={extensionTypes} setSelected={setSelectedExtensionTypes} />
-                                {isMultiSiteEnabled ? <AdditiveFilter title="Site" placeholder="Select" options={siteNames} setSelected={setSelectedSiteNames} /> : <></>}
+                                {isMultiSiteEnabled ? <AdaptiveFilter title="Site" placeholder="Search" verticalAlign='bottom' options={siteNames} defaultSelected={[]} setSelected={setSelectedSiteNames} /> : <></>}
                                 <div className='healthy-margin-top'>
                                     <Button className='healthy-margin-right' variant='contained' onClick={() => setActiveStep((prev) => prev - 1)} >Back</Button>
                                     <Button variant='contained' disabled={filteredExtensions.length === 0 || isSyncing} onClick={handleSyncButtonClick} >Sync</Button>
