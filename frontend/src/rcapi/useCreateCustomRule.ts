@@ -42,6 +42,7 @@ const useCreateCustomRule = (setProgressValue: (value: (any)) => void, postMessa
                 const payload = customRule
                 if (!maintainVoicemailDestination) payload!.voicemail!.recipient.id = extensions[currentExtensionIndex].id
                 if (payload?.callHandlingAction !== 'TakeMessagesOnly') delete payload?.voicemail
+                if (payload?.callHandlingAction !== 'TransferToExtension') delete payload?.transfer
                 delete payload?.forwarding
                 delete payload?.transfer?.uri
                 delete payload?.id
