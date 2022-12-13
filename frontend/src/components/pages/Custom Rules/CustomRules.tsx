@@ -146,7 +146,7 @@ const CustomRules = () => {
                         <Step>
                             <StepLabel optional={true}>Configure voicemail</StepLabel>
                             <StepContent>
-                                <Typography>{getVoicemailConfigText()}</Typography>
+                                <Typography className="healthy-margin-bottom" >{getVoicemailConfigText()}</Typography>
                                 <ToggleButtonGroup value={voicemailDestinationOption} onChange={(_, value) => setVoicemailDestinationOption(value)} exclusive>
                                     <ToggleButton size='small' value='maintainDestination'>Original Extension</ToggleButton>
                                     <ToggleButton size='small' value='overrideDestination'>Target Extension</ToggleButton>
