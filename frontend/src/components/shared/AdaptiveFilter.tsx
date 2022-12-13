@@ -2,8 +2,19 @@ import React, { useEffect, useState } from "react";
 import {Autocomplete, TextField, Checkbox, Typography} from '@mui/material'
 import {CheckBox, CheckBoxOutlineBlank} from '@mui/icons-material'
 
-const AdaptiveFilter = (props: {options: string[], title: string, placeholder: string, disabled: boolean, defaultSelected: string[], showAllOption: boolean, setSelected: (values: string[]) => void, width: number}) => {
-    const {options, title, placeholder, defaultSelected, showAllOption, width, setSelected} = props
+interface AdaptiveFilterProps {
+    options: string[],
+    title: string,
+    placeholder: string,
+    disabled?: boolean,
+    defaultSelected?: string[],
+    showAllOption?: boolean,
+    setSelected: (values: string[]) => void,
+    width?: number
+    verticalAlign?: 'middle' | 'bottom'
+} 
+
+const AdaptiveFilter: React.FC<AdaptiveFilterProps> = ({options, title, placeholder, disabled = false, defaultSelected = [], showAllOption = true, setSelected, width = 275, verticalAlign = 'middle'}) => {
     const [nOptions, setOptions] = useState<string[]>([])
     const [value, setValue] = useState(defaultSelected)
 
@@ -52,7 +63,7 @@ const AdaptiveFilter = (props: {options: string[], title: string, placeholder: s
     }
 
     return (
-        <div className="inline healthy-margin-right vertical-middle">
+        <div className={`inline healthy-margin-right ${verticalAlign === 'middle' ? 'vertical-middle': ''}`}>
             <Autocomplete
                 multiple
                 id="adaptive-filter"
@@ -91,13 +102,6 @@ const AdaptiveFilter = (props: {options: string[], title: string, placeholder: s
             />
         </div>
     )
-}
-
-AdaptiveFilter.defaultProps = {
-    disabled: false,
-    showAllOption: true,
-    defaultSelected: [],
-    width: 275
 }
 
 export default AdaptiveFilter
