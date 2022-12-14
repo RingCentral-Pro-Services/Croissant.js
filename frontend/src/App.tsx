@@ -1,8 +1,6 @@
 import React, { Suspense } from 'react'
 import { useEffect } from 'react';
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom'
-// import AuditMenus from './components/pages/IVR/AuditMenus';
-// import CallQueues from './components/pages/Call Queues/CallQueues';
 import CreateMenus from './components/pages/IVR/CreateMenus';
 import ExtensionAudit from './components/pages/Account Dump/ExtensionAudit';
 import ExtensionDeleter from './components/pages/Delete Extensions/ExtensionDeleter';
@@ -16,6 +14,7 @@ import CreateCallQueues from './components/pages/Call Queues/CreateCallQueues';
 import Deskphones from './components/pages/Deskphones/Deskphones';
 import CustomRules from './components/pages/Custom Rules/CustomRules';
 import ManipulateCustomRules from './components/pages/Custom Rules/ManipulateCustomRules';
+import Loading from './components/shared/Loading';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -31,7 +30,7 @@ function App() {
       <div className="App">
         <Sidebar />
         <div className="content">
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<Loading/>}>
             <Routes>
               <Route path='/token' element={<Token />} />
               <Route path='/' element={<CreateMenus />} />

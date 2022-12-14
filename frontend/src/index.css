@@ -362,3 +362,14 @@ progress::-webkit-progress-value {
   width: 200px;
   display: inline-block;
 }
+
+html, body {
+  height: 100%;
+}
+
+.loading-container {
+  margin: 0 auto;
+  text-align: center;
+  height: 100vh;
+  width: 100%;
+}
