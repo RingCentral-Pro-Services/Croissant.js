@@ -10,6 +10,7 @@ import usePostTimedMessage from '../../../hooks/usePostTimedMessage'
 import useAnalytics from '../../../hooks/useAnalytics'
 import UIDInputField from '../../shared/UIDInputField'
 import useWritePrettyExcel from '../../../hooks/useWritePrettyExcel'
+import useWriteExcelFile from '../../../hooks/useWriteExcelFile'
 
 const ExtensionAudit = () => {
     useLogin('accountdump')
@@ -19,7 +20,8 @@ const ExtensionAudit = () => {
     let {messages, errors, postMessage} = useMessageQueue()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
-    const {writePrettyExcel} = useWritePrettyExcel()
+    const {writeExcel} = useWriteExcelFile()
+
 
     const handleClick = () => {
         fetchExtensions()
@@ -36,7 +38,8 @@ const ExtensionAudit = () => {
         if (isExtensionListPending) return
 
         let header = ['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']
-        writePrettyExcel(header, extensionsList, 'Extensions', 'account-dump.xlsx')
+        // writePrettyExcel(header, extensionsList, 'Extensions', 'account-dump.xlsx')
+        writeExcel(header, extensionsList, 'Extensions', 'account-dump.xlsx')
     }, [isExtensionListPending, extensionsList])
 
     return (

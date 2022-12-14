@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from "react"
 import useLogin from "../../../hooks/useLogin"
-import { Message } from "../../../models/Message"
 import useExtensionList from "../../../rcapi/useExtensionList"
 import useGetAccessToken from "../../../rcapi/useGetAccessToken"
 import useMessageQueue from "../../../hooks/useMessageQueue"
@@ -17,8 +16,8 @@ import useAnalytics from "../../../hooks/useAnalytics"
 import UIDInputField from "../../shared/UIDInputField"
 import AdaptiveFilter from "../../shared/AdaptiveFilter"
 import RCExtension from "../../../models/RCExtension"
-import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel"
 import MessagesArea from "../../shared/MessagesArea"
+import useWriteExcelFile from "../../../hooks/useWriteExcelFile"
 
 const NotificationAudit = () => {
     useLogin('notificationsaudit')
@@ -28,7 +27,7 @@ const NotificationAudit = () => {
     let {messages, errors, postMessage, postError} = useMessageQueue()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     const [isPending, setIsPending] = useState(false)
-    const {writePrettyExcel} = useWritePrettyExcel()
+    const {writeExcel} = useWriteExcelFile()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const [selectedFile, setSelectedFile] = useState<File | null>()
     const [selectedSheet, setSelectedSheet] = useState('')
@@ -117,7 +116,7 @@ const NotificationAudit = () => {
 
         console.log(notifications)
         let header = ['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses', 'Advanced Mode', 'Advanced Voicemail Emails', 'Advanced Inbound Fax Emails', 'Advanced Outbound Fax Emails', 'Advanced Inbound Texts Emails', 'Advanced Missed Calls Emails']
-        writePrettyExcel(header, notifications, 'Notifications', 'notifications.xlsx')
+        writeExcel(header, notifications, 'Notifications', 'notifications.xlsx')
         // setIsPending(false)
     }, [isNotificationListPending, notifications, isPending])
 

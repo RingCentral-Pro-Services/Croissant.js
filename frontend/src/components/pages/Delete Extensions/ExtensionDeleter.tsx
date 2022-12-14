@@ -14,7 +14,7 @@ import {FileDownload} from '@mui/icons-material'
 import useDeleteExtensions from "../../../rcapi/useDeleteExtensions"
 import Modal from "../../shared/Modal"
 import useAnalytics from "../../../hooks/useAnalytics"
-import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel"
+import useWriteExcelFile from "../../../hooks/useWriteExcelFile"
 
 const ExtensionDeleter = () => {
     useLogin('deleteextensions')
@@ -37,7 +37,7 @@ const ExtensionDeleter = () => {
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
     const {deleteExtensions, isExtensionDeletePending} = useDeleteExtensions(postMessage, postTimedMessage, setProgressValue, setMaxProgressValue, postError)
-    const {writePrettyExcel} = useWritePrettyExcel()
+    const {writeExcel} = useWriteExcelFile()
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -123,7 +123,7 @@ const ExtensionDeleter = () => {
 
     const handleDownloadButtonClick = () => {
         const header = ['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']
-        writePrettyExcel(header, filteredExtensions, 'Deleted Extensions', 'deleted-extensions.xlsx')
+        writeExcel(header, filteredExtensions, 'Deleted Extensions', 'deleted-extensions.xlsx')
     }
 
     useEffect(() => {

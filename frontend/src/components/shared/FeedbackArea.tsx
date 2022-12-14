@@ -29,7 +29,7 @@ const FeedbackArea = (props: {tableHeader: string[], tableData: DataTableFormatt
 
     const handleDownloadButtonClick = () => {
       const header = ['Extension Name', 'Extension Number', 'Error', 'Supplemental Info', 'Platform Response']
-      writeExcel(header, errors, 'errors.xlsx')
+      writeExcel(header, errors, 'Errors', 'errors.xlsx')
     }
 
     return (

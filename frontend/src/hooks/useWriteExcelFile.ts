@@ -2,7 +2,7 @@ import * as xlsx from 'xlsx'
 import ExcelFormattable from '../models/ExcelFormattable'
 
 const useWriteExcelFile = () => {
-    const writeExcel = (headers: string[], items: ExcelFormattable[], filename: string) => {
+    const writeExcel = (headers: string[], items: ExcelFormattable[], sheetName: string, filename: string) => {
         let data: string[][] = []
 
         data.push(headers)
@@ -13,7 +13,7 @@ const useWriteExcelFile = () => {
         let workbook = xlsx.utils.book_new()
         var worksheet = xlsx.utils.aoa_to_sheet(data)
 
-        xlsx.utils.book_append_sheet(workbook, worksheet, "Extensions", true)
+        xlsx.utils.book_append_sheet(workbook, worksheet, sheetName, true)
         xlsx.writeFile(workbook, filename)
     }
 
