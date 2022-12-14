@@ -1,10 +1,11 @@
 import CSVFormattable from "./CSVFormattable"
+import { DataGridFormattable } from "./DataGridFormattable"
 import { DataTableFormattable } from "./DataTableFormattable"
 import ExcelFormattable from "./ExcelFormattable"
 import ExtensionContact from "./ExtensionContact"
 import { SimpleHandlingRule } from "./SimpleHandlingRule"
 
-class RCExtension implements CSVFormattable, ExcelFormattable, DataTableFormattable {
+class RCExtension implements CSVFormattable, ExcelFormattable, DataTableFormattable, DataGridFormattable {
 
     prettyType: {[key: string]: string} = {
         "Department": "Call Queue",
@@ -40,6 +41,31 @@ class RCExtension implements CSVFormattable, ExcelFormattable, DataTableFormatta
 
     toDataTableRow(): string[] {
         return [this.name, `${this.extensionNumber ?? ''}`, this.contact?.email ?? '', this.site ?? 'N/A', this.prettyType[this.type] ?? this.type, this.status, `${this.hidden}`]
+    }
+
+    toDataGridRow(): any {
+        return {
+            id: this.id,
+            name: this.name,
+            extensionNumber: this.extensionNumber ?? '',
+            email: this.contact?.email ?? '',
+            site: this.site ?? 'N/A',
+            type: this.prettyType[this.type] ?? this.type,
+            status: this.status,
+            hidden: this.hidden
+        }
+    }
+
+    toDataGidHeader(): any {
+        return [
+            { field: 'name', headerName: 'Name', width: 200 },
+            { field: 'extensionNumber', headerName: 'Extension Number', width: 200 },
+            { field: 'email', headerName: 'Email', width: 200 },
+            { field: 'site', headerName: 'Site', width: 200 },
+            { field: 'type', headerName: 'Type', width: 200 },
+            { field: 'status', headerName: 'Status', width: 200 },
+            { field: 'hidden', headerName: 'Hidden', width: 200 }
+        ]
     }
 }
 
