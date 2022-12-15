@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import useLogin from "../../../hooks/useLogin";
 import useMessageQueue from "../../../hooks/useMessageQueue";
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
+import { DataGridFormattable } from "../../../models/DataGridFormattable";
 import RCExtension from "../../../models/RCExtension";
 import useExtensionList from "../../../rcapi/useExtensionList";
 import useGetAccessToken from "../../../rcapi/useGetAccessToken";
@@ -22,6 +23,7 @@ const ManipulateCustomRules = () => {
     const [siteNames, setSiteNames] = useState<string[]>([])
     const [selectedSiteNames, setSelectedSiteNames] = useState<string[]>([])
     const [filteredExtensions, setFilteredExtensions] = useState<RCExtension[]>([])
+    const [selectedExtensions, setSelectedExtensions] = useState<RCExtension[]>([])
     const [selectedExtensionTypes, setSelectedExtensionTypes] = useState<string[]>([])
     const [fetchRulesProgress, setFetchRulesProgress] = useState(0)
     const [fetchRulesProgressMax, setFetchRulesProgressMax] = useState(0)
@@ -87,9 +89,14 @@ const ManipulateCustomRules = () => {
 
     const handleSync = () => {
         setIsSyncing(true)
-        setFetchRulesProgressMax(filteredExtensions.length)
-        fetchRules(filteredExtensions)
+        setFetchRulesProgressMax(selectedExtensions.length)
+        fetchRules(selectedExtensions)
         setActiveStep(10)
+    }
+
+    const handleFilterSelection = (selected: DataGridFormattable[]) => {
+        const extensions = selected as RCExtension[]
+        setSelectedExtensions(extensions)
     }
 
     return (
@@ -138,7 +145,7 @@ const ManipulateCustomRules = () => {
                             </StepContent>
                         </Step>
                     </Stepper>
-                    {filteredExtensions.length > 0 ? <FeedbackArea tableHeader={['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']} tableData={filteredExtensions} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
+                    {filteredExtensions.length > 0 ? <FeedbackArea gridData={filteredExtensions} onFilterSelection={handleFilterSelection} tableHeader={['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']} tableData={filteredExtensions} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
                 </div>
             </div>
         </>
