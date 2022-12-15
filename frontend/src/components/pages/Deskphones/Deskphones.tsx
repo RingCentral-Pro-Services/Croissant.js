@@ -4,6 +4,7 @@ import useLogin from "../../../hooks/useLogin";
 import useMessageQueue from "../../../hooks/useMessageQueue";
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
 import { CallForwardingSettings } from "../../../models/CallForwardingSettings";
+import { DataGridFormattable } from "../../../models/DataGridFormattable";
 import RCExtension from "../../../models/RCExtension";
 import useAdjustCallForwarding from "../../../rcapi/useAdjustCallForwarding";
 import useExtensionList from "../../../rcapi/useExtensionList";
@@ -104,6 +105,12 @@ const Deskphones = () => {
         return newForwardingSettings
     }
 
+    const handleFilterSelection = (selected: DataGridFormattable[]) => {
+        const extensions = selected as RCExtension[]
+        setFilteredExtensions(extensions)
+        console.log(extensions)
+    }
+
     const handleSyncButtonClicked = () => {
         setIsSyncing(true)
         setCallForwardingProgressMax(filteredExtensions.length)
@@ -121,7 +128,7 @@ const Deskphones = () => {
                 {isExtensionListPending ? <></> : <Button disabled={isSyncing} variant="contained" onClick={handleSyncButtonClicked}>Sync</Button>}
                 {isSyncing ? <> <Typography>Fetching Call Handling</Typography> <progress value={callForwardingProgressValue} max={callForwardingProgressMax} /> </> : <></>}
                 {isSyncing ? <> <Typography>Updating Call Handling</Typography> <progress value={callforwardingUpdateProgress} max={callForwardingUpdateProgressMax} /> </> : <></>}
-                {filteredExtensions.length > 0 ? <FeedbackArea tableHeader={['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']} tableData={filteredExtensions} messages={messages} errors={errors} timedMessages={timedMessages} /> : <></>}
+                {filteredExtensions.length > 0 ? <FeedbackArea gridData={filteredExtensions} onFilterSelection={handleFilterSelection} showSiteFilter={true} tableHeader={['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']} tableData={filteredExtensions} messages={messages} errors={errors} timedMessages={timedMessages} /> : <></>}
             </div>
         </>
     )
