@@ -37,8 +37,8 @@ const useTimezoneList = () => {
                     result.push(timezone)
                 }
                 result.sort((a, b) => {
-                    if (parseInt(a.bias) < parseInt(b.bias)) return 1
-                    else return -1
+                    if (parseInt(a.bias) < parseInt(b.bias)) return -1
+                    else return 1
                 })
                 createMap(result)
                 setTimezones(result)
@@ -52,6 +52,7 @@ const useTimezoneList = () => {
         }, rateLimitInterval)
     }, [page, shouldFetch])
 
+    // Ironically, this might be the ugliest function I've ever written
     const getPrettyName = (bias: string, description: string) => {
         const sign = bias.includes('-') ? '-' : '+'
         const biasNumber = parseInt(bias.replace('-', ''))
