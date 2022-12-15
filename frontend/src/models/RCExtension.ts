@@ -58,14 +58,21 @@ class RCExtension implements CSVFormattable, ExcelFormattable, DataTableFormatta
 
     toDataGidHeader(): any {
         return [
-            { field: 'name', headerName: 'Name', width: 200 },
-            { field: 'extensionNumber', headerName: 'Extension Number', width: 200 },
-            { field: 'email', headerName: 'Email', width: 200 },
-            { field: 'site', headerName: 'Site', width: 200 },
+            { field: 'name', headerName: 'Name', width: 300 },
+            { field: 'extensionNumber', headerName: 'Extension Number', width: 150 },
+            { field: 'email', headerName: 'Email', width: 400 },
+            { field: 'site', headerName: 'Site', width: 200,},
             { field: 'type', headerName: 'Type', width: 200 },
             { field: 'status', headerName: 'Status', width: 200 },
             { field: 'hidden', headerName: 'Hidden', width: 200 }
         ]
+    }
+
+    property(key: string): any {
+        if (key === 'site') {
+            return this.site ?? 'N/A'
+        }
+        return this[key as keyof RCExtension]
     }
 }
 
