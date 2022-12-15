@@ -4,6 +4,7 @@ import useLogin from "../../../hooks/useLogin";
 import useMessageQueue from "../../../hooks/useMessageQueue";
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
 import { CustomRule } from "../../../models/CustomRule";
+import { DataGridFormattable } from "../../../models/DataGridFormattable";
 import { Message } from "../../../models/Message";
 import RCExtension from "../../../models/RCExtension";
 import useCreateCustomRule from "../../../rcapi/useCreateCustomRule";
@@ -26,6 +27,7 @@ const CustomRules = () => {
     const [siteNames, setSiteNames] = useState<string[]>([])
     const [selectedSiteNames, setSelectedSiteNames] = useState<string[]>([])
     const [filteredExtensions, setFilteredExtensions] = useState<RCExtension[]>([])
+    const [selectedExtensions, setSelectedExtensions] = useState<RCExtension[]>([])
     const [progressValue, setProgressValue] = useState<number>(0)
     const [progressMax, setProgressMax] = useState<number>(0)
     const [isSyncing, setIsSyncing] = useState<boolean>(false)
@@ -100,9 +102,14 @@ const CustomRules = () => {
 
     const handleSyncButtonClick = () => {
         setIsSyncing(true)
-        setProgressMax(filteredExtensions.length)
-        createCustomRule(filteredExtensions, selectedRule!, voicemailDestinationOption === 'maintainDestination')
+        setProgressMax(selectedExtensions.length)
+        createCustomRule(selectedExtensions, selectedRule!, voicemailDestinationOption === 'maintainDestination')
         setActiveStep(10)
+    }
+
+    const handleFilterSelection = (selected: DataGridFormattable[]) => {
+        const extensions = selected as RCExtension[]
+        setSelectedExtensions(extensions)
     }
 
     const isRuleRoutingToVoicemail = () => {
@@ -170,7 +177,7 @@ const CustomRules = () => {
                         </Step>
                     </Stepper>
                 </div>
-                {filteredExtensions.length > 0 ? <FeedbackArea tableHeader={['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']} tableData={filteredExtensions} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
+                {filteredExtensions.length > 0 ? <FeedbackArea gridData={filteredExtensions} onFilterSelection={handleFilterSelection} tableHeader={['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']} tableData={filteredExtensions} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
             </div>
         </>
     )

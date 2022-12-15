@@ -35,7 +35,16 @@ export class IVRMenu implements CSVFormattable, ExcelFormattable, DataTableForma
             extensionNumber: this.data.extensionNumber,
             site: this.data.site ? this.data.site.name : 'Main Site',
             prompt: this.data.prompt.mode === 'Audio' ? this.audioPromptFilename ?? '0' : this.data.prompt.text ?? '',
-            actions: this.actionsToRow()
+            key1: this.actionText(`1`),
+            key2: this.actionText(`2`),
+            key3: this.actionText(`3`),
+            key4: this.actionText(`4`),
+            key5: this.actionText(`5`),
+            key6: this.actionText(`6`),
+            key7: this.actionText(`7`),
+            key8: this.actionText(`8`),
+            key9: this.actionText(`9`),
+            key0: this.actionText(`0`)
         }
 
         return result
@@ -47,7 +56,16 @@ export class IVRMenu implements CSVFormattable, ExcelFormattable, DataTableForma
             { field: 'extensionNumber', headerName: 'Extension Number', width: 200 },
             { field: 'site', headerName: 'Site', width: 200 },
             { field: 'prompt', headerName: 'Prompt', width: 200 },
-            { field: 'actions', headerName: 'Actions', width: 200 },
+            { field: 'key1', headerName: 'Key 1', width: 200 },
+            { field: 'key2', headerName: 'Key 2', width: 200 },
+            { field: 'key3', headerName: 'Key 3', width: 200 },
+            { field: 'key4', headerName: 'Key 4', width: 200 },
+            { field: 'key5', headerName: 'Key 5', width: 200 },
+            { field: 'key6', headerName: 'Key 6', width: 200 },
+            { field: 'key7', headerName: 'Key 7', width: 200 },
+            { field: 'key8', headerName: 'Key 8', width: 200 },
+            { field: 'key9', headerName: 'Key 9', width: 200 },
+            { field: 'key0', headerName: 'Key 0', width: 200 }
         ]
 
         return result
@@ -58,6 +76,27 @@ export class IVRMenu implements CSVFormattable, ExcelFormattable, DataTableForma
             return this.data.site.name ?? 'N/A'
         }
         return this[key as keyof IVRMenu]
+    }
+
+    actionText(key: string) {
+        let result = ''
+        for (let actionIndex = 0; actionIndex < this.data.actions.length; actionIndex++) {
+            if (this.data.actions[actionIndex].input === key) {
+                if (this.data.actions[actionIndex].action === 'Transfer') {
+                    result = `${this.data.actions[actionIndex].action} to ${this.data.actions[actionIndex].phoneNumber}`
+                }
+                else if (this.data.actions[actionIndex].action === 'Connect') {
+                    result = `${this.data.actions[actionIndex].action} to ${this.data.actions[actionIndex].extension?.id}`
+                }
+                else if (this.data.actions[actionIndex].action === 'Voicemail') {
+                    result = `${this.data.actions[actionIndex].action} of ${this.data.actions[actionIndex].extension?.id}`
+                }
+                else {
+                    result = `${this.data.actions[actionIndex].action}`
+                }
+            }
+        }
+        return result
     }
 
     payload(isMultiSiteEnabled: boolean = true, includeActions: boolean = true) {
