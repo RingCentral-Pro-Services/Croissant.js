@@ -25,19 +25,6 @@ const ExtensionAudit = () => {
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
     const {writeExcel} = useWriteExcelFile()
 
-    const [selectedExtensions, setSelectedExtensions] = useState<RCExtension[]>([])
-
-    const handleFilterSelection = (selected: DataGridFormattable[]) => {
-        const extensions = selected as RCExtension[]
-        setSelectedExtensions(extensions)
-    }
-
-    useEffect(() => {
-        console.log('selected extensions: ')
-        console.log(selectedExtensions)
-    }, [selectedExtensions])
-
-
     const handleClick = () => {
         fetchExtensions()
         fireEvent('extension-audit')
@@ -65,7 +52,7 @@ const ExtensionAudit = () => {
             <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} />
             <Button className='healthy-margin-right' disabled={!hasCustomerToken} variant='contained' onClick={handleClick}>Go</Button>
             {/* {extensionsList.length > 0 ? <FilterArea items={extensionsList} defaultSelected={extensionsList.map((extension) => extension.id)} showSiteFilter={true} onSelectionChanged={handleFilterSelection} /> : <></>} */}
-            {extensionsList.length > 0 ? <FeedbackArea tableHeader={['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']} gridData={extensionsList} onFilterSelection={handleFilterSelection} tableData={extensionsList} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
+            {extensionsList.length > 0 ? <FeedbackArea gridData={extensionsList} additiveFilter={true} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
         </div>
         </>
     )

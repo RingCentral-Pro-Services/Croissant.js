@@ -112,7 +112,7 @@ const EditSites = () => {
                 <FileSelect enabled={!isExtensionListPending} handleSubmit={handleFileSubmit} setSelectedFile={setSelectedFile} isPending={false} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
                 <Button variant='contained' disabled={isDataValidationPending || isSyncing} onClick={handleSyncButtonClick}>Sync</Button>
                 {isDataValidationPending ? <></> : <progress max={maxProgressValue} value={progressValue} />}
-                {isDataValidationPending ? <></> : <FeedbackArea tableHeader={['ID', 'Name', 'Ext']} tableData={validatedSites} messages={messages} timedMessages={timedMessages} errors={errors} />}
+                {isDataValidationPending ? <></> : <FeedbackArea gridData={validatedSites} additiveFilter={true} messages={messages} timedMessages={timedMessages} errors={errors} />}
             </div>
         </>
     )

@@ -30,10 +30,12 @@ import ScheduleBuilder from "../../shared/ScheduleBuilder";
 import useUpdateSchedule from "../../../rcapi/useUpdateSchedule";
 import useBuildCustomGreetings from "../../../hooks/useBuildCustomGreetings";
 import useUploadCustomGreetings from "../../../rcapi/useUploadCustomGreetings";
+import { DataGridFormattable } from "../../../models/DataGridFormattable";
 
 const CallQueueTemplates = () => {
     const [targetUID, setTargetUID] = useState('')
     const [filteredExtensions, setFilteredExtensions] = useState<RCExtension[]>([])
+    const [selectedExtensions, setSelectedExtensions] = useState<RCExtension[]>([])
     const [isSyncing, setIsSyncing] = useState(false)
     const [siteNames, setSiteNames] = useState<string[]>([])
     const [selectedSites, setSelectedSites] = useState<string[]>([])
@@ -108,7 +110,7 @@ const CallQueueTemplates = () => {
             ...(greetings.length != 0 && {greetings: greetings}),
             ...(Object.keys(callHandlingPayload).length != 0 && {queue: callHandlingPayload}),
         }
-        updateCallHandling(filteredExtensions, payload)
+        updateCallHandling(selectedExtensions, payload)
     }, [isRegionalSettingApplicationPending])
 
     useEffect(() => {
@@ -123,12 +125,12 @@ const CallQueueTemplates = () => {
         const payload = {
             ...(Object.keys(schedulePayload).length != 0 && {schedule: {weeklyRanges: schedulePayload}})
         }
-        updateSchedule(filteredExtensions, payload)
+        updateSchedule(selectedExtensions, payload)
     }, [isCallHandlingUpdatePending])
 
     useEffect(() => {
         if (isScheduleUpdatePending) return
-        uploadGreetings(filteredExtensions, introGreetingPayload, connectingGreetingPayload, onHoldGreetingPayload, intterruptGreetingPayload)
+        uploadGreetings(selectedExtensions, introGreetingPayload, connectingGreetingPayload, onHoldGreetingPayload, intterruptGreetingPayload)
     }, [isScheduleUpdatePending])
 
     useEffect(() => {
@@ -137,14 +139,14 @@ const CallQueueTemplates = () => {
     }, [isGreetingsUploadPending])
 
     const handleSyncButtonClick = () => {
-        if (filteredExtensions.length === 0) return
+        if (selectedExtensions.length === 0) return
         // Filtering stuff
-        setRegionalSettingsMaxProgress(filteredExtensions.length)
-        setCallHandlingSettingsMaxProgress(filteredExtensions.length)
-        setScheduleMaxProgress(filteredExtensions.length)
-        setGreetingUploadMaxProgress(filteredExtensions.length * progressMultiplier)
+        setRegionalSettingsMaxProgress(selectedExtensions.length)
+        setCallHandlingSettingsMaxProgress(selectedExtensions.length)
+        setScheduleMaxProgress(selectedExtensions.length)
+        setGreetingUploadMaxProgress(selectedExtensions.length * progressMultiplier)
         console.log(`Progress Multiplier: ${progressMultiplier}`)
-        console.log(`Greeting Upload Max Progress: ${filteredExtensions.length * progressMultiplier}`)
+        console.log(`Greeting Upload Max Progress: ${selectedExtensions.length * progressMultiplier}`)
 
         if (Object.keys(regionalSettingsPayload).length != 0) {
             setWillUpdateRegionalSettings(true)
@@ -161,7 +163,7 @@ const CallQueueTemplates = () => {
 
         fireEvent('call-queue-templates')
         setIsSyncing(true)
-        applyRegionalSettings(filteredExtensions, regionalSettingsPayload)
+        applyRegionalSettings(selectedExtensions, regionalSettingsPayload)
     }
 
     const extractSites = (extensions: RCExtension[]) => {
@@ -177,6 +179,12 @@ const CallQueueTemplates = () => {
         setSiteNames(siteNames)
     }
 
+    const handleFilterSelection = (selected: DataGridFormattable[]) => {
+        const extensions = selected as RCExtension[]
+        setSelectedExtensions(extensions)
+        console.log(extensions)
+    }
+
     return (
         <>
             <Header  title="Call Queue Templates" body="Apply settings to call queues in bulk"/>
@@ -184,7 +192,7 @@ const CallQueueTemplates = () => {
                 <h2>Call Queue Templates</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} />
                 {isRegionalFormatListPenging ? <></> : <AdaptiveFilter options={siteNames} showAllOption={true} setSelected={setSelectedSites} title='Sites' placeholder='Search' disabled={isRegionalFormatListPenging || isSyncing} defaultSelected={siteNames}  />}
-                <Button disabled={isRegionalFormatListPenging || isSyncing} variant="contained" onClick={handleSyncButtonClick} >Sync</Button>
+                <Button disabled={selectedExtensions.length === 0 || isRegionalFormatListPenging || isSyncing} variant="contained" onClick={handleSyncButtonClick} >Sync</Button>
                 <ScheduleBuilder isOpen={isShowingHours} setIsOpen={setIsShowingHours} setPayload={setSchedulePayload} />
                 {isSyncing && willUpdateRegionalSettings ? <> <Typography>Regional settings</Typography> <progress value={regionalSettingsProgress} max={regionalSettingsMaxProgress} /> </> : <></>}
                 {isSyncing && willUpdateCallHandlingSettings ? <> <Typography>Call Handling & Greetings</Typography> <progress value={callHandlingSettingsProgress} max={callHandlingSettingsMaxProgress} /> </> : <></>}
@@ -250,7 +258,7 @@ const CallQueueTemplates = () => {
                         </AccordionDetails>
                     </Accordion>
                 </div>
-                {!isRegionalFormatListPenging && filteredExtensions.length > 0 ? <FeedbackArea tableHeader={['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']} tableData={filteredExtensions} messages={messages} errors={errors} timedMessages={timedMessages} /> : <></>}
+                {!isRegionalFormatListPenging && filteredExtensions.length > 0 ? <FeedbackArea gridData={filteredExtensions} onFilterSelection={handleFilterSelection} messages={messages} errors={errors} timedMessages={timedMessages} /> : <></>}
             </div>
         </>
     )

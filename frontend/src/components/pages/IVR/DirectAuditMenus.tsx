@@ -71,7 +71,7 @@ const DirectAuditMenus = () => {
             {isPending ? <CircularProgress className="vertical-middle" /> : <></>}
             {isPending ? <progress className='healthy-margin-top' value={progressValue} max={maxProgressValue} /> : <></>}
             {timedMessages.length > 0 ? <MessagesArea messages={timedMessages} /> : <></>}
-            {isIVRBeautificationPending ? <></> : <FeedbackArea gridData={prettyIVRs} tableHeader={['Name', 'Ext', 'Site', 'Prompt Mode', 'Prompt', 'Key 1', 'Key 2', 'Key 3', 'Key 4', 'Key 5', 'Key 6', 'Key 7', 'Key 8', 'Key 9', 'Key 0']} tableData={prettyIVRs} messages={messages} timedMessages={timedMessages} errors={errors} />}
+            {isIVRBeautificationPending ? <></> : <FeedbackArea gridData={prettyIVRs} messages={messages} timedMessages={timedMessages} errors={errors} />}
         </div>
     )
 }

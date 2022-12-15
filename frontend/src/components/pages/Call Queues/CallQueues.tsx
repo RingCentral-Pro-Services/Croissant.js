@@ -74,7 +74,7 @@ const CallQueues = () => {
                 <Button className='healthy-margin-right' disabled={!hasCustomerToken || isPending} variant="contained" onClick={handleClick}>Go</Button>
                 {isPending ? <progress className='healthy-margin-top' value={progressValue} max={maxProgressValue} /> : <></>}
                 {timedMessages.length > 0 ? <MessagesArea messages={timedMessages} /> : <></>}
-                {!isCallQueueSettingsPending ? <FeedbackArea gridData={callQueues} tableHeader={['Queue Name', 'Extension', 'Site', 'Status', 'Members (Ext)', 'Wait time', 'Wrap-up time']} tableData={callQueues} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
+                {!isCallQueueSettingsPending ? <FeedbackArea gridData={callQueues} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
             </div>
         </>
     )

@@ -7,10 +7,11 @@ interface FilterAreaProps {
     items: DataGridFormattable[]
     defaultSelected?: number[]
     showSiteFilter?: boolean
+    additive?: boolean
     onSelectionChanged?: (selectedItems: DataGridFormattable[]) => void
 }
 
-const FilterArea: React.FC<FilterAreaProps> = ({items, onSelectionChanged, defaultSelected, showSiteFilter}) => {
+const FilterArea: React.FC<FilterAreaProps> = ({items, onSelectionChanged, defaultSelected, showSiteFilter, additive = false}) => {
 
     const [allItems, setAllItems] = useState<DataGridFormattable[]>([])
     const [filteredItems, setFilteredItems] = useState<DataGridFormattable[]>([])
@@ -22,8 +23,8 @@ const FilterArea: React.FC<FilterAreaProps> = ({items, onSelectionChanged, defau
         setFilered(items)
         setFilteredItems(items)
         if (onSelectionChanged) onSelectionChanged(items)
-        if (defaultSelected) {
-            setSelectedIDs(defaultSelected)
+        if (!additive) {
+            setSelectedIDs(items.map((item) => item.property('id')))
         }
         
     }, [items])
@@ -58,10 +59,6 @@ const FilterArea: React.FC<FilterAreaProps> = ({items, onSelectionChanged, defau
         if (onSelectionChanged) {
             onSelectionChanged(selectedItems)
         }
-        // console.log(newSelectionIds)
-
-        // console.log('selected items: ')
-        // console.log(selectedItems)
     }
 
     const handleSiteFilterChanged = (selectedSites: string[]) => {
@@ -75,16 +72,17 @@ const FilterArea: React.FC<FilterAreaProps> = ({items, onSelectionChanged, defau
     }
 
     return (
-        <div style={{ height: 800, width: '100%' }}>
+        <div style={{width: '100%' }}>
             {showSiteFilter ? <AdaptiveFilter title='Site' placeholder='search' options={[...new Set(items.map((item) => item.property('site'))).values()]} defaultSelected={[...new Set(items.map((item) => item.property('site'))).values()]} disabled={false} setSelected={handleSiteFilterChanged} /> : <></>}
             <DataGrid
                 rows={rows} 
                 columns={columns} 
-                checkboxSelection
+                autoHeight
+                checkboxSelection={onSelectionChanged != undefined ? true : false}
                 disableSelectionOnClick
                 onSelectionModelChange={handleSelectionModelChanged}
                 experimentalFeatures={{ newEditingApi: true }}
-                rowsPerPageOptions={[100, 500, 1000]}
+                rowsPerPageOptions={[50, 100, 500, 1000]}
                 selectionModel={selectedIDs}
             />
         </div>

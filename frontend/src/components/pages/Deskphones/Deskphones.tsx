@@ -18,6 +18,7 @@ import UIDInputField from "../../shared/UIDInputField";
 
 const Deskphones = () => {
     const [filteredExtensions, setFilteredExtensions] = useState<RCExtension[]>([])
+    const [selectedExtensions, setSelectedExtensions] = useState<RCExtension[]>([])
     const [targetUID, setTargetUID] = useState('')
     const [siteNames, setSiteNames] = useState<string[]>([])
     const [selectedSites, setSelectedSites] = useState<string[]>([])
@@ -107,14 +108,14 @@ const Deskphones = () => {
 
     const handleFilterSelection = (selected: DataGridFormattable[]) => {
         const extensions = selected as RCExtension[]
-        setFilteredExtensions(extensions)
+        setSelectedExtensions(extensions)
         console.log(extensions)
     }
 
     const handleSyncButtonClicked = () => {
         setIsSyncing(true)
-        setCallForwardingProgressMax(filteredExtensions.length)
-        fetchCallForwardingSettings(filteredExtensions)
+        setCallForwardingProgressMax(selectedExtensions.length)
+        fetchCallForwardingSettings(selectedExtensions)
     }
 
     return (
@@ -125,10 +126,10 @@ const Deskphones = () => {
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} />
                 {siteNames.length === 0 ? <></> : <AdaptiveFilter title='Sites' placeholder="Sites" options={siteNames} defaultSelected={siteNames} disabled={false} showAllOption={true} setSelected={setSelectedSites} />}
                 {siteNames.length === 0 ? <></> : <SimpleSelection options={ringTimes} onSelect={setSelectedRingTime} defaultSelected='4 Rings / 20 Seconds' label='' placeholder='' /> }
-                {isExtensionListPending ? <></> : <Button disabled={isSyncing} variant="contained" onClick={handleSyncButtonClicked}>Sync</Button>}
+                {isExtensionListPending ? <></> : <Button disabled={selectedExtensions.length === 0 || isSyncing} variant="contained" onClick={handleSyncButtonClicked}>Sync</Button>}
                 {isSyncing ? <> <Typography>Fetching Call Handling</Typography> <progress value={callForwardingProgressValue} max={callForwardingProgressMax} /> </> : <></>}
                 {isSyncing ? <> <Typography>Updating Call Handling</Typography> <progress value={callforwardingUpdateProgress} max={callForwardingUpdateProgressMax} /> </> : <></>}
-                {filteredExtensions.length > 0 ? <FeedbackArea gridData={filteredExtensions} onFilterSelection={handleFilterSelection} showSiteFilter={true} tableHeader={['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']} tableData={filteredExtensions} messages={messages} errors={errors} timedMessages={timedMessages} /> : <></>}
+                {!isExtensionListPending ? <FeedbackArea gridData={filteredExtensions} onFilterSelection={handleFilterSelection} messages={messages} errors={errors} timedMessages={timedMessages} /> : <></>}
             </div>
         </>
     )

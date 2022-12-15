@@ -15,6 +15,7 @@ import useDeleteExtensions from "../../../rcapi/useDeleteExtensions"
 import Modal from "../../shared/Modal"
 import useAnalytics from "../../../hooks/useAnalytics"
 import useWriteExcelFile from "../../../hooks/useWriteExcelFile"
+import { DataGridFormattable } from "../../../models/DataGridFormattable"
 
 const ExtensionDeleter = () => {
     useLogin('deleteextensions')
@@ -24,6 +25,7 @@ const ExtensionDeleter = () => {
     const [selectedSites, setSelectedSites] = useState<string[]>([])
     const [selectedExtensionTypes, setSelectedExtensionTypes] = useState<string[]>([])
     const [filteredExtensions, setFilteredExtensions] = useState<RCExtension[]>([])
+    const [selectedExtensions, setSelectedExtensions] = useState<RCExtension[]>([])
     const [isShowingModal, setIsShowingModal] = useState(false)
     const [isPending, setIsPending] = useState(false)
     const prettyExtensionTypes = ['Announcement-Only', 'Call Queue', 'IVR Menu', 'Limited Extension', 'Message-Only', 'Paging Group', 'Park Location', 'Shared Line Group']
@@ -117,13 +119,19 @@ const ExtensionDeleter = () => {
 
     const handleModalAcceptance = () => {
         setIsPending(true)
-        deleteExtensions(filteredExtensions)
+        deleteExtensions(selectedExtensions)
         fireEvent('delete-extensions')
     }
 
     const handleDownloadButtonClick = () => {
         const header = ['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']
-        writeExcel(header, filteredExtensions, 'Deleted Extensions', 'deleted-extensions.xlsx')
+        writeExcel(header, selectedExtensions, 'Deleted Extensions', 'deleted-extensions.xlsx')
+    }
+
+    const handleFilterSelection = (selected: DataGridFormattable[]) => {
+        const extensions = selected as RCExtension[]
+        setSelectedExtensions(extensions)
+        console.log(extensions)
     }
 
     useEffect(() => {
@@ -143,11 +151,11 @@ const ExtensionDeleter = () => {
                     <AdditiveFilter options={prettyExtensionTypes} title='Extension Types' placeholder='Extension Types' setSelected={setSelectedExtensionTypes} />
                     <AdditiveFilter options={sites} title='Sites' placeholder='Sites' setSelected={setSelectedSites} />
                     {/* <Button className="vertical-middle" sx={{top: 9}} variant="contained" onClick={() => deleteExtensions(filteredExtensions)}>Delete</Button> */}
-                    <Button disabled={isPending || filteredExtensions.length === 0} className="vertical-middle" sx={{top: 9}} variant="contained" onClick={() => setIsShowingModal(true)}>Delete</Button>
+                    <Button disabled={isPending || selectedExtensions.length === 0} className="vertical-middle" sx={{top: 9}} variant="contained" onClick={() => setIsShowingModal(true)}>Delete</Button>
                     <Button disabled={filteredExtensions.length === 0} className="vertical-middle healthy-margin-left" sx={{top: 9}} variant="outlined" startIcon={ <FileDownload/>} onClick={handleDownloadButtonClick} >Download</Button>
-                    <Modal open={isShowingModal} setOpen={setIsShowingModal} handleAccept={handleModalAcceptance} title='Are you sure about that?' body={`You're about to delete ${filteredExtensions.length} extensions. Be sure that you understand the implications of this.`} acceptLabel={`Yes, delete ${filteredExtensions.length} extensions`} rejectLabel='Go back' />
+                    <Modal open={isShowingModal} setOpen={setIsShowingModal} handleAccept={handleModalAcceptance} title='Are you sure about that?' body={`You're about to delete ${selectedExtensions.length} extensions. Be sure that you understand the implications of this.`} acceptLabel={`Yes, delete ${selectedExtensions.length} extensions`} rejectLabel='Go back' />
                     {filteredExtensions.length > 0 ? <progress className='healthy-margin-top' id='sync_progress' value={progressValue} max={maxProgressValue} /> : <></>}
-                    {filteredExtensions.length > 0 ? <FeedbackArea gridData={filteredExtensions} tableData={filteredExtensions} tableHeader={['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
+                    {filteredExtensions.length > 0 ? <FeedbackArea gridData={filteredExtensions} onFilterSelection={handleFilterSelection} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
                 </div>
             </div>
         </>

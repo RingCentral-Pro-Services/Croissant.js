@@ -66,7 +66,7 @@ const ExtensionEditor = () => {
                 <SimpleReplacement leftTitle="If last name contains" rightTitle="Replace with" setLeftValue={setOldLastName} setRightValue={setNewLastName} />
                 <SimpleReplacement leftTitle="If email contains" rightTitle="Replace with" setLeftValue={setOldEmail} setRightValue={setNewEmail} />
                 {isSyncing ? <progress value={progressValue} max={maxProgressValue} /> : <></>}
-                {editedExtensions.length > 0 ? <FeedbackArea tableHeader={['Old First Name', 'New First Name', 'Old Last Name', 'New Last Name', 'Old Email', 'New Email']} tableData={editedExtensions} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
+                {editedExtensions.length > 0 ? <FeedbackArea gridData={editedExtensions} additiveFilter={true} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
             </div>
         </>
     )

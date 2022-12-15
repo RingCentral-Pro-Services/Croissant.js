@@ -144,7 +144,7 @@ const NotificationAudit = () => {
             </div>
             {isPending ? <progress className='healthy-margin-top' id='sync_progress' value={progressValue} max={maxProgressValue} /> : <></>}
             {timedMessages.length > 0 ? <MessagesArea messages={timedMessages} /> : <></>}
-            {isEmailSwapPending ? <></> : <FeedbackArea tableHeader={['Mailbox ID', 'Name', 'Ext', 'Type', 'Email Addresses', 'Advanced Mode', 'Advanced Voicemail Emails', 'Advanced Inbound Fax Emails', 'Advanced Outbound Fax Emails', 'Advanced Inbound Texts Emails', 'Advanced Missed Calls Emails']} tableData={adjustedNotifications} messages={messages} timedMessages={timedMessages} errors={errors} />}
+            {isEmailSwapPending ? <></> : <FeedbackArea gridData={adjustedNotifications} additiveFilter={true} messages={messages} timedMessages={timedMessages} errors={errors} />}
             </div>
         </>
     )

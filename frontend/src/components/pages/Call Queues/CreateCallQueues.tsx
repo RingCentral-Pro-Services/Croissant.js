@@ -95,7 +95,7 @@ const CreateCallQueues = () => {
                 <FileSelect enabled={hasCustomerToken} accept=".xlsx" handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
                 {isPending ? <></> : <Button variant="contained" onClick={handleSyncButtonClick}>Sync</Button>}
                 {!(queues.length > 0) ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
-                {isQueueConvertPending ? <></> : <FeedbackArea gridData={queues} tableHeader={['Name', 'Extension', 'Site', 'Members', 'Ring Type', 'Wait time', 'Wrap-up time']} tableData={queues} messages={messages} timedMessages={timedMessages} errors={errors} />}
+                {isQueueConvertPending ? <></> : <FeedbackArea gridData={queues} messages={messages} timedMessages={timedMessages} errors={errors} />}
             </div>
         </>
     )

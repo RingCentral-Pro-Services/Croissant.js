@@ -177,7 +177,7 @@ const CustomRules = () => {
                         </Step>
                     </Stepper>
                 </div>
-                {filteredExtensions.length > 0 ? <FeedbackArea gridData={filteredExtensions} onFilterSelection={handleFilterSelection} tableHeader={['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']} tableData={filteredExtensions} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
+                {filteredExtensions.length > 0 ? <FeedbackArea gridData={filteredExtensions} onFilterSelection={handleFilterSelection} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
             </div>
         </>
     )

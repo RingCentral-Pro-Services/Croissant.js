@@ -21,17 +21,16 @@ interface TabPanelProps {
   }
 
   interface FeedbackAreaProps {
-    tableHeader: string[]
-    tableData: DataTableFormattable[]
     messages: Message[]
     timedMessages: Message[]
     errors: SyncError[]
     gridData?: DataGridFormattable[]
     onFilterSelection?: (selected: DataGridFormattable[]) => void
     showSiteFilter?: boolean
+    additiveFilter?: boolean
   }
 
-const FeedbackArea: React.FC<FeedbackAreaProps> = ({tableHeader, tableData, messages, timedMessages, errors, gridData = [], onFilterSelection, showSiteFilter = false}) => {
+const FeedbackArea: React.FC<FeedbackAreaProps> = ({messages, timedMessages, errors, gridData = [], onFilterSelection, showSiteFilter = false, additiveFilter = false}) => {
     const [value, setValue] = React.useState(0);
     const {writeExcel} = useWriteExcelFile()
 
@@ -48,18 +47,14 @@ const FeedbackArea: React.FC<FeedbackAreaProps> = ({tableHeader, tableData, mess
         <>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs value={value} onChange={handleChange} aria-label="feedback area">
-                <Tab label="Table" icon={<TableRowsIcon/>} iconPosition='start' {...a11yProps(0)} />
-                <Tab label='Data Grid' icon={<TableRowsIcon/>} iconPosition='start' {...a11yProps(0)} />
-                <Tab label="Messages" icon={<Badge badgeContent={messages.length + timedMessages.length} color='primary' anchorOrigin={{vertical: "top", horizontal: "left"}} ><MailIcon/></Badge>} iconPosition='start' {...a11yProps(1)} />
+                <Tab label='Table' icon={<TableRowsIcon/>} iconPosition='start' {...a11yProps(1)} />
+                <Tab label="Messages" icon={<Badge badgeContent={messages.length + timedMessages.length} color='primary' anchorOrigin={{vertical: "top", horizontal: "left"}} ><MailIcon/></Badge>} iconPosition='start' {...a11yProps(2)} />
             </Tabs>
             </Box>
             <TabPanel value={value} index={0}>
-                <DataTable header={tableHeader} data={tableData} />
+                <FilterArea items={gridData} showSiteFilter={showSiteFilter} additive={additiveFilter} onSelectionChanged={onFilterSelection} />
             </TabPanel>
             <TabPanel value={value} index={1}>
-                <FilterArea items={gridData} showSiteFilter={showSiteFilter} onSelectionChanged={onFilterSelection} />
-            </TabPanel>
-            <TabPanel value={value} index={2}>
                 {errors.length > 0 ? <IconButton onClick={handleDownloadButtonClick}><FileDownload /></IconButton> : <></>}
                 <MessagesArea messages={timedMessages} />
                 <MessagesArea messages={messages} />
