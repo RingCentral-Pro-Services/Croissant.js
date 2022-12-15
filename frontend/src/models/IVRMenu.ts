@@ -1,8 +1,9 @@
 import CSVFormattable from "./CSVFormattable"
 import ExcelFormattable from "./ExcelFormattable"
 import { DataTableFormattable } from "./DataTableFormattable"
+import { DataGridFormattable } from "./DataGridFormattable"
 
-export class IVRMenu implements CSVFormattable, ExcelFormattable, DataTableFormattable {
+export class IVRMenu implements CSVFormattable, ExcelFormattable, DataTableFormattable, DataGridFormattable {
     constructor(public data: IVRMenuData, public page?: string, public lucidchartID?: string, public audioPromptFilename?: string) {}
 
     toRow(): string {
@@ -25,6 +26,38 @@ export class IVRMenu implements CSVFormattable, ExcelFormattable, DataTableForma
         result = [...result, ...actions]
         
         return result
+    }
+
+    toDataGridRow(): any {
+        let result = {
+            id: this.data.id,
+            name: this.data.name,
+            extensionNumber: this.data.extensionNumber,
+            site: this.data.site ? this.data.site.name : 'Main Site',
+            prompt: this.data.prompt.mode === 'Audio' ? this.audioPromptFilename ?? '0' : this.data.prompt.text ?? '',
+            actions: this.actionsToRow()
+        }
+
+        return result
+    }
+
+    toDataGidHeader(): any {
+        let result = [
+            { field: 'name', headerName: 'Name', width: 200 },
+            { field: 'extensionNumber', headerName: 'Extension Number', width: 200 },
+            { field: 'site', headerName: 'Site', width: 200 },
+            { field: 'prompt', headerName: 'Prompt', width: 200 },
+            { field: 'actions', headerName: 'Actions', width: 200 },
+        ]
+
+        return result
+    }
+
+    property(key: string): any {
+        if (key === 'site') {
+            return this.data.site.name ?? 'N/A'
+        }
+        return this[key as keyof IVRMenu]
     }
 
     payload(isMultiSiteEnabled: boolean = true, includeActions: boolean = true) {

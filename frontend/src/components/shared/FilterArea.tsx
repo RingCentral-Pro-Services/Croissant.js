@@ -1,20 +1,40 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {DataGrid, DataGridProps, GridColDef, GridRowsProp, GridSelectionModel} from '@mui/x-data-grid'
 import { DataGridFormattable } from "../../models/DataGridFormattable";
+import AdaptiveFilter from "./AdaptiveFilter";
 
 interface FilterAreaProps {
     items: DataGridFormattable[]
     defaultSelected?: number[]
-    onSelectionChanged?: (selectedIDs: number[]) => void
+    showSiteFilter?: boolean
+    onSelectionChanged?: (selectedItems: DataGridFormattable[]) => void
 }
 
-const FilterArea: React.FC<FilterAreaProps> = ({items, onSelectionChanged, defaultSelected}) => {
+const FilterArea: React.FC<FilterAreaProps> = ({items, onSelectionChanged, defaultSelected, showSiteFilter}) => {
 
-    const [rows, setRows] = React.useState<GridRowsProp>([])
-    const [columns, setColumns] = React.useState<GridColDef[]>([])
-    const [selectedIDs, setSelectedIDs] = React.useState<number[]>([])
+    const [allItems, setAllItems] = useState<DataGridFormattable[]>([])
+    const [filteredItems, setFilteredItems] = useState<DataGridFormattable[]>([])
+    const [rows, setRows] = useState<GridRowsProp>([])
+    const [columns, setColumns] = useState<GridColDef[]>([])
+    const [selectedIDs, setSelectedIDs] = useState<number[]>([])
 
     useEffect(() => {
+        setFilered(items)
+        setFilteredItems(items)
+        if (onSelectionChanged) onSelectionChanged(items)
+        if (defaultSelected) {
+            setSelectedIDs(defaultSelected)
+        }
+        
+    }, [items])
+
+    const setFilered = (items: DataGridFormattable[]) => {
+        if (items.length === 0) {
+            setRows([])
+            setColumns([])
+            return
+        }
+
         let rows = []
         let columns = []
 
@@ -22,27 +42,41 @@ const FilterArea: React.FC<FilterAreaProps> = ({items, onSelectionChanged, defau
             rows.push(item.toDataGridRow())
         }
 
-        columns = items[0].toDataGidHeader()
-
-        if (defaultSelected) {
-            setSelectedIDs(defaultSelected)
+        if (items.length > 0) {
+            columns = items[0].toDataGidHeader()
         }
+        columns = items[0].toDataGidHeader()
         
         setRows(rows)
         setColumns(columns)
-    }, [items])
+    }
 
     const handleSelectionModelChanged = (newSelection: GridSelectionModel) => {
         const newSelectionIds = newSelection as number[]
+        let selectedItems = filteredItems.filter((item) => newSelectionIds.includes(item.property('id')))
         setSelectedIDs(newSelectionIds)
         if (onSelectionChanged) {
-            onSelectionChanged(newSelectionIds)
+            onSelectionChanged(selectedItems)
         }
-        console.log(newSelectionIds)
+        // console.log(newSelectionIds)
+
+        // console.log('selected items: ')
+        // console.log(selectedItems)
+    }
+
+    const handleSiteFilterChanged = (selectedSites: string[]) => {
+        if (selectedSites.length === 0) {
+            setFilered([])
+            return
+        }
+        let newItems = items.filter((item) => selectedSites.includes(item.property('site')))
+        setFilteredItems(newItems)
+        setFilered(newItems)
     }
 
     return (
         <div style={{ height: 800, width: '100%' }}>
+            {showSiteFilter ? <AdaptiveFilter title='Site' placeholder='search' options={[...new Set(items.map((item) => item.property('site'))).values()]} defaultSelected={[...new Set(items.map((item) => item.property('site'))).values()]} disabled={false} setSelected={handleSiteFilterChanged} /> : <></>}
             <DataGrid
                 rows={rows} 
                 columns={columns} 

@@ -11,6 +11,8 @@ import TableRowsIcon from '@mui/icons-material/TableRows';
 import { DataTableFormattable } from "../../models/DataTableFormattable";
 import { SyncError } from "../../models/SyncError";
 import useWriteExcelFile from "../../hooks/useWriteExcelFile";
+import { DataGridFormattable } from "../../models/DataGridFormattable";
+import FilterArea from "./FilterArea";
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -18,8 +20,18 @@ interface TabPanelProps {
     value: number;
   }
 
-const FeedbackArea = (props: {tableHeader: string[], tableData: DataTableFormattable[], messages: Message[], timedMessages: Message[], errors: SyncError[]}) => {
-    const {tableData, tableHeader, messages, timedMessages, errors} = props
+  interface FeedbackAreaProps {
+    tableHeader: string[]
+    tableData: DataTableFormattable[]
+    messages: Message[]
+    timedMessages: Message[]
+    errors: SyncError[]
+    gridData?: DataGridFormattable[]
+    onFilterSelection?: (selected: DataGridFormattable[]) => void
+    showSiteFilter?: boolean
+  }
+
+const FeedbackArea: React.FC<FeedbackAreaProps> = ({tableHeader, tableData, messages, timedMessages, errors, gridData = [], onFilterSelection, showSiteFilter = false}) => {
     const [value, setValue] = React.useState(0);
     const {writeExcel} = useWriteExcelFile()
 
@@ -37,6 +49,7 @@ const FeedbackArea = (props: {tableHeader: string[], tableData: DataTableFormatt
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs value={value} onChange={handleChange} aria-label="feedback area">
                 <Tab label="Table" icon={<TableRowsIcon/>} iconPosition='start' {...a11yProps(0)} />
+                <Tab label='Data Grid' icon={<TableRowsIcon/>} iconPosition='start' {...a11yProps(0)} />
                 <Tab label="Messages" icon={<Badge badgeContent={messages.length + timedMessages.length} color='primary' anchorOrigin={{vertical: "top", horizontal: "left"}} ><MailIcon/></Badge>} iconPosition='start' {...a11yProps(1)} />
             </Tabs>
             </Box>
@@ -44,6 +57,9 @@ const FeedbackArea = (props: {tableHeader: string[], tableData: DataTableFormatt
                 <DataTable header={tableHeader} data={tableData} />
             </TabPanel>
             <TabPanel value={value} index={1}>
+                <FilterArea items={gridData} showSiteFilter={showSiteFilter} onSelectionChanged={onFilterSelection} />
+            </TabPanel>
+            <TabPanel value={value} index={2}>
                 {errors.length > 0 ? <IconButton onClick={handleDownloadButtonClick}><FileDownload /></IconButton> : <></>}
                 <MessagesArea messages={timedMessages} />
                 <MessagesArea messages={messages} />

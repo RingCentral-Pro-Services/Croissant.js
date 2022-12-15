@@ -5,8 +5,9 @@ import RCExtension from "./RCExtension";
 import { CallHandlingRules } from "./CallHandlingRules";
 import { Greeting } from "./Greetings";
 import { TransferPayload, UnconditionalForwardingPayload } from "./TransferPayload";
+import { DataGridFormattable } from "./DataGridFormattable";
 
-class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattable {
+class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattable, DataGridFormattable {
     constructor(public extension: RCExtension, public siteID: number, public members: string[], public handlingRules?: CallHandlingRules, public greetings?: Greeting[], public transferExtension?: string, public unconditionalForwardNumber?: string, public maxWaitTimeDestination?: string, public maxCallersDestination?: string) {}
 
     toRow(): string {
@@ -20,6 +21,38 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
 
     toDataTableRow(): string[] {
         return [this.extension.name, `${this.extension.extensionNumber}`, this.extension.site, `${this.members}`, this.prettyRingType(this.handlingRules?.transferMode ?? ''), this.prettyTime(this.handlingRules?.holdTime ?? 0), this.prettyTime(this.handlingRules?.wrapUpTime ?? 0)]
+    }
+
+    toDataGridRow(): any {
+        return {
+            id: this.extension.extensionNumber,
+            name: this.extension.name,
+            extension: this.extension.extensionNumber,
+            site: this.extension.site,
+            members: this.members,
+            ringType: this.prettyRingType(this.handlingRules?.transferMode ?? ''),
+            holdTime: this.prettyTime(this.handlingRules?.holdTime ?? 0),
+            wrapUpTime: this.prettyTime(this.handlingRules?.wrapUpTime ?? 0)
+        }
+    }
+
+    toDataGidHeader(): any {
+        return [
+            { field: 'name', headerName: 'Queue Name', width: 350 },
+            { field: 'extension', headerName: 'Extension', width: 150 },
+            { field: 'site', headerName: 'Site', width: 200 },
+            { field: 'members', headerName: 'Members', width: 350 },
+            { field: 'ringType', headerName: 'Ring Type', width: 150 },
+            { field: 'holdTime', headerName: 'Hold Time', width: 150 },
+            { field: 'wrapUpTime', headerName: 'Wrap Up Time', width: 150 }
+        ]
+    }
+
+    property(key: string): any {
+        if (key === 'site') {
+            return this.extension.site ?? 'N/A'
+        }
+        return this[key as keyof CallQueue]
     }
 
     prettyWaitTimeDestination() {
