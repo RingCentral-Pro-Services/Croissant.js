@@ -36,7 +36,7 @@ class RCExtension implements CSVFormattable, ExcelFormattable, DataTableFormatta
     }
 
     toExcelRow(): string[] {
-        return [this.name, `${this.extensionNumber ?? ''}`, this.contact?.email ?? '', this.site ?? 'N/A', this.prettyType[this.type] ?? this.type, this.status, `${this.hidden}`]
+        return [`${this.id}`, this.name, `${this.extensionNumber ?? ''}`, this.contact?.email ?? '', this.site ?? 'N/A', this.prettyType[this.type] ?? this.type, this.status, `${this.hidden}`]
     }
 
     toDataTableRow(): string[] {
@@ -58,6 +58,7 @@ class RCExtension implements CSVFormattable, ExcelFormattable, DataTableFormatta
 
     toDataGidHeader(): any {
         return [
+            { field: 'id', headerName: 'ID', width: 100 },
             { field: 'name', headerName: 'Name', width: 300 },
             { field: 'extensionNumber', headerName: 'Extension Number', width: 150 },
             { field: 'email', headerName: 'Email', width: 400 },

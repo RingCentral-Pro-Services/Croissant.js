@@ -39,7 +39,7 @@ const ExtensionAudit = () => {
     useEffect(() => {
         if (isExtensionListPending) return
 
-        let header = ['Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']
+        let header = ['Mailbox ID', 'Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']
         // writePrettyExcel(header, extensionsList, 'Extensions', 'account-dump.xlsx')
         writeExcel(header, extensionsList, 'Extensions', 'account-dump.xlsx')
     }, [isExtensionListPending, extensionsList])
