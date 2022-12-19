@@ -34,9 +34,6 @@ const useFetchNotifications = (postMessage: (message: Message) => void, postTime
         if (!shouldFetch) return
         if (currentExtensionIndex === filteredExtensions.length) return
 
-        let targetUID = localStorage.getItem('target_uid')
-        if (!targetUID) return
-
         let url = baseURL.replace('extensionId', `${filteredExtensions[currentExtensionIndex].id}`)
 
         setTimeout(() => {
