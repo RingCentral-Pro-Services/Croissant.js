@@ -18,6 +18,7 @@ const app = express();
 
 var session = require('express-session');
 app.use(session({ secret: 'this-is-a-secret-token', tokens: '', resave: true, saveUninitialized: true}));
+app.use(express.json())
 const PORT = process.env.PORT || 3000
 
 var rcsdk = null
@@ -86,6 +87,21 @@ app.get('/refresh', (req: any, res: any) => {
   }
   )
   
+})
+
+app.post('/feedback', (req: any, res: any) => {
+  console.log('Feedback received')
+  axios.post('https://staging-n8n.ps.ringcentral.com/webhook-test/9d7ee724-8db6-4471-a29a-19818f803e16', req.body)
+  .then((response: any) => {
+    console.log('Feedback sent')
+    console.log(response)
+  })
+  .catch((error: any) => {
+    console.log('Error sending feedback')
+    console.log(error)
+  }
+  )
+  res.send('OK')
 })
 
 app.post('/fileupload', (req: any, res: any) => {

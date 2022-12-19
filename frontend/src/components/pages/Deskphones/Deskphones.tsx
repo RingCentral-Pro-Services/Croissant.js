@@ -12,6 +12,7 @@ import useGetAccessToken from "../../../rcapi/useGetAccessToken";
 import useGetCallForwardingSettings from "../../../rcapi/useGetCallForwardingSettings";
 import AdaptiveFilter from "../../shared/AdaptiveFilter";
 import FeedbackArea from "../../shared/FeedbackArea";
+import FeedbackForm from "../../shared/FeedbackForm";
 import Header from "../../shared/Header";
 import SimpleSelection from "../../shared/SimpleSelection";
 import UIDInputField from "../../shared/UIDInputField";
@@ -20,6 +21,7 @@ const Deskphones = () => {
     const [filteredExtensions, setFilteredExtensions] = useState<RCExtension[]>([])
     const [selectedExtensions, setSelectedExtensions] = useState<RCExtension[]>([])
     const [targetUID, setTargetUID] = useState('')
+    const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
     const [siteNames, setSiteNames] = useState<string[]>([])
     const [selectedSites, setSelectedSites] = useState<string[]>([])
     const [callForwardingProgressValue, setCallForwardingProgressValue] = useState(0)
@@ -120,7 +122,10 @@ const Deskphones = () => {
 
     return (
         <>
-            <Header title="Desk Phones" body="Set ring time for physical phones in bulk" />
+            <Header title="Desk Phones" body="Set ring time for physical phones in bulk">
+                <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
+            </Header>
+            <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Desk Phones" isUserInitiated={true} />
             <div className="tool-card">
                 <h2>Desk Phones</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} />

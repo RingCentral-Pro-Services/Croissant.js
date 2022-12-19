@@ -10,6 +10,7 @@ import useGetAccessToken from "../../../rcapi/useGetAccessToken";
 import AdaptiveFilter from "../../shared/AdaptiveFilter";
 import AdditiveFilter from "../../shared/AdditiveFilter";
 import FeedbackArea from "../../shared/FeedbackArea";
+import FeedbackForm from "../../shared/FeedbackForm";
 import Header from "../../shared/Header";
 import UIDInputField from "../../shared/UIDInputField";
 import useManipulateRules from "./hooks/useManipulateRules";
@@ -29,6 +30,7 @@ const ManipulateCustomRules = () => {
     const [fetchRulesProgressMax, setFetchRulesProgressMax] = useState(0)
     const [manipulateRulesProgress, setManipulateRulesProgress] = useState(0)
     const [manipulateRulesProgressMax, setManipulateRulesProgressMax] = useState(0)
+    const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
     const [isSyncing, setIsSyncing] = useState(false)
     const extensionTypes = ['User', 'Call Queue']
 
@@ -101,7 +103,10 @@ const ManipulateCustomRules = () => {
 
     return (
         <>
-            <Header title="Enable / Disable Custom Rules" body="Enable, disable, an delete custom rules in bulk" />
+            <Header title="Enable / Disable Custom Rules" body="Enable, disable, an delete custom rules in bulk">
+                <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
+            </Header>
+            <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Enable / Disable Custom Rules" isUserInitiated={true} />
             <div className="tool-card">
                 <h2>Enable / Disable Custom Rules</h2>
                 <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} />

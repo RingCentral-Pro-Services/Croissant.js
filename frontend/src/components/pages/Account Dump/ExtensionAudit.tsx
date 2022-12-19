@@ -14,11 +14,13 @@ import useWriteExcelFile from '../../../hooks/useWriteExcelFile'
 import FilterArea from '../../shared/FilterArea'
 import RCExtension from '../../../models/RCExtension'
 import { DataGridFormattable } from '../../../models/DataGridFormattable'
+import FeedbackForm from '../../shared/FeedbackForm'
 
 const ExtensionAudit = () => {
     useLogin('accountdump')
     const {fireEvent} = useAnalytics()
     let [targetUID, setTargetUID] = useState("")
+    const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
     const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
     let {messages, errors, postMessage} = useMessageQueue()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
@@ -46,9 +48,12 @@ const ExtensionAudit = () => {
 
     return (
         <>
-            <Header title='Account Dump' body='This tool generatates a list of all extensions in an account'/>
+            <Header title='Account Dump' body='This tool generatates a list of all extensions in an account'>
+                <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
+            </Header>
             <div className='tool-card'>
             <h2>Account Dump</h2>
+            <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Account Dump" isUserInitiated={true} />
             <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} />
             <Button className='healthy-margin-right' disabled={!hasCustomerToken} variant='contained' onClick={handleClick}>Go</Button>
             {/* {extensionsList.length > 0 ? <FilterArea items={extensionsList} defaultSelected={extensionsList.map((extension) => extension.id)} showSiteFilter={true} onSelectionChanged={handleFilterSelection} /> : <></>} */}

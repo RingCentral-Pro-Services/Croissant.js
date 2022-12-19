@@ -16,6 +16,7 @@ import Modal from "../../shared/Modal"
 import useAnalytics from "../../../hooks/useAnalytics"
 import useWriteExcelFile from "../../../hooks/useWriteExcelFile"
 import { DataGridFormattable } from "../../../models/DataGridFormattable"
+import FeedbackForm from "../../shared/FeedbackForm"
 
 const ExtensionDeleter = () => {
     useLogin('deleteextensions')
@@ -26,6 +27,7 @@ const ExtensionDeleter = () => {
     const [selectedExtensionTypes, setSelectedExtensionTypes] = useState<string[]>([])
     const [filteredExtensions, setFilteredExtensions] = useState<RCExtension[]>([])
     const [selectedExtensions, setSelectedExtensions] = useState<RCExtension[]>([])
+    const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
     const [isShowingModal, setIsShowingModal] = useState(false)
     const [isPending, setIsPending] = useState(false)
     const prettyExtensionTypes = ['Announcement-Only', 'Call Queue', 'IVR Menu', 'Limited Extension', 'Message-Only', 'Paging Group', 'Park Location', 'Shared Line Group']
@@ -142,7 +144,10 @@ const ExtensionDeleter = () => {
 
     return (
         <>
-            <Header title="Delete Extensions" body="Delete extensions in bulk"/>
+            <Header title="Delete Extensions" body="Delete extensions in bulk">
+                <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
+            </Header>
+            <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Extension Deleter" isUserInitiated={true} />
             <div className="tool-card">
                 <h2>Delete Extensions</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID}/>

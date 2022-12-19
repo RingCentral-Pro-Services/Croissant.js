@@ -14,6 +14,7 @@ import useEditSites from "../../../rcapi/useEditSites";
 import useExtensionList from "../../../rcapi/useExtensionList";
 import useGetAccessToken from "../../../rcapi/useGetAccessToken";
 import FeedbackArea from "../../shared/FeedbackArea";
+import FeedbackForm from "../../shared/FeedbackForm";
 import FileSelect from "../../shared/FileSelect";
 import Header from "../../shared/Header";
 import UIDInputField from "../../shared/UIDInputField";
@@ -27,6 +28,7 @@ const EditSites = () => {
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
     const [isSyncing, setIsSyncing] = useState(false)
+    const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
     const defaultSheet = 'Sites'
 
     useLogin('editsites')
@@ -104,7 +106,10 @@ const EditSites = () => {
 
     return (
         <>
-            <Header title='Edit Sites' body='Edit site names and extension numbers in bulk' />
+            <Header title='Edit Sites' body='Edit site names and extension numbers in bulk'>
+                <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
+            </Header>
+            <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Edit Sites" isUserInitiated={true} />
             <div className="tool-card">
                 <h2>Edit Sites</h2>
                 <UIDInputField disabledText={companyName} disabled={hasCustomerToken} setTargetUID={setTargetUID} />

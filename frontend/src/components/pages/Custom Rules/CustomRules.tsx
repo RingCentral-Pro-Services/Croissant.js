@@ -14,6 +14,7 @@ import useGetCustomRules from "../../../rcapi/useGetCustomRules";
 import AdaptiveFilter from "../../shared/AdaptiveFilter";
 import AdditiveFilter from "../../shared/AdditiveFilter";
 import FeedbackArea from "../../shared/FeedbackArea";
+import FeedbackForm from "../../shared/FeedbackForm";
 import Header from "../../shared/Header";
 import SimpleSelection from "../../shared/SimpleSelection";
 import UIDInputField from "../../shared/UIDInputField";
@@ -28,6 +29,7 @@ const CustomRules = () => {
     const [selectedSiteNames, setSelectedSiteNames] = useState<string[]>([])
     const [filteredExtensions, setFilteredExtensions] = useState<RCExtension[]>([])
     const [selectedExtensions, setSelectedExtensions] = useState<RCExtension[]>([])
+    const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
     const [progressValue, setProgressValue] = useState<number>(0)
     const [progressMax, setProgressMax] = useState<number>(0)
     const [isSyncing, setIsSyncing] = useState<boolean>(false)
@@ -122,7 +124,10 @@ const CustomRules = () => {
 
     return (
         <>
-            <Header title="Copy Custom Rules" body="Copy custom rules to other extensions" />
+            <Header title="Copy Custom Rules" body="Copy custom rules to other extensions">
+                <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
+            </Header>
+            <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Copy Custom Rules" isUserInitiated={true} />
             <div className="tool-card">
                 <h2>Copy Custom Rules</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} />

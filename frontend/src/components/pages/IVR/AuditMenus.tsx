@@ -1,13 +1,15 @@
 import React from 'react'
 import { useState } from "react";
 import Header from '../../shared/Header';
-import {ToggleButtonGroup, ToggleButton} from '@mui/material'
+import {ToggleButtonGroup, ToggleButton, Button} from '@mui/material'
 import LegactyAuditMenus from './LegacyAuditMenus';
 import DirectAuditMenus from './DirectAuditMenus';
+import FeedbackForm from '../../shared/FeedbackForm';
 
 const AuditMenus = () => {
     
     const [modeSelection, setModeSelection] = useState('direct')
+    const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
 
     const handleChange = (event: any, newSelection: string) => {
         if (newSelection === null) return
@@ -16,7 +18,9 @@ const AuditMenus = () => {
 
     return ( 
         <>
-            <Header title='Audit IVR Menus' body='Generate an audit-friendly list of all IVR menus in an account'/>
+            <Header title='Audit IVR Menus' body='Generate an audit-friendly list of all IVR menus in an account'>
+                <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
+            </Header>
             <div className="tool-card">
                 <h2>Audit Menus</h2>
                 <ToggleButtonGroup
@@ -33,6 +37,7 @@ const AuditMenus = () => {
                 </ToggleButtonGroup>
                 {modeSelection === 'xml' ? <LegactyAuditMenus /> : <DirectAuditMenus />}
             </div>
+            <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Audit IVRs" isUserInitiated={true} />
         </>
      );
 }

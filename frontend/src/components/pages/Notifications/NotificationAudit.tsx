@@ -18,6 +18,7 @@ import AdaptiveFilter from "../../shared/AdaptiveFilter"
 import RCExtension from "../../../models/RCExtension"
 import MessagesArea from "../../shared/MessagesArea"
 import useWriteExcelFile from "../../../hooks/useWriteExcelFile"
+import FeedbackForm from "../../shared/FeedbackForm"
 
 const NotificationAudit = () => {
     useLogin('notificationsaudit')
@@ -32,6 +33,7 @@ const NotificationAudit = () => {
     const [selectedFile, setSelectedFile] = useState<File | null>()
     const [selectedSheet, setSelectedSheet] = useState('')
     const {readFile, excelData, isExcelDataPending} = useReadExcel()
+    const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
 
     const prettyExtensionTypes = ['Call Queue', 'Message-Only', 'Shared Line Group', 'User', 'Virtual User']
     const [selectedExtensionTypes, setSelectedExtensionTypes] = useState<string[]>(prettyExtensionTypes)
@@ -130,21 +132,24 @@ const NotificationAudit = () => {
 
     return (
         <>
-            <Header title="Notifications" body="Audit and update notification emails"/>
+            <Header title="Notifications" body="Audit and update notification emails">
+                <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
+            </Header>
+            <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Notifications" isUserInitiated={true} />
             <div className="tool-card">
-            <h2>Extension Notifications</h2>
-            <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} />
-            <Button disabled={!hasCustomerToken || isPending} variant="contained" onClick={handleClick}>Go</Button>
-            {isNotificationListPending ? <></> : <FileSelect isPending={false} enabled={true} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} accept='.xlsx' defaultSheet='Notifications' handleSubmit={handleFileSubmit}/>}
-            {isEmailSwapPending ? <></> : <Button variant='contained' onClick={handleSyncButtonClick} >Sync</Button>}
-            <br/>
-            <div className="mega-margin-top">
-                {sites.length > 0 ? <AdaptiveFilter options={prettyExtensionTypes} defaultSelected={prettyExtensionTypes} title='Extension Types' placeholder='Search...' setSelected={setSelectedExtensionTypes} /> : <></>}
-                {sites.length > 0 ? <AdaptiveFilter options={sites} defaultSelected={sites} title='Sites' placeholder='Search...' setSelected={setSelectedSites} /> : <></>}
-            </div>
-            {isPending ? <progress className='healthy-margin-top' id='sync_progress' value={progressValue} max={maxProgressValue} /> : <></>}
-            {timedMessages.length > 0 ? <MessagesArea messages={timedMessages} /> : <></>}
-            {isEmailSwapPending ? <></> : <FeedbackArea gridData={adjustedNotifications} additiveFilter={true} messages={messages} timedMessages={timedMessages} errors={errors} />}
+                <h2>Extension Notifications</h2>
+                <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} />
+                <Button disabled={!hasCustomerToken || isPending} variant="contained" onClick={handleClick}>Go</Button>
+                {isNotificationListPending ? <></> : <FileSelect isPending={false} enabled={true} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} accept='.xlsx' defaultSheet='Notifications' handleSubmit={handleFileSubmit}/>}
+                {isEmailSwapPending ? <></> : <Button variant='contained' onClick={handleSyncButtonClick} >Sync</Button>}
+                <br/>
+                <div className="mega-margin-top">
+                    {sites.length > 0 ? <AdaptiveFilter options={prettyExtensionTypes} defaultSelected={prettyExtensionTypes} title='Extension Types' placeholder='Search...' setSelected={setSelectedExtensionTypes} /> : <></>}
+                    {sites.length > 0 ? <AdaptiveFilter options={sites} defaultSelected={sites} title='Sites' placeholder='Search...' setSelected={setSelectedSites} /> : <></>}
+                </div>
+                {isPending ? <progress className='healthy-margin-top' id='sync_progress' value={progressValue} max={maxProgressValue} /> : <></>}
+                {timedMessages.length > 0 ? <MessagesArea messages={timedMessages} /> : <></>}
+                {isEmailSwapPending ? <></> : <FeedbackArea gridData={adjustedNotifications} additiveFilter={true} messages={messages} timedMessages={timedMessages} errors={errors} />}
             </div>
         </>
     )

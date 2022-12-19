@@ -31,6 +31,7 @@ import useUpdateSchedule from "../../../rcapi/useUpdateSchedule";
 import useBuildCustomGreetings from "../../../hooks/useBuildCustomGreetings";
 import useUploadCustomGreetings from "../../../rcapi/useUploadCustomGreetings";
 import { DataGridFormattable } from "../../../models/DataGridFormattable";
+import FeedbackForm from "../../shared/FeedbackForm";
 
 const CallQueueTemplates = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -41,6 +42,7 @@ const CallQueueTemplates = () => {
     const [selectedSites, setSelectedSites] = useState<string[]>([])
     const [isShowingHours, setIsShowingHours] = useState(false)
     const [schedulePayload, setSchedulePayload] = useState({})
+    const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
 
     const [willUpdateRegionalSettings, setWillUpdateRegionalSettings] = useState(false)
     const [willUpdateCallHandlingSettings, setWillUpdateCallHandlingSettings] = useState(false)
@@ -187,13 +189,16 @@ const CallQueueTemplates = () => {
 
     return (
         <>
-            <Header  title="Call Queue Templates" body="Apply settings to call queues in bulk"/>
+            <Header  title="Call Queue Templates" body="Apply settings to call queues in bulk">
+                <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
+            </Header>
             <div className="tool-card">
                 <h2>Call Queue Templates</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} />
                 {isRegionalFormatListPenging ? <></> : <AdaptiveFilter options={siteNames} showAllOption={true} setSelected={setSelectedSites} title='Sites' placeholder='Search' disabled={isRegionalFormatListPenging || isSyncing} defaultSelected={siteNames}  />}
                 <Button disabled={selectedExtensions.length === 0 || isRegionalFormatListPenging || isSyncing} variant="contained" onClick={handleSyncButtonClick} >Sync</Button>
                 <ScheduleBuilder isOpen={isShowingHours} setIsOpen={setIsShowingHours} setPayload={setSchedulePayload} />
+                <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Call Queue Templates" isUserInitiated={true} />
                 {isSyncing && willUpdateRegionalSettings ? <> <Typography>Regional settings</Typography> <progress value={regionalSettingsProgress} max={regionalSettingsMaxProgress} /> </> : <></>}
                 {isSyncing && willUpdateCallHandlingSettings ? <> <Typography>Call Handling & Greetings</Typography> <progress value={callHandlingSettingsProgress} max={callHandlingSettingsMaxProgress} /> </> : <></>}
                 {isSyncing && willUpdateSchedule ? <> <Typography>Schedule</Typography> <progress value={scheduleProgress} max={scheduleMaxProgress} /> </> : <></>}

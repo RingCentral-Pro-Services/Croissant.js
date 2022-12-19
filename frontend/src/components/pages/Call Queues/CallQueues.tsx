@@ -14,11 +14,13 @@ import usePostTimedMessage from "../../../hooks/usePostTimedMessage"
 import MessagesArea from "../../shared/MessagesArea"
 import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel"
 import FeedbackArea from "../../shared/FeedbackArea"
+import FeedbackForm from "../../shared/FeedbackForm"
 
 const CallQueues = () => {
     useLogin('auditcallqueues')
     const {fireEvent} = useAnalytics()
     let [targetUID, setTargetUID] = useState("")
+    const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
     const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
     let {messages, errors, postMessage, postError} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
@@ -67,7 +69,9 @@ const CallQueues = () => {
 
     return (
         <>
-            <Header title='Audit Call Queues' body='Export a spreadsheet of all queues in an account' />
+            <Header title='Audit Call Queues' body='Export a spreadsheet of all queues in an account'>
+                <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
+            </Header>
             <div className="tool-card">
                 <h2>Export Call Queues</h2>
                 <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} />
@@ -76,6 +80,7 @@ const CallQueues = () => {
                 {timedMessages.length > 0 ? <MessagesArea messages={timedMessages} /> : <></>}
                 {!isCallQueueSettingsPending ? <FeedbackArea gridData={callQueues} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
             </div>
+            <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Audit Call Queues" isUserInitiated={true} />
         </>
     )
 }

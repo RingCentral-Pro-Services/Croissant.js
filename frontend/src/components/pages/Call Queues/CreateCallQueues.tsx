@@ -15,6 +15,7 @@ import useValidateExcelData from "../../../hooks/useValidateExcelData"
 import { callQueueSchema } from "../../../helpers/schemas"
 import Header from "../../shared/Header"
 import useLogin from "../../../hooks/useLogin"
+import FeedbackForm from "../../shared/FeedbackForm"
 
 const CreateCallQueues = () => {
     useLogin('createcallqueues')
@@ -23,6 +24,7 @@ const CreateCallQueues = () => {
     let [isPending, setIsPending] = useState(true)
     let [isReadyToSync, setIsReadyToSync] = useState(false)
     const [targetUID, setTargetUID] = useState('')
+    const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
     const { extensionsList, isExtensionListPending, isMultiSiteEnabled, fetchExtensions } = useExtensionList(postMessage)
     const [selectedFile, setSelectedFile] = useState<File | null>()
     const {readFile, excelData, isExcelDataPending} = useReadExcel()
@@ -88,11 +90,14 @@ const CreateCallQueues = () => {
 
     return (
         <>
-            <Header title="Create Call Queues" body="Create and update call queues in bulk" />
+            <Header title="Create Call Queues" body="Create and update call queues in bulk">
+                <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
+            </Header>
             <div className="tool-card">
                 <h2>Create Call Queues</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} />
                 <FileSelect enabled={hasCustomerToken} accept=".xlsx" handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
+                <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Create Call Queues" isUserInitiated={true} />
                 {isPending ? <></> : <Button variant="contained" onClick={handleSyncButtonClick}>Sync</Button>}
                 {!(queues.length > 0) ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
                 {isQueueConvertPending ? <></> : <FeedbackArea gridData={queues} messages={messages} timedMessages={timedMessages} errors={errors} />}

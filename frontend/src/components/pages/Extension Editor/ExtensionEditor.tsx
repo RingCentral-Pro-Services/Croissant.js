@@ -11,6 +11,7 @@ import useExtensionList from "../../../rcapi/useExtensionList";
 import useGetAccessToken from "../../../rcapi/useGetAccessToken";
 import useUpdateExtensions from "../../../rcapi/useUpdateExtensions";
 import FeedbackArea from "../../shared/FeedbackArea";
+import FeedbackForm from "../../shared/FeedbackForm";
 import Header from "../../shared/Header";
 import SimpleReplacement from "../../shared/SimpleReplacement";
 import UIDInputField from "../../shared/UIDInputField";
@@ -20,6 +21,7 @@ const ExtensionEditor = () => {
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
     const [isSyncing, setIsSyncing] = useState(false)
+    const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
 
     useLogin('editextensions')
     const {fireEvent} = useAnalytics()
@@ -55,7 +57,10 @@ const ExtensionEditor = () => {
 
     return (
         <>
-            <Header title="Edit Extensions" body="Find & replace in extension names and email addresses"/>
+            <Header title="Edit Extensions" body="Find & replace in extension names and email addresses">
+                <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
+            </Header>
+            <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Edit Extensions" isUserInitiated={true} />
             <div className="tool-card">
                 <h2>Edit Extensions</h2>
                 <div className="mega-mergin-top">
