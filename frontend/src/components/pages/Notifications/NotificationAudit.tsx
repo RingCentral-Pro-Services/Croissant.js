@@ -139,7 +139,7 @@ const NotificationAudit = () => {
             <div className="tool-card">
                 <h2>Extension Notifications</h2>
                 <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} />
-                <Button disabled={!hasCustomerToken || isPending} variant="contained" onClick={handleClick}>Go</Button>
+                <Button disabled={isExtensionListPending || isPending} variant="contained" onClick={handleClick}>Go</Button>
                 {isNotificationListPending ? <></> : <FileSelect isPending={false} enabled={true} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} accept='.xlsx' defaultSheet='Notifications' handleSubmit={handleFileSubmit}/>}
                 {isEmailSwapPending ? <></> : <Button variant='contained' onClick={handleSyncButtonClick} >Sync</Button>}
                 <br/>
