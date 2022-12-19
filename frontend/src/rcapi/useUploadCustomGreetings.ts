@@ -54,7 +54,7 @@ const useUploadCustomGreetings = (setProgressValue: (value: (any)) => void, post
 
                 if (response.rateLimitInterval > 0) {
                     setRateLimitInterval(response.rateLimitInterval)
-                    postMessage(new Message('Rate limit reached. Waiting 60 seconds before continuing.', 'info'))
+                    postTimedMessage(new Message('Rate limit reached. Waiting 60 seconds before continuing.', 'info'), 60000)
                 }
                 else {
                     setRateLimitInterval(250)
