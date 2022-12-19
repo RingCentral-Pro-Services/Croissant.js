@@ -90,15 +90,10 @@ app.get('/refresh', (req: any, res: any) => {
 })
 
 app.post('/feedback', (req: any, res: any) => {
-  console.log('Feedback received')
-  axios.post('https://staging-n8n.ps.ringcentral.com/webhook-test/9d7ee724-8db6-4471-a29a-19818f803e16', req.body)
+  axios.post(process.env.FEEDBACK_URL, req.body)
   .then((response: any) => {
-    console.log('Feedback sent')
-    console.log(response)
   })
   .catch((error: any) => {
-    console.log('Error sending feedback')
-    console.log(error)
   }
   )
   res.send('OK')
