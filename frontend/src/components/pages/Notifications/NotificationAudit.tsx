@@ -35,7 +35,7 @@ const NotificationAudit = () => {
     const {readFile, excelData, isExcelDataPending} = useReadExcel()
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
 
-    const prettyExtensionTypes = ['Call Queue', 'Message-Only', 'Shared Line Group', 'User', 'Virtual User']
+    const prettyExtensionTypes = ['Call Queue', 'Message-Only', 'Shared Line Group', 'User']
     const [selectedExtensionTypes, setSelectedExtensionTypes] = useState<string[]>(prettyExtensionTypes)
     const [selectedSites, setSelectedSites] = useState<string[]>([])
     const [sites, setSites] = useState<string[]>([])
