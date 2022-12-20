@@ -37,7 +37,7 @@ const ManipulateCustomRules = () => {
     useLogin('customruleedit')
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
-    const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending} = useGetAccessToken()
     const {fetchExtensions, extensionsList, isExtensionListPending, isMultiSiteEnabled} = useExtensionList(postMessage)
     const {fetchRules, isRuleListPending, adjustedExtensions} = useSimpleRuleList(setFetchRulesProgress, postMessage, postTimedMessage, postError)
     const {manipulateRules, isRuleManipulationPending} = useManipulateRules(setManipulateRulesProgress, postMessage, postTimedMessage, postError)
@@ -109,7 +109,7 @@ const ManipulateCustomRules = () => {
             <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Enable / Disable Custom Rules" isUserInitiated={true} />
             <div className="tool-card">
                 <h2>Enable / Disable Custom Rules</h2>
-                <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} />
+                <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} loading={isTokenPending} error={tokenError} />
                 {isRuleManipulationPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 {isSyncing ? <> <Typography>Discovering Custom Rules</Typography> <progress value={fetchRulesProgress} max={fetchRulesProgressMax} /> </> : <></>}
                 {isSyncing ? <> <Typography>{`Editing Rules`}</Typography> <progress value={manipulateRulesProgress} max={manipulateRulesProgressMax} /> </> : <></>}

@@ -30,7 +30,7 @@ const DirectCreateMenus = () => {
     let [isPending, setIsPending] = useState(false)
     const [menus, setMenus] = useState<IVRMenu[]>([])
     let {messages, errors, postMessage, postError} = useMessageQueue()
-    const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError} = useGetAccessToken()
     const { extensionsList, isExtensionListPending, isMultiSiteEnabled, fetchExtensions } = useExtensionList(postMessage)
     const [selectedFile, setSelectedFile] = useState<File | null>()
     const {excelData, isExcelDataPending, readFile} = useReadExcel()
@@ -145,7 +145,7 @@ const DirectCreateMenus = () => {
     
     return (
         <div>
-            <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} />
+            <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} loading={isTokenPending} error={tokenError} />
             <FileSelect enabled={hasCustomerToken} accept=".xlsx, .csv" handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={isPending} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
             {isDisplayingFilterBox ? <AdaptiveFilter title='Pages' placeholder='Search...' setSelected={setSelectedSites} options={pages.map((page) => page.label)} defaultSelected={pages.map((page) => page.label)} /> : <></>}
             {!isReadyToSync ? <></> : <Button disabled={isSyncing} variant="contained" className="inline" onClick={handleSyncButtonClick}>Sync</Button>}

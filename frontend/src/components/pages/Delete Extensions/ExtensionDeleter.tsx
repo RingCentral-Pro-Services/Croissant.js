@@ -34,7 +34,7 @@ const ExtensionDeleter = () => {
 
     const {postMessage, messages, errors, postError} = useMessageQueue()
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
-    const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending} = useGetAccessToken()
     const {extensionsList, fetchExtensions, isExtensionListPending} = useExtensionList(postMessage)
     const [adjustedExtensionList, setAdjustedExtensionList] = useState<RCExtension[]>([])
 
@@ -150,7 +150,7 @@ const ExtensionDeleter = () => {
             <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Extension Deleter" isUserInitiated={true} />
             <div className="tool-card">
                 <h2>Delete Extensions</h2>
-                <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID}/>
+                <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                 {isExtensionDeletePending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 <br />
                 <div hidden={isExtensionListPending}>

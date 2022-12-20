@@ -24,7 +24,7 @@ const NotificationAudit = () => {
     useLogin('notificationsaudit')
     const {fireEvent} = useAnalytics()
     let [targetUID, setTargetUID] = useState("")
-    const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending} = useGetAccessToken()
     let {messages, errors, postMessage, postError} = useMessageQueue()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     const [isPending, setIsPending] = useState(false)
@@ -138,7 +138,7 @@ const NotificationAudit = () => {
             <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Notifications" isUserInitiated={true} />
             <div className="tool-card">
                 <h2>Extension Notifications</h2>
-                <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} />
+                <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} error={tokenError} loading={isTokenPending} />
                 <Button disabled={isExtensionListPending || isPending} variant="contained" onClick={handleClick}>Go</Button>
                 {isNotificationListPending ? <></> : <FileSelect isPending={false} enabled={true} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} accept='.xlsx' defaultSheet='Notifications' handleSubmit={handleFileSubmit}/>}
                 {isEmailSwapPending ? <></> : <Button variant='contained' onClick={handleSyncButtonClick} >Sync</Button>}

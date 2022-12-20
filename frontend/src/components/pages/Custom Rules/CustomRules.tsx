@@ -37,7 +37,7 @@ const CustomRules = () => {
     const extensionTypes = ['User', 'Call Queue']
 
     useLogin('copycustomrules')
-    const {fetchToken, companyName, hasCustomerToken} = useGetAccessToken()
+    const {fetchToken, companyName, hasCustomerToken, error: tokenError, isTokenPending} = useGetAccessToken()
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const {fetchExtensions, extensionsList, isExtensionListPending, isMultiSiteEnabled} = useExtensionList(postMessage)
@@ -130,7 +130,7 @@ const CustomRules = () => {
             <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Copy Custom Rules" isUserInitiated={true} />
             <div className="tool-card">
                 <h2>Copy Custom Rules</h2>
-                <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} />
+                <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                 {isCustomRuleCreationPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 {isSyncing ? <progress value={progressValue} max={progressMax} />: <></>}
                 <div hidden={isExtensionListPending}>

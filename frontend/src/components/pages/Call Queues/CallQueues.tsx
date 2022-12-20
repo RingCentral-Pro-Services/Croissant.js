@@ -21,7 +21,7 @@ const CallQueues = () => {
     const {fireEvent} = useAnalytics()
     let [targetUID, setTargetUID] = useState("")
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
-    const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending} = useGetAccessToken()
     let {messages, errors, postMessage, postError} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
@@ -74,7 +74,7 @@ const CallQueues = () => {
             </Header>
             <div className="tool-card">
                 <h2>Export Call Queues</h2>
-                <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} />
+                <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} loading={isTokenPending} error={tokenError} />
                 <Button className='healthy-margin-right' disabled={!hasCustomerToken || isPending} variant="contained" onClick={handleClick}>Go</Button>
                 {isCallQueueSettingsPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 {isPending ? <progress className='healthy-margin-top' value={progressValue} max={maxProgressValue} /> : <></>}

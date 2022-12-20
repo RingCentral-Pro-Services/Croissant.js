@@ -33,7 +33,7 @@ const EditSites = () => {
 
     useLogin('editsites')
     const {fireEvent} = useAnalytics()
-    const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending} = useGetAccessToken()
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const {fetchExtensions, extensionsList, isExtensionListPending} = useExtensionList(postMessage)
@@ -112,7 +112,7 @@ const EditSites = () => {
             <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Edit Sites" isUserInitiated={true} />
             <div className="tool-card">
                 <h2>Edit Sites</h2>
-                <UIDInputField disabledText={companyName} disabled={hasCustomerToken} setTargetUID={setTargetUID} />
+                <UIDInputField disabledText={companyName} disabled={hasCustomerToken} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                 <Button disabled={isExtensionListPending} variant='contained' onClick={handleDownloadButtonClick}>Download</Button>
                 <FileSelect enabled={!isExtensionListPending} handleSubmit={handleFileSubmit} setSelectedFile={setSelectedFile} isPending={false} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
                 <Button variant='contained' disabled={isDataValidationPending || isSyncing} onClick={handleSyncButtonClick}>Sync</Button>

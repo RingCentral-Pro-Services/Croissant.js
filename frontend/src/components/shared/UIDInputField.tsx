@@ -1,9 +1,16 @@
 import React, { useEffect, useState } from "react";
-import {TextField, Autocomplete} from '@mui/material'
+import {TextField, Autocomplete, CircularProgress, Typography} from '@mui/material'
 import { AccountUID } from "../../models/AccountUID";
 
-const UIDInputField = (props: {setTargetUID: (value: string) => void, disabled: boolean, disabledText: string}) => {
-    const {setTargetUID, disabled, disabledText} = props
+interface UIDInputFieldProps {
+    setTargetUID: (value: string) => void
+    disabled: boolean
+    disabledText: string
+    error?: string
+    loading?: boolean
+}
+
+const UIDInputField: React.FC<UIDInputFieldProps> = ({setTargetUID, disabled, disabledText, error = '', loading = true}) => {
     const [accounts, setAccounts] = useState<AccountUID[]>([])
 
     useEffect(() => {
@@ -49,23 +56,24 @@ const UIDInputField = (props: {setTargetUID: (value: string) => void, disabled: 
     }
     else {
         return (
-            <Autocomplete
-                className="vertical-middle healthy-margin-right"
-                size="small"
-                id="free-solo-demo"
-                sx={{width: 200, display: 'inline-block'}}
-                freeSolo
-                options={accounts.map((account) => account.name)}
-                onChange={handleInput}
-                renderInput={(params) => <TextField {...params} label="Account UID" />}
-            />
+            <>
+                <div style={{display: 'inline-table'}} >
+                    <Autocomplete
+                        className="vertical-middle healthy-margin-right"
+                        size="small"
+                        id="free-solo-demo"
+                        sx={{width: 200, display: 'inline-block'}}
+                        freeSolo
+                        options={accounts.map((account) => account.name)}
+                        onChange={handleInput}
+                        renderInput={(params) => <TextField {...params} label="Account UID" />}
+                    />
+                    {error === '' ? <></> : <Typography sx={{display: 'block', color: 'red'}} variant='caption' >{error}</Typography>}
+                </div>
+                {loading ? <CircularProgress className='vertical-middle healthy-margin-right' /> : <></>}
+            </>
         )
     }
-}
-
-UIDInputField.defaultProps = {
-    disabled: false,
-    disabledText: ''
 }
 
 export default UIDInputField

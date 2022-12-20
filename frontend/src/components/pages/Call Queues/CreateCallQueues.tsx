@@ -32,7 +32,7 @@ const CreateCallQueues = () => {
     const [selectedSheet, setSelectedSheet] = useState<string>('')
     const defaultSheet = "Queues"
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
-    const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending} = useGetAccessToken()
 
     // Progess bar
     const [progressValue, setProgressValue] = useState(0)
@@ -95,7 +95,7 @@ const CreateCallQueues = () => {
             </Header>
             <div className="tool-card">
                 <h2>Create Call Queues</h2>
-                <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} />
+                <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                 <FileSelect enabled={hasCustomerToken} accept=".xlsx" handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Create Call Queues" isUserInitiated={true} />
                 {isPending ? <></> : <Button variant="contained" onClick={handleSyncButtonClick}>Sync</Button>}

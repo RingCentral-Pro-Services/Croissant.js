@@ -9,10 +9,13 @@ const useGetAccessToken = () => {
     const [hasCustomerToken, setHasToken] = useState(false)
     const [accountID, setAccountID] = useState('')
     const {companyName, isCompanyNamePending, getCompanyName, reset} = useGetCompanyName()
+    const [error, setError] = useState('')
+    const [isTokenPending, setIsTokenPending] = useState(false)
 
     const fetchToken = (uid: string) => {
         let rc_access_token = localStorage.getItem('rc_access_token')
         if (!rc_access_token) return
+        setIsTokenPending(true)
 
         const headers = {
             "Accept": "application/json",
@@ -41,10 +44,13 @@ const useGetAccessToken = () => {
             localStorage.setItem('cs_refresh_token', res.data['refresh_token'])
             setAccountID(uid)
             getCompanyName()
+            setIsTokenPending(false)
             // setHasToken(true)
         })
         .catch((res: any) => {
             console.log(res)
+            setIsTokenPending(false)
+            setError(res.response.data.errors[0].error_description)
         })
     }
 
@@ -86,7 +92,7 @@ const useGetAccessToken = () => {
         }
     }
 
-    return {fetchToken, hasCustomerToken, companyName}
+    return {fetchToken, hasCustomerToken, companyName, error, isTokenPending}
 }
 
 export default useGetAccessToken

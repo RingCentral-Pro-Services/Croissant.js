@@ -25,7 +25,7 @@ const ExtensionEditor = () => {
 
     useLogin('editextensions')
     const {fireEvent} = useAnalytics()
-    const {fetchToken, hasCustomerToken, companyName} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending} = useGetAccessToken()
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const {fetchExtensions, extensionsList, isExtensionListPending} = useExtensionList(postMessage)
@@ -64,7 +64,7 @@ const ExtensionEditor = () => {
             <div className="tool-card">
                 <h2>Edit Extensions</h2>
                 <div className="mega-mergin-top">
-                    <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} />
+                    <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                     <Button disabled={isExtensionListPending} variant="contained" onClick={handleSyncbuttonClick}>Sync</Button>
                     {isExtensionUpdatePending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 </div>
