@@ -35,6 +35,7 @@ const useExcelToIVRs = (postMessage: (message: Message) => void, postError: (err
             let actions = getActions(data[index], extensionList)
             let site = getSite(currentItem['Site'], extensionList)
             let prompt = getPrompt(currentItem['Menu Name'], currentItem['Menu Ext'], currentItem['Prompt Name/Script'], audioPromptList)
+            const existingID = idForExtension(currentItem['Menu Ext'], extensionList)
             let menuData: IVRMenuData = {
                 uri: "",
                 name: currentItem['Menu Name'],
@@ -42,7 +43,7 @@ const useExcelToIVRs = (postMessage: (message: Message) => void, postError: (err
                 prompt: prompt,
                 site: site,
                 actions: actions,
-                id: `${idForExtension(currentItem['Menu Ext'], extensionList)}`
+                id: `${existingID === 0 ? randomID() : existingID}`
             }
             let menu = new IVRMenu(menuData)
             if (prompt.audio) {
@@ -175,6 +176,10 @@ const useExcelToIVRs = (postMessage: (message: Message) => void, postError: (err
         }
 
         return result
+    }
+
+    const randomID = () => {
+        return Math.floor(Math.random() * 1000000)
     }
 
     const idForExtension = (extension: string, extensionsList: RCExtension[]) => {

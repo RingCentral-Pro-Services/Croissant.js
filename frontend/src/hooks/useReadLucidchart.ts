@@ -74,6 +74,8 @@ const useReadLucidchart = (postMessage: (message: Message) => void) => {
 
                 let id = csvData[index]["Id"]
                 const pageName = pageMap[csvData[index]["Page ID"]]
+                const existingID = idForExtension(extensionNumber, extensions)
+
 
                 let menuData: IVRMenuData = {
                     uri: '',
@@ -82,7 +84,7 @@ const useReadLucidchart = (postMessage: (message: Message) => void) => {
                     prompt: {mode: "TextToSpeech", text: "Thank you for calling."},
                     site: getSite(pageName, extensions),
                     actions: [],
-                    id: `${idForExtension(extensionNumber, extensions)}`
+                    id: `${existingID === 0 ? randomID() : existingID}`
                 }
 
                 let menu = new IVRMenu(menuData)
@@ -210,6 +212,10 @@ const useReadLucidchart = (postMessage: (message: Message) => void) => {
         }
 
         return result
+    }
+
+    const randomID = () => {
+        return Math.floor(Math.random() * 1000000)
     }
 
     /**
