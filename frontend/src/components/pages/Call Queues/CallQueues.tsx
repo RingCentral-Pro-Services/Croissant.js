@@ -76,6 +76,7 @@ const CallQueues = () => {
                 <h2>Export Call Queues</h2>
                 <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} />
                 <Button className='healthy-margin-right' disabled={!hasCustomerToken || isPending} variant="contained" onClick={handleClick}>Go</Button>
+                {isCallQueueSettingsPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 {isPending ? <progress className='healthy-margin-top' value={progressValue} max={maxProgressValue} /> : <></>}
                 {timedMessages.length > 0 ? <MessagesArea messages={timedMessages} /> : <></>}
                 {!isCallQueueSettingsPending ? <FeedbackArea gridData={callQueues} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}

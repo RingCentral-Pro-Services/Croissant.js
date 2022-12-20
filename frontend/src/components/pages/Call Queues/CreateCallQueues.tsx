@@ -99,6 +99,7 @@ const CreateCallQueues = () => {
                 <FileSelect enabled={hasCustomerToken} accept=".xlsx" handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Create Call Queues" isUserInitiated={true} />
                 {isPending ? <></> : <Button variant="contained" onClick={handleSyncButtonClick}>Sync</Button>}
+                {isCallQueueCreationPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 {!(queues.length > 0) ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
                 {isQueueConvertPending ? <></> : <FeedbackArea gridData={queues} messages={messages} timedMessages={timedMessages} errors={errors} />}
             </div>

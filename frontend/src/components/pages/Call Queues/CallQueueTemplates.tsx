@@ -197,6 +197,7 @@ const CallQueueTemplates = () => {
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} />
                 {isRegionalFormatListPenging ? <></> : <AdaptiveFilter options={siteNames} showAllOption={true} setSelected={setSelectedSites} title='Sites' placeholder='Search' disabled={isRegionalFormatListPenging || isSyncing} defaultSelected={siteNames}  />}
                 <Button disabled={selectedExtensions.length === 0 || isRegionalFormatListPenging || isSyncing} variant="contained" onClick={handleSyncButtonClick} >Sync</Button>
+                {isGreetingsUploadPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 <ScheduleBuilder isOpen={isShowingHours} setIsOpen={setIsShowingHours} setPayload={setSchedulePayload} />
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Call Queue Templates" isUserInitiated={true} />
                 {isSyncing && willUpdateRegionalSettings ? <> <Typography>Regional settings</Typography> <progress value={regionalSettingsProgress} max={regionalSettingsMaxProgress} /> </> : <></>}

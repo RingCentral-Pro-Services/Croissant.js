@@ -151,6 +151,7 @@ const ExtensionDeleter = () => {
             <div className="tool-card">
                 <h2>Delete Extensions</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID}/>
+                {isExtensionDeletePending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 <br />
                 <div hidden={isExtensionListPending}>
                     <AdditiveFilter options={prettyExtensionTypes} title='Extension Types' placeholder='Extension Types' setSelected={setSelectedExtensionTypes} />

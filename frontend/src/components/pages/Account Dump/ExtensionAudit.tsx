@@ -4,7 +4,7 @@ import useMessageQueue from '../../../hooks/useMessageQueue'
 import useExtensionList from '../../../rcapi/useExtensionList'
 import useGetAccessToken from '../../../rcapi/useGetAccessToken'
 import Header from '../../shared/Header'
-import {Button} from '@mui/material'
+import {Button, Typography} from '@mui/material'
 import FeedbackArea from '../../shared/FeedbackArea'
 import usePostTimedMessage from '../../../hooks/usePostTimedMessage'
 import useAnalytics from '../../../hooks/useAnalytics'
@@ -56,6 +56,7 @@ const ExtensionAudit = () => {
             <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Account Dump" isUserInitiated={true} />
             <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} />
             <Button className='healthy-margin-right' disabled={!hasCustomerToken} variant='contained' onClick={handleClick}>Go</Button>
+            {isExtensionListPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
             {/* {extensionsList.length > 0 ? <FilterArea items={extensionsList} defaultSelected={extensionsList.map((extension) => extension.id)} showSiteFilter={true} onSelectionChanged={handleFilterSelection} /> : <></>} */}
             {extensionsList.length > 0 ? <FeedbackArea gridData={extensionsList} additiveFilter={true} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
         </div>

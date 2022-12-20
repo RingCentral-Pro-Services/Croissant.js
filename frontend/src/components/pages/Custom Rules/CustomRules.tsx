@@ -131,6 +131,7 @@ const CustomRules = () => {
             <div className="tool-card">
                 <h2>Copy Custom Rules</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} />
+                {isCustomRuleCreationPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 {isSyncing ? <progress value={progressValue} max={progressMax} />: <></>}
                 <div hidden={isExtensionListPending}>
                     <Stepper className="healthy-margin-top" activeStep={activeStep} orientation='vertical'>

@@ -142,6 +142,7 @@ const NotificationAudit = () => {
                 <Button disabled={isExtensionListPending || isPending} variant="contained" onClick={handleClick}>Go</Button>
                 {isNotificationListPending ? <></> : <FileSelect isPending={false} enabled={true} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} accept='.xlsx' defaultSheet='Notifications' handleSubmit={handleFileSubmit}/>}
                 {isEmailSwapPending ? <></> : <Button variant='contained' onClick={handleSyncButtonClick} >Sync</Button>}
+                {isNotificationListPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 <br/>
                 <div className="mega-margin-top">
                     {sites.length > 0 ? <AdaptiveFilter options={prettyExtensionTypes} defaultSelected={prettyExtensionTypes} title='Extension Types' placeholder='Search...' setSelected={setSelectedExtensionTypes} /> : <></>}

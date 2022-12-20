@@ -132,6 +132,7 @@ const Deskphones = () => {
                 {siteNames.length === 0 ? <></> : <AdaptiveFilter title='Sites' placeholder="Sites" options={siteNames} defaultSelected={siteNames} disabled={false} showAllOption={true} setSelected={setSelectedSites} />}
                 {siteNames.length === 0 ? <></> : <SimpleSelection options={ringTimes} onSelect={setSelectedRingTime} defaultSelected='4 Rings / 20 Seconds' label='' placeholder='' /> }
                 {isExtensionListPending ? <></> : <Button disabled={selectedExtensions.length === 0 || isSyncing} variant="contained" onClick={handleSyncButtonClicked}>Sync</Button>}
+                {isCallHandlingSettingsPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 {isSyncing ? <> <Typography>Fetching Call Handling</Typography> <progress value={callForwardingProgressValue} max={callForwardingProgressMax} /> </> : <></>}
                 {isSyncing ? <> <Typography>Updating Call Handling</Typography> <progress value={callforwardingUpdateProgress} max={callForwardingUpdateProgressMax} /> </> : <></>}
                 {!isExtensionListPending ? <FeedbackArea gridData={filteredExtensions} onFilterSelection={handleFilterSelection} messages={messages} errors={errors} timedMessages={timedMessages} /> : <></>}

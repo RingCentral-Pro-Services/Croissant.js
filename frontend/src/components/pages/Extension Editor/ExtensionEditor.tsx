@@ -66,6 +66,7 @@ const ExtensionEditor = () => {
                 <div className="mega-mergin-top">
                     <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} />
                     <Button disabled={isExtensionListPending} variant="contained" onClick={handleSyncbuttonClick}>Sync</Button>
+                    {isExtensionUpdatePending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 </div>
                 <SimpleReplacement leftTitle="If first name contains" rightTitle="Replace with" setLeftValue={setOldFirstName} setRightValue={setNewFirstName} />
                 <SimpleReplacement leftTitle="If last name contains" rightTitle="Replace with" setLeftValue={setOldLastName} setRightValue={setNewLastName} />

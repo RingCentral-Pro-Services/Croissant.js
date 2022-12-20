@@ -110,6 +110,7 @@ const ManipulateCustomRules = () => {
             <div className="tool-card">
                 <h2>Enable / Disable Custom Rules</h2>
                 <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} />
+                {isRuleManipulationPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 {isSyncing ? <> <Typography>Discovering Custom Rules</Typography> <progress value={fetchRulesProgress} max={fetchRulesProgressMax} /> </> : <></>}
                 {isSyncing ? <> <Typography>{`Editing Rules`}</Typography> <progress value={manipulateRulesProgress} max={manipulateRulesProgressMax} /> </> : <></>}
                 <div hidden={isExtensionListPending}>
