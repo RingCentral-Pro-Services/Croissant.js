@@ -8,7 +8,7 @@ import { TransferPayload, UnconditionalForwardingPayload } from "./TransferPaylo
 import { DataGridFormattable } from "./DataGridFormattable";
 
 class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattable, DataGridFormattable {
-    constructor(public extension: RCExtension, public siteID: number, public members: string[], public handlingRules?: CallHandlingRules, public greetings?: Greeting[], public transferExtension?: string, public unconditionalForwardNumber?: string, public maxWaitTimeDestination?: string, public maxCallersDestination?: string) {}
+    constructor(public extension: RCExtension, public siteID: number, public members: string[], public handlingRules?: CallHandlingRules, public greetings?: Greeting[], public transferExtension?: string, public unconditionalForwardNumber?: string, public maxWaitTimeDestination?: string, public maxCallersDestination?: string, public afterHoursAction?: string, public afterHoursDestination?: string) {}
 
     toRow(): string {
         return `${this.extension.name},${this.extension.extensionNumber},${this.extension.site},${this.extension.status},"${this.members}"`
@@ -16,7 +16,7 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
 
     toExcelRow(): string[] {
         // Header: ['Queue Name', 'Extension', 'Site', 'Status', 'Members (Ext)', 'Greeting', 'Audio While Connecting', 'Hold Music', 'Voicemail', 'Interrupt Audio', 'Interrupt Prompt', 'Ring type', 'Total Ring Time', 'User Ring Time' , 'Max Wait Time Action', 'No Answer Action', 'Wrap Up Time']
-        return [this.extension.name, `${this.extension.extensionNumber}`, this.extension.site, this.extension.status, `${this.handlingRules?.transferMode === 'FixedOrder' ? this.handlingRules.fixedOrderAgents?.map((agent) => agent.extension.extensionNumber) : this.members}`, this.prettyGreeting(this.greeting('Introductory')), this.prettyGreeting(this.greeting('ConnectingAudio')), this.prettyGreeting(this.greeting('HoldMusic')), this.prettyGreeting(this.greeting('Voicemail')), this.prettyInterruptPeriod(this.handlingRules?.holdAudioInterruptionMode ?? '', this.handlingRules?.holdAudioInterruptionPeriod ?? 0), this.handlingRules?.holdAudioInterruptionPeriod ? this.greeting('InterruptPrompt') : '' , this.prettyRingType(this.handlingRules?.transferMode ?? ''), this.prettyTime(this.handlingRules?.holdTime ?? 0), this.prettyTime(this.handlingRules?.agentTimeout ?? 0) , this.prettyWaitTimeAction() , this.prettyWaitTimeDestination() ?? '', this.prettyMaxCallersAction(), this.prettyMaxCallersDestination() ?? '' ,this.handlingRules?.noAnswerAction ?? '', this.prettyTime(this.handlingRules?.wrapUpTime ?? 0)]
+        return [this.extension.name, `${this.extension.extensionNumber}`, this.extension.site, this.extension.status, `${this.handlingRules?.transferMode === 'FixedOrder' ? this.handlingRules.fixedOrderAgents?.map((agent) => agent.extension.extensionNumber) : this.members}`, this.prettyGreeting(this.greeting('Introductory')), this.prettyGreeting(this.greeting('ConnectingAudio')), this.prettyGreeting(this.greeting('HoldMusic')), this.prettyGreeting(this.greeting('Voicemail')), this.prettyInterruptPeriod(this.handlingRules?.holdAudioInterruptionMode ?? '', this.handlingRules?.holdAudioInterruptionPeriod ?? 0), this.handlingRules?.holdAudioInterruptionPeriod ? this.greeting('InterruptPrompt') : '' , this.prettyRingType(this.handlingRules?.transferMode ?? ''), this.prettyTime(this.handlingRules?.holdTime ?? 0), this.prettyTime(this.handlingRules?.agentTimeout ?? 0) , this.prettyWaitTimeAction() , this.prettyWaitTimeDestination() ?? '', this.prettyMaxCallersAction(), this.prettyMaxCallersDestination() ?? '' ,this.handlingRules?.noAnswerAction ?? '', this.prettyTime(this.handlingRules?.wrapUpTime ?? 0), this.prettyAfterHoursAction(), this.afterHoursDestination ?? '']
     }
 
     toDataTableRow(): string[] {
@@ -182,6 +182,21 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
         else if (value === 'None') return 'Off'
         else {
             return `Music (${value})`
+        }
+    }
+
+    prettyAfterHoursAction() {
+        switch (this.afterHoursAction) {
+            case 'TransferToExtension':
+                return 'Transfer to Extension'
+            case 'UnconditionalForwarding':
+                return 'Forward to External'
+            case 'TakeMessagesOnly':
+                return 'Send to Voicemail'
+            case 'PlayAnnouncementOnly':
+                return 'Play an Announcement'
+            default:
+                return ''
         }
     }
 

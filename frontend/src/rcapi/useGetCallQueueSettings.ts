@@ -13,6 +13,7 @@ const useGetCallQueueSettings = (setProgressValue: (value: (any)) => void, postM
     const [shouldFetch, setShouldFetch] = useState(false)
     const [rateLimitInterval, setRateLimitInterval] = useState(250)
     const [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
+    const [extensionList, setExtensionList] = useState<RCExtension[]>([])
     const baseURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/answering-rule'
 
     const fetchCallQueueSettings = (callQueues: CallQueue[], extensionList: RCExtension[]) => {
@@ -20,6 +21,7 @@ const useGetCallQueueSettings = (setProgressValue: (value: (any)) => void, postM
         setIsPending(true)
         setRateLimitInterval(0)
         setShouldFetch(true)
+        setExtensionList(extensionList)
         setCurrentExtensionIndex(0)
     }
 
@@ -68,6 +70,24 @@ const useGetCallQueueSettings = (setProgressValue: (value: (any)) => void, postM
                     queues[currentExtensionIndex].handlingRules = callHandling
                     queues[currentExtensionIndex].greetings = greetings
                 }
+
+                if (afterHoursData.length > 0) {
+                    const action = afterHoursData[0].callHandlingAction
+                    if (action === 'TransferToExtension') {
+                        const extensionID = afterHoursData[0].transfer.extension.id
+                        const extension = extensionList.find((extension) => {
+                            return extension.id == extensionID
+                        })
+                        queues[currentExtensionIndex].afterHoursDestination = `${extension?.extensionNumber ?? extensionID}`
+                    }
+                    else if (action === 'UnconditionalForwarding') {
+                        const phoneNumber = afterHoursData[0].unconditionalForwarding.phoneNumber
+                        queues[currentExtensionIndex].afterHoursDestination = phoneNumber
+                    }
+                    queues[currentExtensionIndex].afterHoursAction = action
+                    
+                }
+
                 setCurrentExtensionIndex(currentExtensionIndex + 1)
                 setProgressValue(queues.length + currentExtensionIndex)
             }
