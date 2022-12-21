@@ -48,12 +48,11 @@ const useGetCallQueueSettings = (setProgressValue: (value: (any)) => void, postM
                 if (response.rateLimitInterval > 0) postTimedMessage(new Message(`Rate limit reached. Resuming in 60 seconds`, 'info'), 60000)
                 if (response.rateLimitInterval > 0) {
                     setRateLimitInterval(response.rateLimitInterval)
+                    postTimedMessage(new Message(`Rate limit reached. Resuming in 60 seconds`, 'info'), response.rateLimitInterval)
                 }
                 else {
                     setRateLimitInterval(250)
                 }
-                console.log('Queue settings')
-                console.log(response)
 
                 const records = response.data.records as Array<any>
 
