@@ -44,7 +44,9 @@ export class IVRMenu implements CSVFormattable, ExcelFormattable, DataTableForma
             key7: this.actionText(`7`),
             key8: this.actionText(`8`),
             key9: this.actionText(`9`),
-            key0: this.actionText(`0`)
+            key0: this.actionText(`0`),
+            keyHash: this.actionText(`Hash`),
+            keyStar: this.actionText(`Star`)
         }
 
         return result
@@ -65,7 +67,9 @@ export class IVRMenu implements CSVFormattable, ExcelFormattable, DataTableForma
             { field: 'key7', headerName: 'Key 7', width: 200 },
             { field: 'key8', headerName: 'Key 8', width: 200 },
             { field: 'key9', headerName: 'Key 9', width: 200 },
-            { field: 'key0', headerName: 'Key 0', width: 200 }
+            { field: 'key0', headerName: 'Key 0', width: 200 },
+            { field: 'keyHash', headerName: 'Key #', width: 200 },
+            { field: 'keyStar', headerName: 'Key *', width: 200 }
         ]
 
         return result
@@ -173,6 +177,29 @@ export class IVRMenu implements CSVFormattable, ExcelFormattable, DataTableForma
             result.push("")
         }
 
+        let poundKeyFound = false
+        for (let actionIndex = 0; actionIndex < this.data.actions.length; actionIndex++) {
+            if (this.data.actions[actionIndex].input === `Hash`) {
+                result.push(prettyType(this.data.actions[actionIndex].action))
+                poundKeyFound = true
+            }
+        }
+        if (!poundKeyFound) {
+            result.push("")
+        }
+
+        // Special Keys
+        let starKeyFound = false
+        for (let actionIndex = 0; actionIndex < this.data.actions.length; actionIndex++) {
+            if (this.data.actions[actionIndex].input === `Star`) {
+                result.push(prettyType(this.data.actions[actionIndex].action))
+                starKeyFound = true
+            }
+        }
+        if (!starKeyFound) {
+            result.push("")
+        }
+
         return result
     }
 
@@ -241,6 +268,29 @@ export class IVRMenu implements CSVFormattable, ExcelFormattable, DataTableForma
             result.push("")
         }
 
+        let poundKeyFound = false
+        for (let actionIndex = 0; actionIndex < this.data.actions.length; actionIndex++) {
+            if (this.data.actions[actionIndex].input === `Hash`) {
+                result.push(prettyType(this.data.actions[actionIndex].action))
+                poundKeyFound = true
+            }
+        }
+        if (!poundKeyFound) {
+            result.push("")
+        }
+
+        // Special Keys
+        let starKeyFound = false
+        for (let actionIndex = 0; actionIndex < this.data.actions.length; actionIndex++) {
+            if (this.data.actions[actionIndex].input === `Star`) {
+                result.push(prettyType(this.data.actions[actionIndex].action))
+                starKeyFound = true
+            }
+        }
+        if (!starKeyFound) {
+            result.push("")
+        }
+
         return result
     }
 }
@@ -261,6 +311,12 @@ const prettyType = (rawType: string) => {
             return 'Return to the Previous Menu'
         case 'ReturnToRootMenu':
             return 'Return to the Root Menu'
+        case 'Repeat':
+            return 'Repeat the Menu'
+        case 'ReturnToRoot':
+            return 'Return to the Root Menu'
+        case 'ReturnToPrevious':
+            return 'Return to the Previous Menu'
         default:
             return rawType
     }

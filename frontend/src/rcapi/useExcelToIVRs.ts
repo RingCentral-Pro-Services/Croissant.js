@@ -19,9 +19,11 @@ const useExcelToIVRs = (postMessage: (message: Message) => void, postError: (err
         "Transfer to Voicemail of": "Voicemail",
         "Connect to Dial-by-Name Directory": "DialByName",
         "External Transfer": "Transfer",
-        "Repeat the Menu": "RepeatMenuGreeting",
-        "Return to the Previous Menu": "ReturnToPreviousMenu",
-        "Return to the Root Menu": "ReturnToRootMenu",
+
+        "Repeat the Menu": "Repeat",
+        "Return to the Previous Menu": "ReturnToPrevious",
+        "Return to the Root Menu": "ReturnToRoot",
+
         "Dial by first name": "DialByName",
         "Transfer to auto-attendant": "Connect",
         "Transfer to extension": "Connect",
@@ -105,7 +107,6 @@ const useExcelToIVRs = (postMessage: (message: Message) => void, postError: (err
     const getActions = (data: any, extensionList: RCExtension[]) => {
         let actions: IVRAction[] = []
 
-        // TODO: Read actions from excel data...
         for (let keyPressIndex = 0; keyPressIndex < 10; keyPressIndex++) {
             let actionKey = `Key ${keyPressIndex} Action`
             let destinationKey = `Key ${keyPressIndex} Destination`
