@@ -3,7 +3,7 @@ import { TransferPayload, UnconditionalForwardingPayload } from "./TransferPaylo
 export interface CallHandlingRules {
     transferMode: string
     noAnswerAction: string
-    fixedOrderAgents?: string[]
+    fixedOrderAgents?: FixedOrderAgent[]
     holdAudioInterruptionMode: string
     holdAudioInterruptionPeriod?: number
     holdTimeExpirationAction: string
@@ -13,4 +13,13 @@ export interface CallHandlingRules {
     maxCallersAction?: string
     transfer?: TransferPayload[]
     unconditionalForwarding?: UnconditionalForwardingPayload[]
+}
+
+export interface FixedOrderAgent {
+    extension: {
+        id: string,
+        extensionNumber: string,
+        name: string,
+    }
+    index: number
 }
