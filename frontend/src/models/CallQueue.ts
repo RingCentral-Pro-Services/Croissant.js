@@ -8,7 +8,9 @@ import { TransferPayload, UnconditionalForwardingPayload } from "./TransferPaylo
 import { DataGridFormattable } from "./DataGridFormattable";
 
 class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattable, DataGridFormattable {
-    constructor(public extension: RCExtension, public siteID: number, public members: string[], public handlingRules?: CallHandlingRules, public greetings?: Greeting[], public transferExtension?: string, public unconditionalForwardNumber?: string, public maxWaitTimeDestination?: string, public maxCallersDestination?: string, public afterHoursAction?: string, public afterHoursDestination?: string) {}
+    constructor(public extension: RCExtension, public siteID: number, public members: string[], public handlingRules?: CallHandlingRules, public greetings?: Greeting[], public transferExtension?: string, public unconditionalForwardNumber?: string, public maxWaitTimeDestination?: string, public maxCallersDestination?: string, public afterHoursAction?: string, public afterHoursDestination?: string) {
+        this.sortMembers()
+    }
 
     toRow(): string {
         return `${this.extension.name},${this.extension.extensionNumber},${this.extension.site},${this.extension.status},"${this.members}"`
@@ -20,7 +22,7 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
     }
 
     toDataTableRow(): string[] {
-        return [this.extension.name, `${this.extension.extensionNumber}`, this.extension.site, `${this.members}`, this.prettyRingType(this.handlingRules?.transferMode ?? ''), this.prettyTime(this.handlingRules?.holdTime ?? 0), this.prettyTime(this.handlingRules?.wrapUpTime ?? 0)]
+        return [this.extension.name, `${this.extension.extensionNumber}`, this.extension.site, `${this.handlingRules?.transferMode === 'FixedOrder' ? this.handlingRules.fixedOrderAgents?.map((agent) => agent.extension.extensionNumber) : this.members}`, this.prettyRingType(this.handlingRules?.transferMode ?? ''), this.prettyTime(this.handlingRules?.holdTime ?? 0), this.prettyTime(this.handlingRules?.wrapUpTime ?? 0)]
     }
 
     toDataGridRow(): any {
@@ -29,7 +31,7 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
             name: this.extension.name,
             extension: this.extension.extensionNumber,
             site: this.extension.site,
-            members: this.members,
+            members: this.handlingRules?.transferMode === 'FixedOrder' ? this.handlingRules.fixedOrderAgents?.map((agent) => agent.extension.extensionNumber) : this.members,
             ringType: this.prettyRingType(this.handlingRules?.transferMode ?? ''),
             holdTime: this.prettyTime(this.handlingRules?.holdTime ?? 0),
             wrapUpTime: this.prettyTime(this.handlingRules?.wrapUpTime ?? 0)
@@ -198,6 +200,15 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
             default:
                 return ''
         }
+    }
+
+    sortMembers() {
+        console.log('Sorting members')
+        this.members.sort((a, b) => {
+            if (parseInt(a) < parseInt(b)) return -1
+            if (parseInt(a) > parseInt(b)) return 1
+            return 0
+        })
     }
 
     createPayload(isMultiSiteEnabled: boolean = true) {
