@@ -31,7 +31,7 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
             name: this.extension.name,
             extension: this.extension.extensionNumber,
             site: this.extension.site,
-            members: this.handlingRules?.transferMode === 'FixedOrder' ? this.handlingRules.fixedOrderAgents?.map((agent) => agent.extension.extensionNumber) : this.members,
+            members: this.members,
             ringType: this.prettyRingType(this.handlingRules?.transferMode ?? ''),
             holdTime: this.prettyTime(this.handlingRules?.holdTime ?? 0),
             wrapUpTime: this.prettyTime(this.handlingRules?.wrapUpTime ?? 0)
