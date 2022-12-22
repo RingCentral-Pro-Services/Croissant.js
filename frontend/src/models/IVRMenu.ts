@@ -266,6 +266,7 @@ export class IVRMenu implements CSVFormattable, ExcelFormattable, DataTableForma
         }
         if (!zeroKeyFound) {
             result.push("")
+            result.push("")
         }
 
         let poundKeyFound = false
