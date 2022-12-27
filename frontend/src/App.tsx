@@ -15,6 +15,7 @@ import Deskphones from './components/pages/Deskphones/Deskphones';
 import CustomRules from './components/pages/Custom Rules/CustomRules';
 import ManipulateCustomRules from './components/pages/Custom Rules/ManipulateCustomRules';
 import Loading from './components/shared/Loading';
+import Intercom from './components/pages/Intercom/Intercom';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -48,6 +49,7 @@ function App() {
               <Route path='/deskphones' element={<Deskphones />} />
               <Route path='/copycustomrules' element={<CustomRules />} />
               <Route path='/customruleedit' element={<ManipulateCustomRules />} />
+              <Route path='/intercom' element={<Intercom />} />
             </Routes>
           </Suspense>
         </div>
