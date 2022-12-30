@@ -26,7 +26,8 @@ class RCExtension implements CSVFormattable, ExcelFormattable, DataTableFormatta
         "Bot": "Bot",
         "ProxyAdmin": "Proxy Admin",
         "DelegatedLinesGroup": "Delegated Lines Group",
-        "GroupCallPickup": "Group Call Pickup"
+        "GroupCallPickup": "Group Call Pickup",
+        "Room": "Room"
     }
 
     constructor(public id: number, public extensionNumber: number, public name: string, public contact: ExtensionContact, public site: string, public type: string, public status: string, public hidden: boolean , public uri: string, public customRules?: SimpleHandlingRule[]) {}

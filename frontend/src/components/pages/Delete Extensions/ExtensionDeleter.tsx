@@ -31,7 +31,7 @@ const ExtensionDeleter = () => {
     const [isShowingModal, setIsShowingModal] = useState(false)
     const [isShowingUnassignedModal, setIsShowingUnassignedModal] = useState(false)
     const [isPending, setIsPending] = useState(false)
-    const prettyExtensionTypes = ['Announcement-Only', 'Call Queue', 'IVR Menu', 'Limited Extension', 'Message-Only', 'Paging Group', 'Park Location', 'Shared Line Group', 'User', 'Unassigned Extension (User)', 'Unassigned Extension (Limited)']
+    const prettyExtensionTypes = ['Announcement-Only', 'Call Queue', 'IVR Menu', 'Limited Extension', 'Message-Only', 'Paging Group', 'Park Location', 'Room', 'Shared Line Group', 'User', 'Unassigned Extension (User)', 'Unassigned Extension (Limited)']
 
     const {postMessage, messages, errors, postError} = useMessageQueue()
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
