@@ -151,3 +151,31 @@ export const siteSchema = z.object({
     }).or(z.number())
 
 })
+
+export const extensionSchema = z.object({
+    'Site Name': z.string({
+        required_error: 'Missing site name',
+        invalid_type_error: 'Site name data type invalid'
+    }),
+    'First Name': z.string({
+        required_error: 'Missing first name',
+        invalid_type_error: 'First name data type invalid'
+    }).or(z.number()),
+    'Last Name': z.string({
+        required_error: 'Missing last name',
+        invalid_type_error: 'Last name data type invalid'
+    }).or(z.number()).optional(),
+    'Email': z.string({
+        required_error: 'Missing email',
+        invalid_type_error: 'Email data type invalid'
+    }),
+    'Extension': z.string({
+        required_error: 'Missing extension number',
+        invalid_type_error: 'Extension number data type invalid'
+    }).or(z.number()),
+    'User Type': z.string({
+        required_error: 'Missing user type',
+        invalid_type_error: 'User type data type invalid'
+    }),
+    'Department': z.string().optional(),
+})

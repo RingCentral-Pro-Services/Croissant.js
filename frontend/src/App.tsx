@@ -16,6 +16,7 @@ import CustomRules from './components/pages/Custom Rules/CustomRules';
 import ManipulateCustomRules from './components/pages/Custom Rules/ManipulateCustomRules';
 import Loading from './components/shared/Loading';
 import Intercom from './components/pages/Intercom/Intercom';
+import ExtensionUpload from './components/pages/Extension Upload/ExtensionUpload';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -50,6 +51,7 @@ function App() {
               <Route path='/copycustomrules' element={<CustomRules />} />
               <Route path='/customruleedit' element={<ManipulateCustomRules />} />
               <Route path='/intercom' element={<Intercom />} />
+              <Route path='/extensionupload' element={<ExtensionUpload />} />
             </Routes>
           </Suspense>
         </div>

@@ -76,6 +76,22 @@ class RCExtension implements CSVFormattable, ExcelFormattable, DataTableFormatta
         }
         return this[key as keyof RCExtension]
     }
+
+    payload(isMultiSiteEnable: boolean): any {
+        return {
+            contact: {
+                ...((this.type === 'User' || this.type == 'VirtualUser') && {firstName: this.contact?.firstName}),
+                ... ((this.type !== 'User' && this.type !== 'VirtualUser') && {firstName: `${this.contact.firstName}${this.contact.lastName ? ` ${this.contact.lastName }`: ''}`}),
+                ...((this.type === 'User' || this.type == 'VirtualUser') && {lastName: this.contact?.lastName}),
+                email: this.contact?.email,
+            },
+            extensionNumber: this.extensionNumber,
+            type: this.type === 'VirtualUser' ? 'User' : this.type,
+            status: this.status,
+            ...(this.type === 'VirtualUser' && {subType: 'VideoPro'}),
+            ...(isMultiSiteEnable && { site: { id: this.site } })
+        }
+    }
 }
 
 export default RCExtension
