@@ -100,9 +100,11 @@ export class Extension implements ExcelFormattable, DataGridFormattable {
             },
             extensionNumber: this.data.extensionNumber,
             type: this.data.type === 'VirtualUser' ? 'User' : this.data.type,
-            status: this.data.status,
+            status: (this.data.ivrPin && this.data.ivrPin != '') || (this.data.password && this.data.password !== '') ? 'Enabled' : this.data.status,
             ...(this.data.type === 'VirtualUser' && {subType: 'VideoPro'}),
-            ...(isMultiSiteEnable && { site: { id: this.data.site?.id } })
+            ...(isMultiSiteEnable && { site: { id: this.data.site?.id } }),
+            ...((this.data.ivrPin && this.data.ivrPin != '') && {ivrPin: this.data.ivrPin}),
+            ...((this.data.password && this.data.password != '') && {password: this.data.password}),
         }
     }
 }

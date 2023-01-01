@@ -178,4 +178,6 @@ export const extensionSchema = z.object({
         invalid_type_error: 'User type data type invalid'
     }),
     'Department': z.string().optional(),
+    'Pin': z.string().or(z.number()).optional(),
+    'Password': z.string().optional(),
 })

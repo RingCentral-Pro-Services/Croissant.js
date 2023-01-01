@@ -28,6 +28,8 @@ const useExcelToExtensions = () => {
                 },
                 status: 'NotActivated',
                 hidden: false,
+                ivrPin: currentItem['Pin'],
+                password: currentItem['Password']
             }
             let extension = new Extension(data)
             extensions.push(extension)

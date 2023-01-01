@@ -74,7 +74,9 @@ export interface ExtensionData {
         uri?: string
         name: string
         code?: string
-    }
+    },
+    ivrPin?: string,
+    password?: string
 }
 
 export interface CustomField {
