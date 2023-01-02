@@ -7,7 +7,7 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 
 const Sidebar = () => {
-    const [selectedItem, setSelectedItem] = useState("Create IVRs")
+    const [selectedItem, setSelectedItem] = useState("")
     const [isIVRListOpen, setIsIVRListOpen] = useState(true)
     const [isCallQueueListOpen, setIsCallQueueListOpen] = useState(false)
     const [isCustomRuleListOpen, setIsCustomRuleListOpen] = useState(false)
@@ -95,7 +95,7 @@ const Sidebar = () => {
                 <ListItemText primary="Call Queues" />
                 {isCallQueueListOpen ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
-            <Collapse in={isCallQueueListOpen} timeout='auto' unmountOnExit>
+            <Collapse in={isCallQueueListOpen} timeout='auto'>
                 <List>
                     {callQueueItems.map((item) => (
                         <ListItem className={selectedItem === item.label ? 'nav-item-selected' : ''} key={item.label} disablePadding>
@@ -111,7 +111,7 @@ const Sidebar = () => {
                 <ListItemText primary="Custom Rules" />
                 {isCustomRuleListOpen ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
-            <Collapse in={isCustomRuleListOpen} timeout='auto' unmountOnExit>
+            <Collapse in={isCustomRuleListOpen} timeout='auto'>
                 <List>
                     {customRuleItems.map((item) => (
                         <ListItem className={selectedItem === item.label ? 'nav-item-selected' : ''} key={item.label} disablePadding>

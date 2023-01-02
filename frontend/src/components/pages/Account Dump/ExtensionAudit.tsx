@@ -15,9 +15,11 @@ import FilterArea from '../../shared/FilterArea'
 import RCExtension from '../../../models/RCExtension'
 import { DataGridFormattable } from '../../../models/DataGridFormattable'
 import FeedbackForm from '../../shared/FeedbackForm'
+import useSidebar from '../../../hooks/useSidebar'
 
 const ExtensionAudit = () => {
     useLogin('accountdump')
+    useSidebar('Account Dump')
     const {fireEvent} = useAnalytics()
     let [targetUID, setTargetUID] = useState("")
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)

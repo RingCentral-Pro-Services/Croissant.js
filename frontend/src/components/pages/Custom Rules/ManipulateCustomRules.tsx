@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import useLogin from "../../../hooks/useLogin";
 import useMessageQueue from "../../../hooks/useMessageQueue";
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
+import useSidebar from "../../../hooks/useSidebar";
 import { DataGridFormattable } from "../../../models/DataGridFormattable";
 import RCExtension from "../../../models/RCExtension";
 import useExtensionList from "../../../rcapi/useExtensionList";
@@ -35,6 +36,7 @@ const ManipulateCustomRules = () => {
     const extensionTypes = ['User', 'Call Queue']
 
     useLogin('customruleedit')
+    useSidebar('Enable / Disable Custom Rules')
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending} = useGetAccessToken()

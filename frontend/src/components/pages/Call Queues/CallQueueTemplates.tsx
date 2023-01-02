@@ -32,6 +32,7 @@ import useBuildCustomGreetings from "../../../hooks/useBuildCustomGreetings";
 import useUploadCustomGreetings from "../../../rcapi/useUploadCustomGreetings";
 import { DataGridFormattable } from "../../../models/DataGridFormattable";
 import FeedbackForm from "../../shared/FeedbackForm";
+import useSidebar from "../../../hooks/useSidebar";
 
 const CallQueueTemplates = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -58,6 +59,7 @@ const CallQueueTemplates = () => {
     const [greetingUploadMaxProgress, setGreetingUploadMaxProgress] = useState(0)
 
     useLogin('callqueuetemplates')
+    useSidebar('Call Queue Templates')
     const {fireEvent} = useAnalytics()
     const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending} = useGetAccessToken()
     const {postMessage, postError, messages, errors} = useMessageQueue()

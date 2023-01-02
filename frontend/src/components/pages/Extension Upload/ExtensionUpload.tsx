@@ -5,6 +5,7 @@ import useLogin from "../../../hooks/useLogin";
 import useMessageQueue from "../../../hooks/useMessageQueue";
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
 import useReadExcel from "../../../hooks/useReadExcel";
+import useSidebar from "../../../hooks/useSidebar";
 import useValidateExcelData from "../../../hooks/useValidateExcelData";
 import { Extension } from "../../../models/Extension";
 import useExtensionList from "../../../rcapi/useExtensionList";
@@ -28,6 +29,7 @@ const ExtensionUpload = () => {
     const defaultSheet = 'Users'
 
     useLogin('extensionupload')
+    useSidebar('Extension Upload')
     const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError} = useGetAccessToken()
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()

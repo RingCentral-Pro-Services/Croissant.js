@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import useLogin from "../../../hooks/useLogin";
 import useMessageQueue from "../../../hooks/useMessageQueue";
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
+import useSidebar from "../../../hooks/useSidebar";
 import useWriteExcelFile from "../../../hooks/useWriteExcelFile";
 import { DataGridFormattable } from "../../../models/DataGridFormattable";
 import RCExtension from "../../../models/RCExtension";
@@ -32,6 +33,7 @@ const Intercom = () => {
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
 
     useLogin('intercom')
+    useSidebar('Intercom')
     const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError} = useGetAccessToken()
     const {messages, errors, postMessage, postError} = useMessageQueue()
     const {timedMessages, postTimedMessage} = usePostTimedMessage()

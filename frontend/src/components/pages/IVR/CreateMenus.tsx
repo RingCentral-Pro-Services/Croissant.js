@@ -4,8 +4,10 @@ import LegacyCreateMenus from './LegacyCreateMenus';
 import DirectCreateMenus from './DirectCreateMenus';
 import {ToggleButtonGroup, ToggleButton, Button} from '@mui/material'
 import FeedbackForm from '../../shared/FeedbackForm';
+import useSidebar from '../../../hooks/useSidebar';
 
 const CreateMenus = () => {
+    useSidebar('Create IVRs')
     const [buildModeSelection, setBuildMode] = useState('direct')
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
 

@@ -15,9 +15,11 @@ import MessagesArea from "../../shared/MessagesArea"
 import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel"
 import FeedbackArea from "../../shared/FeedbackArea"
 import FeedbackForm from "../../shared/FeedbackForm"
+import useSidebar from "../../../hooks/useSidebar"
 
 const CallQueues = () => {
     useLogin('auditcallqueues')
+    useSidebar('Audit Call Queues')
     const {fireEvent} = useAnalytics()
     let [targetUID, setTargetUID] = useState("")
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)

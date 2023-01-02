@@ -5,9 +5,11 @@ import {ToggleButtonGroup, ToggleButton, Button} from '@mui/material'
 import LegactyAuditMenus from './LegacyAuditMenus';
 import DirectAuditMenus from './DirectAuditMenus';
 import FeedbackForm from '../../shared/FeedbackForm';
+import useSidebar from '../../../hooks/useSidebar';
 
 const AuditMenus = () => {
     
+    useSidebar('Audit IVRs')
     const [modeSelection, setModeSelection] = useState('direct')
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
 

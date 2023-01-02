@@ -16,9 +16,11 @@ import { callQueueSchema } from "../../../helpers/schemas"
 import Header from "../../shared/Header"
 import useLogin from "../../../hooks/useLogin"
 import FeedbackForm from "../../shared/FeedbackForm"
+import useSidebar from "../../../hooks/useSidebar"
 
 const CreateCallQueues = () => {
     useLogin('createcallqueues')
+    useSidebar('Create Call Queues')
     const {fireEvent} = useAnalytics()
     let {messages, errors, postMessage, postError} = useMessageQueue()
     let [isPending, setIsPending] = useState(true)

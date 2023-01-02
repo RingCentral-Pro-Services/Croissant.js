@@ -19,9 +19,11 @@ import RCExtension from "../../../models/RCExtension"
 import MessagesArea from "../../shared/MessagesArea"
 import useWriteExcelFile from "../../../hooks/useWriteExcelFile"
 import FeedbackForm from "../../shared/FeedbackForm"
+import useSidebar from "../../../hooks/useSidebar"
 
 const NotificationAudit = () => {
     useLogin('notificationsaudit')
+    useSidebar('Notifications')
     const {fireEvent} = useAnalytics()
     let [targetUID, setTargetUID] = useState("")
     const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending} = useGetAccessToken()

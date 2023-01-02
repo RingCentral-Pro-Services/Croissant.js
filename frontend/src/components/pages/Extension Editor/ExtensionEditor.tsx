@@ -5,6 +5,7 @@ import useExtensionEditing from "../../../hooks/useExtensionEditing";
 import useLogin from "../../../hooks/useLogin";
 import useMessageQueue from "../../../hooks/useMessageQueue";
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
+import useSidebar from "../../../hooks/useSidebar";
 import { EditedExtension } from "../../../models/EditedExtension";
 import RCExtension from "../../../models/RCExtension";
 import useExtensionList from "../../../rcapi/useExtensionList";
@@ -24,6 +25,7 @@ const ExtensionEditor = () => {
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
 
     useLogin('editextensions')
+    useSidebar('Edit Extensions')
     const {fireEvent} = useAnalytics()
     const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending} = useGetAccessToken()
     const {postMessage, postError, messages, errors} = useMessageQueue()

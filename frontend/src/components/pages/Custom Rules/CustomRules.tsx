@@ -3,6 +3,7 @@ import React, { FocusEventHandler, useEffect, useState } from "react";
 import useLogin from "../../../hooks/useLogin";
 import useMessageQueue from "../../../hooks/useMessageQueue";
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
+import useSidebar from "../../../hooks/useSidebar";
 import { CustomRule } from "../../../models/CustomRule";
 import { DataGridFormattable } from "../../../models/DataGridFormattable";
 import { Message } from "../../../models/Message";
@@ -37,6 +38,7 @@ const CustomRules = () => {
     const extensionTypes = ['User', 'Call Queue']
 
     useLogin('copycustomrules')
+    useSidebar('Copy Custom Rules')
     const {fetchToken, companyName, hasCustomerToken, error: tokenError, isTokenPending} = useGetAccessToken()
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()

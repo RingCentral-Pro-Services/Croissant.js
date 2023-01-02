@@ -6,6 +6,7 @@ import useLogin from "../../../hooks/useLogin";
 import useMessageQueue from "../../../hooks/useMessageQueue";
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
 import useReadExcel from "../../../hooks/useReadExcel";
+import useSidebar from "../../../hooks/useSidebar";
 import useValidateExcelData from "../../../hooks/useValidateExcelData";
 import useWriteExcelFile from "../../../hooks/useWriteExcelFile";
 import RCExtension from "../../../models/RCExtension";
@@ -32,6 +33,7 @@ const EditSites = () => {
     const defaultSheet = 'Sites'
 
     useLogin('editsites')
+    useSidebar('Edit Sites')
     const {fireEvent} = useAnalytics()
     const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending} = useGetAccessToken()
     const {postMessage, postError, messages, errors} = useMessageQueue()

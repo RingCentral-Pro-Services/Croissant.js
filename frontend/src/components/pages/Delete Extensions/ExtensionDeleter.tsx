@@ -17,9 +17,11 @@ import useAnalytics from "../../../hooks/useAnalytics"
 import useWriteExcelFile from "../../../hooks/useWriteExcelFile"
 import { DataGridFormattable } from "../../../models/DataGridFormattable"
 import FeedbackForm from "../../shared/FeedbackForm"
+import useSidebar from "../../../hooks/useSidebar"
 
 const ExtensionDeleter = () => {
     useLogin('deleteextensions')
+    useSidebar('Delete Extensions')
     const {fireEvent} = useAnalytics()
     const [targetUID, setTargetUID] = useState('')
     const [sites, setSites] = useState<string[]>([])

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import useLogin from "../../../hooks/useLogin";
 import useMessageQueue from "../../../hooks/useMessageQueue";
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
+import useSidebar from "../../../hooks/useSidebar";
 import { CallForwardingSettings } from "../../../models/CallForwardingSettings";
 import { DataGridFormattable } from "../../../models/DataGridFormattable";
 import RCExtension from "../../../models/RCExtension";
@@ -36,6 +37,7 @@ const Deskphones = () => {
                        '13 Rings / 65 Seconds', '14 Rings / 70 Seconds', '15 Rings / 75 Seconds']
 
     useLogin('deskphones')
+    useSidebar('Desk Phones')
     const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending} = useGetAccessToken()
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
