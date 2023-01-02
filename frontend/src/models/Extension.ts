@@ -53,15 +53,15 @@ export class Extension implements ExcelFormattable, DataGridFormattable {
     }
 
     toExcelRow(): string[] {
-        return [`${this.data.id}`, this.data.name, this.data.extensionNumber, this.data.contact.email, this.data.site?.name ?? 'N/A', this.prettyType(), this.data.status ?? '', `${this.data.hidden}`]
+        return [`${this.data.id}`, this.data.status === 'Unassigned' ? 'Unassigned Extension' : this.data.name, this.data.extensionNumber, this.data.contact ? this.data.contact.email : '', this.data.site?.name ?? 'N/A', this.prettyType(), this.data.status ?? '', `${this.data.hidden}`]
     }
 
     toDataGridRow(): any {
         return {
             id: this.data.id,
-            name: this.data.name,
+            name: this.data.status === 'Unassigned' ? 'Unassigned Extension' : this.data.name,
             extensionNumber: this.data.extensionNumber,
-            email: this.data.contact.email,
+            email: this.data.contact ? this.data.contact.email : '',
             site: this.data.site?.name ?? 'N/A',
             type: this.prettyType(),
             status: this.data.status ?? '',
