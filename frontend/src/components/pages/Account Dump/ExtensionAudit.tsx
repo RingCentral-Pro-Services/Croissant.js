@@ -1,21 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import useLogin from '../../../hooks/useLogin'
 import useMessageQueue from '../../../hooks/useMessageQueue'
-import useExtensionList from '../../../rcapi/useExtensionList'
 import useGetAccessToken from '../../../rcapi/useGetAccessToken'
 import Header from '../../shared/Header'
-import {Button, Typography} from '@mui/material'
+import {Button} from '@mui/material'
 import FeedbackArea from '../../shared/FeedbackArea'
 import usePostTimedMessage from '../../../hooks/usePostTimedMessage'
 import useAnalytics from '../../../hooks/useAnalytics'
 import UIDInputField from '../../shared/UIDInputField'
-import useWritePrettyExcel from '../../../hooks/useWritePrettyExcel'
 import useWriteExcelFile from '../../../hooks/useWriteExcelFile'
-import FilterArea from '../../shared/FilterArea'
-import RCExtension from '../../../models/RCExtension'
-import { DataGridFormattable } from '../../../models/DataGridFormattable'
 import FeedbackForm from '../../shared/FeedbackForm'
 import useSidebar from '../../../hooks/useSidebar'
+import useExtensions from '../../../rcapi/useExtensions'
 
 const ExtensionAudit = () => {
     useLogin('accountdump')
@@ -25,7 +21,7 @@ const ExtensionAudit = () => {
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
     const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError} = useGetAccessToken()
     let {messages, errors, postMessage} = useMessageQueue()
-    const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
+    const {extensionsList, isExtensionListPending, fetchExtensions} = useExtensions(postMessage)
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
     const {writeExcel} = useWriteExcelFile()
 
@@ -44,7 +40,6 @@ const ExtensionAudit = () => {
         if (isExtensionListPending) return
 
         let header = ['Mailbox ID', 'Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']
-        // writePrettyExcel(header, extensionsList, 'Extensions', 'account-dump.xlsx')
         writeExcel(header, extensionsList, 'Extensions', 'account-dump.xlsx')
     }, [isExtensionListPending, extensionsList])
 
@@ -59,7 +54,6 @@ const ExtensionAudit = () => {
             <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} loading={isTokenPending} error={tokenError} />
             <Button className='healthy-margin-right' disabled={!hasCustomerToken} variant='contained' onClick={handleClick}>Go</Button>
             {isExtensionListPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
-            {/* {extensionsList.length > 0 ? <FilterArea items={extensionsList} defaultSelected={extensionsList.map((extension) => extension.id)} showSiteFilter={true} onSelectionChanged={handleFilterSelection} /> : <></>} */}
             {extensionsList.length > 0 ? <FeedbackArea gridData={extensionsList} additiveFilter={true} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
         </div>
         </>
