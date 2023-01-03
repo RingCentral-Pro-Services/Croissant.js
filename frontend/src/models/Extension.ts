@@ -3,7 +3,14 @@ import ExcelFormattable from "./ExcelFormattable";
 import { ExtensionData } from "./ExtensionData";
 
 export class Extension implements ExcelFormattable, DataGridFormattable {
-    constructor(public data: ExtensionData) {}
+    constructor(public data: ExtensionData) {
+        if (!this.data.site) {
+            this.data.site = {
+                id: 'main-site',
+                name: 'Main Site'
+            }
+        }
+    }
 
     prettyType() {
         switch (this.data.type) {
@@ -85,6 +92,9 @@ export class Extension implements ExcelFormattable, DataGridFormattable {
     property(key: string): any {
         if (key === 'site') {
             return this.data.site?.name ?? 'N/A'
+        }
+        else if (key === 'id') {
+            return this.data.id
         }
         return this[key as keyof Extension]
     }
