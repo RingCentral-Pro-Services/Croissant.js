@@ -11,6 +11,7 @@ import { Extension } from "../../../models/Extension";
 import useExtensionList from "../../../rcapi/useExtensionList";
 import useGetAccessToken from "../../../rcapi/useGetAccessToken";
 import FeedbackArea from "../../shared/FeedbackArea";
+import FeedbackForm from "../../shared/FeedbackForm";
 import FileSelect from "../../shared/FileSelect";
 import Header from "../../shared/Header";
 import UIDInputField from "../../shared/UIDInputField";
@@ -26,6 +27,7 @@ const ExtensionUpload = () => {
     const [filteredExtensions, setFilteredExtensions] = useState<Extension[]>([])
     const [progressValue, setProgressValue] = useState(0)
     const [progressMax, setProgressMax] = useState(0)
+    const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
     const defaultSheet = 'Users'
 
     useLogin('extensionupload')
@@ -99,12 +101,16 @@ const ExtensionUpload = () => {
 
     return (
         <>
-            <Header title='Extension Upload' body='Upload message-only extensions, announcement-only extensions, and virtual users' />
+            <Header title='Extension Upload' body='Upload message-only extensions, announcement-only extensions, and virtual users'>
+                <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
+            </Header>
             <div className="tool-card">
                 <h2>Extension Upload</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} error={tokenError} loading={isTokenPending} setTargetUID={setTargetUID} />
                 <FileSelect enabled={!isSyncing} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
                 <Button variant="contained" disabled={filteredExtensions.length === 0 || isSyncing} onClick={handleSyncButtonClick}>Sync</Button>
+                {isExtensionCreationPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
+                <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Extension Upload" isUserInitiated={true} />
                 {isSyncing ? <> <Typography>Creating extensions</Typography> <progress value={progressValue} max={progressMax} /> </> : <></>}
                 {isDataValidationPending ? <></> : <FeedbackArea gridData={filteredExtensions} messages={messages} timedMessages={timedMessages} errors={errors} />}
             </div>

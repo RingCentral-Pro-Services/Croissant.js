@@ -19,14 +19,14 @@ const Sidebar = () => {
     }
 
     const sidebarItems: SidebarItem[] = [
+        {label: 'Extension Upload', destination: '/extensionupload'},
         {label: 'Edit Sites', destination: '/editsites'},
         {label: 'Edit Extensions', destination: '/editextensions'},
         {label: 'Account Dump', destination: '/accountdump'},
         {label: 'Delete Extensions', destination: '/deleteextensions'},
         {label: 'Notifications', destination: '/notificationsaudit'},
         {label: 'Desk Phones', destination: '/deskphones'},
-        {label: 'Intercom', destination: '/intercom'},
-        {label: 'Extension Upload', destination: '/extensionupload'}
+        {label: 'Intercom', destination: '/intercom'}
     ]
 
     const ivrItems: SidebarItem[] = [
