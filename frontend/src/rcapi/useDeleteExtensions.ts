@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react"
+import { Extension } from "../models/Extension"
 import { Message } from "../models/Message"
-import RCExtension from "../models/RCExtension"
 import { SyncError } from "../models/SyncError"
 import { RestCentral } from "./RestCentral"
 
 const useDeleteExtensions = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, setProgressValue: (value: (any)) => void, setMaxProgressValue: (value: (any)) => void, postError: (error: SyncError) => void) => {
-    const [extensions, setExtensions] = useState<RCExtension[]>([])
+    const [extensions, setExtensions] = useState<Extension[]>([])
     let [shouldDelete, setShouldDelete] = useState(false)
     let [rateLimitInterval, setRateLimitInterval] = useState(0)
     let [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
     const [isExtensionDeletePending, setIsPending] = useState(true)
     const baseURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId'
 
-    const deleteExtensions = (extensions: RCExtension[]) => {
+    const deleteExtensions = (extensions: Extension[]) => {
         setExtensions(extensions)
         setCurrentExtensionIndex(0)
         setIsPending(true)
@@ -27,7 +27,7 @@ const useDeleteExtensions = (postMessage: (message: Message) => void, postTimedM
         if (currentExtensionIndex >= extensions.length) return
         if (!accessToken) return
 
-        let url = baseURL.replace('extensionId', `${extensions[currentExtensionIndex].id}`)
+        let url = baseURL.replace('extensionId', `${extensions[currentExtensionIndex].data.id}`)
         url += '?savePhoneNumbers=true&savePhoneLines=true'
         const headers = {
             "Accept": "application/json",
@@ -42,9 +42,9 @@ const useDeleteExtensions = (postMessage: (message: Message) => void, postTimedM
                 setRateLimitInterval(response.rateLimitInterval)
             }
             catch (e: any) {
-                console.log(`Failed to delete extension ${extensions[currentExtensionIndex].name}`)
-                postMessage(new Message(`Failed to delete ${extensions[currentExtensionIndex].name} - Ext. ${extensions[currentExtensionIndex].extensionNumber}. ${e.error}`, 'error'))
-                postError(new SyncError(extensions[currentExtensionIndex].name, extensions[currentExtensionIndex].extensionNumber, ['Failed to delete extension', ''], e.error))
+                console.log(`Failed to delete extension ${extensions[currentExtensionIndex].data.name}`)
+                postMessage(new Message(`Failed to delete ${extensions[currentExtensionIndex].data.name} - Ext. ${extensions[currentExtensionIndex].data.extensionNumber}. ${e.error}`, 'error'))
+                postError(new SyncError(extensions[currentExtensionIndex].data.name, parseInt(extensions[currentExtensionIndex].data.extensionNumber), ['Failed to delete extension', ''], e.error))
             }
             deleteNext()
         }, rateLimitInterval)

@@ -3,9 +3,7 @@ import useLogin from "../../../hooks/useLogin"
 import Header from "../../shared/Header"
 import useGetAccessToken from "../../../rcapi/useGetAccessToken"
 import UIDInputField from "../../shared/UIDInputField"
-import useExtensionList from "../../../rcapi/useExtensionList"
 import useMessageQueue from "../../../hooks/useMessageQueue"
-import RCExtension from "../../../models/RCExtension"
 import AdditiveFilter from "../../shared/AdditiveFilter"
 import FeedbackArea from "../../shared/FeedbackArea"
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage"
@@ -18,6 +16,8 @@ import useWriteExcelFile from "../../../hooks/useWriteExcelFile"
 import { DataGridFormattable } from "../../../models/DataGridFormattable"
 import FeedbackForm from "../../shared/FeedbackForm"
 import useSidebar from "../../../hooks/useSidebar"
+import useExtensions from "../../../rcapi/useExtensions"
+import { Extension } from "../../../models/Extension"
 
 const ExtensionDeleter = () => {
     useLogin('deleteextensions')
@@ -27,8 +27,8 @@ const ExtensionDeleter = () => {
     const [sites, setSites] = useState<string[]>([])
     const [selectedSites, setSelectedSites] = useState<string[]>([])
     const [selectedExtensionTypes, setSelectedExtensionTypes] = useState<string[]>([])
-    const [filteredExtensions, setFilteredExtensions] = useState<RCExtension[]>([])
-    const [selectedExtensions, setSelectedExtensions] = useState<RCExtension[]>([])
+    const [filteredExtensions, setFilteredExtensions] = useState<Extension[]>([])
+    const [selectedExtensions, setSelectedExtensions] = useState<Extension[]>([])
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
     const [isShowingModal, setIsShowingModal] = useState(false)
     const [isShowingUnassignedModal, setIsShowingUnassignedModal] = useState(false)
@@ -38,8 +38,9 @@ const ExtensionDeleter = () => {
     const {postMessage, messages, errors, postError} = useMessageQueue()
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
     const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending} = useGetAccessToken()
-    const {extensionsList, fetchExtensions, isExtensionListPending} = useExtensionList(postMessage)
-    const [adjustedExtensionList, setAdjustedExtensionList] = useState<RCExtension[]>([])
+    // const {extensionsList, fetchExtensions, isExtensionListPending} = useExtensionList(postMessage)
+    const {extensionsList, fetchExtensions, isExtensionListPending} = useExtensions(postMessage)
+    const [adjustedExtensionList, setAdjustedExtensionList] = useState<Extension[]>([])
 
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
@@ -61,17 +62,17 @@ const ExtensionDeleter = () => {
         if (isExtensionListPending) return
 
         const extractedSites = extensionsList.filter((extension) => {
-            return extension.prettyType[extension.type] === 'Site'
+            return extension.prettyType() === 'Site'
         })
 
         let siteNames = extractedSites.map((site) => {
-            return site.name
+            return site.data.name
         })
 
         // The account is not in multi-site mode. Assign all extensions to main site
         if (siteNames.length === 0) {
             let extensions = extensionsList.map((extension) => {
-                extension.site = 'Main Site'
+                extension.data.site!.name = 'Main Site'
                 return extension
             })
             setAdjustedExtensionList(extensions)
@@ -93,12 +94,12 @@ const ExtensionDeleter = () => {
     }, [selectedSites, selectedExtensionTypes])
 
     const filterExtensions = () => {
-        let result: RCExtension[] = []
+        let result: Extension[] = []
 
         // Look for park locations first; they're not assigned to sites
         if (selectedExtensionTypes.includes('Park Location')) {
             const parkLocations = adjustedExtensionList.filter((extension) => {
-                return extension.prettyType[extension.type] === 'Park Location'
+                return extension.prettyType() === 'Park Location'
             })
             result = [...result, ...parkLocations]
         }
@@ -106,7 +107,7 @@ const ExtensionDeleter = () => {
         // Now look for paging groups
         if (selectedExtensionTypes.includes('Paging Group')) {
             const pagingGroups = adjustedExtensionList.filter((extension) => {
-                return extension.prettyType[extension.type] === 'Paging Group'
+                return extension.prettyType() === 'Paging Group'
             })
             result = [...result, ...pagingGroups]
         }
@@ -114,7 +115,7 @@ const ExtensionDeleter = () => {
         // Now look for unassigned users
         if (selectedExtensionTypes.includes('Unassigned Extension (User)')) {
             const unassignedUsers = adjustedExtensionList.filter((extension) => {
-                return extension.prettyType[extension.type] === 'User' && extension.status === 'Unassigned'
+                return extension.prettyType() === 'User' && extension.data.status === 'Unassigned'
             })
             result = [...result, ...unassignedUsers]
         }
@@ -122,14 +123,14 @@ const ExtensionDeleter = () => {
         // Now look for unassigned LEs
         if (selectedExtensionTypes.includes('Unassigned Extension (Limited)')) {
             const unassignedLimiteds = adjustedExtensionList.filter((extension) => {
-                return extension.prettyType[extension.type] === 'Limited Extension' && extension.status === 'Unassigned'
+                return extension.prettyType() === 'Limited Extension' && extension.data.status === 'Unassigned'
             })
             result = [...result, ...unassignedLimiteds]
         }
         
         // Filter extensions assigned to sites
         const selected = adjustedExtensionList.filter((extension) => {
-            return selectedExtensionTypes.includes(extension.prettyType[extension.type]) && selectedSites.includes(extension.site)
+            return selectedExtensionTypes.includes(extension.prettyType()) && selectedSites.includes(extension.data.site?.name ?? '') && extension.data.status !== 'Unassigned'
         })
 
         result = [...result, ...selected]
@@ -154,9 +155,10 @@ const ExtensionDeleter = () => {
     }
 
     const handleFilterSelection = (selected: DataGridFormattable[]) => {
-        const extensions = selected as RCExtension[]
+        console.log('Selected')
+        console.log(selected)
+        const extensions = selected as Extension[]
         setSelectedExtensions(extensions)
-        console.log(extensions)
     }
 
     const handleDeleteButtonClick = () => {
