@@ -64,7 +64,7 @@ const useExcelToIVRs = (postMessage: (message: Message) => void, postError: (err
         }
 
         for (let index = 0; index < extensionList.length; index++) {
-            if (extensionList[index].name === siteName) {
+            if (extensionList[index].name.trim() === siteName.trim()) {
                 site.id = `${extensionList[index].id}`
                 site.name = siteName
             }

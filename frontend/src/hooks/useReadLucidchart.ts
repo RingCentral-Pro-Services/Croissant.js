@@ -336,7 +336,7 @@ const useReadLucidchart = (postMessage: (message: Message) => void) => {
         }
 
         for (let index = 0; index < extensionList.length; index++) {
-            if (extensionList[index].name === siteName) {
+            if (extensionList[index].name.trim() === siteName.trim()) {
                 site.id = `${extensionList[index].id}`
                 site.name = siteName
             }
