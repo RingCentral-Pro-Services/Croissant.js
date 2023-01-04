@@ -19,7 +19,7 @@ const Sidebar = () => {
     }
 
     const sidebarItems: SidebarItem[] = [
-        // {label: 'Extension Upload', destination: '/extensionupload'},
+        {label: 'Extension Upload', destination: '/extensionupload'},
         {label: 'Edit Sites', destination: '/editsites'},
         {label: 'Edit Extensions', destination: '/editextensions'},
         {label: 'Account Dump', destination: '/accountdump'},
