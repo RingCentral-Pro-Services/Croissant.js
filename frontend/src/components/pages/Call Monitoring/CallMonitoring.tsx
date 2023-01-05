@@ -35,7 +35,7 @@ const CallMonitoring = () => {
     const {extensionsList, isExtensionListPending, fetchExtensions} = useExtensions(postMessage)
     const {readFile, isExcelDataPending, excelData} = useReadExcel()
     const {validate, validatedData, isDataValidationPending} = useValidateExcelData(callMonitoringSchema, postMessage, postError)
-    const {convert, monitoringGroups, isConvertPending} = useExcelToMonitoringGroups()
+    const {convert, monitoringGroups, isConvertPending} = useExcelToMonitoringGroups(postMessage, postError)
     const {createGroups, isGroupCreationPending} = useCreateGroups(setProgressValue, postMessage, postTimedMessage, postError)
 
     useEffect(() => {
