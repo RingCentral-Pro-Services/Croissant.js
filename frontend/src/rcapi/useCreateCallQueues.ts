@@ -85,6 +85,12 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
             setShouldUpdateQueues(false)
             setCurrentExtensionIndex(0)
             setShouldUpdateCallHandling(true)
+            return
+        }
+
+        if (!queues[currentExtensionIndex].extension.id) {
+            setCurrentExtensionIndex(currentExtensionIndex + 1)
+            return
         }
 
         let targetUID = localStorage.getItem('target_uid')
@@ -127,7 +133,15 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
         if (!shouldUpdateCallHandling) return
         if (currentExtensionIndex >= queues.length) {
             setShouldUpdateCallHandling(false)
+            setCurrentExtensionIndex(0)
+            setRateLimitInterval(0)
+            setShouldUpdateGreetings(true)
             console.log('Done updating queue call handling')
+            return
+        }
+
+        if (!queues[currentExtensionIndex].extension.id) {
+            setCurrentExtensionIndex(currentExtensionIndex + 1)
             return
         }
 
@@ -164,6 +178,13 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
         if (currentExtensionIndex >= queues.length) {
             setShouldUpdateGreetings(false)
             setIsPending(false)
+            setProgressValue(Number.MAX_SAFE_INTEGER)
+            console.log('Done updating queue greetings')
+            return
+        }
+
+        if (!queues[currentExtensionIndex].extension.id) {
+            setCurrentExtensionIndex(currentExtensionIndex + 1)
             return
         }
 
@@ -209,7 +230,7 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
     }
 
     const createNext = () => {
-        if (currentExtensionIndex !== queues.length - 1) {
+        if (currentExtensionIndex != queues.length) {
             increaseProgress()
             setCurrentExtensionIndex(currentExtensionIndex + 1)
         }
@@ -223,7 +244,7 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
     }
 
     const updateNext = () => {
-        if (currentExtensionIndex !== queues.length - 1) {
+        if (currentExtensionIndex != queues.length) {
             increaseProgress()
             setCurrentExtensionIndex(currentExtensionIndex + 1)
         }
@@ -238,7 +259,7 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
     }
 
     const updateCallHandlingNext = () => {
-        if (currentExtensionIndex != queues.length -1) {
+        if (currentExtensionIndex != queues.length) {
             increaseProgress()
             setCurrentExtensionIndex(currentExtensionIndex + 1)
         }
@@ -253,7 +274,7 @@ const useCreateCallQueues = (setProgressValue: (value: (any)) => void, postMessa
     }
 
     const updateGreetingNext = () => {
-        if (currentExtensionIndex != queues.length -1) {
+        if (currentExtensionIndex != queues.length) {
             increaseProgress()
             setCurrentExtensionIndex(currentExtensionIndex + 1)
         }
