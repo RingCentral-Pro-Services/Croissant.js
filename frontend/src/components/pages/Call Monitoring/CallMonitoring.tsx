@@ -1,6 +1,7 @@
 import { Button, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { callMonitoringSchema } from "../../../helpers/schemas";
+import useAnalytics from "../../../hooks/useAnalytics";
 import useLogin from "../../../hooks/useLogin";
 import useMessageQueue from "../../../hooks/useMessageQueue";
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
@@ -29,6 +30,7 @@ const CallMonitoring = () => {
 
     useLogin('callmonitoring')
     useSidebar('Call Monitoring')
+    const {fireEvent} = useAnalytics()
     const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError} = useGetAccessToken()
     let {messages, errors, postMessage, postError} = useMessageQueue()
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
@@ -68,6 +70,7 @@ const CallMonitoring = () => {
         setIsSyncing(true)
         setProgressMax(monitoringGroups.length * 2)
         createGroups(monitoringGroups)
+        fireEvent('call-monitoring')
     }
 
     return (

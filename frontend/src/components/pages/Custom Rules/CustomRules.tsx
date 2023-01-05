@@ -1,5 +1,6 @@
 import { Button, Step, StepContent, StepLabel, Stepper, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import React, { FocusEventHandler, useEffect, useState } from "react";
+import useAnalytics from "../../../hooks/useAnalytics";
 import useLogin from "../../../hooks/useLogin";
 import useMessageQueue from "../../../hooks/useMessageQueue";
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
@@ -39,6 +40,7 @@ const CustomRules = () => {
 
     useLogin('copycustomrules')
     useSidebar('Copy Custom Rules')
+    const {fireEvent} = useAnalytics()
     const {fetchToken, companyName, hasCustomerToken, error: tokenError, isTokenPending} = useGetAccessToken()
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
@@ -109,6 +111,7 @@ const CustomRules = () => {
         setProgressMax(selectedExtensions.length)
         createCustomRule(selectedExtensions, selectedRule!, voicemailDestinationOption === 'maintainDestination')
         setActiveStep(10)
+        fireEvent('copy-custom-rules')
     }
 
     const handleFilterSelection = (selected: DataGridFormattable[]) => {

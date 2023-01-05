@@ -1,6 +1,7 @@
 import { Button, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { extensionSchema } from "../../../helpers/schemas";
+import useAnalytics from "../../../hooks/useAnalytics";
 import useLogin from "../../../hooks/useLogin";
 import useMessageQueue from "../../../hooks/useMessageQueue";
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
@@ -32,6 +33,7 @@ const ExtensionUpload = () => {
 
     useLogin('extensionupload')
     useSidebar('Extension Upload')
+    const {fireEvent} = useAnalytics()
     const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError} = useGetAccessToken()
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
@@ -97,6 +99,7 @@ const ExtensionUpload = () => {
         setIsSyncing(true)
         setProgressMax(filteredExtensions.length)
         createExtensions(filteredExtensions)
+        fireEvent('extension-upload')
     }
 
     return (

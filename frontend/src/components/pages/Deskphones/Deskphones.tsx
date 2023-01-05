@@ -1,5 +1,6 @@
 import { Button, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
+import useAnalytics from "../../../hooks/useAnalytics";
 import useLogin from "../../../hooks/useLogin";
 import useMessageQueue from "../../../hooks/useMessageQueue";
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
@@ -38,6 +39,7 @@ const Deskphones = () => {
 
     useLogin('deskphones')
     useSidebar('Desk Phones')
+    const {fireEvent} = useAnalytics()
     const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending} = useGetAccessToken()
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
@@ -120,6 +122,7 @@ const Deskphones = () => {
         setIsSyncing(true)
         setCallForwardingProgressMax(selectedExtensions.length)
         fetchCallForwardingSettings(selectedExtensions)
+        fireEvent('deskphones')
     }
 
     return (

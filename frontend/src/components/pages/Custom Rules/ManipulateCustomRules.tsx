@@ -1,5 +1,6 @@
 import { Button, Step, StepContent, StepLabel, Stepper, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
+import useAnalytics from "../../../hooks/useAnalytics";
 import useLogin from "../../../hooks/useLogin";
 import useMessageQueue from "../../../hooks/useMessageQueue";
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
@@ -37,6 +38,7 @@ const ManipulateCustomRules = () => {
 
     useLogin('customruleedit')
     useSidebar('Enable / Disable Custom Rules')
+    const {fireEvent} = useAnalytics()
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending} = useGetAccessToken()
@@ -96,6 +98,7 @@ const ManipulateCustomRules = () => {
         setFetchRulesProgressMax(selectedExtensions.length)
         fetchRules(selectedExtensions)
         setActiveStep(10)
+        fireEvent('manipulate_custom_rules')
     }
 
     const handleFilterSelection = (selected: DataGridFormattable[]) => {

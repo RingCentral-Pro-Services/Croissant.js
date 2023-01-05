@@ -1,5 +1,6 @@
 import { Button, FormControl, FormControlLabel, Radio, RadioGroup, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
+import useAnalytics from "../../../hooks/useAnalytics";
 import useLogin from "../../../hooks/useLogin";
 import useMessageQueue from "../../../hooks/useMessageQueue";
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
@@ -34,6 +35,7 @@ const Intercom = () => {
 
     useLogin('intercom')
     useSidebar('Intercom')
+    const {fireEvent} = useAnalytics()
     const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError} = useGetAccessToken()
     const {messages, errors, postMessage, postError} = useMessageQueue()
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
@@ -119,6 +121,7 @@ const Intercom = () => {
             setEnablementMax(selectedExtensions.length)
             auditIntercom(selectedExtensions)
         }
+        fireEvent('intercom')
     }
 
     return (
