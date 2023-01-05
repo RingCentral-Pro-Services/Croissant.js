@@ -32,7 +32,7 @@ const CreateCallQueues = () => {
     const {readFile, excelData, isExcelDataPending} = useReadExcel()
     let {convert, queues, isQueueConvertPending} = useExcelToQueues(postMessage, postError)
     const [selectedSheet, setSelectedSheet] = useState<string>('')
-    const defaultSheet = "Queues"
+    const defaultSheet = "Call Queues"
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
     const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending} = useGetAccessToken()
 
