@@ -26,7 +26,8 @@ const Sidebar = () => {
         {label: 'Delete Extensions', destination: '/deleteextensions'},
         {label: 'Notifications', destination: '/notificationsaudit'},
         {label: 'Desk Phones', destination: '/deskphones'},
-        {label: 'Intercom', destination: '/intercom'}
+        {label: 'Intercom', destination: '/intercom'},
+        {label: 'Call Monitoring', destination: '/callmonitoring'},
     ]
 
     const ivrItems: SidebarItem[] = [

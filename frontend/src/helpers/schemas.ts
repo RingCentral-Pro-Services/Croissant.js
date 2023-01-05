@@ -181,3 +181,18 @@ export const extensionSchema = z.object({
     'Pin': z.string().or(z.number()).optional(),
     'Password': z.string().optional(),
 })
+
+export const callMonitoringSchema = z.object({
+    'Group Name': z.string({
+        required_error: 'Missing group name',
+        invalid_type_error: 'Group name data type invalid'
+    }),
+    'Users that can monitor': z.string({
+        required_error: 'Missing Users that can monitor',
+        invalid_type_error: 'Users that can monitor data type invalid'
+    }).or(z.number()),
+    'Users that can be monitored': z.string({
+        required_error: 'Missing Users that can be monitored',
+        invalid_type_error: 'Users that can be monitored data type invalid'
+    }).or(z.number()),
+})
