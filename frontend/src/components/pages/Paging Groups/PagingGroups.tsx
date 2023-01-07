@@ -65,8 +65,6 @@ const PagingGroups = () => {
 
     useEffect(() => {
         if (isConvertPending) return
-        console.log('Paging Groups')
-        console.log(pagingGroups)
 
         const users = pagingGroups.map((group) => group.data.devicesToReceivePage.map((device) => device.id)).flat()
         const uniqueUsers = [...new Set(users)]
@@ -77,37 +75,9 @@ const PagingGroups = () => {
             userExtensions.push(extension)
         }
 
-        console.log('Users to fetch devices for')
-        console.log(uniqueUsers)
         getDeviceMap(userExtensions)
     }, [isConvertPending])
 
-    useEffect(() => {
-        if (isDeviceMapPending) return
-        console.log('Device Map')
-        console.log(deviceMap)
-
-        // let updatedPagingGroups = pagingGroups
-        // for (let i = 0; i < updatedPagingGroups.length; i++) {
-        //     let currentGroup = updatedPagingGroups[i]
-        //     let deviceIDs: string[] = []
-        //     for (let deviceIndex = 0; deviceIndex < currentGroup.data.devicesToReceivePage.length; deviceIndex++) {
-        //         let currentDevice = currentGroup.data.devicesToReceivePage[deviceIndex]
-        //         let devices = deviceMap.get(currentDevice.id)
-        //         if (devices) {
-        //             deviceIDs = [...deviceIDs, ...deviceIDs.concat(devices.map((device) => device.id))]
-        //         }
-        //     }
-        //     const uniqueDeviceIDs = [...new Set(deviceIDs)]
-        //     // console.log('Device IDs')
-        //     // console.log(Array.from(uniqueDeviceIDs))
-        //     currentGroup.deviceIDs = Array.from(uniqueDeviceIDs)
-        // }
-
-        // console.log('Updated Paging Groups')
-        // console.log(updatedPagingGroups)
-
-    }, [isDeviceMapPending, deviceMap])
 
     const handleFileSelect = () => {
         if (!selectedFile) return
@@ -130,8 +100,6 @@ const PagingGroups = () => {
                 }
             }
             const uniqueDeviceIDs = [...new Set(deviceIDs)]
-            // console.log('Device IDs')
-            // console.log(Array.from(uniqueDeviceIDs))
             currentGroup.deviceIDs = Array.from(uniqueDeviceIDs)
         }
         setProgressMax(updatedPagingGroups.length)
