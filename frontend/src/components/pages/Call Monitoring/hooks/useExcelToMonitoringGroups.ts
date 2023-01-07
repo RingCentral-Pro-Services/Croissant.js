@@ -4,11 +4,13 @@ import { CallMonitoringGroup } from "../../../../models/CallMonitoringGroup"
 import { Extension } from "../../../../models/Extension"
 import { Message } from "../../../../models/Message"
 import { SyncError } from "../../../../models/SyncError"
+import { ProspectiveExtension } from '../../../../models/ProspectiveExtension'
 
 const useExcelToMonitoringGroups = (postMessage: (message: Message) => void, postError: (error: SyncError) => void) => {
     const [monitoringGroups, setMonitoringGroups] = useState<CallMonitoringGroup[]>([])
     const [isConvertPending, setIsConvertPending] = useState(true)
 
+    // Big long function 😎
     const convert = (data: any, extensionList: Extension[]) => {
         const groups: CallMonitoringGroup[] = []
         const isolator = new ExtensionIsolator()
@@ -84,11 +86,6 @@ const useExcelToMonitoringGroups = (postMessage: (message: Message) => void, pos
     }
 
     return { monitoringGroups, isConvertPending, convert }
-}
-
-interface ProspectiveExtension {
-    extensionNumber: string
-    id: string
 }
 
 export default useExcelToMonitoringGroups

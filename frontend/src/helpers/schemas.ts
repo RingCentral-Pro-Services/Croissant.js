@@ -196,3 +196,22 @@ export const callMonitoringSchema = z.object({
         invalid_type_error: 'Users that can be monitored data type invalid'
     }).or(z.number()),
 })
+
+export const pagingGroupSchema = z.object({
+    'Group Name': z.string({
+        required_error: 'Missing group name',
+        invalid_type_error: 'Group name data type invalid'
+    }),
+    'Extension': z.string({
+        required_error: 'Missing extension number',
+        invalid_type_error: 'Extension number data type invalid'
+    }).or(z.number()),
+    'Devices to Receive Page (up to 25 devices)': z.string({
+        required_error: 'Missing devices to receive page',
+        invalid_type_error: 'Devices to receive page data type invalid'
+    }).or(z.number()),
+    'Users Allowed to Page This Group': z.string({
+        required_error: 'Missing devices to receive page',
+        invalid_type_error: 'Devices to receive page data type invalid'
+    }).or(z.number())
+})

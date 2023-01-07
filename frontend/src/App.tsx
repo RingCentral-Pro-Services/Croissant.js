@@ -18,6 +18,7 @@ import Loading from './components/shared/Loading';
 import Intercom from './components/pages/Intercom/Intercom';
 import ExtensionUpload from './components/pages/Extension Upload/ExtensionUpload';
 import CallMonitoring from './components/pages/Call Monitoring/CallMonitoring';
+import PagingGroups from './components/pages/Paging Groups/PagingGroups';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -54,6 +55,7 @@ function App() {
               <Route path='/intercom' element={<Intercom />} />
               <Route path='/extensionupload' element={<ExtensionUpload />} />
               <Route path='/callmonitoring' element={<CallMonitoring />} />
+              <Route path='/paginggroups' element={<PagingGroups />} />
             </Routes>
           </Suspense>
         </div>
