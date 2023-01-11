@@ -19,6 +19,7 @@ import Header from "../../shared/Header";
 import UIDInputField from "../../shared/UIDInputField";
 import useCreatePagingGroups from "./hooks/useCreatePagingGroups";
 import useExcelToPagingGroups from "./hooks/useExcelToPagingGroups";
+import LaunchIcon from '@mui/icons-material/Launch';
 
 const PagingGroups = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -120,12 +121,15 @@ const PagingGroups = () => {
 
     return (
         <>
-            <Header title="Paging Groups" body="Create and audit paging groups" />
+            <Header title="Paging Groups" body="Create and audit paging groups">
+                <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
+            </Header>
             <div className="tool-card">
                 <h2>Paging Groups</h2>
                 <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} error={tokenError} loading={isTokenPending} />
                 <FileSelect enabled={!isSyncing} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
-                <Button disabled={isConvertPending || validatedData.length === 0 || isDeviceMapPending} variant='contained' onClick={handleSync} >Sync</Button>
+                <Button disabled={isConvertPending || validatedData.length === 0 || isDeviceMapPending || isSyncing} variant='contained' onClick={handleSync} >Sync</Button>
+                <Button className='healthy-margin-left' variant='outlined' onClick={() => window.open('https://docs.google.com/spreadsheets/d/1XNr_5gjEAt46hYmXASislUwgeZ7yNfsPSsIIJrmDX7E/edit?usp=sharing', '_blank')} endIcon={<LaunchIcon />} >Template</Button>
                 {isCreationPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Paging Groups" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
                 {isShowingDeviceMapProgress ? <> <Typography>Discovering Devices</Typography> <progress value={deviceMapProgressValue} max={deviceMapProgressMax} /> </> : <></>}

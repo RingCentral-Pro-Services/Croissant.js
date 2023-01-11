@@ -17,6 +17,7 @@ import Header from "../../shared/Header";
 import UIDInputField from "../../shared/UIDInputField";
 import useCreateGroups from "./hooks/useCreateGroups";
 import useExcelToMonitoringGroups from "./hooks/useExcelToMonitoringGroups";
+import LaunchIcon from '@mui/icons-material/Launch';
 
 const CallMonitoring = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -83,6 +84,7 @@ const CallMonitoring = () => {
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} loading={isTokenPending} error={tokenError} setTargetUID={setTargetUID} />
                 <FileSelect enabled={!isSyncing} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
                 <Button variant='contained' disabled={monitoringGroups.length === 0 || isConvertPending || isSyncing} onClick={handleSync}>Sync</Button>
+                <Button className='healthy-margin-left' variant='outlined' onClick={() => window.open('https://docs.google.com/spreadsheets/d/11EuhgwFaaFNXj4tt99mhHIFzpsvSUNs2Y-oqLditq24/edit?usp=sharing', '_blank')} endIcon={<LaunchIcon />} >Template</Button>
                 {isGroupCreationPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Create Call Monitoring Groups" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
                 {isSyncing ? <> <Typography>Creating groups</Typography> <progress value={progressValue} max={progressMax} /> </> : <></>}
