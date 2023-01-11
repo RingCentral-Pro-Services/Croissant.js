@@ -1,8 +1,8 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { MenuItem, TextField } from '@mui/material'
 
-const ExcelSheetSelector = (props: {sheets: string[], setSelectedSheet: (name: string) => void, defaultSheet: string}) => {
-    const {sheets, setSelectedSheet, defaultSheet} = props
+const ExcelSheetSelector = (props: {sheets: string[], setSelectedSheet: (name: string) => void, defaultSheet: string, disabled: boolean}) => {
+    const {sheets, setSelectedSheet, defaultSheet, disabled} = props
     const [selectedValue, setSelectedValue] = useState<string>('IVRs')
 
     const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -36,6 +36,7 @@ const ExcelSheetSelector = (props: {sheets: string[], setSelectedSheet: (name: s
             aria-label='Select sheet'
             sx={{minWidth: 100}}
             onChange={handleChange}
+            disabled = {disabled}
         >
             {sheets.map((sheet) => (
                 <MenuItem value={sheet}>{sheet}</MenuItem>
