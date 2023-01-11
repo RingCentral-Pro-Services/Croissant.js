@@ -25,9 +25,12 @@ const PagingGroups = () => {
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [selectedSheet, setSelectedSheet] = useState('')
     const [isSyncing, setIsSyncing] = useState(false)
+    const [deviceMapProgressValue, setDeviceMapProgressValue] = useState(0)
+    const [deviceMapProgressMax, setDeviceMapProgressMax] = useState(0)
     const [progressValue, setProgressValue] = useState(0)
     const [progressMax, setProgressMax] = useState(0)
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
+    const [isShowingDeviceMapProgress, setIsShowingDeviceMapProgress] = useState(false)
     const defaultSheet = 'Paging Groups'
 
     useLogin('paginggroups')
@@ -38,7 +41,7 @@ const PagingGroups = () => {
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const {fetchExtensions, extensionsList, isExtensionListPending, isMultiSiteEnabled} = useExtensionList(postMessage)
-    const {getDeviceMap, deviceMap, isDeviceMapPending} = useDeviceMap(() => {}, postMessage, postTimedMessage, postError)
+    const {getDeviceMap, deviceMap, isDeviceMapPending} = useDeviceMap(setDeviceMapProgressValue, postMessage, postTimedMessage, postError)
     const {validate, validatedData, isDataValidationPending} = useValidateExcelData(pagingGroupSchema, postMessage, postError)
     const {convert, pagingGroups, isConvertPending} = useExcelToPagingGroups(postMessage, postError)
     const {createGroups, isCreationPending} = useCreatePagingGroups(setProgressValue, postMessage, postTimedMessage, postError)
@@ -77,8 +80,15 @@ const PagingGroups = () => {
             userExtensions.push(extension)
         }
 
+        setDeviceMapProgressMax(userExtensions.length)
+        setIsShowingDeviceMapProgress(true)
         getDeviceMap(userExtensions)
     }, [isConvertPending])
+
+    useEffect(() => {
+        if (isDeviceMapPending) return
+        setIsShowingDeviceMapProgress(false)
+    }, [isDeviceMapPending])
 
 
     const handleFileSelect = () => {
@@ -118,6 +128,7 @@ const PagingGroups = () => {
                 <Button disabled={isConvertPending || validatedData.length === 0 || isDeviceMapPending} variant='contained' onClick={handleSync} >Sync</Button>
                 {isCreationPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Paging Groups" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
+                {isShowingDeviceMapProgress ? <> <Typography>Discovering Devices</Typography> <progress value={deviceMapProgressValue} max={deviceMapProgressMax} /> </> : <></>}
                 {isSyncing ? <> <Typography>Creating paging groups</Typography> <progress value={progressValue} max={progressMax} /> </> : <></>}
                 {isDataValidationPending ? <></> : <FeedbackArea gridData={pagingGroups} messages={messages} timedMessages={timedMessages} errors={errors} />}
             </div>
