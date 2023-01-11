@@ -34,7 +34,7 @@ const ExtensionUpload = () => {
     useLogin('extensionupload')
     useSidebar('Extension Upload')
     const {fireEvent} = useAnalytics()
-    const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError, userName} = useGetAccessToken()
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const {fetchExtensions, extensionsList, isExtensionListPending, isMultiSiteEnabled} = useExtensionList(postMessage)
@@ -113,7 +113,7 @@ const ExtensionUpload = () => {
                 <FileSelect enabled={!isSyncing} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
                 <Button variant="contained" disabled={filteredExtensions.length === 0 || isSyncing} onClick={handleSyncButtonClick}>Sync</Button>
                 {isExtensionCreationPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
-                <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Extension Upload" isUserInitiated={true} />
+                <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Extension Upload" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
                 {isSyncing ? <> <Typography>Creating extensions</Typography> <progress value={progressValue} max={progressMax} /> </> : <></>}
                 {isDataValidationPending ? <></> : <FeedbackArea gridData={filteredExtensions} messages={messages} timedMessages={timedMessages} errors={errors} />}
             </div>

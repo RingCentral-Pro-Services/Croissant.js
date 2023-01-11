@@ -31,7 +31,7 @@ const CallMonitoring = () => {
     useLogin('callmonitoring')
     useSidebar('Call Monitoring')
     const {fireEvent} = useAnalytics()
-    const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError, userName} = useGetAccessToken()
     let {messages, errors, postMessage, postError} = useMessageQueue()
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
     const {extensionsList, isExtensionListPending, fetchExtensions} = useExtensions(postMessage)
@@ -84,7 +84,7 @@ const CallMonitoring = () => {
                 <FileSelect enabled={!isSyncing} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
                 <Button variant='contained' disabled={monitoringGroups.length === 0 || isConvertPending || isSyncing} onClick={handleSync}>Sync</Button>
                 {isGroupCreationPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
-                <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Create Call Monitoring Groups" isUserInitiated={true} />
+                <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Create Call Monitoring Groups" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
                 {isSyncing ? <> <Typography>Creating groups</Typography> <progress value={progressValue} max={progressMax} /> </> : <></>}
                 {isDataValidationPending ? <></> : <FeedbackArea gridData={monitoringGroups} messages={messages} errors={errors} timedMessages={timedMessages} />}
             </div>

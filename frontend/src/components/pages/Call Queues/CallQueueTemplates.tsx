@@ -61,7 +61,7 @@ const CallQueueTemplates = () => {
     useLogin('callqueuetemplates')
     useSidebar('Call Queue Templates')
     const {fireEvent} = useAnalytics()
-    const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending, userName} = useGetAccessToken()
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const {fetchExtensions, extensionsList, isExtensionListPending} = useExtensionList(postMessage)
@@ -201,7 +201,7 @@ const CallQueueTemplates = () => {
                 <Button disabled={selectedExtensions.length === 0 || isRegionalFormatListPenging || isSyncing} variant="contained" onClick={handleSyncButtonClick} >Sync</Button>
                 {isGreetingsUploadPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 <ScheduleBuilder isOpen={isShowingHours} setIsOpen={setIsShowingHours} setPayload={setSchedulePayload} />
-                <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Call Queue Templates" isUserInitiated={true} />
+                <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Call Queue Templates" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
                 {isSyncing && willUpdateRegionalSettings ? <> <Typography>Regional settings</Typography> <progress value={regionalSettingsProgress} max={regionalSettingsMaxProgress} /> </> : <></>}
                 {isSyncing && willUpdateCallHandlingSettings ? <> <Typography>Call Handling & Greetings</Typography> <progress value={callHandlingSettingsProgress} max={callHandlingSettingsMaxProgress} /> </> : <></>}
                 {isSyncing && willUpdateSchedule ? <> <Typography>Schedule</Typography> <progress value={scheduleProgress} max={scheduleMaxProgress} /> </> : <></>}

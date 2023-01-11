@@ -41,7 +41,7 @@ const ManipulateCustomRules = () => {
     const {fireEvent} = useAnalytics()
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
-    const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending, userName} = useGetAccessToken()
     const {fetchExtensions, extensionsList, isExtensionListPending, isMultiSiteEnabled} = useExtensionList(postMessage)
     const {fetchRules, isRuleListPending, adjustedExtensions} = useSimpleRuleList(setFetchRulesProgress, postMessage, postTimedMessage, postError)
     const {manipulateRules, isRuleManipulationPending} = useManipulateRules(setManipulateRulesProgress, postMessage, postTimedMessage, postError)
@@ -111,7 +111,7 @@ const ManipulateCustomRules = () => {
             <Header title="Enable / Disable Custom Rules" body="Enable, disable, an delete custom rules in bulk">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
-            <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Enable / Disable Custom Rules" isUserInitiated={true} />
+            <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Enable / Disable Custom Rules" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
             <div className="tool-card">
                 <h2>Enable / Disable Custom Rules</h2>
                 <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} loading={isTokenPending} error={tokenError} />

@@ -34,7 +34,7 @@ const CreateCallQueues = () => {
     const [selectedSheet, setSelectedSheet] = useState<string>('')
     const defaultSheet = "Call Queues"
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
-    const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending, userName} = useGetAccessToken()
 
     // Progess bar
     const [progressValue, setProgressValue] = useState(0)
@@ -99,7 +99,7 @@ const CreateCallQueues = () => {
                 <h2>Create Call Queues</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                 <FileSelect enabled={hasCustomerToken} accept=".xlsx" handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
-                <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Create Call Queues" isUserInitiated={true} />
+                <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Create Call Queues" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
                 {isPending ? <></> : <Button variant="contained" onClick={handleSyncButtonClick}>Sync</Button>}
                 {isCallQueueCreationPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 {!(queues.length > 0) ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}

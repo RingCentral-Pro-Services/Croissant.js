@@ -41,7 +41,7 @@ const CustomRules = () => {
     useLogin('copycustomrules')
     useSidebar('Copy Custom Rules')
     const {fireEvent} = useAnalytics()
-    const {fetchToken, companyName, hasCustomerToken, error: tokenError, isTokenPending} = useGetAccessToken()
+    const {fetchToken, companyName, hasCustomerToken, error: tokenError, isTokenPending, userName} = useGetAccessToken()
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const {fetchExtensions, extensionsList, isExtensionListPending, isMultiSiteEnabled} = useExtensionList(postMessage)
@@ -132,7 +132,7 @@ const CustomRules = () => {
             <Header title="Copy Custom Rules" body="Copy custom rules to other extensions">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
-            <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Copy Custom Rules" isUserInitiated={true} />
+            <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Copy Custom Rules" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
             <div className="tool-card">
                 <h2>Copy Custom Rules</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />

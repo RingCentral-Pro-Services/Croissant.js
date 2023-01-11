@@ -36,7 +36,7 @@ const Intercom = () => {
     useLogin('intercom')
     useSidebar('Intercom')
     const {fireEvent} = useAnalytics()
-    const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError, userName} = useGetAccessToken()
     const {messages, errors, postMessage, postError} = useMessageQueue()
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
     const { extensionsList, isExtensionListPending, isMultiSiteEnabled, fetchExtensions } = useExtensionList(postMessage)
@@ -142,7 +142,7 @@ const Intercom = () => {
                 </FormControl>
                 <Button variant="contained" disabled={selectedExtensions.length === 0 || isSyncing} onClick={handleSyncButtonClick} >Sync</Button>
                 {isIntercomPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
-                <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Intercom" isUserInitiated={true} />
+                <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Intercom" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
                 {isSyncing && action === 'enable' ? <> <Typography>Discovering devices</Typography> <progress value={deviceFetchProgress} max={deviceFetchMax} /> </> : <></>}
                 {isSyncing && action === 'enable' ? <> <Typography>Enabling intercom</Typography> <progress value={enablementProgress} max={enablementMax} /> </> : <></>}
                 {isSyncing && action === 'disable' ? <> <Typography>Disabling intercom</Typography> <progress value={enablementProgress} max={enablementMax} /> </> : <></>}

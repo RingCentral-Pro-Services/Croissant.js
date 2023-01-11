@@ -7,15 +7,18 @@ interface FeedbackFormProps {
     setIsOpen: (isOpen: boolean) => void,
     isUserInitiated: boolean,
     toolName: string
+    uid?: string
+    companyName?: string
+    userName?: string
 }
 
-const useFeedbackForm: React.FC<FeedbackFormProps> = ({isOpen, setIsOpen, isUserInitiated, toolName = "Croissant"}) => {
+const useFeedbackForm: React.FC<FeedbackFormProps> = ({isOpen, setIsOpen, isUserInitiated, toolName = "Croissant", uid, companyName, userName}) => {
     const [feedbackText, setFeedbackText] = useState("")
     const [rating, setRating] = useState<number | undefined>()
     const url = 'https://staging-n8n.ps.ringcentral.com/webhook-test/9d7ee724-8db6-4471-a29a-19818f803e16'
 
     const handleSubmission = () => {
-        RestCentral.post('/feedback', {'Content-Type':'application/json'}, {"tool": toolName, "rating": rating, "body": feedbackText})
+        RestCentral.post('/feedback', {'Content-Type':'application/json'}, {"tool": toolName, "rating": rating, "body": feedbackText, uid: uid ?? '', accountName: companyName ?? '', userName: userName ?? ''})
         setIsOpen(false)
         reset()
     }
@@ -43,6 +46,7 @@ const useFeedbackForm: React.FC<FeedbackFormProps> = ({isOpen, setIsOpen, isUser
                         sx={{display: 'block', marginTop: '5px'}}
                         value={feedbackText}
                         onChange={(e) => setFeedbackText(e.target.value)}
+                        placeholder='Tell us more about your experience... If you are reporting an issue, please include the steps to reproduce it.'
                         ></TextField>
                         <DialogActions>
                             <Button onClick={dismiss}>Close</Button>

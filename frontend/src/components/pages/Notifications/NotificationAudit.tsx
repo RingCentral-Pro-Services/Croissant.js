@@ -26,7 +26,7 @@ const NotificationAudit = () => {
     useSidebar('Notifications')
     const {fireEvent} = useAnalytics()
     let [targetUID, setTargetUID] = useState("")
-    const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending, userName} = useGetAccessToken()
     let {messages, errors, postMessage, postError} = useMessageQueue()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
     const [isPending, setIsPending] = useState(false)
@@ -137,7 +137,7 @@ const NotificationAudit = () => {
             <Header title="Notifications" body="Audit and update notification emails">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
-            <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Notifications" isUserInitiated={true} />
+            <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Notifications" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
             <div className="tool-card">
                 <h2>Extension Notifications</h2>
                 <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} error={tokenError} loading={isTokenPending} />

@@ -27,7 +27,7 @@ const ExtensionEditor = () => {
     useLogin('editextensions')
     useSidebar('Edit Extensions')
     const {fireEvent} = useAnalytics()
-    const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending, userName} = useGetAccessToken()
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const {fetchExtensions, extensionsList, isExtensionListPending} = useExtensionList(postMessage)
@@ -62,7 +62,7 @@ const ExtensionEditor = () => {
             <Header title="Edit Extensions" body="Find & replace in extension names and email addresses">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
-            <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Edit Extensions" isUserInitiated={true} />
+            <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Edit Extensions" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
             <div className="tool-card">
                 <h2>Edit Extensions</h2>
                 <div className="mega-mergin-top">

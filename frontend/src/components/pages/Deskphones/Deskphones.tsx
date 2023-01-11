@@ -40,7 +40,7 @@ const Deskphones = () => {
     useLogin('deskphones')
     useSidebar('Desk Phones')
     const {fireEvent} = useAnalytics()
-    const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending, userName} = useGetAccessToken()
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const {fetchExtensions, extensionsList, isMultiSiteEnabled, isExtensionListPending} = useExtensionList(postMessage)
@@ -130,7 +130,7 @@ const Deskphones = () => {
             <Header title="Desk Phones" body="Set ring time for physical phones in bulk">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
-            <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Desk Phones" isUserInitiated={true} />
+            <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Desk Phones" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
             <div className="tool-card">
                 <h2>Desk Phones</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />

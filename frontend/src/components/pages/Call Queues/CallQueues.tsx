@@ -23,7 +23,7 @@ const CallQueues = () => {
     const {fireEvent} = useAnalytics()
     let [targetUID, setTargetUID] = useState("")
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
-    const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending, userName} = useGetAccessToken()
     let {messages, errors, postMessage, postError} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
@@ -83,7 +83,7 @@ const CallQueues = () => {
                 {timedMessages.length > 0 ? <MessagesArea messages={timedMessages} /> : <></>}
                 {!isCallQueueSettingsPending ? <FeedbackArea gridData={callQueues} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
             </div>
-            <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Audit Call Queues" isUserInitiated={true} />
+            <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Audit Call Queues" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
         </>
     )
 }

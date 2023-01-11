@@ -35,7 +35,7 @@ const EditSites = () => {
     useLogin('editsites')
     useSidebar('Edit Sites')
     const {fireEvent} = useAnalytics()
-    const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending, userName} = useGetAccessToken()
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const {fetchExtensions, extensionsList, isExtensionListPending} = useExtensionList(postMessage)
@@ -111,7 +111,7 @@ const EditSites = () => {
             <Header title='Edit Sites' body='Edit site names and extension numbers in bulk'>
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
-            <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Edit Sites" isUserInitiated={true} />
+            <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Edit Sites" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
             <div className="tool-card">
                 <h2>Edit Sites</h2>
                 <UIDInputField disabledText={companyName} disabled={hasCustomerToken} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />

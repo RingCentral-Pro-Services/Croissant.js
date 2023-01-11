@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { AccountUID } from "../models/AccountUID";
 import useGetCompanyName from "./useGetCompanyName";
+import useGetUserName from "./useGetUserName";
 
 const sign = require('jwt-encode');
 const axios = require('axios').default;
@@ -9,6 +10,7 @@ const useGetAccessToken = () => {
     const [hasCustomerToken, setHasToken] = useState(false)
     const [accountID, setAccountID] = useState('')
     const {companyName, isCompanyNamePending, getCompanyName, reset} = useGetCompanyName()
+    const {getUserName, isUserNamePending, userName} = useGetUserName()
     const [error, setError] = useState('')
     const [isTokenPending, setIsTokenPending] = useState(false)
 
@@ -58,9 +60,17 @@ const useGetAccessToken = () => {
         if (isCompanyNamePending) return
 
         addAccountToLocalStorage()
+        getUserName()
+        // setHasToken(true)
+        // reset()
+    }, [isCompanyNamePending])
+
+    useEffect(() => {
+        if (isUserNamePending) return
+        console.log('username', userName)
         setHasToken(true)
         reset()
-    }, [isCompanyNamePending])
+    }, [isUserNamePending])
 
     const addAccountToLocalStorage = () => {
         const accountData: AccountUID = {
@@ -92,7 +102,7 @@ const useGetAccessToken = () => {
         }
     }
 
-    return {fetchToken, hasCustomerToken, companyName, error, isTokenPending}
+    return {fetchToken, hasCustomerToken, companyName, error, isTokenPending, userName}
 }
 
 export default useGetAccessToken

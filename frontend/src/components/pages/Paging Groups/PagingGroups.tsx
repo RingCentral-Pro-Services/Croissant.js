@@ -13,6 +13,7 @@ import useDeviceMap from "../../../rcapi/useDeviceMap";
 import useExtensionList from "../../../rcapi/useExtensionList";
 import useGetAccessToken from "../../../rcapi/useGetAccessToken";
 import FeedbackArea from "../../shared/FeedbackArea";
+import FeedbackForm from "../../shared/FeedbackForm";
 import FileSelect from "../../shared/FileSelect";
 import Header from "../../shared/Header";
 import UIDInputField from "../../shared/UIDInputField";
@@ -26,12 +27,13 @@ const PagingGroups = () => {
     const [isSyncing, setIsSyncing] = useState(false)
     const [progressValue, setProgressValue] = useState(0)
     const [progressMax, setProgressMax] = useState(0)
+    const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
     const defaultSheet = 'Paging Groups'
 
     useLogin('paginggroups')
     useSidebar('Paging Groups')
     const {fireEvent} = useAnalytics()
-    const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError} = useGetAccessToken()
+    const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError, userName} = useGetAccessToken()
     const {readFile, excelData, isExcelDataPending} = useReadExcel()
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
@@ -114,6 +116,8 @@ const PagingGroups = () => {
                 <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} error={tokenError} loading={isTokenPending} />
                 <FileSelect enabled={!isSyncing} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
                 <Button disabled={isConvertPending || validatedData.length === 0 || isDeviceMapPending} variant='contained' onClick={handleSync} >Sync</Button>
+                {isCreationPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
+                <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Paging Groups" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
                 {isSyncing ? <> <Typography>Creating paging groups</Typography> <progress value={progressValue} max={progressMax} /> </> : <></>}
                 {isDataValidationPending ? <></> : <FeedbackArea gridData={pagingGroups} messages={messages} timedMessages={timedMessages} errors={errors} />}
             </div>
