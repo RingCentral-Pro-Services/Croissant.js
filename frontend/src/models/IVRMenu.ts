@@ -34,7 +34,6 @@ export class IVRMenu implements CSVFormattable, ExcelFormattable, DataTableForma
             id: this.data.id,
             name: this.data.name,
             extensionNumber: this.data.extensionNumber,
-            phoneNumbers: this.phoneNumbers?.map(p => p.phoneNumber).join(', ') ?? '',
             site: this.data.site ? this.data.site.name : 'Main Site',
             prompt: this.data.prompt.mode === 'Audio' ? this.audioPromptFilename ?? '0' : this.data.prompt.text ?? '',
             key1: this.actionText(`1`),
@@ -58,7 +57,6 @@ export class IVRMenu implements CSVFormattable, ExcelFormattable, DataTableForma
         let result = [
             { field: 'name', headerName: 'Name', width: 200 },
             { field: 'extensionNumber', headerName: 'Extension Number', width: 200 },
-            { field: 'phoneNumbers', headerName: 'Phone Numbers', width: 200 },
             { field: 'site', headerName: 'Site', width: 200 },
             { field: 'prompt', headerName: 'Prompt', width: 200 },
             { field: 'key1', headerName: 'Key 1', width: 200 },
