@@ -16,6 +16,8 @@ import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel"
 import FeedbackArea from "../../shared/FeedbackArea"
 import FeedbackForm from "../../shared/FeedbackForm"
 import useSidebar from "../../../hooks/useSidebar"
+import usePhoneNumberMap from "../../../rcapi/usePhoneNumberMap"
+import CallQueue from "../../../models/CallQueue"
 
 const CallQueues = () => {
     useLogin('auditcallqueues')
@@ -27,6 +29,7 @@ const CallQueues = () => {
     let {messages, errors, postMessage, postError} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
+    const {getPhoneNumberMap, phoneNumberMap, isPhoneNumberMapPending} = usePhoneNumberMap()
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
     let {callQueues, isQueueListPending, fetchQueueMembers} = useFetchCallQueueMembers(setProgressValue, setMaxProgressValue, postTimedMessage)
@@ -48,10 +51,14 @@ const CallQueues = () => {
 
     useEffect(() => {
         if (isExtensionListPending) return
-        
+        getPhoneNumberMap()
+    }, [extensionsList, isExtensionListPending])
+
+    useEffect(() => {
+        if (isPhoneNumberMapPending) return
         fetchQueueMembers(extensionsList)
         fireEvent('call-queue-audit')
-    }, [extensionsList, isExtensionListPending])
+    }, [isPhoneNumberMapPending])
 
     useEffect(() => {
         if (isQueueListPending) return
@@ -59,8 +66,15 @@ const CallQueues = () => {
         fetchCallQueueSettings(callQueues, extensionsList)
     }, [isQueueListPending, callQueues])
 
+    const addPhoneNumbers = (queues: CallQueue[]) => {
+        queues.forEach(queue => {
+            queue.phoneNumbers = phoneNumberMap.get(`${queue.extension.id}`)
+        })
+    }
+
     useEffect(() => {
         if (isCallQueueSettingsPending) return
+        addPhoneNumbers(adjsutedQueues)
         console.log('Queues')
         console.log(adjsutedQueues)
         const header = ['Queue Name', 'Extension', 'Site', 'Status', 'Members (Ext)', 'Greeting', 'Audio While Connecting', 'Hold Music', 'Voicemail', 'Interrupt Audio', 'Interrupt Prompt', 'Ring Type', 'Total Ring Time', 'User Ring Time' , 'Max Wait Time Action', 'Max Wait Time Destination', 'Max Callers Action', 'Max Callers Destination', 'No Answer Action', 'Wrap Up Time']
