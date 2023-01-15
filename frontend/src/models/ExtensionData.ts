@@ -1,3 +1,5 @@
+import { PhoneNumber } from "./PhoneNumber"
+
 export interface ExtensionData {
     id: number
     uri?: string
@@ -76,7 +78,8 @@ export interface ExtensionData {
         code?: string
     },
     ivrPin?: string,
-    password?: string
+    password?: string,
+    phoneNumbers?: PhoneNumber[],
 }
 
 export interface CustomField {

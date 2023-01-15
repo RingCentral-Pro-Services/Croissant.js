@@ -12,6 +12,8 @@ import useWriteExcelFile from '../../../hooks/useWriteExcelFile'
 import FeedbackForm from '../../shared/FeedbackForm'
 import useSidebar from '../../../hooks/useSidebar'
 import useExtensions from '../../../rcapi/useExtensions'
+import usePhoneNumberMap from '../../../rcapi/usePhoneNumberMap'
+import { Extension } from '../../../models/Extension'
 
 const ExtensionAudit = () => {
     useLogin('accountdump')
@@ -21,12 +23,13 @@ const ExtensionAudit = () => {
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
     const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError, userName} = useGetAccessToken()
     let {messages, errors, postMessage} = useMessageQueue()
+    const {getPhoneNumberMap, isPhoneNumberMapPending, phoneNumberMap} = usePhoneNumberMap()
     const {extensionsList, isExtensionListPending, fetchExtensions} = useExtensions(postMessage)
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
     const {writeExcel} = useWriteExcelFile()
 
     const handleClick = () => {
-        fetchExtensions()
+        getPhoneNumberMap()
         fireEvent('extension-audit')
     }
 
@@ -37,9 +40,21 @@ const ExtensionAudit = () => {
     },[targetUID])
 
     useEffect(() => {
-        if (isExtensionListPending) return
+        if (isPhoneNumberMapPending) return
+        fetchExtensions()
+    }, [isPhoneNumberMapPending])
 
-        let header = ['Mailbox ID', 'Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']
+    const addPhoneNumbers = (extensions: Extension[]) => {
+        extensions.forEach(extension => {
+            extension.data.phoneNumbers = phoneNumberMap.get(`${extension.data.id}`) || []
+        })
+    }
+
+    useEffect(() => {
+        if (isExtensionListPending) return
+        addPhoneNumbers(extensionsList)
+
+        let header = ['Mailbox ID', 'Name', 'Ext', 'Email', 'Site', 'Phone Numbers', 'Type', 'Status', 'Hidden']
         writeExcel(header, extensionsList, 'Extensions', 'account-dump.xlsx')
     }, [isExtensionListPending, extensionsList])
 
