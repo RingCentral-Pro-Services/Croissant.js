@@ -14,6 +14,8 @@ import useAnalytics from "../../../hooks/useAnalytics";
 import MessagesArea from "../../shared/MessagesArea";
 import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel";
 import useLogin from "../../../hooks/useLogin";
+import usePhoneNumberMap from "../../../rcapi/usePhoneNumberMap";
+import { IVRMenu } from "../../../models/IVRMenu";
 
 const DirectAuditMenus = () => {
     useLogin('auditmenus')
@@ -25,6 +27,7 @@ const DirectAuditMenus = () => {
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const {fetchExtensions, extensionsList, isExtensionListPending} = useExtensionList(postMessage)
+    const {getPhoneNumberMap, phoneNumberMap, isPhoneNumberMapPending} = usePhoneNumberMap()
     const {fetchAudioPrompts, audioPromptList, isAudioPromptListPending} = useGetAudioPrompts(postMessage, postTimedMessage)
     const {fetchIVRs, ivrsList, isIVRsListPending} = useFetchIVRs(setProgressValue, setMaxProgressValue, postMessage, postTimedMessage, postError)
     const {writeExcel} = useWriteExcelFile()
@@ -52,12 +55,26 @@ const DirectAuditMenus = () => {
 
     useEffect(() => {
         if (isAudioPromptListPending) return
-        fetchIVRs(extensionsList)
+        getPhoneNumberMap()
     }, [isAudioPromptListPending])
+
+    useEffect(() => {
+        if (isPhoneNumberMapPending) return
+        fetchIVRs(extensionsList)
+    }, [isPhoneNumberMapPending])
+
+    const addPhoneNumbers = (ivrs: IVRMenu[]) => {
+        ivrs.forEach((ivr) => {
+            ivr.phoneNumbers = phoneNumberMap.get(ivr.data.id!)
+        })
+        console.log('IVRs with phone numbers')
+        console.log(ivrs)
+    }
 
     useEffect(() => {
         if (isIVRBeautificationPending) return
         setIsPending(false)
+        addPhoneNumbers(prettyIVRs)
         let header = ['Menu Name', 'Menu Ext', 'Site', 'Prompt Mode', 'Prompt Name/Script', 'Key 1 Action', 'Key 1 Destination', 'Key 2 Action', 'Key 2 Destination', 'Key 3 Action', 'Key 3 Destination',
                      'Key 4 Action', 'Key 4 Destination', 'Key 5 Action', 'Key 5 Destination', 'Key 6 Action', 'Key 6 Destination', 'Key 7 Action', 'Key 7 Destination',
                      'Key 8 Action', 'Key 8 Destination', 'Key 9 Action', 'Key 9 Destination', 'Key 0 Action', 'Key 0 Destination', 'Key # Press', 'Key * Press']

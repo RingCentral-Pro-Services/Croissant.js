@@ -2,16 +2,17 @@ import CSVFormattable from "./CSVFormattable"
 import ExcelFormattable from "./ExcelFormattable"
 import { DataTableFormattable } from "./DataTableFormattable"
 import { DataGridFormattable } from "./DataGridFormattable"
+import { PhoneNumber } from "./PhoneNumber"
 
 export class IVRMenu implements CSVFormattable, ExcelFormattable, DataTableFormattable, DataGridFormattable {
-    constructor(public data: IVRMenuData, public page?: string, public lucidchartID?: string, public audioPromptFilename?: string) {}
+    constructor(public data: IVRMenuData, public page?: string, public lucidchartID?: string, public audioPromptFilename?: string, public phoneNumbers?: PhoneNumber[]) {}
 
     toRow(): string {
         return `${this.data.name},${this.data.extensionNumber},${this.data.site.id},${this.data.prompt.mode},${this.data.prompt.text}`
     }
 
     toExcelRow(): string[] {
-        let result = [this.data.name, `${this.data.extensionNumber}`, this.data.site ? this.data.site.name : 'Main Site', this.data.prompt.mode, this.data.prompt.mode === 'Audio' ? this.audioPromptFilename ?? '0' : this.data.prompt.text ?? '',]
+        let result = [this.data.name, `${this.data.extensionNumber}`, this.phoneNumbers?.map((p) => p.phoneNumber).join(', ') ?? '' , this.data.site ? this.data.site.name : 'Main Site', this.data.prompt.mode, this.data.prompt.mode === 'Audio' ? this.audioPromptFilename ?? '0' : this.data.prompt.text ?? '',]
         let actions = this.excelActionsToRow()
 
         result = [...result, ...actions]
@@ -33,6 +34,7 @@ export class IVRMenu implements CSVFormattable, ExcelFormattable, DataTableForma
             id: this.data.id,
             name: this.data.name,
             extensionNumber: this.data.extensionNumber,
+            phoneNumbers: this.phoneNumbers?.map(p => p.phoneNumber).join(', ') ?? '',
             site: this.data.site ? this.data.site.name : 'Main Site',
             prompt: this.data.prompt.mode === 'Audio' ? this.audioPromptFilename ?? '0' : this.data.prompt.text ?? '',
             key1: this.actionText(`1`),
@@ -56,6 +58,7 @@ export class IVRMenu implements CSVFormattable, ExcelFormattable, DataTableForma
         let result = [
             { field: 'name', headerName: 'Name', width: 200 },
             { field: 'extensionNumber', headerName: 'Extension Number', width: 200 },
+            { field: 'phoneNumbers', headerName: 'Phone Numbers', width: 200 },
             { field: 'site', headerName: 'Site', width: 200 },
             { field: 'prompt', headerName: 'Prompt', width: 200 },
             { field: 'key1', headerName: 'Key 1', width: 200 },
