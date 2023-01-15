@@ -18,6 +18,8 @@ import UIDInputField from "../../shared/UIDInputField";
 import useCreateGroups from "./hooks/useCreateGroups";
 import useExcelToMonitoringGroups from "./hooks/useExcelToMonitoringGroups";
 import LaunchIcon from '@mui/icons-material/Launch';
+import useCallMonitoringList from "./hooks/useCallMonitoringList";
+import useWriteExcelFile from "../../../hooks/useWriteExcelFile";
 
 const CallMonitoring = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -26,7 +28,10 @@ const CallMonitoring = () => {
     const [isSyncing, setIsSyncing] = useState(false)
     const [progressValue, setProgressValue] = useState(0)
     const [progressMax, setProgressMax] = useState(0)
+    const [auditProgress, setAuditProgress] = useState(0)
+    const [auditProgressMax, setAuditProgressMax] = useState(0)
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
+    const [isAuditPending, setIsAuditPending] = useState(false)
     const defaultSheet = 'Call Monitoring'
 
     useLogin('callmonitoring')
@@ -40,6 +45,8 @@ const CallMonitoring = () => {
     const {validate, validatedData, isDataValidationPending} = useValidateExcelData(callMonitoringSchema, postMessage, postError)
     const {convert, monitoringGroups, isConvertPending} = useExcelToMonitoringGroups(postMessage, postError)
     const {createGroups, isGroupCreationPending} = useCreateGroups(setProgressValue, postMessage, postTimedMessage, postError)
+    const {adjustedMonitoringGroups: auditedGroups, isGroupAdjustmentPending} = useCallMonitoringList(isAuditPending, setAuditProgress, setAuditProgressMax, postMessage, postTimedMessage, postError)
+    const {writeExcel} = useWriteExcelFile()
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -67,6 +74,11 @@ const CallMonitoring = () => {
         convert(validatedData, extensionsList)
     }, [isDataValidationPending])
 
+    useEffect(() => {
+        if (isGroupAdjustmentPending) return
+        writeExcel(['Group Name', 'Users that can monitor', 'Users that can be monitored'], auditedGroups, 'Call Monitoring Audit', 'Call Monitoring Audit.xlsx')
+    }, [isGroupAdjustmentPending])
+
     const handleSync = () => {
         setIsSyncing(true)
         setProgressMax(monitoringGroups.length * 2)
@@ -84,11 +96,14 @@ const CallMonitoring = () => {
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} loading={isTokenPending} error={tokenError} setTargetUID={setTargetUID} />
                 <FileSelect enabled={!isSyncing} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
                 <Button variant='contained' disabled={monitoringGroups.length === 0 || isConvertPending || isSyncing} onClick={handleSync}>Sync</Button>
+                <Button className='healthy-margin-left' variant='contained' disabled={!hasCustomerToken || isAuditPending} onClick={() => setIsAuditPending(true)}>Audit</Button>
                 <Button className='healthy-margin-left' variant='outlined' onClick={() => window.open('https://docs.google.com/spreadsheets/d/11EuhgwFaaFNXj4tt99mhHIFzpsvSUNs2Y-oqLditq24/edit?usp=sharing', '_blank')} endIcon={<LaunchIcon />} >Template</Button>
-                {isGroupCreationPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
+                {isGroupCreationPending || isGroupAdjustmentPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Create Call Monitoring Groups" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
-                {isSyncing ? <> <Typography>Creating groups</Typography> <progress value={progressValue} max={progressMax} /> </> : <></>}
+                {isSyncing ? <progress value={progressValue} max={progressMax} /> : <></>}
+                {isAuditPending ? <progress value={auditProgress} max={auditProgressMax} /> : <></>}
                 {isDataValidationPending ? <></> : <FeedbackArea gridData={monitoringGroups} messages={messages} errors={errors} timedMessages={timedMessages} />}
+                {isGroupAdjustmentPending ? <></> : <FeedbackArea gridData={auditedGroups} messages={messages} errors={errors} timedMessages={timedMessages} />}
             </div>
         </>
     )
