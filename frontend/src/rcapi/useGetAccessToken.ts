@@ -59,7 +59,7 @@ const useGetAccessToken = () => {
     useEffect(() => {
         if (isCompanyNamePending) return
 
-        addAccountToLocalStorage()
+        if (companyName != undefined && companyName != '') addAccountToLocalStorage()
         getUserName()
         // setHasToken(true)
         // reset()
