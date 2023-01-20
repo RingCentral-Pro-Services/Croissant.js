@@ -33,7 +33,7 @@ const Deskphones = () => {
     const [callForwardingSettings, setCallForwardingSettings] = useState<CallForwardingSettings[]>([])
     const [selectedRingTime, setSelectedRingTime] = useState('4 Rings / 20 Seconds')
     const [isSyncing, setIsSyncing] = useState(false)
-    const ringTimes = ['1 Ring / 5 Seconds', '2 Rings / 10 Seconds', '3 Rings / 15 Seconds', '4 Rings / 20 Seconds', '5 Rings / 25 Seconds', '6 Rings / 20 Seconds',
+    const ringTimes = ['1 Ring / 5 Seconds', '2 Rings / 10 Seconds', '3 Rings / 15 Seconds', '4 Rings / 20 Seconds', '5 Rings / 25 Seconds', '6 Rings / 30 Seconds',
                        '7 Rings / 35 Seconds', '8 Rings / 40 Seconds', '9 Rings / 45 Seconds', '10 Rings / 50 Seconds', '11 Rings / 55 Seconds', '12 Rings / 60 Seconds',
                        '13 Rings / 65 Seconds', '14 Rings / 70 Seconds', '15 Rings / 75 Seconds']
 
