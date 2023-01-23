@@ -11,6 +11,7 @@ const Sidebar = () => {
     const [isIVRListOpen, setIsIVRListOpen] = useState(true)
     const [isCallQueueListOpen, setIsCallQueueListOpen] = useState(false)
     const [isCustomRuleListOpen, setIsCustomRuleListOpen] = useState(false)
+    const [isSiteListOpen, setIsSiteListOpen] = useState(false)
     const navigate = useNavigate()
 
     const handleClick = (text: string, destination: string) => {
@@ -20,7 +21,6 @@ const Sidebar = () => {
 
     const sidebarItems: SidebarItem[] = [
         {label: 'Extension Upload', destination: '/extensionupload'},
-        {label: 'Edit Sites', destination: '/editsites'},
         {label: 'Edit Extensions', destination: '/editextensions'},
         {label: 'Account Dump', destination: '/accountdump'},
         {label: 'Delete Extensions', destination: '/deleteextensions'},
@@ -29,6 +29,11 @@ const Sidebar = () => {
         {label: 'Intercom', destination: '/intercom'},
         {label: 'Call Monitoring', destination: '/callmonitoring'},
         {label: 'Paging Groups', destination: '/paginggroups'},
+    ]
+
+    const siteItems: SidebarItem[] = [
+        {label: 'Create Sites', destination: '/sites'},
+        {label: 'Edit Sites', destination: '/editsites'},
     ]
 
     const ivrItems: SidebarItem[] = [
@@ -57,6 +62,10 @@ const Sidebar = () => {
 
     const handleCustomRuleToggle = () => {
         setIsCustomRuleListOpen(!isCustomRuleListOpen)
+    }
+
+    const handleSiteToggle = () => {
+        setIsSiteListOpen(!isSiteListOpen)
     }
 
     return ( 
@@ -116,6 +125,22 @@ const Sidebar = () => {
             <Collapse in={isCustomRuleListOpen} timeout='auto'>
                 <List>
                     {customRuleItems.map((item) => (
+                        <ListItem className={selectedItem === item.label ? 'nav-item-selected' : ''} key={item.label} disablePadding>
+                        <ListItemButton onClick={() => handleClick(item.label, item.destination)}>
+                        <ListItemText primary={item.label} />
+                        </ListItemButton>
+                    </ListItem>
+                    ))}
+                </List>
+            </Collapse>
+            <Divider />
+            <ListItemButton onClick={handleSiteToggle}>
+                <ListItemText primary="Sites" />
+                {isSiteListOpen ? <ExpandLess /> : <ExpandMore />}
+            </ListItemButton>
+            <Collapse in={isSiteListOpen} timeout='auto'>
+                <List>
+                    {siteItems.map((item) => (
                         <ListItem className={selectedItem === item.label ? 'nav-item-selected' : ''} key={item.label} disablePadding>
                         <ListItemButton onClick={() => handleClick(item.label, item.destination)}>
                         <ListItemText primary={item.label} />

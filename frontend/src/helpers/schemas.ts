@@ -215,3 +215,60 @@ export const pagingGroupSchema = z.object({
         invalid_type_error: 'Devices to receive page data type invalid'
     }).or(z.number())
 })
+
+export const createSiteSchema = z.object({
+    'Site Name': z.string({
+        required_error: 'Missing name',
+        invalid_type_error: 'Name data type invalid'
+    }),
+    'Address 1': z.string({
+        required_error: 'Missing address 1',
+        invalid_type_error: 'Address 1 data type invalid'
+    }),
+    'Address 2': z.string().optional(),
+    'City': z.string({
+        required_error: 'Missing city',
+        invalid_type_error: 'City data type invalid'
+    }),
+    'State': z.string({
+        required_error: 'Missing state',
+        invalid_type_error: 'State data type invalid'
+    }),
+    'Postal Code': z.string({
+        required_error: 'Missing zip',
+        invalid_type_error: 'Zip data type invalid'
+    }),
+    'Country': z.string({
+        required_error: 'Missing country',
+        invalid_type_error: 'Country data type invalid'
+    }),
+    'Timezone': z.string({
+        required_error: 'Missing time zone',
+        invalid_type_error: 'Time zone data type invalid'
+    }),
+    'User Language': z.string({
+        required_error: 'Missing user language',
+        invalid_type_error: 'User language data type invalid'
+    }),
+    'Greeting Language': z.string({
+        required_error: 'Missing greetings language',
+        invalid_type_error: 'Greetings language data type invalid'
+    }),
+    'Regional Format': z.string({
+        required_error: 'Missing regional format',
+        invalid_type_error: 'Regional format data type invalid'
+    }),
+    'Time Format': z.string({
+        required_error: 'Missing time format',
+        invalid_type_error: 'Time format data type invalid'
+    }),
+    'Outbound Cnam': z.string({
+        required_error: 'Missing outbound cnam',
+        invalid_type_error: 'Outbound cnam data type invalid'
+    }),
+    'Main Extension Number': z.string({
+        required_error: 'Missing main extension number',
+        invalid_type_error: 'Main extension number data type invalid'
+    }).or(z.number()),
+    'Site Code': z.string().optional()
+})
