@@ -35,6 +35,7 @@ const useExcelToSites = (regionalFormats: RegionalFormat[]) => {
                 timeFormat: item['Time Format'],
                 outboundCnam: item['Outbound Cnam'],
                 siteCode: item['Site Code'],
+                erlName: item['Emergency Response Location Nickname'],
             }
             const site = new Site(data)
             sites.push(site)

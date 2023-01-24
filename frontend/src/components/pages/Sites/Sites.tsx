@@ -1,4 +1,4 @@
-import { Button, Typography } from "@mui/material";
+import { Button, Checkbox, FormControlLabel, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { createSiteSchema } from "../../../helpers/schemas";
 import useLogin from "../../../hooks/useLogin";
@@ -9,11 +9,11 @@ import useSidebar from "../../../hooks/useSidebar";
 import useValidateExcelData from "../../../hooks/useValidateExcelData";
 import useGetAccessToken from "../../../rcapi/useGetAccessToken";
 import useRegionalFormats from "../../../rcapi/useRegionalFormats";
-import useTimezoneList from "../../../rcapi/useTimezoneList";
 import FeedbackArea from "../../shared/FeedbackArea";
 import FileSelect from "../../shared/FileSelect";
 import Header from "../../shared/Header";
 import UIDInputField from "../../shared/UIDInputField";
+import useCreateERLs from "./hooks/useCreateERLs";
 import useCreateSites from "./hooks/useCreateSites";
 import useExcelToSites from "./hooks/useExcelToSites";
 
@@ -24,6 +24,9 @@ const Sites = () => {
     const [isSyncing, setIsSyncing] = useState(false)
     const [progressValue, setProgressValue] = useState(0)
     const [progressMax, setProgressMax] = useState(0)
+    const [erlProgressValue, setErlProgressValue] = useState(0)
+    const [erlProgressMax, setErlProgressMax] = useState(0)
+    const [shouldBuildERLs, setShouldBuildERLs] = useState(true)
     const defaultSheet = 'Site Information'
 
     useLogin('sites')
@@ -35,7 +38,8 @@ const Sites = () => {
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
     const {validate, validatedData, isDataValidationPending} = useValidateExcelData(createSiteSchema, postMessage, postError)
     const {convert, sites, isConvertPending} = useExcelToSites(regionalFormats)
-    const {createSites, isCreatePending} = useCreateSites(setProgressValue, postMessage, postTimedMessage, postError)
+    const {createSites, isCreatePending, createdSites} = useCreateSites(setProgressValue, postMessage, postTimedMessage, postError)
+    const {createERLs, isERLCreationPending} = useCreateERLs(setErlProgressValue, postMessage, postTimedMessage, postError)
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -64,12 +68,10 @@ const Sites = () => {
     }, [isDataValidationPending])
 
     useEffect(() => {
-        if (isConvertPending) return
-        console.log('Site payloads')
-        for (const site of sites) {
-            console.log(site.payload())
-        }
-    }, [isConvertPending])
+        if (isCreatePending || !shouldBuildERLs) return
+        setErlProgressMax(createdSites.length)
+        createERLs(sites)
+    }, [isCreatePending])
 
     const handleSync = () => {
         setIsSyncing(true)
@@ -86,7 +88,9 @@ const Sites = () => {
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} error={tokenError} loading={isTokenPending} />
                 <FileSelect enabled={!isSyncing} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
                 <Button variant='contained' disabled={!hasCustomerToken || sites.length === 0 || isSyncing} onClick={handleSync} >Sync</Button>
-                {isSyncing ? <progress value={progressValue} max={progressMax} /> : <></>}
+                <FormControlLabel className='healthy-margin-left' control={<Checkbox defaultChecked onChange={() => setShouldBuildERLs(!shouldBuildERLs)}/>} label="Create ERLs" />
+                {isSyncing ? <> <Typography>Creating Sites</Typography> <progress value={progressValue} max={progressMax} /> </> : <></>}
+                {isSyncing && shouldBuildERLs ? <> <Typography>Creating ERLs</Typography> <progress value={erlProgressValue} max={erlProgressMax} /> </> : <></>}
                 {isConvertPending ? <></> : <FeedbackArea gridData={sites} messages={messages} timedMessages={timedMessages} errors={errors} /> }
             </div>
         </>

@@ -3,13 +3,13 @@ import { DataGridFormattable } from "../../../../models/DataGridFormattable"
 
 export class Site implements DataGridFormattable {
 
-    constructor(public data: SiteData, public id?: number) { 
-        this.id = this.randomId()
+    constructor(public data: SiteData, public tableID?: number, public id?: string) { 
+        this.tableID = this.randomId()
      }
     
     toDataGridRow(): any {
         return {
-            id: `${this.id}`,
+            id: `${this.tableID}`,
             name: this.data.name,
             extensionNumber: this.data.extensionNumber,
             street1: this.data.street1,
@@ -81,6 +81,24 @@ export class Site implements DataGridFormattable {
             ...(this.data.siteCode && { siteCode: this.data.siteCode }),
         }
     }
+
+    erlPayload() {
+        return {
+            name: this.data.erlName ?? this.data.name,
+            site: {
+                id: this.id
+            },
+            address: {
+                street: this.data.street1,
+                street2: this.data.street2,
+                city: this.data.city,
+                state: this.data.state,
+                zip: this.data.zip,
+                country: this.data.country,
+                customerName: this.data.outboundCnam,
+            }
+        }
+    }
 }
 
 export interface SiteData {
@@ -99,4 +117,5 @@ export interface SiteData {
     timeFormat: string
     outboundCnam: string
     siteCode: string
+    erlName: string
 }

@@ -4,16 +4,16 @@ import { SyncError } from "../../../../models/SyncError"
 import { RestCentral } from "../../../../rcapi/RestCentral"
 import { Site } from "../models/Site"
 
-const useCreateSites = (setProgressValue: (value: (any)) => void, postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
+const useCreateERLs = (setProgressValue: (value: (any)) => void, postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
     const [sites, setSites] = useState<Site[]>([])
     const [createdSites, setCreatedSites] = useState<Site[]>([])
-    const [isCreatePending, setIsCreatePending] = useState(true)
+    const [isERLCreationPending, setIsCreatePending] = useState(true)
     const [rateLimitInterval, setRateLimitInterval] = useState(250)
     const [shouldCreate, setShouldCreate] = useState(false)
     const [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
-    const url = 'https://platform.ringcentral.com/restapi/v1.0/account/~/sites'
+    const url = 'https://platform.ringcentral.com/restapi/v1.0/account/~/emergency-locations'
 
-    const createSites = (sites: Site[]) => {
+    const createERLs = (sites: Site[]) => {
         setSites(sites)
         setShouldCreate(true)
     }
@@ -36,7 +36,7 @@ const useCreateSites = (setProgressValue: (value: (any)) => void, postMessage: (
                     "Authorization": `Bearer ${accessToken}`
                 }
 
-                const response = await RestCentral.post(url, headers, sites[currentExtensionIndex].payload())
+                const response = await RestCentral.post(url, headers, sites[currentExtensionIndex].erlPayload())
                 console.log(response)
 
                 if (response.rateLimitInterval > 0) {
@@ -47,16 +47,12 @@ const useCreateSites = (setProgressValue: (value: (any)) => void, postMessage: (
                     setRateLimitInterval(250)
                 }
 
-                const site = sites[currentExtensionIndex]
-                site.id = response.data.id
-                setCreatedSites([...createdSites, site])
-
                 next()
             }
             catch (e: any) {
-                console.log(`Failed to create site '${sites[currentExtensionIndex].data.name}'`)
-                postMessage(new Message(`Failed to create site '${sites[currentExtensionIndex].data.name}.' ${e.error}`, 'error'))
-                postError(new SyncError(sites[currentExtensionIndex].data.name, parseInt(sites[currentExtensionIndex].data.extensionNumber), ['Failed to create site', ''], e.error ?? ''))
+                console.log(`Failed to create ERL for site '${sites[currentExtensionIndex].data.name}'`)
+                postMessage(new Message(`Failed to create ERL for site '${sites[currentExtensionIndex].data.name}.' ${e.error}`, 'error'))
+                postError(new SyncError(sites[currentExtensionIndex].data.name, parseInt(sites[currentExtensionIndex].data.extensionNumber), ['Failed to create ERL', ''], e.error ?? ''))
                 console.log(e)
                 next()
             }
@@ -68,7 +64,7 @@ const useCreateSites = (setProgressValue: (value: (any)) => void, postMessage: (
         setProgressValue(currentExtensionIndex + 1)
     }
 
-    return {createSites, isCreatePending, createdSites}
+    return {createERLs, isERLCreationPending, createdSites}
 }
 
-export default useCreateSites
+export default useCreateERLs
