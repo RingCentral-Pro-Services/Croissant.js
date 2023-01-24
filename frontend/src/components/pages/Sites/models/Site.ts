@@ -53,17 +53,13 @@ export class Site implements DataGridFormattable {
             extensionNumber: this.data.extensionNumber,
             callerIdName: this.data.outboundCnam,
             businessAddress: {
-                street: this.data.street1,
-                // street2: this.data.street2,
+                street: `${this.data.street1}${this.data.street2 ? ` ${this.data.street2}` : ''}`,
                 city: this.data.city,
                 state: this.data.state,
                 zip: this.data.zip,
                 country: this.data.country,
             },
             regionalSettings: {
-                // homeCountry: {
-                //     id: this.data.country,
-                // },
                 timezone: {
                     id: this.data.timezone,
                 },
