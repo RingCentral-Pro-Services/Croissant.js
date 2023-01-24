@@ -10,6 +10,7 @@ import useValidateExcelData from "../../../hooks/useValidateExcelData";
 import useGetAccessToken from "../../../rcapi/useGetAccessToken";
 import useRegionalFormats from "../../../rcapi/useRegionalFormats";
 import FeedbackArea from "../../shared/FeedbackArea";
+import FeedbackForm from "../../shared/FeedbackForm";
 import FileSelect from "../../shared/FileSelect";
 import Header from "../../shared/Header";
 import UIDInputField from "../../shared/UIDInputField";
@@ -27,6 +28,7 @@ const Sites = () => {
     const [erlProgressValue, setErlProgressValue] = useState(0)
     const [erlProgressMax, setErlProgressMax] = useState(0)
     const [shouldBuildERLs, setShouldBuildERLs] = useState(true)
+    const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
     const defaultSheet = 'Site Information'
 
     useLogin('sites')
@@ -82,13 +84,17 @@ const Sites = () => {
 
     return (
         <>
-            <Header title="Create Sites" body="Build sites in bulk" />
+            <Header title="Create Sites" body="Build sites in bulk">
+                <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
+            </Header>
             <div className="tool-card">
                 <h2>Create Sites</h2>
+                <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Create Sites" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} error={tokenError} loading={isTokenPending} />
                 <FileSelect enabled={!isSyncing} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
                 <Button variant='contained' disabled={!hasCustomerToken || sites.length === 0 || isSyncing} onClick={handleSync} >Sync</Button>
                 <FormControlLabel className='healthy-margin-left' control={<Checkbox defaultChecked onChange={() => setShouldBuildERLs(!shouldBuildERLs)}/>} label="Create ERLs" />
+                {(shouldBuildERLs ? isERLCreationPending : isCreatePending) ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 {isSyncing ? <> <Typography>Creating Sites</Typography> <progress value={progressValue} max={progressMax} /> </> : <></>}
                 {isSyncing && shouldBuildERLs ? <> <Typography>Creating ERLs</Typography> <progress value={erlProgressValue} max={erlProgressMax} /> </> : <></>}
                 {isConvertPending ? <></> : <FeedbackArea gridData={sites} messages={messages} timedMessages={timedMessages} errors={errors} /> }
