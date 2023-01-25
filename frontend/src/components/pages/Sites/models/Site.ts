@@ -13,6 +13,7 @@ export class Site implements DataGridFormattable {
             name: this.data.name,
             extensionNumber: this.data.extensionNumber,
             street1: this.data.street1,
+            street2: this.data.street2,
             city: this.data.city,
             state: this.data.state,
             zip: this.data.zip,
