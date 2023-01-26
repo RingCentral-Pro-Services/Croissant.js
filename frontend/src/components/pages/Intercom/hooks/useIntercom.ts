@@ -1,66 +1,69 @@
 import { useEffect, useState } from "react"
-import { IntercomStatus } from "../../../../models/IntercomStatus"
+import { IntercomStatus, IntercomUser } from "../../../../models/IntercomStatus"
 import { Message } from "../../../../models/Message"
 import RCExtension from "../../../../models/RCExtension"
 import { SyncError } from "../../../../models/SyncError"
 import { RestCentral } from "../../../../rcapi/RestCentral"
 
 const useIntercom = (setProgressValue: (value: (any)) => void, postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
-    const [enablementMap, setEnablementMap] = useState<Map<string, string>>(new Map())
-    const [shouldEnable, setShouldEnable] = useState(false)
+    const [shouldChangeIntercom, setShouldChangeIntercom] = useState(false)
+    const [shouldChangePermissions, setShouldChangePermissions] = useState(false)
+    const [intercomData, setIntercomData] = useState<IntercomStatus[]>([])
 
-    const [shouldDisable, setShouldDisable] = useState(false)
     const [extensions, setExtensions] =  useState<RCExtension[]>([])
 
     const [auditData, setAuditData] = useState<IntercomStatus[]>([])
+    const [completeAuditData, setCompleteAuditData] = useState<IntercomStatus[]>([])
     const [shouldAudit, setShouldAudit] = useState(false)
+    const [shouldFetchUsers, setShouldFetchUsers] = useState(false)
 
     const [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
     const [rateLimitInterval, setRateLimitInterval] = useState(250)
     const [isIntercomPending, setIsIntercomPending] = useState(true)
+    const [isAuditPending, setIsAuditPending] = useState(true)
+
+    const [progressValue, setProgressValueInternal] = useState(0)
+
     const baseURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/intercom'
+    const basePermissionsURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/intercom/permissions'
 
-    const enableIntercom = (map: Map<string, string>) => {
-        setEnablementMap(map)
-        setShouldEnable(true)
-    }
-
-    const disableIntercom = (extensions: RCExtension[]) => {
-        setExtensions(extensions)
-        setShouldDisable(true)
+    const changeIntercom = (intercomData: IntercomStatus[]) => {
+        setIntercomData(intercomData)
+        setShouldChangeIntercom(true)
+        setCurrentExtensionIndex(0)
+        setProgressValueInternal(0)
     }
 
     const auditIntercom = (extensions: RCExtension[]) => {
         setExtensions(extensions)
+        setProgressValueInternal(0)
         setShouldAudit(true)
     }
 
     useEffect(() => {
         const accessToken = localStorage.getItem("cs_access_token")
-        if (!accessToken || !shouldEnable) {
+        if (!accessToken || !shouldChangeIntercom) {
             return
         }
-        if (currentExtensionIndex >= enablementMap.size) {
-            setIsIntercomPending(false)
+        if (currentExtensionIndex >= intercomData.length) {
+            setShouldChangeIntercom(false)
+            setShouldChangePermissions(true)
+            setCurrentExtensionIndex(0)
             return
         }
 
         setTimeout(async () => {
-            const url = baseURL.replace('extensionId', `${Array.from(enablementMap.keys())[currentExtensionIndex]}`)
+            const url = baseURL.replace('extensionId', intercomData[currentExtensionIndex].id)
             const headers = {
                 "Accept": "application/json",
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${accessToken}`
             }
-            const body = {
-                enabled: true,
-                device: {
-                    id: Array.from(enablementMap.values())[currentExtensionIndex]
-                }
-            }
 
             try {
-                const response = await RestCentral.put(url, headers, body)
+                console.log('Payload:')
+                console.log(intercomData[currentExtensionIndex].payload())
+                const response = await RestCentral.put(url, headers, intercomData[currentExtensionIndex].payload())
                 if (response.rateLimitInterval > 0) {
                     setRateLimitInterval(response.rateLimitInterval)
                     postTimedMessage(new Message('Rate limit reached. Waiting 60 seconds before continuing...', 'info'), response.rateLimitInterval)
@@ -71,25 +74,27 @@ const useIntercom = (setProgressValue: (value: (any)) => void, postMessage: (mes
                 next()
             }
             catch (e: any) {
-                console.log(`Failed to enable intercom for extension ${Array.from(enablementMap.keys())[currentExtensionIndex]}`)
-                postMessage(new Message(`Failed to enable intercom for extension ${Array.from(enablementMap.keys())[currentExtensionIndex]}`, 'error'))
+                console.log(`Failed to enable intercom for ${intercomData[currentExtensionIndex].extensionName} - Ext. ${intercomData[currentExtensionIndex].extensionNumber}`)
+                postMessage(new Message(`Failed to enable intercom for extension ${intercomData[currentExtensionIndex].extensionName} - ${intercomData[currentExtensionIndex].extensionNumber}`, 'error'))
                 console.log(e)
+                next()
             }
         }, rateLimitInterval)
-    }, [enablementMap, shouldEnable, currentExtensionIndex, rateLimitInterval])
+    }, [shouldChangeIntercom, currentExtensionIndex, rateLimitInterval])
 
     useEffect(() => {
         const accessToken = localStorage.getItem("cs_access_token")
-        if (!accessToken || !shouldDisable) {
+        if (!accessToken || !shouldChangePermissions) {
             return
         }
-        if (currentExtensionIndex >= extensions.length) {
+        if (currentExtensionIndex >= intercomData.length) {
             setIsIntercomPending(false)
+            setShouldChangePermissions(false)
             return
         }
 
         setTimeout(async () => {
-            const url = baseURL.replace('extensionId', `${extensions[currentExtensionIndex].id}`)
+            const url = basePermissionsURL.replace('extensionId', intercomData[currentExtensionIndex].id)
             const headers = {
                 "Accept": "application/json",
                 "Content-Type": "application/json",
@@ -97,7 +102,10 @@ const useIntercom = (setProgressValue: (value: (any)) => void, postMessage: (mes
             }
 
             try {
-                const response = await RestCentral.put(url, headers, { enabled: false })
+                const payload = {
+                    extensions: intercomData[currentExtensionIndex].users
+                }
+                const response = await RestCentral.put(url, headers, payload)
                 if (response.rateLimitInterval > 0) {
                     setRateLimitInterval(response.rateLimitInterval)
                     postTimedMessage(new Message('Rate limit reached. Waiting 60 seconds before continuing...', 'info'), response.rateLimitInterval)
@@ -108,12 +116,13 @@ const useIntercom = (setProgressValue: (value: (any)) => void, postMessage: (mes
                 next()
             }
             catch (e: any) {
-                console.log(`Failed to disable intercom for extension ${extensions[currentExtensionIndex].id}`)
-                postMessage(new Message(`Failed to disable intercom for extension ${extensions[currentExtensionIndex].id}`, 'error'))
+                console.log(`Failed to adjust intercom permissions for ${intercomData[currentExtensionIndex].extensionName} - Ext. ${intercomData[currentExtensionIndex].extensionNumber}`)
+                postMessage(new Message(`Failed to adjust intercom permissions for extension ${intercomData[currentExtensionIndex].extensionName} - ${intercomData[currentExtensionIndex].extensionNumber}`, 'error'))
                 console.log(e)
+                next()
             }
         }, rateLimitInterval)
-    }, [extensions, shouldDisable, currentExtensionIndex, rateLimitInterval])
+    }, [shouldChangeIntercom, currentExtensionIndex, rateLimitInterval])
 
     useEffect(() => {
         const accessToken = localStorage.getItem("cs_access_token")
@@ -121,8 +130,10 @@ const useIntercom = (setProgressValue: (value: (any)) => void, postMessage: (mes
             return
         }
         if (currentExtensionIndex >= extensions.length) {
-            setIsIntercomPending(false)
+            // setIsIntercomPending(false)
             setShouldAudit(false)
+            setCurrentExtensionIndex(0)
+            setShouldFetchUsers(true)
             return
         }
 
@@ -145,10 +156,12 @@ const useIntercom = (setProgressValue: (value: (any)) => void, postMessage: (mes
                 }
 
                 const status = new IntercomStatus (
+                    `${extensions[currentExtensionIndex].id}`,
                     extensions[currentExtensionIndex].name,
                     `${extensions[currentExtensionIndex].extensionNumber}`,
                     response.data.enabled ? 'Enabled' : 'Disabled',
-                    response.data.enabled ? response.data.device.name : ''
+                    response.data.enabled ? response.data.device.name : '',
+                    ''
                 )
 
                 setAuditData(prev => [...prev, status])
@@ -158,16 +171,65 @@ const useIntercom = (setProgressValue: (value: (any)) => void, postMessage: (mes
                 console.log(`Failed to audit intercom for extension ${extensions[currentExtensionIndex].id}`)
                 postMessage(new Message(`Failed to audit intercom for extension ${extensions[currentExtensionIndex].id}`, 'error'))
                 console.log(e)
+                next()
             }
         }, rateLimitInterval)
     }, [auditData, shouldAudit, currentExtensionIndex, rateLimitInterval, extensions])
 
+    useEffect(() => {
+        const accessToken = localStorage.getItem("cs_access_token")
+        if (!accessToken || !shouldFetchUsers) {
+            return
+        }
+        if (currentExtensionIndex >= auditData.length) {
+            setIsAuditPending(false)
+            setShouldFetchUsers(false)
+            setProgressValueInternal(0)
+            setProgressValue(0)
+            return
+        }
+
+        setTimeout(async () => {
+            const url = basePermissionsURL.replace('extensionId', `${auditData[currentExtensionIndex].id}`)
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${accessToken}`
+            }
+
+            try {
+                const response = await RestCentral.get(url, headers)
+                if (response.rateLimitInterval > 0) {
+                    setRateLimitInterval(response.rateLimitInterval)
+                    postTimedMessage(new Message('Rate limit reached. Waiting 60 seconds before continuing...', 'info'), response.rateLimitInterval)
+                }
+                else {
+                    setRateLimitInterval(250)
+                }
+
+                const users = response.data.extensions as IntercomUser[]
+                const data = auditData[currentExtensionIndex]
+                data.users = users
+
+                setCompleteAuditData(prev => [...prev, data])
+                next()
+            }
+            catch (e: any) {
+                console.log(`Failed to get intercom permissions for extension ${auditData[currentExtensionIndex].extensionName}`)
+                postMessage(new Message(`Failed to audit intercom permissions for extension ${auditData[currentExtensionIndex].extensionName}`, 'error'))
+                console.log(e)
+                next()
+            }
+        }, rateLimitInterval)
+    }, [auditData, shouldFetchUsers, currentExtensionIndex, rateLimitInterval, extensions])
+
     const next = () => {
+        setProgressValueInternal(prev => prev + 1)
         setCurrentExtensionIndex(currentExtensionIndex + 1)
-        setProgressValue(currentExtensionIndex + 1)
+        setProgressValue(progressValue + 1)
     }
 
-    return { enableIntercom, disableIntercom, auditIntercom, auditData, isIntercomPending }
+    return { auditIntercom, changeIntercom, auditData, isIntercomPending, isAuditPending, completeAuditData }
 }
 
 export default useIntercom

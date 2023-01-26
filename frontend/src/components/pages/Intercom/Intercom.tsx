@@ -4,9 +4,11 @@ import useAnalytics from "../../../hooks/useAnalytics";
 import useLogin from "../../../hooks/useLogin";
 import useMessageQueue from "../../../hooks/useMessageQueue";
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
+import useReadExcel from "../../../hooks/useReadExcel";
 import useSidebar from "../../../hooks/useSidebar";
 import useWriteExcelFile from "../../../hooks/useWriteExcelFile";
 import { DataGridFormattable } from "../../../models/DataGridFormattable";
+import { IntercomStatus } from "../../../models/IntercomStatus";
 import RCExtension from "../../../models/RCExtension";
 import useDeviceMap from "../../../rcapi/useDeviceMap";
 import useExtensionList from "../../../rcapi/useExtensionList";
@@ -14,13 +16,17 @@ import useGetAccessToken from "../../../rcapi/useGetAccessToken";
 import AdaptiveFilter from "../../shared/AdaptiveFilter";
 import FeedbackArea from "../../shared/FeedbackArea";
 import FeedbackForm from "../../shared/FeedbackForm";
+import FileSelect from "../../shared/FileSelect";
 import Header from "../../shared/Header";
 import UIDInputField from "../../shared/UIDInputField";
+import useExcelToIntercom from "./hooks/useExcelToIntercom";
 import useIntercom from "./hooks/useIntercom";
 
 const Intercom = () => {
     const [targetUID, setTargetUID] = useState('')
     const [siteNames, setSiteNames] = useState<string[]>([])
+    const [selectedFile, setSelectedFile] = useState<File | null>(null)
+    const [selectedSheet, setSelectedSheet] = useState('')
     const [selectedSiteNames, setSelectedSiteNames] = useState<string[]>([])
     const [filteredExtensions, setFilteredExtensions] = useState<RCExtension[]>([])
     const [selectedExtensions, setSelectedExtensions] = useState<RCExtension[]>([])
@@ -29,9 +35,11 @@ const Intercom = () => {
     const [enablementMax, setEnablementMax] = useState(0)
     const [deviceFetchMax, setDeviceFetchMax] = useState(0)
     const [isSyncing, setIsSyncing] = useState(false)
-    const [action, setAction] = useState('enable')
-    const [enablementMap, setEnablementMap] = useState<Map<string, string>>(new Map())
+    const [isAuditing, setIsAuditing] = useState(false)
+    const [isFetchingDevices, setIsFetchingDevices] = useState(false)
+    const [action, setAction] = useState('audit')
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
+    const defaultSheet = 'Intercom'
 
     useLogin('intercom')
     useSidebar('Intercom')
@@ -41,8 +49,10 @@ const Intercom = () => {
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
     const { extensionsList, isExtensionListPending, isMultiSiteEnabled, fetchExtensions } = useExtensionList(postMessage)
     const {getDeviceMap, deviceMap, isDeviceMapPending} = useDeviceMap(setDeviceFetchProgress, postMessage, postTimedMessage, postError)
-    const {enableIntercom, disableIntercom, auditIntercom, isIntercomPending, auditData} = useIntercom(setEnablementProgress, postMessage, postTimedMessage, postError)
+    const {auditIntercom, changeIntercom, isIntercomPending, isAuditPending, auditData, completeAuditData} = useIntercom(setEnablementProgress, postMessage, postTimedMessage, postError)
     const {writeExcel} = useWriteExcelFile()
+    const {readFile, isExcelDataPending, excelData} = useReadExcel()
+    const {convert, isConvertPending, intercomData} = useExcelToIntercom()
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -76,52 +86,78 @@ const Intercom = () => {
 
     useEffect(() => {
         if (isDeviceMapPending) return
-        let map = new Map<string, string>()
 
-        for (const extension of selectedExtensions) {
-            const devices = deviceMap.get(`${extension.id}`)
+        const statues: IntercomStatus[] = []
+
+        for (const data of intercomData) {
+            if (data.intercomStatus === 'Disabled') {
+                statues.push(data)
+                continue
+            }
+            const devices = deviceMap.get(`${data.id}`)
             if (devices) {
                 const supportedDevices = devices.filter((device) => device.type === 'HardPhone' && device.model.features.includes('Intercom'))
                 if (supportedDevices.length !== 0) {
-                    map.set(`${extension.id}`, supportedDevices[0].id)
+                    data.intercomDeviceId = supportedDevices[0].id
+                    statues.push(data)
                 }
             }
         }
-        setEnablementMap(map)
-        setEnablementMax(map.size)
-        enableIntercom(map)
+
+        setIsFetchingDevices(false)
+        setIsSyncing(true)
+        changeIntercom(statues)
     }, [isDeviceMapPending, deviceMap])
 
     useEffect(() => {
-        if (isIntercomPending || action !== 'audit') return
-        writeExcel(['Extension Name', 'Extension Number', 'Intercom Status', 'Device Name'], auditData, 'Intercom', 'intercom.xlsx')
+        if (isAuditPending) return
+        setIsAuditing(false)
+        writeExcel(['ID','Extension Name', 'Extension Number', 'Intercom Status', 'Device Name', 'Users Allowed'], completeAuditData, 'Intercom', 'intercom.xlsx')
+    }, [isAuditPending])
+
+    useEffect(() => {
+        if (isExcelDataPending) return
+        console.log('Excel data')
+        console.log(excelData)
+        convert(excelData, extensionsList)
+    }, [isExcelDataPending])
+
+    useEffect(() => {
+        if (isConvertPending) return
+        setIsSyncing(false)
     }, [isIntercomPending])
 
     const handleFilterSelection = (selected: DataGridFormattable[]) => {
         const extensions = selected as RCExtension[]
         setSelectedExtensions(extensions)
-        console.log(extensions)
+    }
+
+    const handleFileSelect = () => {
+        if (!selectedFile) return
+        readFile(selectedFile, selectedSheet)
     }
 
     const handleSiteSelection = (selected: string[]) => {
         setSelectedSiteNames(selected)
     }
 
+    const handleDownloadButtonClick = () => {
+        setIsAuditing(true)
+        setEnablementMax(selectedExtensions.length * 2)
+        auditIntercom(selectedExtensions)
+        fireEvent('intercom-audit')
+    }
+
     const handleSyncButtonClick = () => {
-        setIsSyncing(true)
-        if (action === 'enable') {
-            setDeviceFetchMax(selectedExtensions.length)
-            getDeviceMap(selectedExtensions)
+        setIsFetchingDevices(true)
+        const extensions: RCExtension[] = []
+        for (const extension of intercomData) {
+            const ext = new RCExtension(parseInt(extension.id), parseInt(extension.extensionNumber), extension.extensionName, {firstName: '', lastName: '', email: ''}, '', '', '', false, '')
+            extensions.push(ext)
         }
-        else if (action === 'disable') {
-            setEnablementMax(selectedExtensions.length)
-            disableIntercom(selectedExtensions)
-        }
-        else if (action === 'audit') {
-            setEnablementMax(selectedExtensions.length)
-            auditIntercom(selectedExtensions)
-        }
-        fireEvent('intercom')
+        setDeviceFetchMax(extensions.length)
+        getDeviceMap(extensions)
+        fireEvent('intercom-sync')
     }
 
     return (
@@ -133,21 +169,15 @@ const Intercom = () => {
                 <h2>Intercom</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} loading={isTokenPending} error={tokenError} setTargetUID={setTargetUID} />
                 {siteNames.length > 0 ? <AdaptiveFilter options={siteNames} showAllOption={true} defaultSelected={siteNames} title='Sites' placeholder='Search' disabled={false} setSelected={handleSiteSelection} /> : <></>}
-                <FormControl>
-                    <RadioGroup row value={action} onChange={(e, value) => setAction(value)} >
-                        <FormControlLabel value="enable" control={<Radio/>} label="Enable" />
-                        <FormControlLabel value="disable" control={<Radio/>} label="Disable" />
-                        <FormControlLabel value="audit" control={<Radio/>} label="Audit" />
-                    </RadioGroup>
-                </FormControl>
-                <Button variant="contained" disabled={selectedExtensions.length === 0 || isSyncing} onClick={handleSyncButtonClick} >Sync</Button>
+                <Button variant="contained" disabled={selectedExtensions.length === 0 || isAuditing} onClick={handleDownloadButtonClick} >Download</Button>
+                <FileSelect enabled={true} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
+                <Button variant='contained' disabled={isConvertPending || isSyncing} onClick={handleSyncButtonClick} >Sync</Button>
                 {isIntercomPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Intercom" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
-                {isSyncing && action === 'enable' ? <> <Typography>Discovering devices</Typography> <progress value={deviceFetchProgress} max={deviceFetchMax} /> </> : <></>}
-                {isSyncing && action === 'enable' ? <> <Typography>Enabling intercom</Typography> <progress value={enablementProgress} max={enablementMax} /> </> : <></>}
-                {isSyncing && action === 'disable' ? <> <Typography>Disabling intercom</Typography> <progress value={enablementProgress} max={enablementMax} /> </> : <></>}
-                {isSyncing && action === 'audit' ? <> <Typography>Discovering intercom status</Typography> <progress value={enablementProgress} max={enablementMax} /> </> : <></>}
-                {isExtensionListPending ? <></> : <FeedbackArea gridData={filteredExtensions} onFilterSelection={handleFilterSelection} messages={messages} timedMessages={timedMessages} errors={errors} />}
+                {isFetchingDevices ? <> <Typography>Discovering devices</Typography> <progress value={deviceFetchProgress} max={deviceFetchMax} /> </> : <></>}
+                {isSyncing ? <> <Typography>Setting intercom</Typography> <progress value={enablementProgress} max={enablementMax} /> </> : <></>}
+                {isAuditing ? <> <Typography>Discovering intercom status</Typography> <progress value={enablementProgress} max={enablementMax} /> </> : <></>}
+                {isExtensionListPending ? <></> : <FeedbackArea gridData={isExcelDataPending ? filteredExtensions : intercomData} onFilterSelection={handleFilterSelection} messages={messages} timedMessages={timedMessages} errors={errors} />}
             </div>
         </>
     )
