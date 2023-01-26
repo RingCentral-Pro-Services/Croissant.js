@@ -11,7 +11,7 @@ const useExcelToIntercom = () => {
         const data: IntercomStatus[] = []
 
         for (const currentData of excelData) {
-            const rawMembers = currentData['Users Allowed'] as string ?? ''
+            const rawMembers = `${currentData['Users Allowed'] ? currentData['Users Allowed'] : ''}`
             const members = rawMembers.split(',').map(member => member.trim())
 
             const prospectiveUsers: ProspectiveUser[] = []
