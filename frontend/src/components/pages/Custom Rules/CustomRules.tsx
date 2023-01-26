@@ -115,6 +115,7 @@ const CustomRules = () => {
     }
 
     const handleFilterSelection = (selected: DataGridFormattable[]) => {
+        if (isSyncing) return
         const extensions = selected as RCExtension[]
         setSelectedExtensions(extensions)
     }

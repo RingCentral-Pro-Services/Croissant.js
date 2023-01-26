@@ -155,6 +155,7 @@ const ExtensionDeleter = () => {
     }
 
     const handleFilterSelection = (selected: DataGridFormattable[]) => {
+        if (isPending) return
         console.log('Selected')
         console.log(selected)
         const extensions = selected as Extension[]

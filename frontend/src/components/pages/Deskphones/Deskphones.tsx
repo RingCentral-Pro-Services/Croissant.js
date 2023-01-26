@@ -113,6 +113,7 @@ const Deskphones = () => {
     }
 
     const handleFilterSelection = (selected: DataGridFormattable[]) => {
+        if (isSyncing) return
         const extensions = selected as RCExtension[]
         setSelectedExtensions(extensions)
         console.log(extensions)

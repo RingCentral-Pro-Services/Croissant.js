@@ -125,6 +125,7 @@ const NotificationAudit = () => {
     }, [isNotificationListPending, notifications, isPending])
 
     useEffect(() => {
+        if (isPending) return
         const filtered = adjustedExtensionList.filter((extension) => {
             return selectedExtensionTypes.includes(extension.prettyType[extension.type]) && selectedSites.includes(extension.site)
         })

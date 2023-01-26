@@ -128,6 +128,7 @@ const Intercom = () => {
     }, [isIntercomPending])
 
     const handleFilterSelection = (selected: DataGridFormattable[]) => {
+        if (isSyncing) return
         const extensions = selected as RCExtension[]
         setSelectedExtensions(extensions)
     }

@@ -133,6 +133,7 @@ const DirectCreateMenus = () => {
     },[targetUID])
 
     useEffect(() => {
+        if (isSyncing) return
         console.log('Selected Sites:')
         console.log(selectedSites)
         const filtered = menus.filter((menu) => {
