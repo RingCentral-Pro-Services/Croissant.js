@@ -51,7 +51,7 @@ export class Site implements DataGridFormattable {
     payload() {
         return {
             name: this.data.name,
-            extensionNumber: this.data.extensionNumber,
+            ...(this.data.extensionNumber && { extensionNumber: this.data.extensionNumber }),
             callerIdName: this.data.outboundCnam,
             businessAddress: {
                 street: `${this.data.street1}${this.data.street2 ? ` ${this.data.street2}` : ''}`,
