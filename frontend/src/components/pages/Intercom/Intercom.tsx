@@ -104,6 +104,7 @@ const Intercom = () => {
             }
         }
 
+        setEnablementMax(statues.length * 2)
         setIsFetchingDevices(false)
         setIsSyncing(true)
         changeIntercom(statues)
