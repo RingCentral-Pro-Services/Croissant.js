@@ -81,7 +81,7 @@ const usePhoneNumberMap = () => {
         setIsPhoneNumberMapPending(false)
     }, [isDoneFetching])
 
-    return { phoneNumberMap, isPhoneNumberMapPending, getPhoneNumberMap }
+    return { phoneNumberMap, phoneNumbers, isPhoneNumberMapPending, getPhoneNumberMap }
 }
 
 export default usePhoneNumberMap

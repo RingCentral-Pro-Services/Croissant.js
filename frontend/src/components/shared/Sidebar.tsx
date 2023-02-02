@@ -12,6 +12,7 @@ const Sidebar = () => {
     const [isCallQueueListOpen, setIsCallQueueListOpen] = useState(false)
     const [isCustomRuleListOpen, setIsCustomRuleListOpen] = useState(false)
     const [isSiteListOpen, setIsSiteListOpen] = useState(false)
+    const [isPhoneNumbersListOpen, setIsPhoneNumbersListOpen] = useState(false)
     const navigate = useNavigate()
 
     const handleClick = (text: string, destination: string) => {
@@ -52,6 +53,10 @@ const Sidebar = () => {
         {label: 'Enable / Disable Custom Rules', destination: '/customruleedit'}
     ]
 
+    const phoneNumberItems: SidebarItem[] = [
+        {label: 'Bulk Assign', destination: '/bulkassign'},
+    ]
+
     const handleToggle = () => {
         setIsIVRListOpen(!isIVRListOpen)
     }
@@ -66,6 +71,10 @@ const Sidebar = () => {
 
     const handleSiteToggle = () => {
         setIsSiteListOpen(!isSiteListOpen)
+    }
+
+    const handlePhoneNumberToggle = () => {
+        setIsPhoneNumbersListOpen(!isPhoneNumbersListOpen)
     }
 
     return ( 
@@ -141,6 +150,22 @@ const Sidebar = () => {
             <Collapse in={isSiteListOpen} timeout='auto'>
                 <List>
                     {siteItems.map((item) => (
+                        <ListItem className={selectedItem === item.label ? 'nav-item-selected' : ''} key={item.label} disablePadding>
+                        <ListItemButton onClick={() => handleClick(item.label, item.destination)}>
+                        <ListItemText primary={item.label} />
+                        </ListItemButton>
+                    </ListItem>
+                    ))}
+                </List>
+            </Collapse>
+            <Divider />
+            <ListItemButton onClick={handlePhoneNumberToggle}>
+                <ListItemText primary="Phone Numbers" />
+                {isPhoneNumbersListOpen ? <ExpandLess /> : <ExpandMore />}
+            </ListItemButton>
+            <Collapse in={isPhoneNumbersListOpen} timeout='auto'>
+                <List>
+                    {phoneNumberItems.map((item) => (
                         <ListItem className={selectedItem === item.label ? 'nav-item-selected' : ''} key={item.label} disablePadding>
                         <ListItemButton onClick={() => handleClick(item.label, item.destination)}>
                         <ListItemText primary={item.label} />

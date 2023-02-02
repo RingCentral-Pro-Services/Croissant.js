@@ -20,6 +20,7 @@ import ExtensionUpload from './components/pages/Extension Upload/ExtensionUpload
 import CallMonitoring from './components/pages/Call Monitoring/CallMonitoring';
 import PagingGroups from './components/pages/Paging Groups/PagingGroups';
 import Sites from './components/pages/Sites/Sites';
+import BulkAssign from './components/pages/Phone Numbers/Bulk Assign/BulkAssign';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -58,6 +59,7 @@ function App() {
               <Route path='/callmonitoring' element={<CallMonitoring />} />
               <Route path='/paginggroups' element={<PagingGroups />} />
               <Route path='/sites' element={<Sites />} />
+              <Route path='/bulkassign' element={<BulkAssign />} />
             </Routes>
           </Suspense>
         </div>

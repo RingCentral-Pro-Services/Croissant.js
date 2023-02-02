@@ -269,3 +269,14 @@ export const createSiteSchema = z.object({
     'Main Extension Number': z.string().or(z.number()).optional(),
     'Site Code': z.string().optional()
 })
+
+export const PhoneNumberPayloadSchema = z.object({
+    'Phone Number': z.string({
+        required_error: 'Missing phone number',
+        invalid_type_error: 'Phone number data type invalid. Expected text, found number'
+    }),
+    'Extension': z.string({
+        required_error: 'Missing extension number',
+        invalid_type_error: 'Extension number data type invalid. Expected text, found number'
+    }).or(z.number())
+})
