@@ -280,3 +280,31 @@ export const PhoneNumberPayloadSchema = z.object({
         invalid_type_error: 'Extension number data type invalid. Expected text, found number'
     }).or(z.number())
 })
+
+export const LocationUpdateSchema = z.object({
+    'Site': z.string({
+        required_error: 'Missing site name',
+        invalid_type_error: 'Site name data type invalid'
+    }),
+    'Nickname': z.string({
+        required_error: 'Missing nickname',
+        invalid_type_error: 'Nickname data type invalid. Expected text, found number'
+    }),
+    'Type': z.string({
+        required_error: 'Missing type',
+        invalid_type_error: 'Type data type invalid. Expected text, found number'
+    }),
+    'Chassis ID / BSSID': z.string({
+        required_error: 'Missing chassis id',
+        invalid_type_error: 'Chassis id data type invalid. Expected text, found number'
+    }),
+    'ERL': z.string({
+        required_error: 'Missing ERL',
+        invalid_type_error: 'ERL data type invalid. Expected text, found number'
+    }),
+    'Street': z.string().optional(),
+    'Street 2': z.string().optional(),
+    'City': z.string().optional(),
+    'State': z.string().optional(),
+    'Postal Code': z.string().or(z.number()).optional(),
+})

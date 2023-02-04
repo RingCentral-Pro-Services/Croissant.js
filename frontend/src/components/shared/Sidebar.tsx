@@ -30,6 +30,7 @@ const Sidebar = () => {
         {label: 'Intercom', destination: '/intercom'},
         {label: 'Call Monitoring', destination: '/callmonitoring'},
         {label: 'Paging Groups', destination: '/paginggroups'},
+        {label: 'Automatic Location Updates', destination: '/locationupdates'},
     ]
 
     const siteItems: SidebarItem[] = [

@@ -21,6 +21,7 @@ import CallMonitoring from './components/pages/Call Monitoring/CallMonitoring';
 import PagingGroups from './components/pages/Paging Groups/PagingGroups';
 import Sites from './components/pages/Sites/Sites';
 import BulkAssign from './components/pages/Phone Numbers/Bulk Assign/BulkAssign';
+import LocationUpdates from './components/pages/Automatic Location Updates/LocationUpdates';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -60,6 +61,7 @@ function App() {
               <Route path='/paginggroups' element={<PagingGroups />} />
               <Route path='/sites' element={<Sites />} />
               <Route path='/bulkassign' element={<BulkAssign />} />
+              <Route path='/locationupdates' element={<LocationUpdates />} />
             </Routes>
           </Suspense>
         </div>
