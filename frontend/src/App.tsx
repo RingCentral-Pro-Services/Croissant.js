@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react'
+import React, { Suspense, useState } from 'react'
 import { useEffect } from 'react';
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom'
 import CreateMenus from './components/pages/IVR/CreateMenus';
@@ -22,20 +22,41 @@ import PagingGroups from './components/pages/Paging Groups/PagingGroups';
 import Sites from './components/pages/Sites/Sites';
 import BulkAssign from './components/pages/Phone Numbers/Bulk Assign/BulkAssign';
 import LocationUpdates from './components/pages/Automatic Location Updates/LocationUpdates';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { Theme } from '@emotion/react';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
 
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+});
+
+const lightTheme = createTheme({
+  palette: {
+    mode: 'light',
+  },
+});
+
 function App() {
+  const[theme, setTheme] = useState<string>('light')
 
   useEffect(() => {
     document.title = "Croissant"
   }, [])
 
+  const setcolorTheme =(theme: string) => {
+    setTheme(theme)
+    document.querySelector('body')?.setAttribute('data-theme', theme)
+  }
+
   return (
-    <Router>
+    <ThemeProvider theme={theme === 'light'? lightTheme : darkTheme}>
+       <Router>
       <div className="App">
-        <Sidebar />
+        <Sidebar setColorTheme={setcolorTheme} />
         <div className="content">
           <Suspense fallback={<Loading/>}>
             <Routes>
@@ -67,6 +88,7 @@ function App() {
         </div>
       </div>
     </Router>
+    </ThemeProvider>
   );
 }
 

@@ -1,23 +1,41 @@
-import { Drawer, Toolbar, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, Collapse } from "@mui/material";
+import { Drawer, Toolbar, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, Collapse, IconButton } from "@mui/material";
 import React from "react";
 import { useState } from "react";
 import { useNavigate } from 'react-router-dom'
 import { SidebarItem } from "../../models/SidebarItem";
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import SettingsIcon from '@mui/icons-material/Settings';
+import LightModeIcon from '@mui/icons-material/LightMode';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
 
-const Sidebar = () => {
+interface SidebarProps {
+    setColorTheme: (theme: 'light' | 'dark') => void
+}
+
+const Sidebar: React.FC<SidebarProps> = ({setColorTheme}) => {
     const [selectedItem, setSelectedItem] = useState("")
     const [isIVRListOpen, setIsIVRListOpen] = useState(true)
     const [isCallQueueListOpen, setIsCallQueueListOpen] = useState(false)
     const [isCustomRuleListOpen, setIsCustomRuleListOpen] = useState(false)
     const [isSiteListOpen, setIsSiteListOpen] = useState(false)
     const [isPhoneNumbersListOpen, setIsPhoneNumbersListOpen] = useState(false)
+    const [theme, setTheme] = useState("light")
     const navigate = useNavigate()
 
     const handleClick = (text: string, destination: string) => {
         setSelectedItem(text)
         navigate(destination)
+    }
+
+    const handleThemeChange = () => {
+        if (theme === "dark") {
+            setTheme("light")
+            setColorTheme("light")
+        } else {
+            setTheme("dark")
+            setColorTheme("dark")
+        }
     }
 
     const sidebarItems: SidebarItem[] = [
@@ -80,6 +98,7 @@ const Sidebar = () => {
 
     return ( 
         <Drawer
+        className='nav-toolbar'
         sx={{
           width: 230,
           flexShrink: 0,
@@ -91,11 +110,14 @@ const Sidebar = () => {
         variant="permanent"
         anchor="left"
       >
-        <Toolbar className="nav-toolbar" >
+        <Toolbar className="nav-header" >
             <Typography variant="h6">Croissant</Typography>
+            <IconButton className='settings-button' color="primary" aria-label="upload picture" component="label" onClick={handleThemeChange}>
+                {theme === "light" ? <DarkModeIcon /> : <LightModeIcon />}
+            </IconButton>
         </Toolbar>
         <Divider />
-        <List>
+        <List className='nav-toolbar'>
             <ListItemButton onClick={handleToggle}>
                 <ListItemText primary="IVRs" />
                 {isIVRListOpen ? <ExpandLess /> : <ExpandMore />}

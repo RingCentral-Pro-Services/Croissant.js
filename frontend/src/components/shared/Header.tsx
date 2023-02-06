@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import {IconButton} from '@mui/material'
+import {IconButton, Paper} from '@mui/material'
 import {ExpandMore, ExpandLess} from '@mui/icons-material'
 
 const Header = (props: {title: string, body: string, children?: React.ReactNode}) => {
