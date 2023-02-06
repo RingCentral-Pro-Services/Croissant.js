@@ -20,7 +20,8 @@ const Sidebar: React.FC<SidebarProps> = ({setColorTheme}) => {
     const [isCustomRuleListOpen, setIsCustomRuleListOpen] = useState(false)
     const [isSiteListOpen, setIsSiteListOpen] = useState(false)
     const [isPhoneNumbersListOpen, setIsPhoneNumbersListOpen] = useState(false)
-    const [theme, setTheme] = useState("light")
+    const initialTheme = localStorage.getItem('theme') || 'light'
+    const [theme, setTheme] = useState(initialTheme)
     const navigate = useNavigate()
 
     const handleClick = (text: string, destination: string) => {

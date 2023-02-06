@@ -45,10 +45,15 @@ function App() {
 
   useEffect(() => {
     document.title = "Croissant"
+    const storedTheme = localStorage.getItem('theme')
+    if (storedTheme) {
+      setcolorTheme(storedTheme)
+    }
   }, [])
 
   const setcolorTheme =(theme: string) => {
     setTheme(theme)
+    localStorage.setItem('theme', theme)
     document.querySelector('body')?.setAttribute('data-theme', theme)
   }
 
