@@ -16,6 +16,7 @@ import UIDInputField from "../../shared/UIDInputField";
 import useCreateNetworkLocations from "./hooks/useCreateNetworkLocations";
 import useExcelToNetworkLocations from "./hooks/useExcelToNetworkLocations";
 import useFetchERLs from "./hooks/useFetchERLs";
+import LaunchIcon from '@mui/icons-material/Launch';
 
 const LocationUpdates = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -83,6 +84,7 @@ const LocationUpdates = () => {
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                 <FileSelect enabled={!isERLListPending} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
                 <Button disabled={isSyncing || networkLocations.length === 0} variant='contained' onClick={handleSync}>Sync</Button>
+                <Button className='healthy-margin-left' variant='outlined' onClick={() => window.open('https://docs.google.com/spreadsheets/d/13gGbVn_3c4HqI0HuxhAJs4sf6h8mQQBpFh2FhDoynkk/edit?usp=sharing', '_blank')} endIcon={<LaunchIcon />} >Template</Button>
                 {isSyncing ? <progress value={progressValue} max={progessMax} /> : <></>}
                 {isConvertPending ? <></> : <FeedbackArea gridData={networkLocations} messages={messages} timedMessages={timedMessages} errors={errors} />}
             </div>
