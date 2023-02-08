@@ -25,6 +25,7 @@ const CreateCallQueues = () => {
     let {messages, errors, postMessage, postError} = useMessageQueue()
     let [isPending, setIsPending] = useState(true)
     let [isReadyToSync, setIsReadyToSync] = useState(false)
+    const [isSyncing, setIsSyncing] = useState(false)
     const [targetUID, setTargetUID] = useState('')
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
     const { extensionsList, isExtensionListPending, isMultiSiteEnabled, fetchExtensions } = useExtensionList(postMessage)
@@ -49,6 +50,7 @@ const CreateCallQueues = () => {
     }
 
     const handleSyncButtonClick = () => {
+        setIsSyncing(true)
         setIsReadyToSync(true)
         fireEvent('create-call-queues')
     }
@@ -100,7 +102,7 @@ const CreateCallQueues = () => {
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                 <FileSelect enabled={hasCustomerToken} accept=".xlsx" handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Create Call Queues" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
-                {isPending ? <></> : <Button variant="contained" onClick={handleSyncButtonClick}>Sync</Button>}
+                {isPending ? <></> : <Button disabled={isSyncing} variant="contained" onClick={handleSyncButtonClick}>Sync</Button>}
                 {isCallQueueCreationPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 {!(queues.length > 0) ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
                 {isQueueConvertPending ? <></> : <FeedbackArea gridData={queues} messages={messages} timedMessages={timedMessages} errors={errors} />}

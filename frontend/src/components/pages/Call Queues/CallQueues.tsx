@@ -18,29 +18,36 @@ import FeedbackForm from "../../shared/FeedbackForm"
 import useSidebar from "../../../hooks/useSidebar"
 import usePhoneNumberMap from "../../../rcapi/usePhoneNumberMap"
 import CallQueue from "../../../models/CallQueue"
+import RCExtension from "../../../models/RCExtension"
+import AdaptiveFilter from "../../shared/AdaptiveFilter"
 
 const CallQueues = () => {
+    let [targetUID, setTargetUID] = useState("")
+    const [siteNames, setSiteNames] = useState<string[]>([])
+    const [selectedSiteNames, setSelectedSiteNames] = useState<string[]>([])
+    const [selectedExtensions, setSelectedExtensions] = useState<RCExtension[]>([])
+    const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
+    const [progressValue, setProgressValue] = useState(0)
+    const [maxProgressValue, setMaxProgressValue] = useState(0)
+    const [isPending, setisPending] = useState(false)
+
     useLogin('auditcallqueues')
     useSidebar('Audit Call Queues')
     const {fireEvent} = useAnalytics()
-    let [targetUID, setTargetUID] = useState("")
-    const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
     const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending, userName} = useGetAccessToken()
     let {messages, errors, postMessage, postError} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
-    const { extensionsList, isExtensionListPending, fetchExtensions } = useExtensionList(postMessage)
+    const { extensionsList, isExtensionListPending, isMultiSiteEnabled, fetchExtensions } = useExtensionList(postMessage)
     const {getPhoneNumberMap, phoneNumberMap, isPhoneNumberMapPending} = usePhoneNumberMap()
-    const [progressValue, setProgressValue] = useState(0)
-    const [maxProgressValue, setMaxProgressValue] = useState(0)
     let {callQueues, isQueueListPending, fetchQueueMembers} = useFetchCallQueueMembers(setProgressValue, setMaxProgressValue, postTimedMessage)
     const {fetchCallQueueSettings, queues: adjsutedQueues, isCallQueueSettingsPending} = useGetCallQueueSettings(setProgressValue, postMessage, postTimedMessage, postError)
     let {writeExcel} = useWriteExcelFile()
-    const [isPending, setisPending] = useState(false)
     const {writePrettyExcel} = useWritePrettyExcel()
 
     const handleClick = () => {
         setisPending(true)
-        fetchExtensions()
+        fetchQueueMembers(selectedExtensions)
+        fireEvent('call-queue-audit')
     }
 
     useEffect(() => {
@@ -50,15 +57,31 @@ const CallQueues = () => {
     },[targetUID])
 
     useEffect(() => {
+        if (!hasCustomerToken) return
+        fetchExtensions()
+    }, [hasCustomerToken])
+
+    useEffect(() => {
         if (isExtensionListPending) return
+
+        if (isMultiSiteEnabled) {
+            const sites = extensionsList.filter((ext) => ext.prettyType[ext.type] === 'Site')
+            const names = sites.map((site) => site.name)
+            setSiteNames(names)
+            setSelectedSiteNames(names)
+        }
+        else {
+            setSelectedExtensions(extensionsList)
+        }
+
+
         getPhoneNumberMap()
     }, [extensionsList, isExtensionListPending])
 
     useEffect(() => {
-        if (isPhoneNumberMapPending) return
-        fetchQueueMembers(extensionsList)
-        fireEvent('call-queue-audit')
-    }, [isPhoneNumberMapPending])
+        const filtered = extensionsList.filter((ext) => selectedSiteNames.includes(ext.site))
+        setSelectedExtensions(filtered)
+    }, [selectedSiteNames])
 
     useEffect(() => {
         if (isQueueListPending) return
@@ -91,6 +114,7 @@ const CallQueues = () => {
             <div className="tool-card">
                 <h2>Export Call Queues</h2>
                 <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} loading={isTokenPending} error={tokenError} />
+                {!isPhoneNumberMapPending && isMultiSiteEnabled ? <AdaptiveFilter options={siteNames} defaultSelected={siteNames} title='Sites' placeholder='Search...' setSelected={setSelectedSiteNames} />  : <></>}
                 <Button className='healthy-margin-right' disabled={!hasCustomerToken || isPending} variant="contained" onClick={handleClick}>Go</Button>
                 {isCallQueueSettingsPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 {isPending ? <progress className='healthy-margin-top' value={progressValue} max={maxProgressValue} /> : <></>}
