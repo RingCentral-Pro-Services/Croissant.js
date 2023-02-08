@@ -50,6 +50,13 @@ const useCreateERLs = (setProgressValue: (value: (any)) => void, postMessage: (m
                 next()
             }
             catch (e: any) {
+                if (e.rateLimitInterval > 0) {
+                    setRateLimitInterval(e.rateLimitInterval)
+                    postTimedMessage(new Message('Rate limit reached. Waiting 60 seconds before continuing', 'info'), 60000)
+                }
+                else {
+                    setRateLimitInterval(250)
+                }
                 console.log(`Failed to create ERL for site '${sites[currentExtensionIndex].data.name}'`)
                 postMessage(new Message(`Failed to create ERL for site '${sites[currentExtensionIndex].data.name}.' ${e.error}`, 'error'))
                 postError(new SyncError(sites[currentExtensionIndex].data.name, parseInt(sites[currentExtensionIndex].data.extensionNumber), ['Failed to create ERL', ''], e.error ?? ''))
