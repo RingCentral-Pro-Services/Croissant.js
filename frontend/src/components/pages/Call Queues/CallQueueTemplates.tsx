@@ -33,6 +33,7 @@ import useUploadCustomGreetings from "../../../rcapi/useUploadCustomGreetings";
 import { DataGridFormattable } from "../../../models/DataGridFormattable";
 import FeedbackForm from "../../shared/FeedbackForm";
 import useSidebar from "../../../hooks/useSidebar";
+import useSetMemberStatus from "./hooks/useSetMemberStatus";
 
 const CallQueueTemplates = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -44,11 +45,13 @@ const CallQueueTemplates = () => {
     const [isShowingHours, setIsShowingHours] = useState(false)
     const [schedulePayload, setSchedulePayload] = useState({})
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
+    const [editableMemberStatus, setEditableMemberStatus] = useState('')
 
     const [willUpdateRegionalSettings, setWillUpdateRegionalSettings] = useState(false)
     const [willUpdateCallHandlingSettings, setWillUpdateCallHandlingSettings] = useState(false)
     const [willUpdateSchedule, setWillUpdateSchedule] = useState(false)
     const [willUploadGreetings, setWillUploadGreetings] = useState(false)
+    const [willSetMemberStatus, setWillSetMemberStatus] = useState(false)
     const [regionalSettingsProgress, setRegionalSettingsProgress] = useState(0)
     const [callHandlingSettingsProgress, setCallHandlingSettingsProgress] = useState(0)
     const [scheduleProgress, setScheduleProgress] = useState(0)
@@ -57,6 +60,8 @@ const CallQueueTemplates = () => {
     const [callHandlingSettingsMaxProgress, setCallHandlingSettingsMaxProgress] = useState(0)
     const [scheduleMaxProgress, setScheduleMaxProgress] = useState(0)
     const [greetingUploadMaxProgress, setGreetingUploadMaxProgress] = useState(0)
+    const [memberStatusProgress, setMemberStatusProgress] = useState(0)
+    const [memberStatusMaxProgress, setMemberStatusMaxProgress] = useState(0)
 
     useLogin('callqueuetemplates')
     useSidebar('Call Queue Templates')
@@ -76,6 +81,7 @@ const CallQueueTemplates = () => {
     const {updateSchedule, isScheduleUpdatePending} = useUpdateSchedule(setScheduleProgress, postMessage, postTimedMessage, postError)
     const {setIntroGreetingFile, setConnectingGreetingFile, setIntterruptGreetingFile, setOnHoldGreetingFile, introGreetingPayload, connectingGreetingPayload, onHoldGreetingPayload, intterruptGreetingPayload, progressMultiplier} = useBuildCustomGreetings()
     const {uploadGreetings, isGreetingsUploadPending} = useUploadCustomGreetings(setGreetingUploadProgress, postMessage, postTimedMessage, postError)
+    const {editMemberStatus, isMemberStatusPending} = useSetMemberStatus(setMemberStatusProgress, postMessage, postTimedMessage, postError)
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -139,8 +145,13 @@ const CallQueueTemplates = () => {
 
     useEffect(() => {
         if (isGreetingsUploadPending) return
-        postMessage(new Message('Finished applying template', 'success'))
+        editMemberStatus(selectedExtensions, editableMemberStatus)
     }, [isGreetingsUploadPending])
+
+    useEffect(() => {
+        if (isMemberStatusPending) return
+        postMessage(new Message('Finished applying template', 'success'))
+    }, [isMemberStatusPending])
 
     const handleSyncButtonClick = () => {
         if (selectedExtensions.length === 0) return
@@ -149,8 +160,7 @@ const CallQueueTemplates = () => {
         setCallHandlingSettingsMaxProgress(selectedExtensions.length)
         setScheduleMaxProgress(selectedExtensions.length)
         setGreetingUploadMaxProgress(selectedExtensions.length * progressMultiplier)
-        console.log(`Progress Multiplier: ${progressMultiplier}`)
-        console.log(`Greeting Upload Max Progress: ${selectedExtensions.length * progressMultiplier}`)
+        setMemberStatusMaxProgress(selectedExtensions.length)
 
         if (Object.keys(regionalSettingsPayload).length != 0) {
             setWillUpdateRegionalSettings(true)
@@ -163,6 +173,9 @@ const CallQueueTemplates = () => {
         }
         if (introGreetingPayload.has('binary') || connectingGreetingPayload.has('binary') || onHoldGreetingPayload.has('binary') || intterruptGreetingPayload.has('binary')) {
             setWillUploadGreetings(true)
+        }
+        if (editableMemberStatus != '') {
+            setWillSetMemberStatus(true)
         }
 
         fireEvent('call-queue-templates')
@@ -200,13 +213,14 @@ const CallQueueTemplates = () => {
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                 {isRegionalFormatListPenging ? <></> : <AdaptiveFilter options={siteNames} showAllOption={true} setSelected={setSelectedSites} title='Sites' placeholder='Search' disabled={isRegionalFormatListPenging || isSyncing} defaultSelected={siteNames}  />}
                 <Button disabled={selectedExtensions.length === 0 || isRegionalFormatListPenging || isSyncing} variant="contained" onClick={handleSyncButtonClick} >Sync</Button>
-                {isGreetingsUploadPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
+                {isMemberStatusPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 <ScheduleBuilder isOpen={isShowingHours} setIsOpen={setIsShowingHours} setPayload={setSchedulePayload} />
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Call Queue Templates" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
                 {isSyncing && willUpdateRegionalSettings ? <> <Typography>Regional settings</Typography> <progress value={regionalSettingsProgress} max={regionalSettingsMaxProgress} /> </> : <></>}
                 {isSyncing && willUpdateCallHandlingSettings ? <> <Typography>Call Handling & Greetings</Typography> <progress value={callHandlingSettingsProgress} max={callHandlingSettingsMaxProgress} /> </> : <></>}
                 {isSyncing && willUpdateSchedule ? <> <Typography>Schedule</Typography> <progress value={scheduleProgress} max={scheduleMaxProgress} /> </> : <></>}
                 {isSyncing && willUploadGreetings ? <> <Typography>Custom Greetings</Typography> <progress value={greetingUploadProgress} max={greetingUploadMaxProgress} /> </> : <></>}
+                {isSyncing && willSetMemberStatus ? <> <Typography>Member Status</Typography> <progress value={memberStatusProgress} max={memberStatusMaxProgress} /> </> : <></>}
                 <div className="healthy-margin-bottom"></div>
                 <div hidden={isRegionalFormatListPenging || isSyncing}>
                     <Accordion>
@@ -263,6 +277,9 @@ const CallQueueTemplates = () => {
                                 <SimpleSelection label="When max wait time reached, send caller to" placeholder="" options={['Voicemail', 'Extension', 'External number']} defaultSelected='' onSelect={setMaxWaitTimeAction} />
                                 {/* <SimpleSelection label="Max wait time destination" placeholder="" options={['Needs new conponent', 'Needs new conponent', 'Needs new conponent']} defaultSelected='Needs new conponent' onSelect={setMaxWaitTimeDestination} /> */}
                                 <FreeResponse label="Max wait time destination" onInput={setMaxWaitTimeDestination} />
+                            </div>
+                            <div className="inline">
+                                <SimpleSelection label="Allow members to change status" placeholder="" options={['Allowed', 'Not Allowed']} defaultSelected='' onSelect={setEditableMemberStatus} />
                             </div>
                         </AccordionDetails>
                     </Accordion>
