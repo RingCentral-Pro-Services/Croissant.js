@@ -84,9 +84,6 @@ const ExtensionDeleter = () => {
         siteNames = ['Main Site', ...siteNames]
 
         setSites(siteNames)
-
-        console.log(`Sites: ${siteNames.length}`)
-        console.log(siteNames)
     }, [extensionsList, isExtensionListPending])
 
     useEffect(() => {

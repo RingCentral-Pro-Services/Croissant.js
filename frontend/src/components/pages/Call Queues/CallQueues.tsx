@@ -67,8 +67,8 @@ const CallQueues = () => {
         if (isMultiSiteEnabled) {
             const sites = extensionsList.filter((ext) => ext.prettyType[ext.type] === 'Site')
             const names = sites.map((site) => site.name)
-            setSiteNames(names)
-            setSelectedSiteNames(names)
+            setSiteNames(['Main Site', ...names])
+            setSelectedSiteNames(['Main Site', ...names])
         }
         else {
             setSelectedExtensions(extensionsList)

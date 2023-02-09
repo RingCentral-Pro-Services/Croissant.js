@@ -16,29 +16,34 @@ import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel";
 import useLogin from "../../../hooks/useLogin";
 import usePhoneNumberMap from "../../../rcapi/usePhoneNumberMap";
 import { IVRMenu } from "../../../models/IVRMenu";
+import RCExtension from "../../../models/RCExtension";
+import AdaptiveFilter from "../../shared/AdaptiveFilter";
 
 const DirectAuditMenus = () => {
-    useLogin('auditmenus')
     const {fireEvent} = useAnalytics()
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
     const [targetUID, setTargetUID] = useState('')
+    const [isPending, setIsPending] = useState(false)
+    const [siteNames, setSiteNames] = useState<string[]>([])
+    const [selectedSiteNames, setSelectedSiteNames] = useState<string[]>([])
+    const [selectedExtensions, setSelectedExtensions] = useState<RCExtension[]>([])
+
+    useLogin('auditmenus')
     const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending} = useGetAccessToken()
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
-    const {fetchExtensions, extensionsList, isExtensionListPending} = useExtensionList(postMessage)
+    const {fetchExtensions, extensionsList, isExtensionListPending, isMultiSiteEnabled} = useExtensionList(postMessage)
     const {getPhoneNumberMap, phoneNumberMap, isPhoneNumberMapPending} = usePhoneNumberMap()
     const {fetchAudioPrompts, audioPromptList, isAudioPromptListPending} = useGetAudioPrompts(postMessage, postTimedMessage)
     const {fetchIVRs, ivrsList, isIVRsListPending} = useFetchIVRs(setProgressValue, setMaxProgressValue, postMessage, postTimedMessage, postError)
     const {writeExcel} = useWriteExcelFile()
     const {writePrettyExcel} = useWritePrettyExcel()
-    const [isPending, setIsPending] = useState(false)
     const {prettyIVRs, isIVRBeautificationPending} = useBeautifyIVRs(isIVRsListPending, ivrsList, extensionsList, audioPromptList)
 
     const handleClick = () => {
-        console.log('Hey you clicked the button')
         setIsPending(true)
-        fetchExtensions()
+        fetchIVRs(selectedExtensions)
         fireEvent('update-audit')
     }
 
@@ -49,19 +54,35 @@ const DirectAuditMenus = () => {
     }, [targetUID])
 
     useEffect(() => {
+        if (!hasCustomerToken) return
+        fetchExtensions()
+    }, [hasCustomerToken])
+
+    useEffect(() => {
         if (isExtensionListPending) return
+
+        if (isMultiSiteEnabled) {
+            const sites = extensionsList.filter((ext) => ext.prettyType[ext.type] === 'Site')
+            const names = sites.map((site) => site.name)
+            setSiteNames(['Main Site', ...names])
+            setSelectedSiteNames(['Main Site', ...names])
+        }
+        else {
+            setSelectedExtensions(extensionsList)
+        }
+
         fetchAudioPrompts()
     }, [isExtensionListPending])
+
+    useEffect(() => {
+        const filtered = extensionsList.filter((ext) => selectedSiteNames.includes(ext.site))
+        setSelectedExtensions(filtered)
+    }, [selectedSiteNames])
 
     useEffect(() => {
         if (isAudioPromptListPending) return
         getPhoneNumberMap()
     }, [isAudioPromptListPending])
-
-    useEffect(() => {
-        if (isPhoneNumberMapPending) return
-        fetchIVRs(extensionsList)
-    }, [isPhoneNumberMapPending])
 
     const addPhoneNumbers = (ivrs: IVRMenu[]) => {
         ivrs.forEach((ivr) => {
@@ -84,6 +105,7 @@ const DirectAuditMenus = () => {
     return (
         <div className="main-content">
             <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
+            {!isPhoneNumberMapPending && isMultiSiteEnabled ? <AdaptiveFilter options={siteNames} defaultSelected={siteNames} title='Sites' placeholder='Search...' setSelected={setSelectedSiteNames} />  : <></>}
             <Button className='healthy-margin-right' disabled={!hasCustomerToken || isPending} variant="contained" onClick={handleClick}>Go</Button>
             {isPending ? <CircularProgress className="vertical-middle" /> : <></>}
             {isPending ? <progress className='healthy-margin-top' value={progressValue} max={maxProgressValue} /> : <></>}
