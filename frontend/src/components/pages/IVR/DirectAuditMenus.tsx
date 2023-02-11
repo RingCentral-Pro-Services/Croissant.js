@@ -106,7 +106,7 @@ const DirectAuditMenus = () => {
         <div className="main-content">
             <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
             {!isPhoneNumberMapPending && isMultiSiteEnabled ? <AdaptiveFilter options={siteNames} defaultSelected={siteNames} title='Sites' placeholder='Search...' setSelected={setSelectedSiteNames} />  : <></>}
-            <Button className='healthy-margin-right' disabled={!hasCustomerToken || isPending} variant="contained" onClick={handleClick}>Go</Button>
+            <Button className='healthy-margin-right' disabled={!hasCustomerToken || isPhoneNumberMapPending || isPending} variant="contained" onClick={handleClick}>Go</Button>
             {isPending ? <CircularProgress className="vertical-middle" /> : <></>}
             {isPending ? <progress className='healthy-margin-top' value={progressValue} max={maxProgressValue} /> : <></>}
             {timedMessages.length > 0 ? <MessagesArea messages={timedMessages} /> : <></>}
