@@ -106,7 +106,8 @@ export const callQueueSchema = z.object({
     'User Ring Time': z.string().optional(),
     'Total Ring Time': z.string().optional(),
     'Wrap Up Time': z.string().optional(),
-    'Voicemail Greeting': z.string().optional()
+    'Voicemail Greeting': z.string().optional(),
+    'Queue PIN': z.string().or(z.number()).optional()
 })
 
 export const notificationSchema = z.object({

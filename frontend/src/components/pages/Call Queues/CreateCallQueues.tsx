@@ -71,7 +71,6 @@ const CreateCallQueues = () => {
     useEffect(() => {
         if (isExcelDataPending) return
         validate(excelData)
-        // convert(excelData, extensionsList)
     }, [isExcelDataPending, excelData, extensionsList])
 
     useEffect(() => {
@@ -82,6 +81,7 @@ const CreateCallQueues = () => {
     useEffect(() => {
         if (isQueueConvertPending) return
         setIsPending(false)
+        console.log(queues)
     }, [isQueueConvertPending])
 
     useEffect(() => {

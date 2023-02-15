@@ -9,7 +9,7 @@ import { DataGridFormattable } from "./DataGridFormattable";
 import { PhoneNumber } from "./PhoneNumber";
 
 class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattable, DataGridFormattable {
-    constructor(public extension: RCExtension, public siteID: number, public members: string[], public handlingRules?: CallHandlingRules, public greetings?: Greeting[], public transferExtension?: string, public unconditionalForwardNumber?: string, public maxWaitTimeDestination?: string, public maxCallersDestination?: string, public afterHoursAction?: string, public afterHoursDestination?: string, public phoneNumbers?: PhoneNumber[]) {
+    constructor(public extension: RCExtension, public siteID: number, public members: string[], public handlingRules?: CallHandlingRules, public greetings?: Greeting[], public transferExtension?: string, public unconditionalForwardNumber?: string, public maxWaitTimeDestination?: string, public maxCallersDestination?: string, public afterHoursAction?: string, public afterHoursDestination?: string, public phoneNumbers?: PhoneNumber[], public pin?: string) {
         this.sortMembers()
     }
 
@@ -221,6 +221,8 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
                 email: this.extension.contact.email,
             },
             ...(isMultiSiteEnabled && {site: {id: this.siteID === 0 ? 'main-site' : this.siteID}}),
+            ...(this.pin != undefined && this.pin != '' && {ivrPin: this.pin}),
+            ...(this.pin != undefined && this.pin != '' && {status: 'Enabled'}),
         }
         return payload
     }

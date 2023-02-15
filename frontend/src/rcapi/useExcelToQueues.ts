@@ -55,6 +55,7 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
             }
 
             let queue = new CallQueue(extension, idForSite(extension.site, extensionsList), validMembers, getCallHandling(data[index], extensionsList), getGreetings(data[index]), getTransferExtension(data[index], extensionsList), getTransferPhoneNumber(data[index], extensionsList), getMaxWaitDestination(data[index], extensionsList), getMaxCallersDestination(data[index], extensionsList))
+            queue.pin = currentItem['Queue PIN']
 
             if (queue.siteID === 0) {
                 postMessage(new Message(`${contact.firstName} - Ext ${extension.extensionNumber} cannot be built because the site it's assigned to (${extension.site}) does not exist`, 'error'))
