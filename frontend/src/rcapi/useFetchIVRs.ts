@@ -6,7 +6,7 @@ import { IVRPrompt } from "../models/IVRMenu"
 import { Message } from "../models/Message"
 import { SyncError } from "../models/SyncError"
 
-const useFetchIVRs = (setProgressValue: (value: (any)) => void, setMaxProgressValue: (value: any) => void, postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
+const useFetchIVRs = (setProgressValue: (value: (any)) => void, setMaxProgressValue: (value: any) => void, postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void, isPaused: boolean) => {
     const [isIVRsListPending, setIsIVRsListPending] = useState(true)
     const [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
     const [ivrsList, setIvrsList] = useState<IVRMenu[]>([])
@@ -29,7 +29,7 @@ const useFetchIVRs = (setProgressValue: (value: (any)) => void, setMaxProgressVa
     }
 
     useEffect(() => {
-        if (!shouldFetch) return
+        if (!shouldFetch || isPaused) return
         if (currentExtensionIndex >= ivrExtensions.length) {
             console.log('Done fetching IVRs')
             console.log(ivrsList)
@@ -93,7 +93,7 @@ const useFetchIVRs = (setProgressValue: (value: (any)) => void, setMaxProgressVa
                 console.log(e)                
             }
         }, rateLimitInterval)
-    }, [currentExtensionIndex, rateLimitInterval, shouldFetch])
+    }, [currentExtensionIndex, rateLimitInterval, shouldFetch, isPaused])
 
     const increaseProgress = () => {
         setProgressValue((prev: any) => prev + 1)

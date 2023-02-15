@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import UIDInputField from "../../shared/UIDInputField";
 import useGetAccessToken from "../../../rcapi/useGetAccessToken";
-import {Button, CircularProgress} from '@mui/material'
+import {Button, CircularProgress, IconButton} from '@mui/material'
 import useExtensionList from "../../../rcapi/useExtensionList";
 import useMessageQueue from "../../../hooks/useMessageQueue";
 import useFetchIVRs from "../../../rcapi/useFetchIVRs";
@@ -18,6 +18,8 @@ import usePhoneNumberMap from "../../../rcapi/usePhoneNumberMap";
 import { IVRMenu } from "../../../models/IVRMenu";
 import RCExtension from "../../../models/RCExtension";
 import AdaptiveFilter from "../../shared/AdaptiveFilter";
+import StopCircleIcon from '@mui/icons-material/StopCircle';
+import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 
 const DirectAuditMenus = () => {
     const {fireEvent} = useAnalytics()
@@ -28,6 +30,7 @@ const DirectAuditMenus = () => {
     const [siteNames, setSiteNames] = useState<string[]>([])
     const [selectedSiteNames, setSelectedSiteNames] = useState<string[]>([])
     const [selectedExtensions, setSelectedExtensions] = useState<RCExtension[]>([])
+    const [isPaused, setIsPaused] = useState(false)
 
     useLogin('auditmenus')
     const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending} = useGetAccessToken()
@@ -36,7 +39,7 @@ const DirectAuditMenus = () => {
     const {fetchExtensions, extensionsList, isExtensionListPending, isMultiSiteEnabled} = useExtensionList(postMessage)
     const {getPhoneNumberMap, phoneNumberMap, isPhoneNumberMapPending} = usePhoneNumberMap()
     const {fetchAudioPrompts, audioPromptList, isAudioPromptListPending} = useGetAudioPrompts(postMessage, postTimedMessage)
-    const {fetchIVRs, ivrsList, isIVRsListPending} = useFetchIVRs(setProgressValue, setMaxProgressValue, postMessage, postTimedMessage, postError)
+    const {fetchIVRs, ivrsList, isIVRsListPending} = useFetchIVRs(setProgressValue, setMaxProgressValue, postMessage, postTimedMessage, postError, isPaused)
     const {writeExcel} = useWriteExcelFile()
     const {writePrettyExcel} = useWritePrettyExcel()
     const {prettyIVRs, isIVRBeautificationPending} = useBeautifyIVRs(isIVRsListPending, ivrsList, extensionsList, audioPromptList)
@@ -107,7 +110,11 @@ const DirectAuditMenus = () => {
             <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
             {!isPhoneNumberMapPending && isMultiSiteEnabled ? <AdaptiveFilter options={siteNames} defaultSelected={siteNames} title='Sites' placeholder='Search...' setSelected={setSelectedSiteNames} />  : <></>}
             <Button className='healthy-margin-right' disabled={!hasCustomerToken || isPhoneNumberMapPending || isPending} variant="contained" onClick={handleClick}>Go</Button>
-            {isPending ? <CircularProgress className="vertical-middle" /> : <></>}
+            {isPending ? 
+                <IconButton color="primary" aria-label="upload picture" component="label" onClick={() => setIsPaused(!isPaused)}>
+                    {isPaused ? <PlayCircleIcon/> : <StopCircleIcon />}
+                </IconButton>
+            : <></>}
             {isPending ? <progress className='healthy-margin-top' value={progressValue} max={maxProgressValue} /> : <></>}
             {timedMessages.length > 0 ? <MessagesArea messages={timedMessages} /> : <></>}
             {isIVRBeautificationPending ? <></> : <FeedbackArea gridData={prettyIVRs} messages={messages} timedMessages={timedMessages} errors={errors} />}
