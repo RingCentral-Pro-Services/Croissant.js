@@ -17,6 +17,7 @@ import Header from "../../shared/Header"
 import useLogin from "../../../hooks/useLogin"
 import FeedbackForm from "../../shared/FeedbackForm"
 import useSidebar from "../../../hooks/useSidebar"
+import useCallQueue from "./hooks/useCallQueue"
 
 const CreateCallQueues = () => {
     useLogin('createcallqueues')
@@ -24,10 +25,10 @@ const CreateCallQueues = () => {
     const {fireEvent} = useAnalytics()
     let {messages, errors, postMessage, postError} = useMessageQueue()
     let [isPending, setIsPending] = useState(true)
-    let [isReadyToSync, setIsReadyToSync] = useState(false)
     const [isSyncing, setIsSyncing] = useState(false)
     const [targetUID, setTargetUID] = useState('')
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
+    const [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
     const { extensionsList, isExtensionListPending, isMultiSiteEnabled, fetchExtensions } = useExtensionList(postMessage)
     const [selectedFile, setSelectedFile] = useState<File | null>()
     const {readFile, excelData, isExcelDataPending} = useReadExcel()
@@ -37,10 +38,12 @@ const CreateCallQueues = () => {
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
     const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending, userName} = useGetAccessToken()
 
+    const increaseProgress = () => {
+        setCurrentExtensionIndex( prev => prev + 1)
+    }
+
     // Progess bar
-    const [progressValue, setProgressValue] = useState(0)
-    const [maxProgressValue, setMaxProgressValue] = useState(0)
-    let {isCallQueueCreationPending, createQueues} = useCreateCallQueues(setProgressValue ,postMessage, postTimedMessage, postError, isMultiSiteEnabled)
+    const {createCallQueue} = useCallQueue(postMessage, postTimedMessage, postError, isMultiSiteEnabled, increaseProgress)
     const {validatedData, isDataValidationPending, validate} = useValidateExcelData(callQueueSchema, postMessage, postError)
 
     const handleFileSelect = () => {
@@ -51,9 +54,13 @@ const CreateCallQueues = () => {
 
     const handleSyncButtonClick = () => {
         setIsSyncing(true)
-        setIsReadyToSync(true)
         fireEvent('create-call-queues')
     }
+
+    useEffect(() => {
+        if (currentExtensionIndex >= queues.length || !isSyncing) return
+        createCallQueue(queues[currentExtensionIndex])
+    }, [currentExtensionIndex, isSyncing])
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -84,14 +91,6 @@ const CreateCallQueues = () => {
         console.log(queues)
     }, [isQueueConvertPending])
 
-    useEffect(() => {
-        if (isQueueConvertPending) return
-        if (!isReadyToSync) return
-
-        setMaxProgressValue(queues.length * 4)
-        createQueues(queues, extensionsList)
-    }, [isQueueConvertPending, isReadyToSync, extensionsList, queues])
-
     return (
         <>
             <Header title="Create Call Queues" body="Create and update call queues in bulk">
@@ -103,8 +102,8 @@ const CreateCallQueues = () => {
                 <FileSelect enabled={hasCustomerToken} accept=".xlsx" handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Create Call Queues" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
                 {isPending ? <></> : <Button disabled={isSyncing} variant="contained" onClick={handleSyncButtonClick}>Sync</Button>}
-                {isCallQueueCreationPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
-                {!(queues.length > 0) ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
+                {isSyncing && currentExtensionIndex === queues.length ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
+                {!(queues.length > 0) ? <></> : <progress id='sync_progress' value={currentExtensionIndex} max={queues.length} />}
                 {isQueueConvertPending ? <></> : <FeedbackArea gridData={queues} messages={messages} timedMessages={timedMessages} errors={errors} />}
             </div>
         </>
