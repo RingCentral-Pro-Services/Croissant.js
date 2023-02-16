@@ -7,9 +7,26 @@ import { Greeting } from "./Greetings";
 import { TransferPayload, UnconditionalForwardingPayload } from "./TransferPayload";
 import { DataGridFormattable } from "./DataGridFormattable";
 import { PhoneNumber } from "./PhoneNumber";
+import { CallQueueManager } from "./CallQueueManager";
 
 class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattable, DataGridFormattable {
-    constructor(public extension: RCExtension, public siteID: number, public members: string[], public handlingRules?: CallHandlingRules, public greetings?: Greeting[], public transferExtension?: string, public unconditionalForwardNumber?: string, public maxWaitTimeDestination?: string, public maxCallersDestination?: string, public afterHoursAction?: string, public afterHoursDestination?: string, public phoneNumbers?: PhoneNumber[], public pin?: string) {
+    constructor(
+        public extension: RCExtension,
+        public siteID: number,
+        public members: string[],
+        public handlingRules?: CallHandlingRules,
+        public greetings?: Greeting[],
+        public transferExtension?: string,
+        public unconditionalForwardNumber?: string,
+        public maxWaitTimeDestination?: string,
+        public maxCallersDestination?: string,
+        public afterHoursAction?: string,
+        public afterHoursDestination?: string,
+        public phoneNumbers?: PhoneNumber[],
+        public pin?: string,
+        public managers?: string[],
+        public editableMemberStatus?: string
+        ) {
         this.sortMembers()
     }
 
@@ -272,6 +289,32 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
             queue: {...this.handlingRules, ...(transferActions.length > 0 && {transfer: [...transferActions]}), ...(forwardActions.length > 0 && {unconditionalForwarding: [...forwardActions]})}
         }
         return payload
+    }
+
+    afterHoursPayload() {
+        return {
+            'callHandlingAction': this.afterHoursAction,
+            ...(this.afterHoursAction === 'UnconditionalForwarding' && { 'unconditionalForwarding': { 'phoneNumber': this.afterHoursDestination } }),
+            ...(this.afterHoursAction === 'TransferToExtension' && { 'transfer': { 'extension': {'id': this.afterHoursDestination} } }),
+        }
+    }
+
+    managersPayload() {
+        const managers: CallQueueManager[] = []
+
+        this.managers?.forEach((manager) => {
+            managers.push({id: manager, permission: 'FullAccess'})
+        })
+
+        return {
+            updatedExtensions: managers
+        }
+    }
+
+    memberStatusPayload() {
+        return {
+            editableMemberStatus: this.editableMemberStatus === 'Allow' ? true : false
+        }
     }
 }
 

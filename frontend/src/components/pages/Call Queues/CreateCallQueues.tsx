@@ -59,7 +59,7 @@ const CreateCallQueues = () => {
 
     useEffect(() => {
         if (currentExtensionIndex >= queues.length || !isSyncing) return
-        createCallQueue(queues[currentExtensionIndex])
+        createCallQueue(queues[currentExtensionIndex], extensionsList)
     }, [currentExtensionIndex, isSyncing])
 
     useEffect(() => {
@@ -102,7 +102,7 @@ const CreateCallQueues = () => {
                 <FileSelect enabled={hasCustomerToken} accept=".xlsx" handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Create Call Queues" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
                 {isPending ? <></> : <Button disabled={isSyncing} variant="contained" onClick={handleSyncButtonClick}>Sync</Button>}
-                {isSyncing && currentExtensionIndex === queues.length ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
+                {(isSyncing && currentExtensionIndex >= queues.length) ? <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button> : <></>}
                 {!(queues.length > 0) ? <></> : <progress id='sync_progress' value={currentExtensionIndex} max={queues.length} />}
                 {isQueueConvertPending ? <></> : <FeedbackArea gridData={queues} messages={messages} timedMessages={timedMessages} errors={errors} />}
             </div>

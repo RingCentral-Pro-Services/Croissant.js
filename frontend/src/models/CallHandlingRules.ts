@@ -11,6 +11,7 @@ export interface CallHandlingRules {
     holdTime: number
     wrapUpTime?: number
     maxCallersAction?: string
+    maxCallers: number
     transfer?: TransferPayload[]
     unconditionalForwarding?: UnconditionalForwardingPayload[]
 }

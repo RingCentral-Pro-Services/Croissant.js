@@ -28,6 +28,7 @@ const useBuildCallHandlingSettings = (extensions: RCExtension[]) => {
         wrapUpTime: -1,
         maxCallersAction: '',
         transfer: [],
+        maxCallers: -1,
         unconditionalForwarding: []
     }
     const [callHandling, setCallHandling] = useState<CallHandlingRules>(defaultSettings)

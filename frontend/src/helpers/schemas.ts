@@ -97,6 +97,7 @@ export const callQueueSchema = z.object({
         required_error: 'Missing members',
         invalid_type_error: 'Members data type invalid'
     }),
+    'Queue Manager': z.string().or(z.number()).optional(),
     'Greeting': z.string().optional(),
     'Audio While Connecting': z.string().optional(),
     'Hold Music': z.string().optional(),

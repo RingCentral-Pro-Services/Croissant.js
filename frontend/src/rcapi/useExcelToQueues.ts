@@ -21,7 +21,7 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
             let contact: ExtensionContact = {
                 firstName: currentItem['Queue Name'],
                 lastName: "",
-                email: currentItem['Email']
+                email: currentItem['Email'] ?? currentItem['Queue Email']
             }
             let extension = new RCExtension(idForQueue(currentItem['Extension'], extensionsList), currentItem['Extension'], currentItem['Queue Name'], contact, currentItem['Site'], 'Department', '', false, '')
             let memberString: string = currentItem['Members (Ext)']
@@ -56,6 +56,16 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
 
             let queue = new CallQueue(extension, idForSite(extension.site, extensionsList), validMembers, getCallHandling(data[index], extensionsList), getGreetings(data[index]), getTransferExtension(data[index], extensionsList), getTransferPhoneNumber(data[index], extensionsList), getMaxWaitDestination(data[index], extensionsList), getMaxCallersDestination(data[index], extensionsList))
             queue.pin = currentItem['Queue PIN']
+            queue.afterHoursAction = getAfterHoursAction(data[index])
+            queue.afterHoursDestination = getAfterHoursDestination(data[index], extensionsList)
+            queue.managers = getManagers(data[index], extensionsList)
+            queue.editableMemberStatus = getMemberStatusSetting(data[index])
+
+            // You must supply an email address to create a call queue, even if you're going to select managers from the account
+            // Set the email to a dummy one if it's not supplied and there is at least one manager
+            if ((!queue.extension.contact.email || queue.extension.contact.email === '') && queue.managers.length > 0) {
+                queue.extension.contact.email = `noreply-${queue.extension.extensionNumber}@ps.ringcentral.com`
+            }
 
             if (queue.siteID === 0) {
                 postMessage(new Message(`${contact.firstName} - Ext ${extension.extensionNumber} cannot be built because the site it's assigned to (${extension.site}) does not exist`, 'error'))
@@ -78,6 +88,7 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
             maxCallersAction: "Voicemail",
             holdTime: 180,
             agentTimeout: 20,
+            maxCallers: 10,
             wrapUpTime: 15
         }
 
@@ -90,6 +101,10 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
 
             if (time < 10) time = time * 60
             settings.agentTimeout = time
+        }
+        if (CallQueueKeys.maxCallers in data) {
+            const callers = parseInt(data[CallQueueKeys.maxCallers].toString().replace(/\D/g, ''))
+            settings.maxCallers = callers
         }
         if (CallQueueKeys.totalRingTime in data) {
             if (data[CallQueueKeys.totalRingTime] === '10 min' || data[CallQueueKeys.totalRingTime] === '15 min') {
@@ -132,26 +147,26 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
                 settings.holdAudioInterruptionPeriod = time
             }
         }
-        if (CallQueueKeys.maxWaitTimeAction in data) {
-            const action = data[CallQueueKeys.maxWaitTimeAction]
+        if (CallQueueKeys.maxQueueWaitTimeAction in data || CallQueueKeys.maxWaitTimeAction in data) {
+            const action = data[CallQueueKeys.maxWaitTimeAction] ?? data[CallQueueKeys.maxQueueWaitTimeAction]
 
-            if (action === 'Transfer to Extension') {
+            if (action === 'Extension →' || action === 'Transfer to Extension') {
                 settings.holdTimeExpirationAction = 'TransferToExtension'
             }
-            else if (action === 'Forward to External') {
+            else if (action === 'External Number →' || action === 'Forward to External') {
                 settings.holdTimeExpirationAction = 'UnconditionalForwarding'
             }
         }
-        if (CallQueueKeys.maxCallersAction in data) {
-            const action = data[CallQueueKeys.maxCallersAction]
+        if (CallQueueKeys.queueFullAction in data || CallQueueKeys.maxCallersAction in data) {
+            const action = data[CallQueueKeys.maxCallersAction] ?? data[CallQueueKeys.queueFullAction]
 
-            if (action === 'Transfer to Extension') {
+            if (action === 'Send new callers to Extension →' || action === 'Transfer to Extension') {
                 settings.maxCallersAction = 'TransferToExtension'
             }
-            else if (action === 'Forward to External') {
+            else if (action === 'Forward new callers to Externa number →' || action === 'Forward to External') {
                 settings.maxCallersAction = 'UnconditionalForwarding'
             }
-            else if (action === 'Play Greeting and Disconnect') {
+            else if (action === 'Advise callers of heavy call volume and disconnect' || action === 'Play Greeting and Disconnect') {
                 settings.maxCallersAction = 'Announcement'
             }
         }
@@ -160,20 +175,20 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
     }
 
     const getMaxWaitDestination = (data: any, extensionList: RCExtension[]) => {
-        if (CallQueueKeys.maxWaitTimeAction in data) {
-            const action = data[CallQueueKeys.maxWaitTimeAction] as string
+        if (CallQueueKeys.maxQueueWaitTimeAction in data || CallQueueKeys.maxWaitTimeAction in data) {
+            const action = data[CallQueueKeys.maxWaitTimeAction] as string ?? data[CallQueueKeys.maxQueueWaitTimeAction] as string
             
-            if (CallQueueKeys.maxWaitTimeDestination in data && action === 'Transfer to Extension') {
+            if ((CallQueueKeys.maxQueueWaitTimeDestination in data || CallQueueKeys.maxWaitTimeDestination in data) && (action === 'Extension →' || action === 'Transfer to Extension')) {
                 const isolator = new ExtensionIsolator()
-                const rawDestination = data[CallQueueKeys.maxWaitTimeDestination] as string
+                const rawDestination = `${data[CallQueueKeys.maxWaitTimeDestination] ?? data[CallQueueKeys.maxQueueWaitTimeDestination]}`
                 const extension = isolator.isolateExtension(rawDestination)
                 if (extension) {
                     return `${idForExtension(extension, extensionList)}`    
                 }
             }
-            else if (CallQueueKeys.maxWaitTimeDestination in data && action === 'Forward to External') {
+            else if ((CallQueueKeys.maxQueueWaitTimeDestination in data || CallQueueKeys.maxWaitTimeDestination in data) && (action === 'External Number →' || action === 'Forward to External')) {
                 const isolator = new ExtensionIsolator()
-                const rawDestination = data[CallQueueKeys.maxWaitTimeDestination] as string
+                const rawDestination = `${data[CallQueueKeys.maxWaitTimeDestination] ?? data[CallQueueKeys.maxQueueWaitTimeDestination]}`
                 const phoneNumber = isolator.isolatePhoneNumber(rawDestination)
                 return phoneNumber
             }
@@ -181,20 +196,20 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
     }
 
     const getMaxCallersDestination = (data: any, extensionList: RCExtension[]) => {
-        if (CallQueueKeys.maxCallersAction in data) {
-            const action = data[CallQueueKeys.maxCallersAction] as string
+        if (CallQueueKeys.queueFullAction in data || CallQueueKeys.maxCallersAction in data) {
+            const action = data[CallQueueKeys.maxCallersAction] ?? data[CallQueueKeys.queueFullAction] as string
             
-            if (CallQueueKeys.maxCallersDestination in data && action === 'Transfer to Extension') {
+            if ((CallQueueKeys.queueFullAction in data || CallQueueKeys.maxCallersDestination in data) && (action === 'Send new callers to Extension →' || action === 'Transfer to Extension')) {
                 const isolator = new ExtensionIsolator()
-                const rawDestination = data[CallQueueKeys.maxCallersDestination] as string
+                const rawDestination = `${data[CallQueueKeys.maxCallersDestination] ?? data[CallQueueKeys.queueFullDestination]}`
                 const extension = isolator.isolateExtension(rawDestination)
                 if (extension) {
                     return `${idForExtension(extension, extensionList)}`
                 }
             }
-            else if (CallQueueKeys.maxCallersDestination in data && action === 'Forward to External') {
+            else if ((CallQueueKeys.queueFullDestination in data || CallQueueKeys.maxCallersDestination in data) && (action === 'Forward new callers to Externa number →' || action === 'Forward to External')) {
                 const isolator = new ExtensionIsolator()
-                const rawDestination = data[CallQueueKeys.maxCallersDestination] as string
+                const rawDestination = `${data[CallQueueKeys.maxCallersDestination] ?? data[CallQueueKeys.queueFullDestination]}`
                 const phoneNumber = isolator.isolatePhoneNumber(rawDestination)
                 return phoneNumber
             }
@@ -233,6 +248,55 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
                     return phoneNumber
                 }
             }
+        }
+    }
+
+    const getAfterHoursAction = (data: any) => {
+        if (CallQueueKeys.afterHoursAction in data) {
+            const action = data[CallQueueKeys.afterHoursAction] as string
+
+            if (action === 'Play an Announcement') {
+                return 'PlayAnnouncementOnly'
+            }
+            else if (action === 'Send to Voicemail') {
+                return 'TakeMessagesOnly'
+            }
+            else if (action === 'Forward to External Number →') {
+                return 'UnconditionalForwarding'
+            }
+            else if (action === 'Forward to Extension →') {
+                return 'TransferToExtension'
+            }
+        }
+    }
+
+    const getAfterHoursDestination = (data: any, extensionList: RCExtension[]) => {
+        if (CallQueueKeys.afterHoursDestination in data) {
+            const rawDestination = data[CallQueueKeys.afterHoursDestination] as string
+            const isolator = new ExtensionIsolator()
+
+            if (CallQueueKeys.afterHoursAction in data) {
+                const action = data[CallQueueKeys.afterHoursAction] as string
+
+                if (action === 'Forward to External Number →') {
+                    const phoneNumber = isolator.isolatePhoneNumber(rawDestination)
+                    return phoneNumber
+                }
+                else if (action === 'Forward to Extension →') {
+                    const extension = isolator.isolateExtension(rawDestination)
+
+                    if (extension) {
+                        return `${idForExtension(extension, extensionList)}`
+                    }
+                }
+            }
+        }
+    }
+
+    const getMemberStatusSetting = (data: any) => {
+        if (CallQueueKeys.memberStatus in data) {
+            const status = data[CallQueueKeys.memberStatus] as string
+            return status
         }
     }
 
@@ -281,6 +345,22 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
 
         greetings.push(interruptAudio)
         return greetings
+    }
+
+    const getManagers = (data: any, extensionList: RCExtension[]) => {
+        let managers: string[] = []
+        if (CallQueueKeys.managers in data) {
+            const rawManagerList = `${data[CallQueueKeys.managers]}`
+            const managerList = rawManagerList.split(',')
+            managerList.forEach(manager => {
+                const isolator = new ExtensionIsolator()
+                const extension = isolator.isolateExtension(manager)
+                if (extension) {
+                    managers.push(`${idForExtension(extension, extensionList)}`)
+                }
+            })
+        }
+        return managers
     }
 
     const translatedRingType = (text: string) => {

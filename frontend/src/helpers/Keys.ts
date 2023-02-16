@@ -20,6 +20,15 @@ export const CallQueueKeys = {
     'maxWaitTimeDestination': 'Max Wait Time Destination',
     'maxCallersAction': 'Max Callers Action',
     'maxCallersDestination': 'Max Callers Destination',
+    'queueFullAction': 'When Queue is Full',
+    'queueFullDestination': 'Queue Full Destination',
+    'maxQueueWaitTimeAction': 'When Max Time is Reached',
+    'maxQueueWaitTimeDestination': 'Time Reached Destination',
     'voicemailRecipient': 'Voicemail Recipient',
-    'voicemailRecipientExt': 'Voicemail Recipient Ext'
+    'voicemailRecipientExt': 'Voicemail Recipient Ext',
+    'afterHoursAction': 'After Hours Behavior',
+    'afterHoursDestination': 'After Hours Destination',
+    'managers': 'Queue Manager',
+    'maxCallers': 'Callers In Queue',
+    'memberStatus': 'Member Queue Status'
 }
