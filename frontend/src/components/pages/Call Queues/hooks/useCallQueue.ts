@@ -53,12 +53,8 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             await makeQueue(queue, accessToken)
         }
 
-        if (queue.managers && queue.managers?.length > 0) {
-            await setManagers(queue, accessToken)
-        }
-        if (queue.editableMemberStatus) {
-            await setMemberStatus(queue, accessToken)
-        }
+        await setManagers(queue, accessToken)
+        await setMemberStatus(queue, accessToken)
         await addQueueMembers(queue, accessToken)
         await setCallHandling(queue, accessToken)
         await setGreetings(queue, accessToken)
@@ -89,16 +85,16 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             if (e.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
-
             console.log(`Failed to make queue ${queue.extension.name}`)
             console.log(e)
             postMessage(new Message(`Failed to make queue ${queue.extension.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to create queue', ''], e.error ?? ''))
+            await wait(e.rateLimitInterval)
         }
     }
 
     const setManagers = async (queue: CallQueue, token: string) => {
-        if (!queue.extension.id) return
+        if (!queue.extension.id || !queue.managers || queue.managers.length === 0) return
 
         try {
             const headers = {
@@ -124,11 +120,12 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(e)
             postMessage(new Message(`Failed to set managers for ${queue.extension.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set managers', ''], e.error ?? ''))
+            await wait(e.rateLimitInterval)
         }
     }
 
     const addQueueMembers = async (queue: CallQueue, token: string) => {
-        if (!queue.extension.id) return
+        if (!queue.extension.id || queue.members.length === 0) return
 
         try {
             const headers = {
@@ -157,6 +154,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(e)
             postMessage(new Message(`Failed to add queue members ${queue.extension.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to add queue members', ''], e.error ?? ''))
+            await wait(e.rateLimitInterval)
         }
     }
 
@@ -189,11 +187,12 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(e)
             postMessage(new Message(`Failed to set call handling ${queue.extension.name}. ${e.error ?? ''}`, 'error'))
             postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set call handling', ''], e.error ?? ''))
+            await wait(e.rateLimitInterval)
         }
     }
 
     const setAfterHoursCallHandling = async (queue: CallQueue, token: string) => {
-        if (!queue.extension.id) return
+        if (!queue.extension.id || !queue.afterHoursAction || queue.afterHoursAction === '' ) return
 
         try {
             const headers = {
@@ -221,11 +220,12 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(e)
             postMessage(new Message(`Failed to set after hours call handling ${queue.extension.name}. ${e.error ?? ''}`, 'error'))
             postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set after hours call handling', ''], e.error ?? ''))
+            await wait(e.rateLimitInterval)
         }
     }
 
     const setGreetings = async (queue: CallQueue, token: string) => {
-        if (!queue.extension.id) return
+        if (!queue.extension.id || !queue.greetings || queue.greetings.length === 0) return
 
         try {
             const headers = {
@@ -256,6 +256,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(e)
             postMessage(new Message(`Failed to set greetings ${queue.extension.name}. ${e.error ?? ''}`, 'error'))
             postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set greetings', ''], e.error ?? ''))
+            await wait(e.rateLimitInterval)
         }
     }
 
@@ -288,11 +289,12 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(e)
             postMessage(new Message(`Failed to set schedule for ${queue.extension.name}. ${e.error ?? ''}`, 'error'))
             postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set schedule', ''], e.error ?? ''))
+            await wait(e.rateLimitInterval)
         }
     }
 
     const setMemberStatus = async (queue: CallQueue, token: string) => {
-        if (!queue.extension.id) return
+        if (!queue.extension.id || !queue.editableMemberStatus || queue.editableMemberStatus === '') return
         
         try {
             const headers = {
@@ -320,6 +322,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(e)
             postMessage(new Message(`Failed to set editable member status for ${queue.extension.name}. ${e.error ?? ''}`, 'error'))
             postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set editable member status', ''], e.error ?? ''))
+            await wait(e.rateLimitInterval)
         }
     }
 
