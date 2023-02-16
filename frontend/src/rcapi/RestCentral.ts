@@ -10,7 +10,7 @@ export class RestCentral {
             console.log('Customer token is about to expire. Fetching new token.')
             await this.fetchCustomerTokenAsync()
         }
-        else if (this.isRCTokenAboutToExpire()) {
+        if (this.isRCTokenAboutToExpire()) {
             console.log('RC token is about to expire. Fetching new token.')
             await this.refreshRCRokenAsync()
         }
@@ -39,7 +39,7 @@ export class RestCentral {
             console.log('Customer token is about to expire. Fetching new token.')
             await this.fetchCustomerTokenAsync()
         }
-        else if (this.isRCTokenAboutToExpire()) {
+        if (this.isRCTokenAboutToExpire()) {
             console.log('RC token is about to expire. Fetching new token.')
             await this.refreshRCRokenAsync()
         }
@@ -71,7 +71,7 @@ export class RestCentral {
             console.log('Customer token is about to expire. Fetching new token.')
             await this.fetchCustomerTokenAsync()
         }
-        else if (this.isRCTokenAboutToExpire()) {
+        if (this.isRCTokenAboutToExpire()) {
             console.log('RC token is about to expire. Fetching new token.')
             await this.refreshRCRokenAsync()
         }
@@ -95,7 +95,6 @@ export class RestCentral {
                 rateLimitInterval: rateLimit(res.response.headers),
                 error: res.response.data.message
             }
-            console.log('returning response')
             throw response
         }
     }
@@ -105,7 +104,7 @@ export class RestCentral {
             console.log('Customer token is about to expire. Fetching new token.')
             await this.fetchCustomerTokenAsync()
         }
-        else if (this.isRCTokenAboutToExpire()) {
+        if (this.isRCTokenAboutToExpire()) {
             console.log('RC token is about to expire. Fetching new token.')
             await this.refreshRCRokenAsync()
         }
