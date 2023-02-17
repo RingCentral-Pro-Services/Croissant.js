@@ -20,6 +20,7 @@ import usePhoneNumberMap from "../../../rcapi/usePhoneNumberMap"
 import CallQueue from "../../../models/CallQueue"
 import RCExtension from "../../../models/RCExtension"
 import AdaptiveFilter from "../../shared/AdaptiveFilter"
+import useAuditCallQueue from "./hooks/useAuditCallQueue"
 
 const CallQueues = () => {
     let [targetUID, setTargetUID] = useState("")
@@ -30,6 +31,14 @@ const CallQueues = () => {
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
     const [isPending, setisPending] = useState(false)
+    const [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
+    const [isSyncing, setIsSyncing] = useState(false)
+    const [aditedQueues, setAditedQueues] = useState<CallQueue[]>([])
+
+    const increaseProgress = (queue: CallQueue) => {
+        setAditedQueues([...aditedQueues, queue])
+        setCurrentExtensionIndex( prev => prev + 1)
+    }
 
     useLogin('auditcallqueues')
     useSidebar('Audit Call Queues')
@@ -41,14 +50,27 @@ const CallQueues = () => {
     const {getPhoneNumberMap, phoneNumberMap, isPhoneNumberMapPending} = usePhoneNumberMap()
     let {callQueues, isQueueListPending, fetchQueueMembers} = useFetchCallQueueMembers(setProgressValue, setMaxProgressValue, postTimedMessage)
     const {fetchCallQueueSettings, queues: adjsutedQueues, isCallQueueSettingsPending} = useGetCallQueueSettings(setProgressValue, postMessage, postTimedMessage, postError)
+    const {auditQueue} = useAuditCallQueue(postMessage, postTimedMessage, postError, increaseProgress)
     let {writeExcel} = useWriteExcelFile()
     const {writePrettyExcel} = useWritePrettyExcel()
 
     const handleClick = () => {
         setisPending(true)
-        fetchQueueMembers(selectedExtensions)
-        fireEvent('call-queue-audit')
+        setIsSyncing(true)
+        // fetchQueueMembers(selectedExtensions)
+        // fireEvent('call-queue-audit')
     }
+
+    useEffect(() => {
+        if (!isSyncing) return
+        if (currentExtensionIndex >= selectedExtensions.length) {
+            setIsSyncing(false)
+            setisPending(false)
+            exportQueues()
+            return
+        }
+        auditQueue(selectedExtensions[currentExtensionIndex], extensionsList)
+    }, [currentExtensionIndex, isSyncing])
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -79,7 +101,7 @@ const CallQueues = () => {
     }, [extensionsList, isExtensionListPending])
 
     useEffect(() => {
-        const filtered = extensionsList.filter((ext) => selectedSiteNames.includes(ext.site))
+        const filtered = extensionsList.filter((ext) => selectedSiteNames.includes(ext.site) && ext.type === 'Department')
         setSelectedExtensions(filtered)
     }, [selectedSiteNames])
 
@@ -93,6 +115,16 @@ const CallQueues = () => {
         queues.forEach(queue => {
             queue.phoneNumbers = phoneNumberMap.get(`${queue.extension.id}`)
         })
+    }
+
+    const exportQueues = () => {
+        addPhoneNumbers(aditedQueues)
+        console.log('Queues')
+        console.log(aditedQueues)
+        const header = ['Queue Name', 'Extension', 'Site', 'Status', 'Members (Ext)', 'Greeting', 'Audio While Connecting', 'Hold Music', 'Voicemail', 'Interrupt Audio', 'Interrupt Prompt', 'Ring Type', 'Total Ring Time', 'User Ring Time' , 'Max Wait Time Action', 'Max Wait Time Destination', 'Max Callers Action', 'Max Callers Destination', 'No Answer Action', 'Wrap Up Time']
+        writePrettyExcel(header, aditedQueues, 'Call Queues', 'queues.xlsx', '/call-queue-template.xlsx')
+        setisPending(false)
+        setProgressValue(aditedQueues.length * 2)
     }
 
     useEffect(() => {
@@ -117,7 +149,7 @@ const CallQueues = () => {
                 {!isPhoneNumberMapPending && isMultiSiteEnabled ? <AdaptiveFilter options={siteNames} defaultSelected={siteNames} title='Sites' placeholder='Search...' setSelected={setSelectedSiteNames} />  : <></>}
                 <Button className='healthy-margin-right' disabled={!hasCustomerToken || isPhoneNumberMapPending || isPending} variant="contained" onClick={handleClick}>Go</Button>
                 {isCallQueueSettingsPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
-                {isPending ? <progress className='healthy-margin-top' value={progressValue} max={maxProgressValue} /> : <></>}
+                {isPending ? <progress className='healthy-margin-top' value={currentExtensionIndex} max={selectedExtensions.length} /> : <></>}
                 {timedMessages.length > 0 ? <MessagesArea messages={timedMessages} /> : <></>}
                 {!isCallQueueSettingsPending ? <FeedbackArea gridData={callQueues} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
             </div>
