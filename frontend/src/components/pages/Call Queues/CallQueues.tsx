@@ -93,7 +93,7 @@ const CallQueues = () => {
             setSelectedSiteNames(['Main Site', ...names])
         }
         else {
-            setSelectedExtensions(extensionsList)
+            setSelectedExtensions(extensionsList.filter((ext) => ext.type === 'Department'))
         }
 
 
