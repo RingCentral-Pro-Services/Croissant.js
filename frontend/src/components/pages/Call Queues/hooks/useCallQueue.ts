@@ -12,6 +12,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
     const baseScheduleURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/business-hours'
     const baseManagersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/extensionId/permissions-bulk-assign'
     const baseMemberStatusURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId'
+    const baseWaitingPeriod = 250
 
     const defaultHours = {
         schedule: {
@@ -78,8 +79,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             queue.extension.id = response.data.id
-            await wait(response.rateLimitInterval)
-            console.log(response)
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
@@ -89,7 +89,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(e)
             postMessage(new Message(`Failed to make queue ${queue.extension.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to create queue', ''], e.error ?? ''))
-            await wait(e.rateLimitInterval)
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
 
@@ -108,8 +108,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
-            await wait(response.rateLimitInterval)
-            console.log(response)
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
@@ -120,7 +119,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(e)
             postMessage(new Message(`Failed to set managers for ${queue.extension.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set managers', ''], e.error ?? ''))
-            await wait(e.rateLimitInterval)
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
 
@@ -142,8 +141,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
 
-            await wait(response.rateLimitInterval)
-            console.log(response)
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
@@ -154,7 +152,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(e)
             postMessage(new Message(`Failed to add queue members ${queue.extension.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to add queue members', ''], e.error ?? ''))
-            await wait(e.rateLimitInterval)
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
 
@@ -175,8 +173,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
 
-            await wait(response.rateLimitInterval)
-            console.log(response)
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
@@ -187,7 +184,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(e)
             postMessage(new Message(`Failed to set call handling ${queue.extension.name}. ${e.error ?? ''}`, 'error'))
             postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set call handling', ''], e.error ?? ''))
-            await wait(e.rateLimitInterval)
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
 
@@ -208,8 +205,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
 
-            await wait(response.rateLimitInterval)
-            console.log(response)
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
@@ -220,7 +216,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(e)
             postMessage(new Message(`Failed to set after hours call handling ${queue.extension.name}. ${e.error ?? ''}`, 'error'))
             postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set after hours call handling', ''], e.error ?? ''))
-            await wait(e.rateLimitInterval)
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
 
@@ -244,8 +240,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
 
-            await wait(response.rateLimitInterval)
-            console.log(response)
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
@@ -256,7 +251,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(e)
             postMessage(new Message(`Failed to set greetings ${queue.extension.name}. ${e.error ?? ''}`, 'error'))
             postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set greetings', ''], e.error ?? ''))
-            await wait(e.rateLimitInterval)
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
 
@@ -277,8 +272,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
 
-            await wait(response.rateLimitInterval)
-            console.log(response)
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
@@ -289,7 +283,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(e)
             postMessage(new Message(`Failed to set schedule for ${queue.extension.name}. ${e.error ?? ''}`, 'error'))
             postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set schedule', ''], e.error ?? ''))
-            await wait(e.rateLimitInterval)
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
 
@@ -310,8 +304,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
 
-            await wait(response.rateLimitInterval)
-            console.log(response)
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
@@ -322,7 +315,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(e)
             postMessage(new Message(`Failed to set editable member status for ${queue.extension.name}. ${e.error ?? ''}`, 'error'))
             postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set editable member status', ''], e.error ?? ''))
-            await wait(e.rateLimitInterval)
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
 

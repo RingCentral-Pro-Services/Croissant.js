@@ -11,6 +11,7 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
     const baseCallHandlingURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/answering-rule'
     const baseMemberStatusURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId'
     const baseManagersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId/permissions'
+    const baseWaitingPeriod = 250
 
     const auditQueue = async (extension: RCExtension, extensions: RCExtension[]) => {
         const accessToken = localStorage.getItem('cs_access_token')
@@ -19,12 +20,11 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
         }
 
         const queue = new CallQueue(extension, 0, [])
+
         await fetchQueueMembers(queue, accessToken)
         await fetchCallHandling(queue, extensions, accessToken)
         await fetchEditableMemberStatus(queue, accessToken)
         await fetchManagers(queue, accessToken)
-        console.log('Finished queue')
-        console.log(queue)
         callback(queue)
     }
 
@@ -45,7 +45,7 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
             const members = response.data.records.map((member: any) => member.extensionNumber) as string[]
             queue.members = members
             
-            await wait(response.rateLimitInterval)
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
@@ -55,7 +55,8 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
             console.log(e)
             postMessage(new Message(`Failed to get members for ${queue.extension.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to get members', ''], e.error ?? ''))
-            await wait(e.rateLimitInterval)
+            
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
 
@@ -106,7 +107,7 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
                 queue.afterHoursAction = action
             }
             
-            await wait(response.rateLimitInterval)
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
@@ -116,7 +117,8 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
             console.log(e)
             postMessage(new Message(`Failed to get call handling for ${queue.extension.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to get call handling', ''], e.error ?? ''))
-            await wait(e.rateLimitInterval)
+            
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
 
@@ -137,7 +139,7 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
             const memberStatus = response.data.editableMemberStatus
             memberStatus ? queue.editableMemberStatus = 'Allowed' : queue.editableMemberStatus = 'Not Allowed'
             
-            await wait(response.rateLimitInterval)
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
@@ -147,7 +149,8 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
             console.log(e)
             postMessage(new Message(`Failed to get member status for ${queue.extension.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to get member status', ''], e.error ?? ''))
-            await wait(e.rateLimitInterval)
+            
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
 
@@ -169,7 +172,7 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
             const managers = response.data.records.map((record: any) => `${record.extension.name} Ext. ${record.extension.extensionNumber}`)
             queue.managers = managers
             
-            await wait(response.rateLimitInterval)
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
@@ -179,7 +182,8 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
             console.log(e)
             postMessage(new Message(`Failed to get managers for ${queue.extension.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to get managers', ''], e.error ?? ''))
-            await wait(e.rateLimitInterval)
+
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
 
