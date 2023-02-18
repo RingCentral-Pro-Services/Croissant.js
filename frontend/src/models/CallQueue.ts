@@ -100,9 +100,9 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
     prettyWaitTimeAction() {
         switch (this.handlingRules?.holdTimeExpirationAction) {
             case 'TransferToExtension':
-                return 'Transfer to Extension'
+                return 'Extension →'
             case 'UnconditionalForwarding':
-                return 'Forward to External'
+                return 'External Number →'
             case 'Voicemail':
                 return 'Voicemail'
             default:
@@ -113,13 +113,13 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
     prettyMaxCallersAction() {
         switch (this.handlingRules?.maxCallersAction) {
             case 'TransferToExtension':
-                return 'Transfer to Extension'
+                return 'Extension →'
             case 'UnconditionalForwarding':
-                return 'Forward to External'
+                return 'External Number →'
             case 'Voicemail':
-                return 'Voicemail'
+                return 'Send new callers to voicemail'
             case 'Announcement':
-                return 'Play Greeting and Disconnect'
+                return 'Advise callers of heavy call volume and disconnect'
             default:
                 return ''
         }
@@ -208,9 +208,9 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
     prettyAfterHoursAction() {
         switch (this.afterHoursAction) {
             case 'TransferToExtension':
-                return 'Transfer to Extension'
+                return 'Forward to Extension →'
             case 'UnconditionalForwarding':
-                return 'Forward to External'
+                return 'Forward to External Number →'
             case 'TakeMessagesOnly':
                 return 'Send to Voicemail'
             case 'PlayAnnouncementOnly':
