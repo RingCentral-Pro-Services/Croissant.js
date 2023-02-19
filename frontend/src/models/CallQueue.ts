@@ -36,8 +36,38 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
     }
 
     toExcelRow(): string[] {
-        // Header: ['Queue Name', 'Extension', 'Site', 'Status', 'Members (Ext)', 'Greeting', 'Audio While Connecting', 'Hold Music', 'Voicemail', 'Interrupt Audio', 'Interrupt Prompt', 'Ring type', 'Total Ring Time', 'User Ring Time' , 'Max Wait Time Action', 'No Answer Action', 'Wrap Up Time']
-        return [this.extension.name, this.extension.contact.pronouncedName?.type === 'Recorded' ? 'Custom Audio' : this.extension.contact.pronouncedName?.text ?? '', `${this.extension.extensionNumber}`, this.extension.site, this.extension.status, this.phoneNumbers?.map((p) => p.phoneNumber).join(', ') || '', this.managers?.join(',') || '', this.extension.contact.email ?? '', `${this.members}`, this.prettyGreeting(this.greeting('Introductory')), this.prettyGreeting(this.greeting('ConnectingAudio')), this.prettyGreeting(this.greeting('HoldMusic')), this.prettyInterruptPeriod(this.handlingRules?.holdAudioInterruptionMode ?? '', this.handlingRules?.holdAudioInterruptionPeriod ?? 0), this.handlingRules?.holdAudioInterruptionPeriod ? this.greeting('InterruptPrompt') : '' , this.prettyRingType(this.handlingRules?.transferMode ?? ''), this.prettyTime(this.handlingRules?.agentTimeout ?? 0), this.prettyTime(this.handlingRules?.holdTime ?? 0), this.prettyTime(this.handlingRules?.wrapUpTime ?? 0), this.editableMemberStatus ?? '', `${this.handlingRules?.maxCallers}`, this.prettyMaxCallersAction(), this.prettyMaxCallersDestination() ?? '' , this.prettyWaitTimeAction() , this.prettyWaitTimeDestination() ?? '', this.greeting('Voicemail'), this.voicemailRecipient ?? '', '', '', this.prettyAfterHoursAction(), this.afterHoursDestination ?? '']
+        return [
+            this.extension.name,
+            this.extension.contact.pronouncedName?.type === 'Recorded' ? 'Custom Audio' : this.extension.contact.pronouncedName?.text ?? '',
+            `${this.extension.extensionNumber}`,
+            this.extension.site,
+            this.extension.status,
+            this.phoneNumbers?.map((p) => p.phoneNumber).join(', ') || '', this.managers?.join(',') || '',
+            this.extension.contact.email ?? '',
+            `${this.members}`,
+            this.prettyGreeting(this.greeting('Introductory')),
+            this.prettyGreeting(this.greeting('ConnectingAudio')),
+            this.prettyGreeting(this.greeting('HoldMusic')),
+            this.prettyInterruptPeriod(this.handlingRules?.holdAudioInterruptionMode ?? '',
+            this.handlingRules?.holdAudioInterruptionPeriod ?? 0),
+            this.handlingRules?.holdAudioInterruptionPeriod ? this.greeting('InterruptPrompt') : '' ,
+            this.prettyRingType(this.handlingRules?.transferMode ?? ''),
+            this.prettyTime(this.handlingRules?.agentTimeout ?? 0),
+            this.prettyTime(this.handlingRules?.holdTime ?? 0),
+            this.prettyTime(this.handlingRules?.wrapUpTime ?? 0),
+            this.editableMemberStatus ?? '',
+            `${this.handlingRules?.maxCallers}`,
+            this.prettyMaxCallersAction(),
+            this.prettyMaxCallersDestination() ?? '' ,
+            this.prettyWaitTimeAction(),
+            this.prettyWaitTimeDestination() ?? '',
+            this.greeting('Voicemail'),
+            this.voicemailRecipient ?? '',
+            '',
+            '',
+            this.prettyAfterHoursAction(),
+            this.afterHoursDestination ?? ''
+        ]
     }
 
     toDataTableRow(): string[] {
