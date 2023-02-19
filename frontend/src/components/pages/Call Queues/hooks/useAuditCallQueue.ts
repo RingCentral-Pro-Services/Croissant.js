@@ -87,6 +87,16 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
             if (businessHoursData.length > 0) {
                 const callHandling: CallHandlingRules = businessHoursData[0].queue
                 const greetings: Greeting[] = businessHoursData[0].greetings
+
+                const voicemailRecipientID = businessHoursData[0].voicemail?.recipient?.id
+                console.log(`Voicemail recipient ID: ${voicemailRecipientID}`)
+                const voicemailRecipient = extensions.find((extension) => {
+                    return extension.id === voicemailRecipientID
+                })
+                if (voicemailRecipient) {
+                    queue.voicemailRecipient = `${voicemailRecipient.name} Ext. ${voicemailRecipient.extensionNumber}`
+                }
+
                 queue.handlingRules = callHandling
                 queue.greetings = greetings
             }
