@@ -313,7 +313,8 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
         } 
 
         const payload = {
-            queue: {...this.handlingRules, ...(transferActions.length > 0 && {transfer: [...transferActions]}), ...(forwardActions.length > 0 && {unconditionalForwarding: [...forwardActions]})}
+            queue: {...this.handlingRules, ...(transferActions.length > 0 && {transfer: [...transferActions]}), ...(forwardActions.length > 0 && {unconditionalForwarding: [...forwardActions]})},
+            ...(( this.greetings && this.greetings?.length > 0) && {greetings: [...this.greetings]}),
         }
         return payload
     }

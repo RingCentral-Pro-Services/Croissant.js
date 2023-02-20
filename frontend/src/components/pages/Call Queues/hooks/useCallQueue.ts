@@ -58,8 +58,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
         await setMemberStatus(queue, accessToken)
         await addQueueMembers(queue, accessToken)
         await setCallHandling(queue, accessToken)
-        await setGreetings(queue, accessToken)
-        if (queue.afterHoursAction) {
+        if (queue.afterHoursAction && queue.afterHoursAction !== '') {
             await setSchedule(queue, accessToken)
             await setAfterHoursCallHandling(queue, accessToken) // Will only work if the queue is not set to 24/7
         }
@@ -216,41 +215,6 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(e)
             postMessage(new Message(`Failed to set after hours call handling ${queue.extension.name}. ${e.error ?? ''}`, 'error'))
             postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set after hours call handling', ''], e.error ?? ''))
-            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
-        }
-    }
-
-    const setGreetings = async (queue: CallQueue, token: string) => {
-        if (!queue.extension.id || !queue.greetings || queue.greetings.length === 0) return
-
-        try {
-            const headers = {
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
-
-            const url = baseCallHandlingURL.replace('extensionId', `${queue.extension.id}`)
-            let body = {
-                greetings: queue.greetings
-            }
-            const response = await RestCentral.put(url, headers, body)
-
-            if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
-            }
-
-            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
-        }
-        catch (e: any) {
-            if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
-            }
-
-            console.log(`Failed to set greetings for ${queue.extension.name}`)
-            console.log(e)
-            postMessage(new Message(`Failed to set greetings ${queue.extension.name}. ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set greetings', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
