@@ -27,6 +27,10 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
         public managers?: string[],
         public editableMemberStatus?: string,
         public voicemailRecipient?: string,
+        public sendEmailNotifications?: boolean,
+        public includeAttachment?: boolean,
+        public markAsRead?: boolean,
+        public notificationEmails?: string[],
         ) {
         this.sortMembers()
     }
@@ -315,6 +319,7 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
         const payload = {
             queue: {...this.handlingRules, ...(transferActions.length > 0 && {transfer: [...transferActions]}), ...(forwardActions.length > 0 && {unconditionalForwarding: [...forwardActions]})},
             ...(( this.greetings && this.greetings?.length > 0) && {greetings: [...this.greetings]}),
+            ... ((this.voicemailRecipient && this.voicemailRecipient !== '') && {voicemail: {recipient: {id: this.voicemailRecipient}}}),
         }
         return payload
     }
@@ -342,6 +347,38 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
     memberStatusPayload() {
         return {
             editableMemberStatus: this.editableMemberStatus === 'Allow' ? true : false
+        }
+    }
+
+    notificationPayload() {
+        return {
+            includeManagers: false,
+            advancedMode: false,
+            emailAddresses: this.notificationEmails,
+            voicemails: {
+                notifyByEmail: this.sendEmailNotifications,
+                ...(this.sendEmailNotifications === true && {includeAttachment: this.includeAttachment == true}),
+                ...(this.sendEmailNotifications === true && {markAsRead: this.markAsRead === true}),
+                notifyBySms: false
+            },
+            inboundFaxes: {
+                notifyByEmail: this.sendEmailNotifications,
+                ...(this.sendEmailNotifications === true && {includeAttachment: this.includeAttachment === true}),
+                ...(this.sendEmailNotifications === true && {markAsRead: this.markAsRead == true}),
+                notifyBySms: false
+            },
+            outboundFaxes: {
+                notifyByEmail: this.sendEmailNotifications,
+                notifyBySms: false
+            },
+            inboundTexts: {
+                notifyByEmail: this.sendEmailNotifications,
+                notifyBySms: false
+            },
+            missedCalls: {
+                notifyByEmail: this.sendEmailNotifications,
+                notifyBySms: false
+            }
         }
     }
 }
