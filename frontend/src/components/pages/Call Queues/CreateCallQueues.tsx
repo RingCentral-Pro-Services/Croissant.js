@@ -88,6 +88,7 @@ const CreateCallQueues = () => {
     useEffect(() => {
         if (isQueueConvertPending) return
         setIsPending(false)
+        console.log('Queues')
         console.log(queues)
     }, [isQueueConvertPending])
 

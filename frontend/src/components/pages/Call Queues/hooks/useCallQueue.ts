@@ -12,6 +12,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
     const baseScheduleURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/business-hours'
     const baseManagersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/extensionId/permissions-bulk-assign'
     const baseMemberStatusURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId'
+    const baseNotificationsURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/notification-settings'
     const baseWaitingPeriod = 250
 
     const defaultHours = {
@@ -58,6 +59,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
         await setMemberStatus(queue, accessToken)
         await addQueueMembers(queue, accessToken)
         await setCallHandling(queue, accessToken)
+        await setNotificationSettings(queue, accessToken)
         if (queue.afterHoursAction && queue.afterHoursAction !== '') {
             await setSchedule(queue, accessToken)
             await setAfterHoursCallHandling(queue, accessToken) // Will only work if the queue is not set to 24/7
@@ -279,6 +281,38 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(e)
             postMessage(new Message(`Failed to set editable member status for ${queue.extension.name}. ${e.error ?? ''}`, 'error'))
             postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set editable member status', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const setNotificationSettings = async (queue: CallQueue, token: string) => {
+        if (!queue.sendEmailNotifications) return
+
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+
+            const url = baseNotificationsURL.replace('extensionId', `${queue.extension.id}`)
+            const response = await RestCentral.put(url, headers, queue.notificationPayload())
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+
+            console.log(`Failed to set notification settings for ${queue.extension.name}`)
+            console.log(e)
+            postMessage(new Message(`Failed to set notification settings for ${queue.extension.name}. ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set notification settings', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }

@@ -60,6 +60,30 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
             queue.afterHoursDestination = getAfterHoursDestination(data[index], extensionsList)
             queue.managers = getManagers(data[index], extensionsList)
             queue.editableMemberStatus = getMemberStatusSetting(data[index])
+            queue.voicemailRecipient = getVoicemailRecipient(data[index], extensionsList)
+
+            // Email notification settings
+            const rawNotificationSettings = data[index]['Voicemail Notifications']
+            if (rawNotificationSettings && rawNotificationSettings != '') {
+                if (rawNotificationSettings === 'Send Email') {
+                    queue.sendEmailNotifications = true
+                    queue.includeAttachment = false
+                }
+                else if (rawNotificationSettings === 'Send Email & Attach') {
+                    queue.sendEmailNotifications = true
+                    queue.includeAttachment = true
+                }
+                else if (rawNotificationSettings === 'Send Email, Attach, & Mark as Read') {
+                    queue.sendEmailNotifications = true
+                    queue.includeAttachment = true
+                    queue.markAsRead = true
+                }
+            }
+
+            const rawNotificationEmails = data[index]['Voicemail Notifications Email']
+            if (rawNotificationEmails && rawNotificationEmails != '') {
+                queue.notificationEmails = rawNotificationEmails.split(',')
+            }
 
             // You must supply an email address to create a call queue, even if you're going to select managers from the account
             // Set the email to a dummy one if it's not supplied and there is at least one manager
@@ -77,6 +101,26 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
         }
         setQueues(records)
         setIsQueueConvertPending(false)
+    }
+
+    const getVoicemailRecipient = (data: any, extensionsList: RCExtension[]) => {
+        const rawRecipient = data['Voicemail Recipients']
+
+        if (!rawRecipient || rawRecipient === '') {
+            return undefined
+        }
+
+        const recipients = `${rawRecipient}`.split(',')
+        const isolator = new ExtensionIsolator()
+
+        // I haven't found a way to set multiple voicemail recipients with the API, so I'll just use the first one for now
+        const extensionNumber = isolator.isolateExtension(`${recipients[0]}`)
+
+        if (!extensionNumber) {
+            return undefined
+        }
+
+        return `${idForExtension(extensionNumber, extensionsList)}`
     }
 
     const getCallHandling = (data: any, extensionList: RCExtension[]) => {
