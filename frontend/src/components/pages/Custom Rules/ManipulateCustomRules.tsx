@@ -36,7 +36,7 @@ const ManipulateCustomRules = () => {
     const [isSyncing, setIsSyncing] = useState(false)
     const extensionTypes = ['User', 'Call Queue']
 
-    useLogin('customruleedit')
+    useLogin('customruleedit', isSyncing)
     useSidebar('Enable / Disable Custom Rules')
     const {fireEvent} = useAnalytics()
     const {postMessage, postError, messages, errors} = useMessageQueue()

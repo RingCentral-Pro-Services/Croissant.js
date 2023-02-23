@@ -28,7 +28,7 @@ const CreateCallQueues = () => {
     const [selectedFile, setSelectedFile] = useState<File | null>()
     const [selectedSheet, setSelectedSheet] = useState<string>('')
 
-    useLogin('createcallqueues')
+    useLogin('createcallqueues', isSyncing)
     useSidebar('Create Call Queues')
     const {fireEvent} = useAnalytics()
     let {messages, errors, postMessage, postError} = useMessageQueue()

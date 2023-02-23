@@ -27,7 +27,7 @@ const LocationUpdates = () => {
     const [isSyncing, setIsSyncing] = useState(false)
     const defaultSheet = 'Automatic Location Updates'
 
-    useLogin('locationupdates')
+    useLogin('locationupdates', isSyncing)
     useSidebar('Automatic Location Updates')
     const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError, userName} = useGetAccessToken()
     const {messages, errors, postMessage, postError} = useMessageQueue()

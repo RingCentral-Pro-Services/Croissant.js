@@ -41,7 +41,7 @@ const Intercom = () => {
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
     const defaultSheet = 'Intercom'
 
-    useLogin('intercom')
+    useLogin('intercom', isSyncing)
     useSidebar('Intercom')
     const {fireEvent} = useAnalytics()
     const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError, userName} = useGetAccessToken()

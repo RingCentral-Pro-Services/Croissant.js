@@ -37,7 +37,7 @@ const Deskphones = () => {
                        '7 Rings / 35 Seconds', '8 Rings / 40 Seconds', '9 Rings / 45 Seconds', '10 Rings / 50 Seconds', '11 Rings / 55 Seconds', '12 Rings / 60 Seconds',
                        '13 Rings / 65 Seconds', '14 Rings / 70 Seconds', '15 Rings / 75 Seconds']
 
-    useLogin('deskphones')
+    useLogin('deskphones', isSyncing)
     useSidebar('Desk Phones')
     const {fireEvent} = useAnalytics()
     const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending, userName} = useGetAccessToken()

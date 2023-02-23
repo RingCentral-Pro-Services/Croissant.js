@@ -32,7 +32,7 @@ const EditSites = () => {
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
     const defaultSheet = 'Sites'
 
-    useLogin('editsites')
+    useLogin('editsites', isSyncing)
     useSidebar('Edit Sites')
     const {fireEvent} = useAnalytics()
     const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending, userName} = useGetAccessToken()

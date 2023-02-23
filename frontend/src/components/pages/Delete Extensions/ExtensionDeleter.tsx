@@ -20,8 +20,6 @@ import useExtensions from "../../../rcapi/useExtensions"
 import { Extension } from "../../../models/Extension"
 
 const ExtensionDeleter = () => {
-    useLogin('deleteextensions')
-    useSidebar('Delete Extensions')
     const {fireEvent} = useAnalytics()
     const [targetUID, setTargetUID] = useState('')
     const [sites, setSites] = useState<string[]>([])
@@ -35,6 +33,8 @@ const ExtensionDeleter = () => {
     const [isPending, setIsPending] = useState(false)
     const prettyExtensionTypes = ['Announcement-Only', 'Call Queue', 'IVR Menu', 'Limited Extension', 'Message-Only', 'Paging Group', 'Park Location', 'Room', 'Shared Line Group', 'User', 'Unassigned Extension (User)', 'Unassigned Extension (Limited)']
 
+    useLogin('deleteextensions', isPending)
+    useSidebar('Delete Extensions')
     const {postMessage, messages, errors, postError} = useMessageQueue()
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
     const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending, userName} = useGetAccessToken()

@@ -31,7 +31,7 @@ const Sites = () => {
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
     const defaultSheet = 'Site Information'
 
-    useLogin('sites')
+    useLogin('sites', isSyncing)
     useSidebar('Create Sites')
     const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending, userName} = useGetAccessToken()
     const {fetchRegionalFormats, regionalFormats, isRegionalFormatListPenging} = useRegionalFormats()

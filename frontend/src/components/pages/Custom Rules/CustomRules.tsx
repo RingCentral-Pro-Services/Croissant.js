@@ -38,7 +38,7 @@ const CustomRules = () => {
     const [voicemailDestinationOption, setVoicemailDestinationOption] = useState('maintainDestination')
     const extensionTypes = ['User', 'Call Queue']
 
-    useLogin('copycustomrules')
+    useLogin('copycustomrules', isSyncing)
     useSidebar('Copy Custom Rules')
     const {fireEvent} = useAnalytics()
     const {fetchToken, companyName, hasCustomerToken, error: tokenError, isTokenPending, userName} = useGetAccessToken()

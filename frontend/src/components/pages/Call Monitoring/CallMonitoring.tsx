@@ -34,7 +34,7 @@ const CallMonitoring = () => {
     const [isAuditPending, setIsAuditPending] = useState(false)
     const defaultSheet = 'Call Monitoring'
 
-    useLogin('callmonitoring')
+    useLogin('callmonitoring', isSyncing)
     useSidebar('Call Monitoring')
     const {fireEvent} = useAnalytics()
     const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError, userName} = useGetAccessToken()

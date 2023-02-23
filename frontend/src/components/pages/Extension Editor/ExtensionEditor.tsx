@@ -24,7 +24,7 @@ const ExtensionEditor = () => {
     const [isSyncing, setIsSyncing] = useState(false)
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
 
-    useLogin('editextensions')
+    useLogin('editextensions', isSyncing)
     useSidebar('Edit Extensions')
     const {fireEvent} = useAnalytics()
     const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending, userName} = useGetAccessToken()

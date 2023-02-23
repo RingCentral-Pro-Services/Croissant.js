@@ -1,6 +1,9 @@
-const useLogin = (callbackroute: string = '') => {
+const useLogin = (callbackroute: string = '', isSyncing: boolean = false) => {
     let token = localStorage.getItem('rc_access_token')
     let expiration = localStorage.getItem('rc_token_expiry')
+
+    // Sync is running, don't redirect to login page
+    if (isSyncing) return
 
     const isTokenExpired = () => {
         if (!expiration) return true

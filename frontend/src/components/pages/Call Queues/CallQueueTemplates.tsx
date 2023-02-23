@@ -63,7 +63,7 @@ const CallQueueTemplates = () => {
     const [memberStatusProgress, setMemberStatusProgress] = useState(0)
     const [memberStatusMaxProgress, setMemberStatusMaxProgress] = useState(0)
 
-    useLogin('callqueuetemplates')
+    useLogin('callqueuetemplates', isSyncing)
     useSidebar('Call Queue Templates')
     const {fireEvent} = useAnalytics()
     const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending, userName} = useGetAccessToken()

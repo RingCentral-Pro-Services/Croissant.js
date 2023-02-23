@@ -31,7 +31,7 @@ const ExtensionUpload = () => {
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
     const defaultSheet = 'Users'
 
-    useLogin('extensionupload')
+    useLogin('extensionupload', isSyncing)
     useSidebar('Extension Upload')
     const {fireEvent} = useAnalytics()
     const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError, userName} = useGetAccessToken()

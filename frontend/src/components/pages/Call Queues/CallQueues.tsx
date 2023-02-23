@@ -40,7 +40,7 @@ const CallQueues = () => {
         setCurrentExtensionIndex( prev => prev + 1)
     }
 
-    useLogin('auditcallqueues')
+    useLogin('auditcallqueues', isSyncing)
     useSidebar('Audit Call Queues')
     const {fireEvent} = useAnalytics()
     const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending, userName} = useGetAccessToken()

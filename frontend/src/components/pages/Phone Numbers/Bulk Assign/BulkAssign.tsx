@@ -29,7 +29,7 @@ const BulkAssign = () => {
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
     const defaultSheet = 'Phone Numbers'
 
-    useLogin('bulkassign')
+    useLogin('bulkassign', isSyncing)
     useSidebar('Bulk Assign')
     const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError, userName} = useGetAccessToken()
     const {messages, errors, postMessage, postError} = useMessageQueue()

@@ -34,7 +34,7 @@ const PagingGroups = () => {
     const [isShowingDeviceMapProgress, setIsShowingDeviceMapProgress] = useState(false)
     const defaultSheet = 'Paging Groups'
 
-    useLogin('paginggroups')
+    useLogin('paginggroups', isSyncing)
     useSidebar('Paging Groups')
     const {fireEvent} = useAnalytics()
     const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError, userName} = useGetAccessToken()

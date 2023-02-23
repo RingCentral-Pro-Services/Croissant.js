@@ -22,8 +22,6 @@ import FeedbackForm from "../../shared/FeedbackForm"
 import useSidebar from "../../../hooks/useSidebar"
 
 const NotificationAudit = () => {
-    useLogin('notificationsaudit')
-    useSidebar('Notifications')
     const {fireEvent} = useAnalytics()
     let [targetUID, setTargetUID] = useState("")
     const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending, userName} = useGetAccessToken()
@@ -37,6 +35,8 @@ const NotificationAudit = () => {
     const {readFile, excelData, isExcelDataPending} = useReadExcel()
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
 
+    useLogin('notificationsaudit', isPending)
+    useSidebar('Notifications')
     const prettyExtensionTypes = ['Call Queue', 'Message-Only', 'Shared Line Group', 'User']
     const [selectedExtensionTypes, setSelectedExtensionTypes] = useState<string[]>(prettyExtensionTypes)
     const [selectedSites, setSelectedSites] = useState<string[]>([])
