@@ -11,6 +11,7 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
     const baseCallHandlingURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/answering-rule'
     const baseMemberStatusURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId'
     const baseManagersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId/permissions'
+    const baseNotificationsURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/notification-settings'
     const baseWaitingPeriod = 250
 
     const auditQueue = async (extension: RCExtension, extensions: RCExtension[]) => {
@@ -25,6 +26,7 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
         await fetchCallHandling(queue, extensions, accessToken)
         await fetchEditableMemberStatus(queue, accessToken)
         await fetchManagers(queue, accessToken)
+        await fetchNotificationsSettings(queue, accessToken)
         callback(queue)
     }
 
@@ -193,6 +195,40 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
             postMessage(new Message(`Failed to get managers for ${queue.extension.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to get managers', ''], e.error ?? ''))
 
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const fetchNotificationsSettings = async (queue: CallQueue, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const url = baseNotificationsURL.replace('extensionId', `${queue.extension.id}`)
+            const response = await RestCentral.get(url, headers)
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+
+            queue.sendEmailNotifications = response.data.voicemails.notifyByEmail
+            queue.includeAttachment = response.data.voicemails.includeAttachment
+            queue.markAsRead = response.data.voicemails.markAsRead
+            queue.notificationEmails = response.data.emailAddresses
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to get notification settings ${queue.extension.name}`)
+            console.log(e)
+            postMessage(new Message(`Failed to get notification settings for ${queue.extension.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to get notifications', ''], e.error ?? ''))
+            
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }

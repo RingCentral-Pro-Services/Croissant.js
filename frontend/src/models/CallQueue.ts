@@ -8,6 +8,7 @@ import { TransferPayload, UnconditionalForwardingPayload } from "./TransferPaylo
 import { DataGridFormattable } from "./DataGridFormattable";
 import { PhoneNumber } from "./PhoneNumber";
 import { CallQueueManager } from "./CallQueueManager";
+import { join } from "path";
 
 class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattable, DataGridFormattable {
     constructor(
@@ -67,8 +68,8 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
             this.prettyWaitTimeDestination() ?? '',
             this.greeting('Voicemail'),
             this.voicemailRecipient ?? '',
-            '',
-            '',
+            this.prettyNotificationSettings(),
+            this.notificationEmails ? this.notificationEmails.join(',') : '',
             this.prettyAfterHoursAction(),
             this.afterHoursDestination ?? ''
         ]
@@ -108,6 +109,19 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
             return this.extension.site ?? 'N/A'
         }
         return this[key as keyof CallQueue]
+    }
+
+    prettyNotificationSettings() {
+        if (this.sendEmailNotifications && !this.includeAttachment) {
+            return 'Send Email'
+        }
+        else if (this.sendEmailNotifications && this.includeAttachment && !this.markAsRead) {
+            return 'Send Email & Attach'
+        }
+        else if (this.sendEmailNotifications && this.includeAttachment && this.markAsRead) {
+            return 'Send Email, Attach, & Mark as Read'
+        }
+        return ''
     }
 
     prettyWaitTimeDestination() {
