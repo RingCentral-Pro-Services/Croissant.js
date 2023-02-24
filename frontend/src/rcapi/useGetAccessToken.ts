@@ -67,7 +67,6 @@ const useGetAccessToken = () => {
 
     useEffect(() => {
         if (isUserNamePending) return
-        console.log('username', userName)
         setHasToken(true)
         reset()
     }, [isUserNamePending])

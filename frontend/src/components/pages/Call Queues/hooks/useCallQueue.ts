@@ -64,7 +64,6 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             await setSchedule(queue, accessToken)
             await setAfterHoursCallHandling(queue, accessToken) // Will only work if the queue is not set to 24/7
         }
-        console.log('Finished creating call queue')
         callback()
     }
 
