@@ -36,7 +36,7 @@ const CustomRules = () => {
     const [progressMax, setProgressMax] = useState<number>(0)
     const [isSyncing, setIsSyncing] = useState<boolean>(false)
     const [voicemailDestinationOption, setVoicemailDestinationOption] = useState('maintainDestination')
-    const extensionTypes = ['User', 'Call Queue']
+    const extensionTypes = ['User', 'Call Queue', 'Site']
 
     useLogin('copycustomrules', isSyncing)
     useSidebar('Copy Custom Rules')
@@ -70,6 +70,10 @@ const CustomRules = () => {
         let filtered: RCExtension[] = []
         if (isMultiSiteEnabled) {
             filtered = extensionsList.filter((extension) => selectedExtensionTypes.includes(extension.prettyType[extension.type]) && selectedSiteNames.includes(extension.site))
+            if (selectedExtensionTypes.includes('Site')) {
+                const sites = extensionsList.filter((extension) => extension.type === 'Site')
+                filtered = [...filtered, ...sites]
+            }
         }
         else {
             filtered = extensionsList.filter((extension) => selectedExtensionTypes.includes(extension.prettyType[extension.type]))
