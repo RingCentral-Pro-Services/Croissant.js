@@ -2,7 +2,7 @@ import React from "react";
 import {Dialog, DialogTitle, DialogContent, DialogActions, Button, DialogContentText} from '@mui/material'
 
 const Modal = (props: {open: boolean, setOpen: (open: boolean) => void, title: string, body: string, acceptLabel: string, rejectLabel: string, handleAccept: () => void, handleReject: () => void}) => {
-    const {open, setOpen, title, body, acceptLabel = 'Accept', rejectLabel='Decline', handleAccept, handleReject} = props
+    const {open, setOpen, title, body, acceptLabel = 'Accept', rejectLabel='Default', handleAccept, handleReject} = props
 
     const reject = () => {
         setOpen(false)
@@ -21,7 +21,7 @@ const Modal = (props: {open: boolean, setOpen: (open: boolean) => void, title: s
                 <DialogContentText>{body}</DialogContentText>
             </DialogContent>
             <DialogActions>
-                <Button onClick={() => reject()}>{rejectLabel}</Button>
+                {rejectLabel !== 'Default' ? <Button onClick={() => reject()}>{rejectLabel}</Button> : <></>}
                 <Button onClick={() => accept()}>{acceptLabel}</Button>
             </DialogActions>
         </Dialog>
@@ -30,7 +30,7 @@ const Modal = (props: {open: boolean, setOpen: (open: boolean) => void, title: s
 
 Modal.defaultProps = {
     acceptLabel: 'Accept',
-    rejectLabel: 'Decline',
+    rejectLabel: 'Default',
     handleReject: null
 }
 

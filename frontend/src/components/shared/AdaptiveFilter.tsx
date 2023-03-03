@@ -65,6 +65,7 @@ const AdaptiveFilter: React.FC<AdaptiveFilterProps> = ({options, title, placehol
     return (
         <div className={`inline healthy-margin-right ${verticalAlign === 'middle' ? 'vertical-middle': ''}`}>
             <Autocomplete
+                disabled={disabled}
                 multiple
                 id="adaptive-filter"
                 title={title}
