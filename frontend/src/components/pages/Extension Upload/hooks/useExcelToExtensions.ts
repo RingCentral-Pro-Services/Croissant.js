@@ -1,13 +1,13 @@
 import { useState } from "react"
 import { Extension } from "../../../../models/Extension"
-import { ExtensionData } from "../../../../models/ExtensionData"
+import { ExtensionData, Role } from "../../../../models/ExtensionData"
 import RCExtension from "../../../../models/RCExtension"
 
 const useExcelToExtensions = () => {
     const [extensions, setExtensions] = useState<Extension[]>([])
     const [isExtensionConverPending, setIsExtensionConverPending] = useState(true)
 
-    const convertExcelToExtensions = (excelData: any[], extensionList: RCExtension[]) => {
+    const convertExcelToExtensions = (excelData: any[], extensionList: RCExtension[], roles: Role[]) => {
         let extensions: Extension[] = []
         for (let index = 0; index < excelData.length; index++) {
             const currentItem = excelData[index]
@@ -28,7 +28,7 @@ const useExcelToExtensions = () => {
                     firstName: firstName,
                     lastName: lastName,
                     email: currentItem['Email'],
-                    department: currentItem['Dept']
+                    department: currentItem['Dept'] ?? currentItem['Department'] ?? ''
                 },
                 extensionNumber: currentItem['Extension'],
                 name: `${currentItem['First Name']} ${currentItem['Last Name'] ? ` ${currentItem['Last Name']}` : ''}`,
@@ -40,13 +40,21 @@ const useExcelToExtensions = () => {
                 status: 'NotActivated',
                 hidden: false,
                 ivrPin: currentItem['Pin'],
-                password: currentItem['Password']
+                password: currentItem['Password'],
+                roles: findRole(currentItem['Role'], roles)
             }
             let extension = new Extension(data)
             extensions.push(extension)
         }
         setExtensions(extensions)
         setIsExtensionConverPending(false)
+    }
+
+    const findRole = (name: string, roles: Role[]) => {
+        const role = roles.find(role => role.displayName === name)
+        if (role) {
+            return [role]
+        }
     }
 
     /*

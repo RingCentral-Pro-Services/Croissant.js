@@ -10,6 +10,12 @@ export class Extension implements ExcelFormattable, DataGridFormattable {
                 name: 'Main Site'
             }
         }
+        if (this.data.type === 'Limited') {
+            // Set the pin to a random 6-digit number
+            this.data.ivrPin = Math.floor(100000 + Math.random() * 900000).toString()
+
+            this.data.password = `Ring${this.data.ivrPin}Central!`
+        }
     }
 
     prettyType() {
@@ -99,6 +105,16 @@ export class Extension implements ExcelFormattable, DataGridFormattable {
         return this[key as keyof Extension]
     }
 
+    status() {
+        if ((this.data.type === 'User' || this.data.type === 'VirtualUser') && (this.data.password && this.data.password !== '' || this.data.ivrPin && this.data.ivrPin !== '')) {
+            return 'Enabled'
+        }
+        else if (this.data.type === 'Limited') {
+            return 'Enabled'
+        }
+        return this.data.status
+    }
+
     payload(isMultiSiteEnable: boolean): any {
         return {
             contact: {
@@ -106,15 +122,30 @@ export class Extension implements ExcelFormattable, DataGridFormattable {
                 ... ((this.data.type !== 'User' && this.data.type !== 'VirtualUser') && {firstName: `${this.data.contact.firstName}${this.data.contact.lastName ? ` ${this.data.contact.lastName }`: ''}`}),
                 ...((this.data.type === 'User' || this.data.type == 'VirtualUser') && {lastName: this.data.contact?.lastName}),
                 email: this.data.contact?.email,
-                ...(((this.data.type === 'User' || this.data.type == 'VirtualUser') && (this.data.contact.department && this.data.contact?.department !== '')) && {department: this.data.contact?.department ?? ''})
+                ...(((this.data.type === 'User' || this.data.type == 'VirtualUser') && (this.data.contact.department && this.data.contact?.department !== '')) && {department: this.data.contact?.department ?? ''}),
+                ... (this.data.type === 'Limited' && {lastName: ''})
             },
             extensionNumber: this.data.extensionNumber,
             type: this.data.type === 'VirtualUser' ? 'User' : this.data.type,
-            status: (this.data.ivrPin && this.data.ivrPin != '') || (this.data.password && this.data.password !== '') ? 'Enabled' : this.data.status,
+            status: this.status(),
             ...(this.data.type === 'VirtualUser' && {subType: 'VideoPro'}),
             ...(isMultiSiteEnable && { site: { id: this.data.site?.id } }),
             ...((this.data.ivrPin && this.data.ivrPin != '') && {ivrPin: this.data.ivrPin}),
             ...((this.data.password && this.data.password != '') && {password: this.data.password}),
+        }
+    }
+
+    rolePayload(): any {
+        if (!this.data.roles) {
+            return {}
+        }
+        
+        return {
+            records: [
+                {
+                    id: this.data.roles[0].id,
+                }
+            ]
         }
     }
 }

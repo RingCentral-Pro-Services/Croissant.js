@@ -11,25 +11,40 @@ import useValidateExcelData from "../../../hooks/useValidateExcelData";
 import { Extension } from "../../../models/Extension";
 import useExtensionList from "../../../rcapi/useExtensionList";
 import useGetAccessToken from "../../../rcapi/useGetAccessToken";
+import AdaptiveFilter from "../../shared/AdaptiveFilter";
 import FeedbackArea from "../../shared/FeedbackArea";
 import FeedbackForm from "../../shared/FeedbackForm";
 import FileSelect from "../../shared/FileSelect";
 import Header from "../../shared/Header";
+import Modal from "../../shared/Modal";
 import UIDInputField from "../../shared/UIDInputField";
-import useCreateExtensions from "./hooks/useCreateExtensions";
 import useExcelToExtensions from "./hooks/useExcelToExtensions";
+import useExtension from "./hooks/useExtension";
+import useFetchRoles from "./hooks/useFetchRoles";
 
 const ExtensionUpload = () => {
     const [targetUID, setTargetUID] = useState("")
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [selectedSheet, setSelectedSheet] = useState('')
     const [isSyncing, setIsSyncing] = useState(false)
-    const [adjsutedExcelData, setAdjustedExcelData] = useState<any>()
     const [filteredExtensions, setFilteredExtensions] = useState<Extension[]>([])
-    const [progressValue, setProgressValue] = useState(0)
-    const [progressMax, setProgressMax] = useState(0)
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
+    const [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
+    const [userIDIndex, setUserIDIndex] = useState(0)
+    const [limitedIDIndex, setLimitedIDIndex] = useState(0)
+    const [unassignedUserIDs, setUnassignedUserIDs] = useState<number[]>([])
+    const [unassignedLEIDs, setUnassignedLEIDs] = useState<number[]>([])
+    const [userDeficit, setUserDeficit] = useState(0)
+    const [leDeficit, setLEDeficit] = useState(0)
+    const [isShowingModal, setIsShowingModal] = useState(false)
+    const [deficitLabel, setDeficitLabel] = useState('')
+    const [selectedExtensionTypes, setSelectedExtensionTypes] = useState<string[]>([])
     const defaultSheet = 'Users'
+    const supportedExtensionTypes = ['Announcement-Only', 'Message-Only', 'Limited Extension', 'User', 'Virtual User']
+
+    const increaseProgress = () => {
+        setCurrentExtensionIndex( prev => prev + 1)
+    }
 
     useLogin('extensionupload', isSyncing)
     useSidebar('Extension Upload')
@@ -41,7 +56,8 @@ const ExtensionUpload = () => {
     const {readFile, excelData, isExcelDataPending} = useReadExcel()
     const {validate, validatedData, isDataValidationPending} = useValidateExcelData(extensionSchema, postMessage, postError)
     const {convertExcelToExtensions, isExtensionConverPending, extensions} = useExcelToExtensions()
-    const {createExtensions, isExtensionCreationPending} = useCreateExtensions(setProgressValue, postMessage, postTimedMessage, postError, isMultiSiteEnabled)
+    const {fetchRoles, roles, isRoleListPending} = useFetchRoles()
+    const {createExtension} = useExtension(postMessage, postTimedMessage, postError, isMultiSiteEnabled, increaseProgress)
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -55,40 +71,95 @@ const ExtensionUpload = () => {
     }, [hasCustomerToken])
 
     useEffect(() => {
-        if (isExcelDataPending) return
-        console.log('raw excel data')
-        console.log(excelData)
+        if (isExtensionListPending) return
+        fetchRoles()
+    }, [isExtensionListPending])
 
+    useEffect(() => {
+        if (isExcelDataPending) return
         // Currently there are formulas in the BRD that cause empty rows to not
         // actually be empty. This is a workaround for that.
         const goodRows = excelData.filter((row) => {
             return Object.keys(row).length != 5 && row['Address 1'] != '#N/A'
         })
-
-        console.log('good rows')
-        console.log(goodRows)
         validate(goodRows)
     }, [isExcelDataPending, excelData])
  
     useEffect(() => {
         if (isDataValidationPending) return
-        console.log('validated data')
-        console.log(validatedData)
-        convertExcelToExtensions(validatedData, extensionsList)
+        convertExcelToExtensions(validatedData, extensionsList, roles)
     }, [isDataValidationPending, validatedData])
 
     useEffect(() => {
         if (isExtensionConverPending) return
-        console.log('converted extensions')
-        console.log(extensions)
-        console.log('Payloads')
-        for (const extension of extensions) {
-            console.log(extension.payload(isMultiSiteEnabled))
+        const licensedUsers = extensions.filter((ext) => ext.data.type === 'User')
+        const limitedExtensions = extensions.filter((ext) => ext.data.type === 'Limited')
+        const unassignedUsers = extensionsList.filter((extension) => extension.status == 'Unassigned' && extension.type === 'User').map((extension) => extension.id)
+        const unassignedLEs = extensionsList.filter((extension) => extension.status == 'Unassigned' && extension.type === 'Limited').map((extension) => extension.id)
+
+        setUserDeficit(licensedUsers.length - unassignedUsers.length)
+        setLEDeficit(limitedExtensions.length - unassignedLEs.length)
+        let label = ''
+        const usersLabel = `There are ${licensedUsers.length} licensed users in the spreadsheet, but only ${unassignedUsers.length} unassigned users in the account. So you'll need to add ${licensedUsers.length - unassignedUsers.length} more users to the account.`
+        const leLabel = `There are ${limitedExtensions.length} limited extensions in the spreadsheet, but only ${unassignedLEs.length} unassigned limited extensions in the account. So you'll need to add ${limitedExtensions.length - unassignedLEs.length} more limited extensions to the account.`
+        if ((licensedUsers.length - unassignedUsers.length) > 0) {
+            label += usersLabel
+        }
+        if ((limitedExtensions.length - unassignedLEs.length) > 0) {
+            label += leLabel
         }
 
-        // For now, we're only allowing the creation of message-only extensions, announcement-only extensions, and virtual users
-        setFilteredExtensions(extensions.filter((extension) => extension.data.type != 'User' && extension.data.type != 'Limited'))
+        setDeficitLabel(label)
+
+        setUnassignedUserIDs(unassignedUsers)
+        setUnassignedLEIDs(unassignedLEs)
+
+        setFilteredExtensions(extensions)
     }, [isExtensionConverPending, extensions])
+
+    useEffect(() => {
+        const filtered = extensions.filter((ext) => selectedExtensionTypes.includes(ext.prettyType()))
+        
+        const licensedUsers = filtered.filter((ext) => ext.data.type === 'User')
+        const limitedExtensions = filtered.filter((ext) => ext.data.type === 'Limited')
+        const unassignedUsers = extensionsList.filter((extension) => extension.status == 'Unassigned' && extension.type === 'User').map((extension) => extension.id)
+        const unassignedLEs = extensionsList.filter((extension) => extension.status == 'Unassigned' && extension.type === 'Limited').map((extension) => extension.id)
+
+        setUserDeficit(licensedUsers.length - unassignedUsers.length)
+        setLEDeficit(limitedExtensions.length - unassignedLEs.length)
+        let label = ''
+        const usersLabel = `There are ${licensedUsers.length} licensed users in the spreadsheet, but only ${unassignedUsers.length} unassigned users in the account. So you'll need to add ${licensedUsers.length - unassignedUsers.length} more users to the account.`
+        const leLabel = `There are ${limitedExtensions.length} limited extensions in the spreadsheet, but only ${unassignedLEs.length} unassigned limited extensions in the account. So you'll need to add ${limitedExtensions.length - unassignedLEs.length} more limited extensions to the account.`
+        if ((licensedUsers.length - unassignedUsers.length) > 0) {
+            label += usersLabel
+        }
+        if ((limitedExtensions.length - unassignedLEs.length) > 0) {
+            label += leLabel
+        }
+
+        setDeficitLabel(label)
+
+        setFilteredExtensions(filtered)
+    }, [selectedExtensionTypes])
+
+    useEffect(() => {
+        setIsShowingModal(userDeficit > 0 || leDeficit > 0)
+    }, [userDeficit, leDeficit])
+
+    useEffect(() => {
+        if (currentExtensionIndex >= filteredExtensions.length || !isSyncing) return
+        if (filteredExtensions[currentExtensionIndex].data.type === 'User') {
+            createExtension(filteredExtensions[currentExtensionIndex], `${unassignedUserIDs[userIDIndex]}`)
+            setUserIDIndex(prev => prev + 1)
+        }
+        else if (filteredExtensions[currentExtensionIndex].data.type === 'Limited') {
+            createExtension(filteredExtensions[currentExtensionIndex], `${unassignedLEIDs[limitedIDIndex]}`)
+            setLimitedIDIndex(prev => prev + 1)
+        }
+        else {
+            createExtension(filteredExtensions[currentExtensionIndex])
+        }
+    }, [currentExtensionIndex, isSyncing])
 
     const handleFileSelect = () => {
         if (!selectedFile) return
@@ -97,24 +168,24 @@ const ExtensionUpload = () => {
 
     const handleSyncButtonClick = () => {
         setIsSyncing(true)
-        setProgressMax(filteredExtensions.length)
-        createExtensions(filteredExtensions)
         fireEvent('extension-upload')
     }
 
     return (
         <>
-            <Header title='Extension Upload' body='Upload message-only extensions, announcement-only extensions, and virtual users'>
+            <Header title='Extension Upload' body={`Create extensions using the BRD's users tab`}>
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <div className="tool-card">
                 <h2>Extension Upload</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} error={tokenError} loading={isTokenPending} setTargetUID={setTargetUID} />
                 <FileSelect enabled={!isSyncing} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
-                <Button variant="contained" disabled={filteredExtensions.length === 0 || isSyncing} onClick={handleSyncButtonClick}>Sync</Button>
-                {isExtensionCreationPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
+                <AdaptiveFilter title='Extension Types' placeholder='search' options={supportedExtensionTypes} defaultSelected={supportedExtensionTypes} setSelected={setSelectedExtensionTypes} disabled={isExtensionConverPending || isSyncing} />
+                <Button variant="contained" disabled={filteredExtensions.length === 0 || userDeficit > 0 || leDeficit > 0 || isSyncing} onClick={handleSyncButtonClick}>Sync</Button>
+                <Modal open={isShowingModal} setOpen={setIsShowingModal} handleAccept={() => console.log('acceptance')} title='Not enough unassigned extensions' body={deficitLabel} acceptLabel='Okay' />
+                {(isSyncing && currentExtensionIndex === filteredExtensions.length) ? <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button> : <></>}
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Extension Upload" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
-                {isSyncing ? <> <Typography>Creating extensions</Typography> <progress value={progressValue} max={progressMax} /> </> : <></>}
+                {isSyncing ? <progress value={currentExtensionIndex} max={filteredExtensions.length} /> : <></>}
                 {isDataValidationPending ? <></> : <FeedbackArea gridData={filteredExtensions} messages={messages} timedMessages={timedMessages} errors={errors} />}
             </div>
         </>
