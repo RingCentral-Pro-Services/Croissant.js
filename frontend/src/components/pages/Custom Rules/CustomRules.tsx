@@ -105,11 +105,6 @@ const CustomRules = () => {
         setSelectedRules(rules)
     }
 
-    useEffect(() => {
-        console.log('selected rules')
-        console.log(selectedRules)
-    }, [selectedRules])
-
     const handleSyncButtonClick = () => {
         setIsSyncing(true)
         setProgressMax(selectedExtensions.length)
