@@ -7,9 +7,7 @@ import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
 import useSidebar from "../../../hooks/useSidebar";
 import { CustomRule } from "../../../models/CustomRule";
 import { DataGridFormattable } from "../../../models/DataGridFormattable";
-import { Message } from "../../../models/Message";
 import RCExtension from "../../../models/RCExtension";
-import useCreateCustomRule from "../../../rcapi/useCreateCustomRule";
 import useExtensionList from "../../../rcapi/useExtensionList";
 import useGetAccessToken from "../../../rcapi/useGetAccessToken";
 import useGetCustomRules from "../../../rcapi/useGetCustomRules";
@@ -118,9 +116,8 @@ const CustomRules = () => {
     const handleSyncButtonClick = () => {
         setIsSyncing(true)
         setProgressMax(selectedExtensions.length)
-        // createCustomRule(selectedExtensions, selectedRule!, voicemailDestinationOption === 'maintainDestination')
         setActiveStep(10)
-        // fireEvent('copy-custom-rules')
+        fireEvent('copy-custom-rules')
     }
 
     const handleFilterSelection = (selected: DataGridFormattable[]) => {
