@@ -34,7 +34,7 @@ const ManipulateCustomRules = () => {
     const [manipulateRulesProgressMax, setManipulateRulesProgressMax] = useState(0)
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
     const [isSyncing, setIsSyncing] = useState(false)
-    const extensionTypes = ['User', 'Call Queue']
+    const extensionTypes = ['User', 'Call Queue', 'Site']
 
     useLogin('customruleedit', isSyncing)
     useSidebar('Enable / Disable Custom Rules')
@@ -67,12 +67,14 @@ const ManipulateCustomRules = () => {
         let filtered: RCExtension[] = []
         if (isMultiSiteEnabled) {
             filtered = extensionsList.filter((extension) => selectedExtensionTypes.includes(extension.prettyType[extension.type]) && selectedSiteNames.includes(extension.site))
+            if (selectedExtensionTypes.includes('Site')) {
+                const sites = extensionsList.filter((extension) => extension.type === 'Site')
+                filtered = [...filtered, ...sites]
+            }
         }
         else {
             filtered = extensionsList.filter((extension) => selectedExtensionTypes.includes(extension.prettyType[extension.type]))
         }
-        console.log('Filtered Extension')
-        console.log(filtered)
         setFilteredExtensions(filtered)
     }, [selectedExtensionTypes, selectedSiteNames])
 
@@ -87,8 +89,6 @@ const ManipulateCustomRules = () => {
                 }
             }
         }
-        console.log('Rule IDs')
-        console.log(ruleIDs)
         setManipulateRulesProgressMax(ruleIDs.length)
         manipulateRules(ruleIDs, ruleAction)
     }, [isRuleListPending])
