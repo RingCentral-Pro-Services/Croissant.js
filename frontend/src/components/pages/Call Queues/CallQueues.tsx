@@ -58,7 +58,7 @@ const CallQueues = () => {
         setisPending(true)
         setIsSyncing(true)
         // fetchQueueMembers(selectedExtensions)
-        // fireEvent('call-queue-audit')
+        fireEvent('call-queue-audit')
     }
 
     useEffect(() => {

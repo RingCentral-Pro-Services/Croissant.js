@@ -1,5 +1,5 @@
 import { Button, Step, StepContent, StepLabel, Stepper, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
-import React, { FocusEventHandler, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import useAnalytics from "../../../hooks/useAnalytics";
 import useLogin from "../../../hooks/useLogin";
 import useMessageQueue from "../../../hooks/useMessageQueue";
@@ -18,14 +18,13 @@ import AdditiveFilter from "../../shared/AdditiveFilter";
 import FeedbackArea from "../../shared/FeedbackArea";
 import FeedbackForm from "../../shared/FeedbackForm";
 import Header from "../../shared/Header";
-import SimpleSelection from "../../shared/SimpleSelection";
 import UIDInputField from "../../shared/UIDInputField";
+import useApplyRules from "./hooks/useApplyRules";
 
 const CustomRules = () => {
     const [targetUID, setTargetUID] = useState<string>('')
     const [activeStep, setActiveStep] = useState<number>(0)
     const [originalExtensionID, setOriginalExtensionID] = useState(0)
-    const [selectedRule, setSelectedRule] = useState<CustomRule>()
     const [selectedExtensionTypes, setSelectedExtensionTypes] = useState<string[]>([])
     const [siteNames, setSiteNames] = useState<string[]>([])
     const [selectedSiteNames, setSelectedSiteNames] = useState<string[]>([])
@@ -36,7 +35,16 @@ const CustomRules = () => {
     const [progressMax, setProgressMax] = useState<number>(0)
     const [isSyncing, setIsSyncing] = useState<boolean>(false)
     const [voicemailDestinationOption, setVoicemailDestinationOption] = useState('maintainDestination')
+    const [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
+
+    // new stuff
+    const [selectedRules, setSelectedRules] = useState<CustomRule[]>([])
+
     const extensionTypes = ['User', 'Call Queue', 'Site']
+
+    const increaseProgress = () => {
+        setCurrentExtensionIndex( prev => prev + 1)
+    }
 
     useLogin('copycustomrules', isSyncing)
     useSidebar('Copy Custom Rules')
@@ -46,7 +54,7 @@ const CustomRules = () => {
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const {fetchExtensions, extensionsList, isExtensionListPending, isMultiSiteEnabled} = useExtensionList(postMessage)
     const {getCustomRules, customRules, isCustomRulesListPending} = useGetCustomRules()
-    const {createCustomRule, isCustomRuleCreationPending} = useCreateCustomRule(setProgressValue, postMessage, postTimedMessage, postError)
+    const {applyRules} = useApplyRules(postMessage, postTimedMessage, postError, voicemailDestinationOption === 'maintainDestination' ,increaseProgress)
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -78,16 +86,13 @@ const CustomRules = () => {
         else {
             filtered = extensionsList.filter((extension) => selectedExtensionTypes.includes(extension.prettyType[extension.type]))
         }
-        console.log('Filtered Extension')
-        console.log(filtered)
         setFilteredExtensions(filtered)
     }, [selectedExtensionTypes, selectedSiteNames])
 
     useEffect(() => {
-        if (isCustomRuleCreationPending) return
-        console.log('Custom Rule Creation Complete')
-        postMessage(new Message('Custom Rule Creation Complete', 'success'))
-    }, [isCustomRuleCreationPending])
+        if (currentExtensionIndex >= selectedExtensions.length || !isSyncing) return
+        applyRules(selectedExtensions[currentExtensionIndex], selectedRules)
+    }, [currentExtensionIndex, isSyncing])
 
     const handleExtensionInput = (value: string) => {
         console.log(value)
@@ -99,23 +104,23 @@ const CustomRules = () => {
             }
         }
     }
-    
-    const handleRuleInput = (value: string) => {
-        console.log(value)
-        for (const rule of customRules) {
-            if (rule.name === value) {
-                console.log(rule)
-                setSelectedRule(rule)
-            }
-        }
+
+    const handleRuleSelection = (ruleNames: string[]) => {
+        const rules = customRules.filter((rule) => ruleNames.includes(rule.name))
+        setSelectedRules(rules)
     }
+
+    useEffect(() => {
+        console.log('selected rules')
+        console.log(selectedRules)
+    }, [selectedRules])
 
     const handleSyncButtonClick = () => {
         setIsSyncing(true)
         setProgressMax(selectedExtensions.length)
-        createCustomRule(selectedExtensions, selectedRule!, voicemailDestinationOption === 'maintainDestination')
+        // createCustomRule(selectedExtensions, selectedRule!, voicemailDestinationOption === 'maintainDestination')
         setActiveStep(10)
-        fireEvent('copy-custom-rules')
+        // fireEvent('copy-custom-rules')
     }
 
     const handleFilterSelection = (selected: DataGridFormattable[]) => {
@@ -125,11 +130,14 @@ const CustomRules = () => {
     }
 
     const isRuleRoutingToVoicemail = () => {
-        if (selectedRule?.callHandlingAction === 'TakeMessagesOnly' && selectedRule.voicemail!.recipient.id === originalExtensionID) return true
+        for (const rule of selectedRules) {
+            if (rule.callHandlingAction === 'TakeMessagesOnly' && rule.voicemail!.recipient.id === originalExtensionID) return true
+        }
+        return false
     }
 
     const getVoicemailConfigText = () => {
-        return `Who should the voicemail be sent to?`
+        return `Some rules route to voicemail. In those cases, who should the voicemail be sent to?`
     }
 
     return (
@@ -141,8 +149,8 @@ const CustomRules = () => {
             <div className="tool-card">
                 <h2>Copy Custom Rules</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
-                {isCustomRuleCreationPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
-                {isSyncing ? <progress value={progressValue} max={progressMax} />: <></>}
+                {isSyncing && currentExtensionIndex === selectedExtensions.length ? <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button> : <></>}
+                {isSyncing ? <progress value={currentExtensionIndex} max={progressMax} />: <></>}
                 <div hidden={isExtensionListPending}>
                     <Stepper className="healthy-margin-top" activeStep={activeStep} orientation='vertical'>
                         <Step key='select-extension'>
@@ -157,12 +165,12 @@ const CustomRules = () => {
                             </StepContent>
                         </Step>
                         <Step key='select-rule'>
-                            <StepLabel>Select Custom Rule</StepLabel>
+                            <StepLabel>Select Custom Rule(s)</StepLabel>
                             <StepContent>
-                                <SimpleSelection label="Select a rule" defaultSelected="" placeholder="" options={customRules.map((rule) => rule.name)} onSelect={handleRuleInput} />
+                                <AdaptiveFilter title="Rules" placeholder="Search" options={customRules.map((rule) => rule.name)} defaultSelected={[]} setSelected={handleRuleSelection} />
                                 <div className='healthy-margin-top'>
                                     <Button className='healthy-margin-right' variant='contained' onClick={() => setActiveStep((prev) => prev - 1)} >Back</Button>
-                                    <Button variant='contained' disabled={selectedRule === undefined} onClick={() => setActiveStep(isRuleRoutingToVoicemail() ? 2 : 3)} >Next</Button>
+                                    <Button variant='contained' disabled={selectedRules.length === 0} onClick={() => setActiveStep(isRuleRoutingToVoicemail() ? 2 : 3)} >Next</Button>
                                 </div>
                             </StepContent>
                         </Step>
@@ -176,7 +184,7 @@ const CustomRules = () => {
                                 </ToggleButtonGroup>
                                 <div className='healthy-margin-top'>
                                     <Button className='healthy-margin-right' variant='contained' onClick={() => setActiveStep((prev) => prev - 1)} >Back</Button>
-                                    <Button variant='contained' disabled={selectedRule === undefined} onClick={() => setActiveStep((prev) => prev + 1)} >Next</Button>
+                                    <Button variant='contained' disabled={selectedRules.length === 0} onClick={() => setActiveStep((prev) => prev + 1)} >Next</Button>
                                 </div>
                             </StepContent>
                         </Step>
