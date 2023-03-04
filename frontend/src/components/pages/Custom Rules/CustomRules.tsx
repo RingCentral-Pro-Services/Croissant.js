@@ -34,10 +34,7 @@ const CustomRules = () => {
     const [isSyncing, setIsSyncing] = useState<boolean>(false)
     const [voicemailDestinationOption, setVoicemailDestinationOption] = useState('maintainDestination')
     const [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
-
-    // new stuff
     const [selectedRules, setSelectedRules] = useState<CustomRule[]>([])
-
     const extensionTypes = ['User', 'Call Queue', 'Site']
 
     const increaseProgress = () => {
