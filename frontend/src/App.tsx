@@ -24,10 +24,11 @@ import BulkAssign from './components/pages/Phone Numbers/Bulk Assign/BulkAssign'
 import LocationUpdates from './components/pages/Automatic Location Updates/LocationUpdates';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Theme } from '@emotion/react';
-import Presence from './components/pages/Presence/Presence';
+// import Presence from './components/pages/Presence/Presence';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
+const Presence = React.lazy(() => import('./components/pages/Presence/Presence'));
 
 const darkTheme = createTheme({
   palette: {

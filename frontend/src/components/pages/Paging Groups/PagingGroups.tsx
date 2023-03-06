@@ -99,6 +99,7 @@ const PagingGroups = () => {
 
     const handleSync = () => {
         setIsSyncing(true)
+        fireEvent('paging-groups')
 
         let updatedPagingGroups = pagingGroups
         for (let i = 0; i < updatedPagingGroups.length; i++) {

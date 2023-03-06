@@ -21,6 +21,7 @@ import CallQueue from "../../../models/CallQueue"
 import RCExtension from "../../../models/RCExtension"
 import AdaptiveFilter from "../../shared/AdaptiveFilter"
 import useAuditCallQueue from "./hooks/useAuditCallQueue"
+import { sanitize } from "../../../helpers/Sanatize"
 
 const CallQueues = () => {
     let [targetUID, setTargetUID] = useState("")
@@ -122,7 +123,7 @@ const CallQueues = () => {
         console.log('Queues')
         console.log(aditedQueues)
         const header = ['Queue Name', 'Extension', 'Site', 'Status', 'Members (Ext)', 'Greeting', 'Audio While Connecting', 'Hold Music', 'Voicemail', 'Interrupt Audio', 'Interrupt Prompt', 'Ring Type', 'Total Ring Time', 'User Ring Time' , 'Max Wait Time Action', 'Max Wait Time Destination', 'Max Callers Action', 'Max Callers Destination', 'No Answer Action', 'Wrap Up Time']
-        writePrettyExcel(header, aditedQueues, 'Call Queues', `queues.xlsx`, '/call-queue-template.xlsx')
+        writePrettyExcel(header, aditedQueues, 'Call Queues', `Queues - ${sanitize(companyName)}.xlsx`, '/call-queue-template.xlsx')
         setisPending(false)
         setProgressValue(aditedQueues.length * 2)
     }

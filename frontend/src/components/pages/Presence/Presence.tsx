@@ -1,6 +1,6 @@
 import { Button } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import { sanatize } from '../../../helpers/Sanatize'
+import { sanitize } from '../../../helpers/Sanatize'
 import useAnalytics from '../../../hooks/useAnalytics'
 import useLogin from '../../../hooks/useLogin'
 import useMessageQueue from '../../../hooks/useMessageQueue'
@@ -78,7 +78,7 @@ const Presence = () => {
     useEffect(() => {
         if (isSyncing && currentExtensionIndex === selectedExtensions.length) {
             const header = ['']
-            writePrettyExcel(header, presenceData, 'Presence Audit', `presence - ${sanatize(companyName)}.xlsx`, '/presence-audit-template.xlsx')
+            writePrettyExcel(header, presenceData, 'Presence Audit', `presence - ${sanitize(companyName)}.xlsx`, '/presence-audit-template.xlsx')
         }
     }, [currentExtensionIndex])
 

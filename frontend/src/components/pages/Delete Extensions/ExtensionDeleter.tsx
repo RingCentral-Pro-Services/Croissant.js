@@ -18,6 +18,7 @@ import FeedbackForm from "../../shared/FeedbackForm"
 import useSidebar from "../../../hooks/useSidebar"
 import useExtensions from "../../../rcapi/useExtensions"
 import { Extension } from "../../../models/Extension"
+import { sanitize } from "../../../helpers/Sanatize"
 
 const ExtensionDeleter = () => {
     const {fireEvent} = useAnalytics()
@@ -148,7 +149,7 @@ const ExtensionDeleter = () => {
 
     const handleDownloadButtonClick = () => {
         const header = ['Mailbox ID', 'Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']
-        writeExcel(header, selectedExtensions, 'Deleted Extensions', 'deleted-extensions.xlsx')
+        writeExcel(header, selectedExtensions, 'Deleted Extensions', `Deleted Extensions - ${sanitize(companyName)}.xlsx`)
     }
 
     const handleFilterSelection = (selected: DataGridFormattable[]) => {
