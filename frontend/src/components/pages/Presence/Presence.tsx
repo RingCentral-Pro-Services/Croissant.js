@@ -94,7 +94,7 @@ const Presence = () => {
                 <h2>Presence</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                 {!isSiteListPending && isMultiSiteEnabled ? <AdaptiveFilter title="Site" placeholder="Search" verticalAlign='middle' options={siteNames} defaultSelected={siteNames} setSelected={setSelectedSiteNames} /> : <></>}
-                <Button variant='contained'onClick={handleSync} >Audit</Button>
+                <Button variant='contained'onClick={handleSync} disabled={ isExtensionListPending || isSyncing || selectedExtensions.length === 0} >Audit</Button>
                 {isSyncing ? <progress value={currentExtensionIndex} max={selectedExtensions.length} /> : <></>}
                 {isExtensionListPending ? <></> : <FeedbackArea gridData={selectedExtensions} messages={messages} timedMessages={timedMessages} errors={errors} />}
             </div>
