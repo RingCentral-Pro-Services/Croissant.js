@@ -87,6 +87,8 @@ const useExcelToExtensions = () => {
         switch (rawType) {
             case 'User':
                 return 'User'
+            case 'MS Teams User →':
+                return 'User'
             case 'Virtual User':
                 return 'User'
             case 'LimitedExtension':
