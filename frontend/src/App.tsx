@@ -29,6 +29,7 @@ import { Theme } from '@emotion/react';
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
 const Presence = React.lazy(() => import('./components/pages/Presence/Presence'));
+const Testbed = React.lazy(() => import('./components/pages/Testbed/Testbed'));
 
 const darkTheme = createTheme({
   palette: {
@@ -91,6 +92,7 @@ function App() {
               <Route path='/bulkassign' element={<BulkAssign />} />
               <Route path='/locationupdates' element={<LocationUpdates />} />
               <Route path='/presence' element={<Presence />} />
+              <Route path='/testbed' element={<Testbed />} />
             </Routes>
           </Suspense>
         </div>
