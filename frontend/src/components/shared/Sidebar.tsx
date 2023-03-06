@@ -42,6 +42,7 @@ const Sidebar: React.FC<SidebarProps> = ({setColorTheme}) => {
     const sidebarItems: SidebarItem[] = [
         {label: 'Extension Upload', destination: '/extensionupload'},
         {label: 'Edit Extensions', destination: '/editextensions'},
+        {label: 'Presence', destination: '/presence'},
         {label: 'Account Dump', destination: '/accountdump'},
         {label: 'Delete Extensions', destination: '/deleteextensions'},
         {label: 'Notifications', destination: '/notificationsaudit'},
