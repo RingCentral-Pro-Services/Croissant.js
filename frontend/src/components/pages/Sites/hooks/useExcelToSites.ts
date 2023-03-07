@@ -117,7 +117,7 @@ const useExcelToSites = (regionalFormats: RegionalFormat[]) => {
                 userLanguage: regionalFormats.find(rf => rf.name === item['User Language'])?.id || '',
                 greetingLanguage: regionalFormats.find(rf => rf.name === item['Greeting Language'])?.id || '',
                 regionalFormat: regionalFormats.find(rf => rf.name === item['Regional Format'])?.id || '',
-                timeFormat: item['Time Format'],
+                timeFormat: getTimeFormat(`${item['Time Format']}`),
                 outboundCnam: item['Outbound Cnam'],
                 siteCode: item['Site Code'],
                 erlName: item['Emergency Response Location Nickname'],
@@ -128,6 +128,13 @@ const useExcelToSites = (regionalFormats: RegionalFormat[]) => {
 
         setSites(sites)
         setIsConvertPending(false)
+    }
+
+    const getTimeFormat = (rawFormat: string) => {
+        if (rawFormat.includes('12')) {
+            return '12h'
+        }
+        return '24h'
     }
 
     return { sites, isConvertPending, convert }

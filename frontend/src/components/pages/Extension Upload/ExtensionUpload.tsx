@@ -77,12 +77,7 @@ const ExtensionUpload = () => {
 
     useEffect(() => {
         if (isExcelDataPending) return
-        // Currently there are formulas in the BRD that cause empty rows to not
-        // actually be empty. This is a workaround for that.
-        const goodRows = excelData.filter((row) => {
-            return Object.keys(row).length != 5 && row['Address 1'] != '#N/A'
-        })
-        validate(goodRows)
+        validate(excelData)
     }, [isExcelDataPending, excelData])
  
     useEffect(() => {
