@@ -24,7 +24,7 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
                 email: currentItem['Email'] ?? currentItem['Queue Email']
             }
             let extension = new RCExtension(idForQueue(currentItem['Extension'], extensionsList), currentItem['Extension'], currentItem['Queue Name'], contact, currentItem['Site'], 'Department', '', false, '')
-            let memberString: string = currentItem['Members (Ext)']
+            let memberString: string = `${currentItem['Members (Ext)']}`
             let membersExtensions = memberString.split(',')
             membersExtensions = isolateExtensions(membersExtensions)
             let members: string[] = []
