@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom'
 import { SidebarItem } from "../../models/SidebarItem";
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import SettingsIcon from '@mui/icons-material/Settings';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 
@@ -15,7 +14,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({setColorTheme}) => {
     const [selectedItem, setSelectedItem] = useState("")
-    const [isIVRListOpen, setIsIVRListOpen] = useState(true)
+    const [isIVRListOpen, setIsIVRListOpen] = useState(false)
     const [isCallQueueListOpen, setIsCallQueueListOpen] = useState(false)
     const [isCustomRuleListOpen, setIsCustomRuleListOpen] = useState(false)
     const [isSiteListOpen, setIsSiteListOpen] = useState(false)
