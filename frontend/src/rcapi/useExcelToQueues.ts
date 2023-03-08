@@ -207,7 +207,7 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
             if (action === 'Send new callers to Extension →' || action === 'Transfer to Extension') {
                 settings.maxCallersAction = 'TransferToExtension'
             }
-            else if (action === 'Forward new callers to Externa number →' || action === 'Forward to External') {
+            else if (action === 'Forward new callers to Externa number →' || action === 'Forward new callers to External number →' || action === 'Forward to External') {
                 settings.maxCallersAction = 'UnconditionalForwarding'
             }
             else if (action === 'Advise callers of heavy call volume and disconnect' || action === 'Play Greeting and Disconnect') {
@@ -251,7 +251,7 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
                     return `${idForExtension(extension, extensionList)}`
                 }
             }
-            else if ((CallQueueKeys.queueFullDestination in data || CallQueueKeys.maxCallersDestination in data) && (action === 'Forward new callers to Externa number →' || action === 'Forward to External')) {
+            else if ((CallQueueKeys.queueFullDestination in data || CallQueueKeys.maxCallersDestination in data) && (action === 'Forward new callers to Externa number →' || action === 'Forward new callers to Externa number →' || action === 'Forward to External')) {
                 const isolator = new ExtensionIsolator()
                 const rawDestination = `${data[CallQueueKeys.maxCallersDestination] ?? data[CallQueueKeys.queueFullDestination]}`
                 const phoneNumber = isolator.isolatePhoneNumber(rawDestination)
