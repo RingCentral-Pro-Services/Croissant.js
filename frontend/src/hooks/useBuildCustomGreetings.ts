@@ -9,6 +9,8 @@ const useBuildCustomGreetings = () => {
     const [connectingGreetingPayload, setConnectingGreetingPayload] = useState<FormData>(new FormData())
     const [onHoldGreetingPayload, setOnHoldGreetingPayload] = useState<FormData>(new FormData())
     const [intterruptGreetingPayload, setIntterruptGreetingPayload] = useState<FormData>(new FormData())
+    const [voicemailGreetingFile, setVoicemailGreetingFile] = useState<File | null>(null)
+    const [voicemailGreetingPayload, setVoicemailGreetingPayload] = useState<FormData>(new FormData())
     const [progressMultiplier, setProgressMultiplier] = useState(0)
 
     useEffect(() => {
@@ -51,15 +53,25 @@ const useBuildCustomGreetings = () => {
     }, [intterruptGreetingFile])
 
     useEffect(() => {
+        if (!voicemailGreetingFile) return
+        const formData = new FormData()
+        formData.append('type', 'Voicemail')
+        formData.append('answeringRuleId', 'business-hours-rule')
+        formData.append('binary', voicemailGreetingFile, voicemailGreetingFile.name)
+        setVoicemailGreetingPayload(formData)
+    }, [voicemailGreetingFile])
+
+    useEffect(() => {
         let multiplier = 0
         if (introGreetingPayload.has('binary')) multiplier += 1
         if (connectingGreetingPayload.has('binary')) multiplier += 1
         if (onHoldGreetingPayload.has('binary')) multiplier += 1
         if (intterruptGreetingPayload.has('binary')) multiplier += 1
+        if (voicemailGreetingPayload.has('binary')) multiplier += 1
         setProgressMultiplier(multiplier)
-    }, [introGreetingPayload, connectingGreetingPayload, onHoldGreetingPayload, intterruptGreetingPayload])
+    }, [introGreetingPayload, connectingGreetingPayload, onHoldGreetingPayload, intterruptGreetingPayload, voicemailGreetingPayload])
 
-    return {setIntroGreetingFile, setConnectingGreetingFile, setOnHoldGreetingFile, setIntterruptGreetingFile, introGreetingPayload, connectingGreetingPayload, onHoldGreetingPayload, intterruptGreetingPayload, progressMultiplier}
+    return {setIntroGreetingFile, setConnectingGreetingFile, setOnHoldGreetingFile, setIntterruptGreetingFile, setVoicemailGreetingFile, introGreetingPayload, connectingGreetingPayload, onHoldGreetingPayload, intterruptGreetingPayload, voicemailGreetingPayload, progressMultiplier}
 }
 
 export default useBuildCustomGreetings

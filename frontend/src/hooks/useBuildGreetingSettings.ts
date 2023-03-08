@@ -2,11 +2,12 @@ import { useEffect, useState } from "react"
 import { GreetingResource } from "../models/GreetingResource"
 import { Greeting } from "../models/Greetings"
 
-const useBuildGreetingSettings = (connectingAudioMap: Map<string, GreetingResource>, interruptAudioMap: Map<string, GreetingResource>, greetingAudioMap: Map<string, GreetingResource>, holdMusicMap: Map<string, GreetingResource>) => {
+const useBuildGreetingSettings = (connectingAudioMap: Map<string, GreetingResource>, interruptAudioMap: Map<string, GreetingResource>, greetingAudioMap: Map<string, GreetingResource>, holdMusicMap: Map<string, GreetingResource>, voicemailGreetingMap: Map<string, GreetingResource>) => {
     const [introGreeting, setIntroGreeting] = useState('')
     const [audioWhileConnecting, setAudioWhileConnecting] = useState('')
     const [holdMusic, setHoldMusic] = useState('')
     const [interruptAudio, setInterruptAudio] = useState('')
+    const [voicemailGreeting, setVoicemailGreeting] = useState('')
     const [payload, setPayload] = useState({})
     const [greetings, setGreetings] = useState<Greeting[]>([])
 
@@ -14,6 +15,7 @@ const useBuildGreetingSettings = (connectingAudioMap: Map<string, GreetingResour
     const CONNECTING_AUDIO = 'ConnectingAudio'
     const HOLD_MUSIC = 'HoldMusic'
     const INTERRUPT_AUDIO = 'InterruptPrompt'
+    const VOICEMAIL_GREETING = 'Voicemail'
 
     useEffect(() => {
         if (introGreeting === '' || !introGreeting) {
@@ -88,6 +90,24 @@ const useBuildGreetingSettings = (connectingAudioMap: Map<string, GreetingResour
     }, [interruptAudio])
 
     useEffect(() => {
+        if (voicemailGreeting === '' || !voicemailGreeting) {
+            if (hasGreeting(VOICEMAIL_GREETING)) deleteGreeting(VOICEMAIL_GREETING)
+        }
+        else {
+            const resource = voicemailGreetingMap.get(voicemailGreeting)
+            const greeting: Greeting = {
+                type: VOICEMAIL_GREETING,
+                preset: {
+                    id: resource!.id,
+                    name: resource!.name
+                }
+            }
+
+            updateGreeting(VOICEMAIL_GREETING, greeting)
+        }
+    }, [voicemailGreeting])
+
+    useEffect(() => {
         console.log('Greetings')
         console.log(greetings)
     }, [greetings])
@@ -122,7 +142,7 @@ const useBuildGreetingSettings = (connectingAudioMap: Map<string, GreetingResour
         setGreetings(newGreetings)
     }
 
-    return {setIntroGreeting, setAudioWhileConnecting, setHoldMusic, setInterruptAudio, greetings}
+    return {setIntroGreeting, setAudioWhileConnecting, setHoldMusic, setInterruptAudio, setVoicemailGreeting, greetings}
 }
 
 export default useBuildGreetingSettings

@@ -15,10 +15,21 @@ const useGreetingList = () => {
     const [interruptAudioMap, setInterruptAudioMap] = useState<Map<string, GreetingResource>>(new Map())
     const [greetingAudioMap, setGreetingAudioMap] = useState<Map<string, GreetingResource>>(new Map())
     const [holdMusicMap, setHoldMusicMap] = useState<Map<string, GreetingResource>>(new Map())
+    const [voicemailGreetingMap, setVoicemailGreetingMap] = useState<Map<string, GreetingResource>>(new Map())
     const baseURL = 'https://platform.ringcentral.com/restapi/v1.0/dictionary/greeting'
 
     const fetchGreetings = () => {
         setShouldFetchCallQueueAudio(true)
+        const queueVM: GreetingResource = {
+            id: '131329',
+            name: 'Default',
+            uri: '',
+            usageType: "",
+            contentUri: "",
+            type: "",
+            category: ""
+        }
+        voicemailGreetingMap.set('Default', queueVM)
     }
 
     useEffect(() => {
@@ -123,7 +134,7 @@ const useGreetingList = () => {
         setGreetingAudioMap(introMap)
     }
 
-    return {fetchGreetings, callQueueConnectingAudio, callQueueGreetingAudio, holdMusicAudio, callQueueInterruptAudio, isGreetingListPending, connectingAudioMap, holdMusicMap, interruptAudioMap, greetingAudioMap}
+    return {fetchGreetings, callQueueConnectingAudio, callQueueGreetingAudio, holdMusicAudio, callQueueInterruptAudio, isGreetingListPending, connectingAudioMap, holdMusicMap, interruptAudioMap, greetingAudioMap, voicemailGreetingMap}
 
 }
 

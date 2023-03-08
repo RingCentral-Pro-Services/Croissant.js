@@ -11,21 +11,24 @@ const useUploadCustomGreetings = (setProgressValue: (value: (any)) => void, post
     const [connectingGreetingPayload, setConnectingGreetingPayload] = useState<FormData>(new FormData())
     const [onHoldGreetingPayload, setOnHoldGreetingPayload] = useState<FormData>(new FormData())
     const [intterruptGreetingPayload, setIntterruptGreetingPayload] = useState<FormData>(new FormData())
+    const [voicemailGreetingPayload, setVoicemailGreetingPayload] = useState<FormData>(new FormData())
     const [shouldUploadIntroGreeting, setShouldUploadIntroGreeting] = useState(false)
     const [shouldUploadConnectingGreeting, setShouldUploadConnectingGreeting] = useState(false)
     const [shouldUploadOnHoldGreeting, setShouldUploadOnHoldGreeting] = useState(false)
     const [shouldUploadIntterruptGreeting, setShouldUploadIntterruptGreeting] = useState(false)
+    const [shouldUploadVoicemailGreeting, setShouldUploadVoicemailGreeting] = useState(false)
     const [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
     const [rateLimitInterval, setRateLimitInterval] = useState(250)
     const [progress, setProgress] = useState(0)
     const baseURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/greeting'
 
-    const uploadGreetings = (extensions: RCExtension[], introGreetingPayload: FormData, connectingGreetingPayload: FormData, onHoldGreetingPayload: FormData, intterruptGreetingPayload: FormData) => {
+    const uploadGreetings = (extensions: RCExtension[], introGreetingPayload: FormData, connectingGreetingPayload: FormData, onHoldGreetingPayload: FormData, intterruptGreetingPayload: FormData, voicemailGreetingPayload: FormData) => {
         setExtensions(extensions)
         setIntroGreetingPayload(introGreetingPayload)
         setConnectingGreetingPayload(connectingGreetingPayload)
         setOnHoldGreetingPayload(onHoldGreetingPayload)
         setIntterruptGreetingPayload(intterruptGreetingPayload)
+        setVoicemailGreetingPayload(voicemailGreetingPayload)
         setShouldUploadIntroGreeting(true)
     }
 
@@ -164,8 +167,7 @@ const useUploadCustomGreetings = (setProgressValue: (value: (any)) => void, post
         if (!intterruptGreetingPayload.has('binary') || currentExtensionIndex >= extensions.length) {
             setCurrentExtensionIndex(0)
             setShouldUploadIntterruptGreeting(false)
-            setProgressValue(Number.MAX_SAFE_INTEGER)
-            setIsGreetingsUploadPending(false)
+            setShouldUploadVoicemailGreeting(true)
             return
         }
 
@@ -201,6 +203,50 @@ const useUploadCustomGreetings = (setProgressValue: (value: (any)) => void, post
             }
         }, rateLimitInterval)
     }, [shouldUploadIntterruptGreeting, rateLimitInterval, extensions, introGreetingPayload, currentExtensionIndex, baseURL])
+
+    useEffect(() => {
+        const accessToken = localStorage.getItem('cs_access_token')
+        if (!shouldUploadVoicemailGreeting || !accessToken) return
+        if (!voicemailGreetingPayload.has('binary') || currentExtensionIndex >= extensions.length) {
+            setCurrentExtensionIndex(0)
+            setShouldUploadVoicemailGreeting(false)
+            setProgressValue(Number.MAX_SAFE_INTEGER)
+            setIsGreetingsUploadPending(false)
+            return
+        }
+
+        setTimeout(async () => {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "multipart/form-data",
+                "Authorization": `Bearer ${accessToken}`
+            }
+
+            try {
+                let url = baseURL.replace('extensionId', `${extensions[currentExtensionIndex].id}`)
+                url += '?apply=true'
+                let response = await RestCentral.post(url, headers, voicemailGreetingPayload)
+                console.log(response)
+
+                if (response.rateLimitInterval > 0) {
+                    setRateLimitInterval(response.rateLimitInterval)
+                    postMessage(new Message('Rate limit reached. Waiting 60 seconds before continuing.', 'info'))
+                }
+                else {
+                    setRateLimitInterval(250)
+                }
+
+                uploadNext()
+            }
+            catch (e: any) {
+                console.log('It failed')
+                console.log(e)
+                postMessage(new Message(`Failed to upload voicemail greeting for ${extensions[currentExtensionIndex].name} ${e.error}`, 'error'))
+                postError(new SyncError(extensions[currentExtensionIndex].name, extensions[currentExtensionIndex].extensionNumber, ['Custom voicemail failed', ''], e.error ?? ''))
+                uploadNext()
+            }
+        }, rateLimitInterval)
+    }, [shouldUploadVoicemailGreeting, rateLimitInterval, extensions, voicemailGreetingPayload, currentExtensionIndex, baseURL])
 
     const uploadNext = () => {
         if (currentExtensionIndex >= extensions.length) {

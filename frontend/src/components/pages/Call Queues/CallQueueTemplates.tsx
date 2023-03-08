@@ -74,12 +74,12 @@ const CallQueueTemplates = () => {
     const {fetchRegionalFormats, isRegionalFormatListPenging, regionalFormats, regionalFormatMap} = useRegionalFormats()
     const {setGreetingsLanguage, setRegionalFormat, setTimeFormat, setTimezone, setUserLanguage, payload: regionalSettingsPayload} = useBuildRegionalSettings(regionalFormatMap, timezoneMap)
     const {applyRegionalSettings, isRegionalSettingApplicationPending} = useApplyRegionalSettings(setRegionalSettingsProgress, postMessage, postTimedMessage, postError)
-    const {fetchGreetings, callQueueConnectingAudio, holdMusicAudio, callQueueGreetingAudio, callQueueInterruptAudio, connectingAudioMap, greetingAudioMap, interruptAudioMap, holdMusicMap} = useGreetingList()
-    const {setIntroGreeting, setAudioWhileConnecting, setHoldMusic, setInterruptAudio, greetings} = useBuildGreetingSettings(connectingAudioMap, interruptAudioMap, greetingAudioMap, holdMusicMap)
+    const {fetchGreetings, callQueueConnectingAudio, holdMusicAudio, callQueueGreetingAudio, callQueueInterruptAudio, connectingAudioMap, greetingAudioMap, interruptAudioMap, holdMusicMap, voicemailGreetingMap} = useGreetingList()
+    const {setIntroGreeting, setAudioWhileConnecting, setHoldMusic, setInterruptAudio, setVoicemailGreeting, greetings} = useBuildGreetingSettings(connectingAudioMap, interruptAudioMap, greetingAudioMap, holdMusicMap, voicemailGreetingMap)
     const {updateCallHandling, isCallHandlingUpdatePending} = useUpdateCallHandling(setCallHandlingSettingsProgress, postMessage, postTimedMessage, postError)
     const {setRingType, setMaxCallersInQueue, setMaxWaitTime, setMaxWaitTimeAction, setMaxWaitTimeDestination, setQueueFullAction, setQueueFullDestination, setUserRingTime, setWrapUpTime, setInterruptPeriod, payload: callHandlingPayload} = useBuildCallHandlingSettings(extensionsList)
     const {updateSchedule, isScheduleUpdatePending} = useUpdateSchedule(setScheduleProgress, postMessage, postTimedMessage, postError)
-    const {setIntroGreetingFile, setConnectingGreetingFile, setIntterruptGreetingFile, setOnHoldGreetingFile, introGreetingPayload, connectingGreetingPayload, onHoldGreetingPayload, intterruptGreetingPayload, progressMultiplier} = useBuildCustomGreetings()
+    const {setIntroGreetingFile, setConnectingGreetingFile, setIntterruptGreetingFile, setOnHoldGreetingFile, setVoicemailGreetingFile, introGreetingPayload, connectingGreetingPayload, onHoldGreetingPayload, intterruptGreetingPayload, voicemailGreetingPayload, progressMultiplier} = useBuildCustomGreetings()
     const {uploadGreetings, isGreetingsUploadPending} = useUploadCustomGreetings(setGreetingUploadProgress, postMessage, postTimedMessage, postError)
     const {editMemberStatus, isMemberStatusPending} = useSetMemberStatus(setMemberStatusProgress, postMessage, postTimedMessage, postError)
 
@@ -140,7 +140,7 @@ const CallQueueTemplates = () => {
 
     useEffect(() => {
         if (isScheduleUpdatePending) return
-        uploadGreetings(selectedExtensions, introGreetingPayload, connectingGreetingPayload, onHoldGreetingPayload, intterruptGreetingPayload)
+        uploadGreetings(selectedExtensions, introGreetingPayload, connectingGreetingPayload, onHoldGreetingPayload, intterruptGreetingPayload, voicemailGreetingPayload)
     }, [isScheduleUpdatePending])
 
     useEffect(() => {
@@ -171,7 +171,7 @@ const CallQueueTemplates = () => {
         if (Object.keys(schedulePayload).length != 0) {
             setWillUpdateSchedule(true)
         }
-        if (introGreetingPayload.has('binary') || connectingGreetingPayload.has('binary') || onHoldGreetingPayload.has('binary') || intterruptGreetingPayload.has('binary')) {
+        if (introGreetingPayload.has('binary') || connectingGreetingPayload.has('binary') || onHoldGreetingPayload.has('binary') || intterruptGreetingPayload.has('binary') || voicemailGreetingPayload.has('binary')) {
             setWillUploadGreetings(true)
         }
         if (editableMemberStatus != '') {
@@ -280,6 +280,16 @@ const CallQueueTemplates = () => {
                             </div>
                             <div className="inline">
                                 <SimpleSelection label="Allow members to change status" placeholder="" options={['Allowed', 'Not Allowed']} defaultSelected='' onSelect={setEditableMemberStatus} />
+                            </div>
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography>Voicemail & Notifications</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <div className="inline">
+                                <SimpleSelection label="Voicemail Greeting" placeholder="" options={['Default', 'Custom']} defaultSelected='' onSelect={setVoicemailGreeting} onFileSelect={setVoicemailGreetingFile} />
                             </div>
                         </AccordionDetails>
                     </Accordion>
