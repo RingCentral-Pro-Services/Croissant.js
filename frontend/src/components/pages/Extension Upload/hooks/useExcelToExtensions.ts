@@ -3,7 +3,7 @@ import { Extension } from "../../../../models/Extension"
 import { ExtensionData, Role } from "../../../../models/ExtensionData"
 import RCExtension from "../../../../models/RCExtension"
 
-const useExcelToExtensions = () => {
+const useExcelToExtensions = (shouldAlterEmails: boolean) => {
     const [extensions, setExtensions] = useState<Extension[]>([])
     const [isExtensionConverPending, setIsExtensionConverPending] = useState(true)
 
@@ -27,7 +27,7 @@ const useExcelToExtensions = () => {
                 contact: {
                     firstName: firstName,
                     lastName: lastName,
-                    email: currentItem['Email'],
+                    email: shouldAlterEmails ? `${currentItem['Email']}.ps.ringcentral.com` : currentItem['Email'],
                     department: currentItem['Dept'] ?? currentItem['Department'] ?? ''
                 },
                 extensionNumber: currentItem['Extension'],

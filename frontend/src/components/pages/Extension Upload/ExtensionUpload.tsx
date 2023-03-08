@@ -1,4 +1,4 @@
-import { Button, Typography } from "@mui/material";
+import { Button, Checkbox, FormControlLabel, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { extensionSchema } from "../../../helpers/schemas";
 import useAnalytics from "../../../hooks/useAnalytics";
@@ -39,6 +39,7 @@ const ExtensionUpload = () => {
     const [isShowingModal, setIsShowingModal] = useState(false)
     const [deficitLabel, setDeficitLabel] = useState('')
     const [selectedExtensionTypes, setSelectedExtensionTypes] = useState<string[]>([])
+    const [shouldAlterEmails, setShouldAlterEmails] = useState(false)
     const defaultSheet = 'Users'
     const supportedExtensionTypes = ['Announcement-Only', 'Message-Only', 'Limited Extension', 'User', 'Virtual User']
 
@@ -55,7 +56,7 @@ const ExtensionUpload = () => {
     const {fetchExtensions, extensionsList, isExtensionListPending, isMultiSiteEnabled} = useExtensionList(postMessage)
     const {readFile, excelData, isExcelDataPending} = useReadExcel()
     const {validate, validatedData, isDataValidationPending} = useValidateExcelData(extensionSchema, postMessage, postError)
-    const {convertExcelToExtensions, isExtensionConverPending, extensions} = useExcelToExtensions()
+    const {convertExcelToExtensions, isExtensionConverPending, extensions} = useExcelToExtensions(shouldAlterEmails)
     const {fetchRoles, roles, isRoleListPending} = useFetchRoles()
     const {createExtension} = useExtension(postMessage, postTimedMessage, postError, isMultiSiteEnabled, increaseProgress)
 
@@ -177,6 +178,7 @@ const ExtensionUpload = () => {
                 <FileSelect enabled={!isSyncing} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
                 <AdaptiveFilter title='Extension Types' placeholder='search' options={supportedExtensionTypes} defaultSelected={supportedExtensionTypes} setSelected={setSelectedExtensionTypes} disabled={isExtensionConverPending || isSyncing} />
                 <Button variant="contained" disabled={filteredExtensions.length === 0 || userDeficit > 0 || leDeficit > 0 || isSyncing} onClick={handleSyncButtonClick}>Sync</Button>
+                <FormControlLabel className='healthy-margin-left' control={<Checkbox onChange={() => setShouldAlterEmails(!shouldAlterEmails)}/>} label="Add .ps.ringcentral.com" />
                 <Modal open={isShowingModal} setOpen={setIsShowingModal} handleAccept={() => console.log('acceptance')} title='Not enough unassigned extensions' body={deficitLabel} acceptLabel='Okay' />
                 {(isSyncing && currentExtensionIndex === filteredExtensions.length) ? <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button> : <></>}
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Extension Upload" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
