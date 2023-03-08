@@ -18,6 +18,7 @@ import useLogin from "../../../hooks/useLogin"
 import FeedbackForm from "../../shared/FeedbackForm"
 import useSidebar from "../../../hooks/useSidebar"
 import useCallQueue from "./hooks/useCallQueue"
+import LaunchIcon from '@mui/icons-material/Launch';
 
 const CreateCallQueues = () => {
     let [isPending, setIsPending] = useState(true)
@@ -104,6 +105,7 @@ const CreateCallQueues = () => {
                 <FileSelect enabled={hasCustomerToken} accept=".xlsx" handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Create Call Queues" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
                 {isPending ? <></> : <Button disabled={isSyncing} variant="contained" onClick={handleSyncButtonClick}>Sync</Button>}
+                <Button className='healthy-margin-left' variant='outlined' onClick={() => window.open('https://docs.google.com/spreadsheets/d/1NW5wnPJFJKAfZQ6jc57JMRP4ddJr4-qSoLlQXZ3g_ko/edit?usp=sharing', '_blank')} endIcon={<LaunchIcon />} >Template</Button>
                 {(isSyncing && currentExtensionIndex >= queues.length) ? <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button> : <></>}
                 {!(queues.length > 0) ? <></> : <progress id='sync_progress' value={currentExtensionIndex} max={queues.length} />}
                 {isQueueConvertPending ? <></> : <FeedbackArea gridData={queues} messages={messages} timedMessages={timedMessages} errors={errors} />}

@@ -21,6 +21,7 @@ import useValidateExcelData from "../../../hooks/useValidateExcelData";
 import { ivrSchema } from "../../../helpers/schemas";
 import UIDInputField from "../../shared/UIDInputField";
 import AdaptiveFilter from "../../shared/AdaptiveFilter";
+import LaunchIcon from '@mui/icons-material/Launch';
 
 const DirectCreateMenus = () => {
     useLogin('create-ivr')
@@ -149,7 +150,8 @@ const DirectCreateMenus = () => {
             <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} loading={isTokenPending} error={tokenError} />
             <FileSelect enabled={hasCustomerToken} accept=".xlsx, .csv" handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={isPending} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
             {isDisplayingFilterBox ? <AdaptiveFilter title='Pages' placeholder='Search...' setSelected={setSelectedSites} options={pages.map((page) => page.label)} defaultSelected={pages.map((page) => page.label)} /> : <></>}
-            {!isReadyToSync ? <></> : <Button disabled={isSyncing} variant="contained" className="inline" onClick={handleSyncButtonClick}>Sync</Button>}
+            <Button disabled={!hasCustomerToken || menus.length === 0 || isSyncing} variant="contained" className="inline" onClick={handleSyncButtonClick}>Sync</Button>
+            <Button className='healthy-margin-left' variant='outlined' onClick={() => window.open('https://docs.google.com/spreadsheets/d/1jcXdr5mc-HpmbkjRq4V-2_G_pftrSOHqFYSyo5wLs2k/edit?usp=sharing', '_blank')} endIcon={<LaunchIcon />} >Template</Button>
             {!(menus.length > 0) ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
             {timedMessages.map((timedMessage) => (
                 <p>{timedMessage.body}</p>
