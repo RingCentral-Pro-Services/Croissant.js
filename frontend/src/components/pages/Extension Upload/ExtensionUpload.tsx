@@ -39,7 +39,7 @@ const ExtensionUpload = () => {
     const [isShowingModal, setIsShowingModal] = useState(false)
     const [deficitLabel, setDeficitLabel] = useState('')
     const [selectedExtensionTypes, setSelectedExtensionTypes] = useState<string[]>([])
-    const [shouldAlterEmails, setShouldAlterEmails] = useState(false)
+    const [shouldAlterEmails, setShouldAlterEmails] = useState(true)
     const defaultSheet = 'Users'
     const supportedExtensionTypes = ['Announcement-Only', 'Message-Only', 'Limited Extension', 'User', 'Virtual User']
 
