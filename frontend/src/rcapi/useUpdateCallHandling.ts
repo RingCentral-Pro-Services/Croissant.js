@@ -89,7 +89,7 @@ const useUpdateCallHandling = (setProgressValue: (value: (any)) => void, postMes
             }
 
             try {
-                const response = await RestCentral.put(url, headers, payload)
+                const response = await RestCentral.put(url, headers, afterHoursPayload)
                 console.log(response)
                 if (response.rateLimitInterval > 0) {
                     postTimedMessage(new Message(`Rate limit reached. Resuming in 60 seconds`, 'info'), 60000)
