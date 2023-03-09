@@ -11,6 +11,8 @@ const useBuildCustomGreetings = () => {
     const [intterruptGreetingPayload, setIntterruptGreetingPayload] = useState<FormData>(new FormData())
     const [voicemailGreetingFile, setVoicemailGreetingFile] = useState<File | null>(null)
     const [voicemailGreetingPayload, setVoicemailGreetingPayload] = useState<FormData>(new FormData())
+    const [afterHoursVoicemailGreetingFile, setAfterHoursVoicemailGreetingFile] = useState<File | null>(null)
+    const [afterHoursVoicemailGreetingPayload, setAfterHoursVoicemailGreetingPayload] = useState<FormData>(new FormData())
     const [progressMultiplier, setProgressMultiplier] = useState(0)
 
     useEffect(() => {
@@ -62,16 +64,28 @@ const useBuildCustomGreetings = () => {
     }, [voicemailGreetingFile])
 
     useEffect(() => {
+        console.log('Setting after hours voicemail greeting payload')
+        if (!afterHoursVoicemailGreetingFile) return
+        const formData = new FormData()
+        formData.append('type', 'Voicemail')
+        formData.append('answeringRuleId', 'after-hours-rule')
+        formData.append('binary', afterHoursVoicemailGreetingFile, afterHoursVoicemailGreetingFile.name)
+        setAfterHoursVoicemailGreetingPayload(formData)
+    }, [afterHoursVoicemailGreetingFile])
+
+    useEffect(() => {
         let multiplier = 0
         if (introGreetingPayload.has('binary')) multiplier += 1
         if (connectingGreetingPayload.has('binary')) multiplier += 1
         if (onHoldGreetingPayload.has('binary')) multiplier += 1
         if (intterruptGreetingPayload.has('binary')) multiplier += 1
         if (voicemailGreetingPayload.has('binary')) multiplier += 1
+        if (afterHoursVoicemailGreetingPayload.has('binary')) multiplier += 1
+        
         setProgressMultiplier(multiplier)
-    }, [introGreetingPayload, connectingGreetingPayload, onHoldGreetingPayload, intterruptGreetingPayload, voicemailGreetingPayload])
+    }, [introGreetingPayload, connectingGreetingPayload, onHoldGreetingPayload, intterruptGreetingPayload, voicemailGreetingPayload, afterHoursVoicemailGreetingPayload])
 
-    return {setIntroGreetingFile, setConnectingGreetingFile, setOnHoldGreetingFile, setIntterruptGreetingFile, setVoicemailGreetingFile, introGreetingPayload, connectingGreetingPayload, onHoldGreetingPayload, intterruptGreetingPayload, voicemailGreetingPayload, progressMultiplier}
+    return {setIntroGreetingFile, setConnectingGreetingFile, setOnHoldGreetingFile, setIntterruptGreetingFile, setVoicemailGreetingFile, setAfterHoursVoicemailGreetingFile, introGreetingPayload, connectingGreetingPayload, onHoldGreetingPayload, intterruptGreetingPayload, voicemailGreetingPayload, afterHoursVoicemailGreetingPayload, progressMultiplier}
 }
 
 export default useBuildCustomGreetings

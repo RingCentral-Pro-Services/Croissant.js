@@ -8,8 +8,10 @@ const useBuildGreetingSettings = (connectingAudioMap: Map<string, GreetingResour
     const [holdMusic, setHoldMusic] = useState('')
     const [interruptAudio, setInterruptAudio] = useState('')
     const [voicemailGreeting, setVoicemailGreeting] = useState('')
+    const [afterHoursVoicemailGreeting, setAfterHoursVoicemailGreeting] = useState('')
     const [payload, setPayload] = useState({})
     const [greetings, setGreetings] = useState<Greeting[]>([])
+    const [afterHoursGreetings, setAfterHoursGreetings] = useState<Greeting[]>([])
 
     const INTRO_GREETING = 'Introductory'
     const CONNECTING_AUDIO = 'ConnectingAudio'
@@ -108,6 +110,24 @@ const useBuildGreetingSettings = (connectingAudioMap: Map<string, GreetingResour
     }, [voicemailGreeting])
 
     useEffect(() => {
+        if (afterHoursVoicemailGreeting === '' || !afterHoursVoicemailGreeting) {
+            // if (hasGreeting(VOICEMAIL_GREETING)) deleteGreeting(VOICEMAIL_GREETING)
+        }
+        else {
+            const resource = voicemailGreetingMap.get(afterHoursVoicemailGreeting)
+            const greeting: Greeting = {
+                type: VOICEMAIL_GREETING,
+                preset: {
+                    id: resource!.id,
+                    name: resource!.name
+                }
+            }
+            
+            setAfterHoursGreetings([greeting])
+        }
+    }, [afterHoursVoicemailGreeting])
+
+    useEffect(() => {
         console.log('Greetings')
         console.log(greetings)
     }, [greetings])
@@ -142,7 +162,7 @@ const useBuildGreetingSettings = (connectingAudioMap: Map<string, GreetingResour
         setGreetings(newGreetings)
     }
 
-    return {setIntroGreeting, setAudioWhileConnecting, setHoldMusic, setInterruptAudio, setVoicemailGreeting, greetings}
+    return {setIntroGreeting, setAudioWhileConnecting, setHoldMusic, setInterruptAudio, setVoicemailGreeting, setAfterHoursVoicemailGreeting, greetings, afterHoursGreetings}
 }
 
 export default useBuildGreetingSettings

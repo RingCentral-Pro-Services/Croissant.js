@@ -12,23 +12,26 @@ const useUploadCustomGreetings = (setProgressValue: (value: (any)) => void, post
     const [onHoldGreetingPayload, setOnHoldGreetingPayload] = useState<FormData>(new FormData())
     const [intterruptGreetingPayload, setIntterruptGreetingPayload] = useState<FormData>(new FormData())
     const [voicemailGreetingPayload, setVoicemailGreetingPayload] = useState<FormData>(new FormData())
+    const [afterHoursVoicemailGreetingPayload, setAfterHoursVoicemailGreetingPayload] = useState<FormData>(new FormData())
     const [shouldUploadIntroGreeting, setShouldUploadIntroGreeting] = useState(false)
     const [shouldUploadConnectingGreeting, setShouldUploadConnectingGreeting] = useState(false)
     const [shouldUploadOnHoldGreeting, setShouldUploadOnHoldGreeting] = useState(false)
     const [shouldUploadIntterruptGreeting, setShouldUploadIntterruptGreeting] = useState(false)
     const [shouldUploadVoicemailGreeting, setShouldUploadVoicemailGreeting] = useState(false)
+    const [shouldUploadAfterHoursVoicemailGreeting, setShouldUploadAfterHoursVoicemailGreeting] = useState(false)
     const [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
     const [rateLimitInterval, setRateLimitInterval] = useState(250)
     const [progress, setProgress] = useState(0)
     const baseURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/greeting'
 
-    const uploadGreetings = (extensions: RCExtension[], introGreetingPayload: FormData, connectingGreetingPayload: FormData, onHoldGreetingPayload: FormData, intterruptGreetingPayload: FormData, voicemailGreetingPayload: FormData) => {
+    const uploadGreetings = (extensions: RCExtension[], introGreetingPayload: FormData, connectingGreetingPayload: FormData, onHoldGreetingPayload: FormData, intterruptGreetingPayload: FormData, voicemailGreetingPayload: FormData, afterHoursVoicemailGreetingPayload: FormData) => {
         setExtensions(extensions)
         setIntroGreetingPayload(introGreetingPayload)
         setConnectingGreetingPayload(connectingGreetingPayload)
         setOnHoldGreetingPayload(onHoldGreetingPayload)
         setIntterruptGreetingPayload(intterruptGreetingPayload)
         setVoicemailGreetingPayload(voicemailGreetingPayload)
+        setAfterHoursVoicemailGreetingPayload(afterHoursVoicemailGreetingPayload)
         setShouldUploadIntroGreeting(true)
     }
 
@@ -210,8 +213,7 @@ const useUploadCustomGreetings = (setProgressValue: (value: (any)) => void, post
         if (!voicemailGreetingPayload.has('binary') || currentExtensionIndex >= extensions.length) {
             setCurrentExtensionIndex(0)
             setShouldUploadVoicemailGreeting(false)
-            setProgressValue(Number.MAX_SAFE_INTEGER)
-            setIsGreetingsUploadPending(false)
+            setShouldUploadAfterHoursVoicemailGreeting(true)
             return
         }
 
@@ -247,6 +249,50 @@ const useUploadCustomGreetings = (setProgressValue: (value: (any)) => void, post
             }
         }, rateLimitInterval)
     }, [shouldUploadVoicemailGreeting, rateLimitInterval, extensions, voicemailGreetingPayload, currentExtensionIndex, baseURL])
+
+    useEffect(() => {
+        const accessToken = localStorage.getItem('cs_access_token')
+        if (!shouldUploadAfterHoursVoicemailGreeting || !accessToken) return
+        if (!afterHoursVoicemailGreetingPayload.has('binary') || currentExtensionIndex >= extensions.length) {
+            setCurrentExtensionIndex(0)
+            setShouldUploadAfterHoursVoicemailGreeting(false)
+            setProgressValue(Number.MAX_SAFE_INTEGER)
+            setIsGreetingsUploadPending(false)
+            return
+        }
+
+        setTimeout(async () => {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "multipart/form-data",
+                "Authorization": `Bearer ${accessToken}`
+            }
+
+            try {
+                let url = baseURL.replace('extensionId', `${extensions[currentExtensionIndex].id}`)
+                url += '?apply=true'
+                let response = await RestCentral.post(url, headers, afterHoursVoicemailGreetingPayload)
+                console.log(response)
+
+                if (response.rateLimitInterval > 0) {
+                    setRateLimitInterval(response.rateLimitInterval)
+                    postMessage(new Message('Rate limit reached. Waiting 60 seconds before continuing.', 'info'))
+                }
+                else {
+                    setRateLimitInterval(250)
+                }
+
+                uploadNext()
+            }
+            catch (e: any) {
+                console.log('It failed')
+                console.log(e)
+                postMessage(new Message(`Failed to upload after hours voicemail greeting for ${extensions[currentExtensionIndex].name} Verify that this queue's schedule is not set to 24/7. ${e.error}`, 'error'))
+                postError(new SyncError(extensions[currentExtensionIndex].name, extensions[currentExtensionIndex].extensionNumber, ['Custom voicemail failed', ''], e.error ?? ''))
+                uploadNext()
+            }
+        }, rateLimitInterval)
+    }, [shouldUploadAfterHoursVoicemailGreeting, rateLimitInterval, extensions, afterHoursVoicemailGreetingPayload, currentExtensionIndex, baseURL])
 
     const uploadNext = () => {
         if (currentExtensionIndex >= extensions.length) {
