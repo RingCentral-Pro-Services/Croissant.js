@@ -1,7 +1,7 @@
 import { useState } from "react";
 import ExtensionIsolator from "../../../../helpers/ExtensionIsolator";
 import { Extension } from "../../../../models/Extension";
-import { CustomRule, CustomRuleCalledNumber, CustomRuleCaller, CustomRuleData } from "../models/CustomRule";
+import { CustomRule, CustomRuleCalledNumber, CustomRuleCaller, CustomRuleData, CustomRuleWeeklyRanges } from "../models/CustomRule";
 
 const useReadCustomRules = () => {
     const [customRules, setCustomRules] = useState<CustomRule[]>([])
@@ -26,6 +26,7 @@ const useReadCustomRules = () => {
 
             let voicemailRecipientID = getVoicemailRecipient(data, extension, extensionsList)
             const transferExtensionID = getTransferExtensionID(`${data['Transfer Extension']}`, extensionsList)
+            // const rangeData = getWeeklyRanges(data)
 
             const ruleData: CustomRuleData = {
                 name: data['Rule Name'],
@@ -33,7 +34,9 @@ const useReadCustomRules = () => {
                 enabled: data['Enabled'] === 'Yes',
                 callers: getCallers(data['Caller ID']),
                 calledNumbers: getCalledNumbers(data['Called Number']),
-                schedule: [],
+                schedule: {
+                    weeklyRanges: getWeeklyRanges(data),
+                },
                 ranges: [],
                 ref: "",
                 callHandlingAction: callHandlingActionMap.get(data['Action']) || '',
@@ -125,13 +128,44 @@ const useReadCustomRules = () => {
     }
 
     const getTransferPhoneNumber = (rawPhoneNumber: string) => {
-        console.log(`Raw phone number: ${rawPhoneNumber}`)
         if (!rawPhoneNumber || rawPhoneNumber === '') return ''
 
         const isolator = new ExtensionIsolator()
         const phoneNumber = isolator.isolatePhoneNumber(rawPhoneNumber)
 
         return phoneNumber ?? ''
+    }
+
+    const getWeeklyRanges = (data: any) => {
+        const weeklyRanges: CustomRuleWeeklyRanges = {}
+        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
+        for (const day of days) {
+            const dayRanges = data[day]
+            if (!dayRanges || dayRanges === '') continue
+
+            const ranges = dayRanges.split('-')
+            if (ranges.length !== 2) continue
+            const rawFrom = ranges[0].trim()
+            const rawTo = ranges[1].trim()
+            const convertedFrom = convertTo24Hour(rawFrom)
+            const convertedTo = convertTo24Hour(rawTo)
+
+            Object.assign(weeklyRanges, {[day.toLowerCase()]: [{from: convertedFrom, to: convertedTo}]})
+        }
+        return weeklyRanges
+    }
+
+    const convertTo24Hour = (time: string) => {
+        const [timeString, modifier] = time.split(' ');
+        let [hours, minutes] = timeString.split(':');
+        if (hours === '12') {
+            hours = '00';
+        }
+        if (modifier === 'PM') {
+            hours = (parseInt(hours) + 12).toString();
+        }
+        return `${hours}:${minutes}`;
     }
 
     return {readCustomRules, customRules, isRuleReadPending}

@@ -50,7 +50,7 @@ export class CustomRule implements DataGridFormattable {
             callHandlingAction: this.data.callHandlingAction,
             ...(this.data.callers.length > 0 && { callers: this.data.callers }),
             ...(this.data.calledNumbers.length > 0 && { calledNumbers: this.data.calledNumbers }),
-            ...(this.data.ranges.length > 0 && { ranges: this.data.ranges }),
+            ...(Object.keys(this.data.schedule.weeklyRanges).length > 0 && { schedule: this.data.schedule }),
             ...(this.data.ref && this.data.ref != '' && { ref: this.data.ref }),
             ...(this.data.callHandlingAction === 'UnconditionalForwarding' && { unconditionalForwarding: this.data.unconditionalForwarding }),
             ...(this.data.callHandlingAction === 'TransferToExtension' && { transfer: this.data.transfer }),
@@ -65,7 +65,9 @@ export interface CustomRuleData {
     enabled: boolean
     callers: CustomRuleCaller[]
     calledNumbers: CustomRuleCalledNumber[]
-    schedule: WeeklyRange[]
+    schedule: {
+        weeklyRanges: CustomRuleWeeklyRanges
+    }
     ranges: DateRange[]
     ref: string
     callHandlingAction: string
@@ -96,4 +98,35 @@ export interface CustomRuleTransfer {
 
 export interface CustomRuleExternalNumber {
     phoneNumber: string
+}
+
+export interface CustomRuleWeeklyRanges {
+    sunday?: [{
+        from: string
+        to: string
+    }]
+    monday?: [{
+        from: string
+        to: string
+    }]
+    tuesday?: [{
+        from: string
+        to: string
+    }]
+    wednesday?: [{
+        from: string
+        to: string
+    }]
+    thursday?: [{
+        from: string
+        to: string
+    }]
+    friday?: [{
+        from: string
+        to: string
+    }]
+    saturday?: [{
+        from: string
+        to: string
+    }]
 }
