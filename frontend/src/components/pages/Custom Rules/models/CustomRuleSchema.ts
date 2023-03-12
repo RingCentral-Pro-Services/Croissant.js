@@ -9,6 +9,7 @@ export const CustomRuleSchema = z.object({
     }),
     'Caller ID': z.string().or(z.number()).optional(),
     'Called Number': z.string().or(z.number()).optional(),
+    'Work or After Hours': z.string().optional(),
     'Sunday': z.string().optional(),
     'Monday': z.string().optional(),
     'Tuesday': z.string().optional(),

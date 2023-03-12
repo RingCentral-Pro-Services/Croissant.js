@@ -1,9 +1,11 @@
 import { useState } from "react";
 import ExtensionIsolator from "../../../../helpers/ExtensionIsolator";
 import { Extension } from "../../../../models/Extension";
-import { CustomRule, CustomRuleCalledNumber, CustomRuleCaller, CustomRuleData, CustomRuleWeeklyRanges } from "../models/CustomRule";
+import { Message } from "../../../../models/Message";
+import { SyncError } from "../../../../models/SyncError";
+import { CustomRule, CustomRuleCalledNumber, CustomRuleCaller, CustomRuleData, CustomRuleWeeklyRanges, DateRange } from "../models/CustomRule";
 
-const useReadCustomRules = () => {
+const useReadCustomRules = (postMessage: (message: Message) => void, postError: (error: SyncError) => void) => {
     const [customRules, setCustomRules] = useState<CustomRule[]>([])
     const [isRuleReadPending, setIsRuleReadPending] = useState(true)
     const callHandlingActionMap = new Map<string, string>([
@@ -15,18 +17,17 @@ const useReadCustomRules = () => {
 
     const readCustomRules = (excelData: any, extensionsList: Extension[]) => {
         const rules: CustomRule[] = []
-        const isolator = new ExtensionIsolator()
 
         for (const data of excelData) {
             const extension = extensionsList.find((extension) => `${extension.data.extensionNumber}` === `${data['Ext Number']}`)
             if (!extension) {
-                // Bruh
+                console.log(`Extension ${data['Ext Number']} not found. Skipping rule ${data['Rule Name']}`)
+                postMessage(new Message(`Extension ${data['Ext Number']} not found. Skipping rule ${data['Rule Name']}`, 'warning'))
                 continue
             }
 
             let voicemailRecipientID = getVoicemailRecipient(data, extension, extensionsList)
             const transferExtensionID = getTransferExtensionID(`${data['Transfer Extension']}`, extensionsList)
-            // const rangeData = getWeeklyRanges(data)
 
             const ruleData: CustomRuleData = {
                 name: data['Rule Name'],
@@ -34,11 +35,11 @@ const useReadCustomRules = () => {
                 enabled: data['Enabled'] === 'Yes',
                 callers: getCallers(data['Caller ID']),
                 calledNumbers: getCalledNumbers(data['Called Number']),
+                ranges: data['Specific Dates'] ? getDateRanges(data['Specific Dates']) : [],
                 schedule: {
                     weeklyRanges: getWeeklyRanges(data),
                 },
-                ranges: [],
-                ref: "",
+                ref: data['Work or After Hours'] ? getRef(data['Work or After Hours']) : '',
                 callHandlingAction: callHandlingActionMap.get(data['Action']) || '',
                 voicemail: {
                     enabled: data['Action'] === 'Send to Voicemail',
@@ -154,6 +155,34 @@ const useReadCustomRules = () => {
             Object.assign(weeklyRanges, {[day.toLowerCase()]: [{from: convertedFrom, to: convertedTo}]})
         }
         return weeklyRanges
+    }
+
+    const getDateRanges = (rawDateRanges: string) => {
+        if (!rawDateRanges || rawDateRanges === '') return []
+
+        const dateRanges: DateRange[] = []
+        const dateRangeList = rawDateRanges.split(',')
+
+        for (const dateRange of dateRangeList) {
+            const rawBeginning = dateRange.split(' - ')[0].trim()
+            const rawEnding = dateRange.split(' - ')[1].trim()
+
+            const rangeData: DateRange = {
+                from: rawBeginning.trim(),
+                to: rawEnding.trim()
+            }
+            dateRanges.push(rangeData)
+        }
+
+        return dateRanges
+    }
+
+    const getRef = (rawRef: string) => {
+        if (!rawRef || rawRef === '') return ''
+
+        if (rawRef === 'Work Hours') return 'BusinessHours'
+        if (rawRef === 'After Hours') return 'AfterHours'
+        return ''
     }
 
     const convertTo24Hour = (time: string) => {

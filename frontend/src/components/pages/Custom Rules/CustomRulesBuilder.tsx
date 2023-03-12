@@ -38,7 +38,7 @@ const CustomRulesBuilder = () => {
     const {fetchExtensions, extensionsList, isExtensionListPending} = useExtensions(postMessage)
     const {readFile, isExcelDataPending, excelData} = useReadExcel()
     const {validate, isDataValidationPending, validatedData} = useValidateExcelData(CustomRuleSchema, postMessage, postError)
-    const {readCustomRules, isRuleReadPending, customRules} = useReadCustomRules()
+    const {readCustomRules, isRuleReadPending, customRules} = useReadCustomRules(postMessage, postError)
     const {createCustomRule} = useCreateCustomRule(postMessage, postTimedMessage, postError, increaseProgress)
     const {writePrettyExcel} = useWritePrettyExcel()
 
@@ -102,9 +102,9 @@ const CustomRulesBuilder = () => {
             <Header title='Build Custom Rules' body='Build and update custom rules' />
             <div className="tool-card">
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
-                <Button variant='contained' onClick={handleTemplateButtonClick}>Template</Button>
                 <FileSelect enabled={hasCustomerToken} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelection} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
                 <Button variant='contained' onClick={handleSyncButtonClick} disabled={isRuleReadPending || isSyncing} >Sync</Button>
+                <Button className='healthy-margin-left' variant='contained' onClick={handleTemplateButtonClick}>Template</Button>
                 {isSyncing ? <progress value={currentExtensionIndex} max={customRules.length} /> : <></>}
                 <FeedbackArea gridData={customRules} messages={messages} timedMessages={timedMessages} errors={errors}  />
             </div>
