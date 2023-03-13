@@ -94,6 +94,7 @@ const CustomRulesBuilder = () => {
                 <FileSelect enabled={hasCustomerToken} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelection} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
                 <Button variant='contained' onClick={handleSyncButtonClick} disabled={isRuleReadPending || isSyncing} >Sync</Button>
                 <Button className='healthy-margin-left' variant='outlined' onClick={handleTemplateButtonClick}>Template</Button>
+                {isSyncing && currentExtensionIndex === customRules.length ? <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button> : <></>}
                 {isSyncing ? <progress value={currentExtensionIndex} max={customRules.length} /> : <></>}
                 {isRuleReadPending ? <></> : <FeedbackArea gridData={customRules} messages={messages} timedMessages={timedMessages} errors={errors} />}
             </div>
