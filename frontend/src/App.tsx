@@ -24,6 +24,7 @@ import BulkAssign from './components/pages/Phone Numbers/Bulk Assign/BulkAssign'
 import LocationUpdates from './components/pages/Automatic Location Updates/LocationUpdates';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Theme } from '@emotion/react';
+import Home from './components/pages/Home/components/Home';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -94,6 +95,7 @@ function App() {
               <Route path='/presence' element={<Presence />} />
               <Route path='/testbed' element={<Testbed />} />
               <Route path='/customrules' element={<CustomRulesBuilder />} />
+              <Route path='/home' element={<Home />} />
             </Routes>
           </Suspense>
         </div>
