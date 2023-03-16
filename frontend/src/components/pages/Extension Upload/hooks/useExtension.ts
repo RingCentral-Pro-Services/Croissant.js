@@ -27,6 +27,9 @@ const useExtension = (postMessage: (message: Message) => void, postTimedMessage:
         else {
             // This is a boring old message-only extension, announcement-only extension, or a video pro extension
             await createUnlicensedExtension(extension, accessToken)
+            if ((extension.data.type === 'User' && extension.data.subType === 'VideoPro') || extension.data.type === 'VirtualUser') {
+                await setRole(extension, accessToken)
+            }
         }
         callback()
     }
