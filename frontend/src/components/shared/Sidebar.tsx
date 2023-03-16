@@ -49,6 +49,7 @@ const Sidebar: React.FC<SidebarProps> = ({setColorTheme}) => {
         {label: 'Intercom', destination: '/intercom'},
         {label: 'Call Monitoring', destination: '/callmonitoring'},
         {label: 'Paging Groups', destination: '/paginggroups'},
+        {label: 'Park Locations', destination: '/parklocations'},
         {label: 'Automatic Location Updates', destination: '/locationupdates'},
     ]
 
