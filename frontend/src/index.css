@@ -432,24 +432,14 @@ html, body {
   margin: 0 auto;
   height: 100vh;
   width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
-/* .home-container input {
-  display: block;
-  width: 40%;
-  margin: 0 auto;
-  height: 35px;
-  border-radius: 7px;
-  border: none;
-  box-sizing: border-box;
-  padding: 10px;
-  text-align: center;
-  font-size: 1.5rem;
-} */
-
-.bruh {
-  display: block;
+.home-container-input {
+  width: 50%
 }
+
 
 .tool-list {
   display: flex;
