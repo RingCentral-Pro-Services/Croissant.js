@@ -79,6 +79,7 @@ const ParkLocations = () => {
         <>
             <Header title='Park Locations' body='Audit Park Locations' />
             <div className="tool-card">
+                <h2>Park Locations</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                 <Button variant='contained' onClick={handleAuditButtonClick} disabled={isExtensionListPending || !isReadyToSync || isSyncing}>Audit</Button>
                 {isSyncing ? <progress value={currentExtensionIndex} max={parkLocationExtensions.length} /> : <></>}
