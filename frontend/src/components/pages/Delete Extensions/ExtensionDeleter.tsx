@@ -19,6 +19,7 @@ import useSidebar from "../../../hooks/useSidebar"
 import useExtensions from "../../../rcapi/useExtensions"
 import { Extension } from "../../../models/Extension"
 import { sanitize } from "../../../helpers/Sanatize"
+import usePhoneNumberMap from "../../../rcapi/usePhoneNumberMap"
 
 const ExtensionDeleter = () => {
     const {fireEvent} = useAnalytics()
@@ -42,6 +43,7 @@ const ExtensionDeleter = () => {
     // const {extensionsList, fetchExtensions, isExtensionListPending} = useExtensionList(postMessage)
     const {extensionsList, fetchExtensions, isExtensionListPending} = useExtensions(postMessage)
     const [adjustedExtensionList, setAdjustedExtensionList] = useState<Extension[]>([])
+    const {getPhoneNumberMap, phoneNumberMap, isPhoneNumberMapPending} = usePhoneNumberMap()
 
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
@@ -56,11 +58,21 @@ const ExtensionDeleter = () => {
 
     useEffect(() => {
         if (!hasCustomerToken) return
-        fetchExtensions()
+        getPhoneNumberMap()
     }, [hasCustomerToken])
 
     useEffect(() => {
+        if (isPhoneNumberMapPending) return
+        fetchExtensions()
+    }, [isPhoneNumberMapPending])
+
+    useEffect(() => {
         if (isExtensionListPending) return
+
+        // Add phone numbers to extensions
+        for (let index = 0; index < extensionsList.length; index++) {
+            extensionsList[index].data.phoneNumbers = phoneNumberMap.get(`${extensionsList[index].data.id}`) || []
+        }
 
         const extractedSites = extensionsList.filter((extension) => {
             return extension.prettyType() === 'Site'
