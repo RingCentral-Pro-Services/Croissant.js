@@ -8,7 +8,6 @@ import { TransferPayload, UnconditionalForwardingPayload } from "./TransferPaylo
 import { DataGridFormattable } from "./DataGridFormattable";
 import { PhoneNumber } from "./PhoneNumber";
 import { CallQueueManager } from "./CallQueueManager";
-import { join } from "path";
 
 class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattable, DataGridFormattable {
     constructor(
