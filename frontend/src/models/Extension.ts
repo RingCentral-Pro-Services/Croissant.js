@@ -88,7 +88,7 @@ export class Extension implements ExcelFormattable, DataGridFormattable {
             { field: 'id', headerName: 'ID', width: 100 },
             { field: 'name', headerName: 'Name', width: 300 },
             { field: 'extensionNumber', headerName: 'Extension Number', width: 150 },
-            { field: 'phoneNumbers', headerName: 'Phone Numbers', width: 400 },
+            { field: 'phoneNumbers', headerName: 'Phone Numbers', width: 200 },
             { field: 'email', headerName: 'Email', width: 400 },
             { field: 'site', headerName: 'Site', width: 200,},
             { field: 'type', headerName: 'Type', width: 200 },
