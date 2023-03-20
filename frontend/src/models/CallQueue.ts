@@ -13,7 +13,7 @@ import { join } from "path";
 class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattable, DataGridFormattable {
     constructor(
         public extension: RCExtension,
-        public siteID: number,
+        public siteID: number | string,
         public members: string[],
         public handlingRules?: CallHandlingRules,
         public greetings?: Greeting[],

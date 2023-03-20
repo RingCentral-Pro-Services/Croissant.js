@@ -431,6 +431,8 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
     }
 
     const idForSite = (siteName: string, extensionList: RCExtension[]) => {
+        if (siteName.toLowerCase() === 'main site') return 'main-site'
+
         for (let index = 0; index < extensionList.length; index++) {
             if (extensionList[index].name.trim() === siteName.trim()) {
                 return extensionList[index].id
