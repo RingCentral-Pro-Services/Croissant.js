@@ -1,9 +1,11 @@
 import { useState } from "react"
 import { Extension } from "../../../../models/Extension"
 import { ExtensionData, Role } from "../../../../models/ExtensionData"
+import { Message } from "../../../../models/Message"
 import RCExtension from "../../../../models/RCExtension"
+import { SyncError } from "../../../../models/SyncError"
 
-const useExcelToExtensions = (shouldAlterEmails: boolean) => {
+const useExcelToExtensions = (shouldAlterEmails: boolean, postMessage: (message: Message) => void, postError: (error: SyncError) => void) => {
     const [extensions, setExtensions] = useState<Extension[]>([])
     const [isExtensionConverPending, setIsExtensionConverPending] = useState(true)
 
@@ -43,6 +45,13 @@ const useExcelToExtensions = (shouldAlterEmails: boolean) => {
                 password: currentItem['Password'],
                 roles: findRole(currentItem['Role'], roles)
             }
+
+            if (data.site?.id === '') {
+                postMessage(new Message(`Extension ${data.name} - Ext. ${data.extensionNumber} cannot be created because the site it's assigned to (${currentItem['Site Name']}) does not exist`, 'error'))
+                postError(new SyncError(data.name, parseInt(data.extensionNumber), ['Site not found', currentItem['Site Name']]))
+                continue
+            }
+
             let extension = new Extension(data)
             extensions.push(extension)
         }
@@ -111,7 +120,7 @@ const useExcelToExtensions = (shouldAlterEmails: boolean) => {
         if (site) {
             return `${site.id}`
         }
-        return 'main-site'
+        return ''
     }
 
     return { extensions, isExtensionConverPending, convertExcelToExtensions }

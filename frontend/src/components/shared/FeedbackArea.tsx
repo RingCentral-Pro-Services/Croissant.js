@@ -48,7 +48,7 @@ const FeedbackArea: React.FC<FeedbackAreaProps> = ({messages, timedMessages, err
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs value={value} onChange={handleChange} aria-label="feedback area">
                 <Tab label='Table' icon={<TableRowsIcon/>} iconPosition='start' {...a11yProps(1)} />
-                <Tab label="Messages" icon={<Badge badgeContent={messages.length + timedMessages.length} color='primary' anchorOrigin={{vertical: "top", horizontal: "left"}} ><MailIcon/></Badge>} iconPosition='start' {...a11yProps(2)} />
+                <Tab label="Messages" icon={<Badge badgeContent={messages.length + timedMessages.length} max={999} color='primary' anchorOrigin={{vertical: "top", horizontal: "left"}} ><MailIcon/></Badge>} iconPosition='start' {...a11yProps(2)} />
             </Tabs>
             </Box>
             <TabPanel value={value} index={0}>
