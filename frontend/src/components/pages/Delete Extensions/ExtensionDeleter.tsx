@@ -160,7 +160,7 @@ const ExtensionDeleter = () => {
     }
 
     const handleDownloadButtonClick = () => {
-        const header = ['Mailbox ID', 'Name', 'Ext', 'Email', 'Site', 'Type', 'Status', 'Hidden']
+        const header = ['Mailbox ID', 'Name', 'Ext', 'Email', 'Site', 'Phone Number', 'Type', 'Status', 'Hidden']
         writeExcel(header, selectedExtensions, 'Deleted Extensions', `Deleted Extensions - ${sanitize(companyName)}.xlsx`)
     }
 
