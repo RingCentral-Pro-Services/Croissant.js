@@ -1,4 +1,4 @@
-import { Button, Typography } from "@mui/material";
+import { Button } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import useLogin from "../../../hooks/useLogin";
 import useMessageQueue from "../../../hooks/useMessageQueue";
@@ -84,7 +84,7 @@ const CustomRulesBuilder = () => {
 
     return (
         <>
-            <Header title='Build Custom Rules' body='Build and update custom rules'>
+            <Header title='Build Custom Rules' body='Build custom rules using a simple Excel spreadsheet'>
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <div className="tool-card">
