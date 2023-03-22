@@ -26,6 +26,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Theme } from '@emotion/react';
 import Home from './components/pages/Home/components/Home';
 import ParkLocations from './components/pages/Park Locations/ParkLocations';
+import GeneratePrompts from './components/pages/Prompt Generation/GeneratePrompts';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -98,6 +99,7 @@ function App() {
               <Route path='/customrules' element={<CustomRulesBuilder />} />
               <Route path='/home' element={<Home />} />
               <Route path='/parklocations' element={<ParkLocations />} />
+              <Route path='/prompts' element={<GeneratePrompts />} />
             </Routes>
           </Suspense>
         </div>
