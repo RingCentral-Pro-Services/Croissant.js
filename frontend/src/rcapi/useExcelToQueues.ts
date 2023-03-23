@@ -93,7 +93,7 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
 
             if (queue.siteID === 0) {
                 postMessage(new Message(`${contact.firstName} - Ext ${extension.extensionNumber} cannot be built because the site it's assigned to (${extension.site}) does not exist`, 'error'))
-                postError(new SyncError(contact.firstName, extension.extensionNumber, ['Invalid site', extension.site]))
+                postError(new SyncError(contact.firstName, extension.extensionNumber, ['Invalid site', extension.site], '', queue))
             }
             else {
                 records.push(queue)

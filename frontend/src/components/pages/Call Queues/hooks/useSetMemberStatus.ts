@@ -64,7 +64,7 @@ const useSetMemberStatus = (setProgressValue: (value: (any)) => void, postMessag
                 console.log(`Failed to set member status for '${callQueues[currentExtensionIndex].name}'`)
                 console.log(e)
                 postMessage(new Message(`Failed to set member status for '${callQueues[currentExtensionIndex].name}.' ${e.error ?? ''}`, 'error'))
-                postError(new SyncError(callQueues[currentExtensionIndex].name, 0, ['Failed to set member status', ''], e.error ?? ''))
+                postError(new SyncError(callQueues[currentExtensionIndex].name, 0, ['Failed to set member status', ''], e.error ?? '', callQueues[currentExtensionIndex]))
                 next()
             }
         }, rateLimitInterval)

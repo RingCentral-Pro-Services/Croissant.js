@@ -88,7 +88,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(`Failed to make queue ${queue.extension.name}`)
             console.log(e)
             postMessage(new Message(`Failed to make queue ${queue.extension.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to create queue', ''], e.error ?? ''))
+            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to create queue', ''], e.error ?? '', queue))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
@@ -118,7 +118,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(`Failed to set managers for ${queue.extension.name}`)
             console.log(e)
             postMessage(new Message(`Failed to set managers for ${queue.extension.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set managers', ''], e.error ?? ''))
+            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set managers', ''], e.error ?? '', queue))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
@@ -151,7 +151,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(`Failed to add queue members ${queue.extension.name}`)
             console.log(e)
             postMessage(new Message(`Failed to add queue members ${queue.extension.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to add queue members', ''], e.error ?? ''))
+            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to add queue members', ''], e.error ?? '', queue))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
@@ -183,7 +183,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(`Failed to set call handling for ${queue.extension.name}`)
             console.log(e)
             postMessage(new Message(`Failed to set call handling ${queue.extension.name}. ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set call handling', ''], e.error ?? ''))
+            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set call handling', ''], e.error ?? '', queue))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
@@ -215,7 +215,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(`Failed to set after hours call handling for ${queue.extension.name}`)
             console.log(e)
             postMessage(new Message(`Failed to set after hours call handling ${queue.extension.name}. ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set after hours call handling', ''], e.error ?? ''))
+            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set after hours call handling', ''], e.error ?? '', queue))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
@@ -247,7 +247,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(`Failed to set schedule for ${queue.extension.name}`)
             console.log(e)
             postMessage(new Message(`Failed to set schedule for ${queue.extension.name}. ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set schedule', ''], e.error ?? ''))
+            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set schedule', ''], e.error ?? '', queue))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
@@ -279,7 +279,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(`Failed to set editable member status for ${queue.extension.name}`)
             console.log(e)
             postMessage(new Message(`Failed to set editable member status for ${queue.extension.name}. ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set editable member status', ''], e.error ?? ''))
+            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set editable member status', ''], e.error ?? '', queue))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
@@ -311,7 +311,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(`Failed to set notification settings for ${queue.extension.name}`)
             console.log(e)
             postMessage(new Message(`Failed to set notification settings for ${queue.extension.name}. ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set notification settings', ''], e.error ?? ''))
+            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set notification settings', ''], e.error ?? '', queue))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }

@@ -56,7 +56,7 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
             console.log(`Failed to get queue members ${queue.extension.name}`)
             console.log(e)
             postMessage(new Message(`Failed to get members for ${queue.extension.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to get members', ''], e.error ?? ''))
+            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to get members', ''], e.error ?? '', queue))
             
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
@@ -128,7 +128,7 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
             console.log(`Failed to get call handling ${queue.extension.name}`)
             console.log(e)
             postMessage(new Message(`Failed to get call handling for ${queue.extension.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to get call handling', ''], e.error ?? ''))
+            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to get call handling', ''], e.error ?? '', queue))
             
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
@@ -160,7 +160,7 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
             console.log(`Failed to get member status ${queue.extension.name}`)
             console.log(e)
             postMessage(new Message(`Failed to get member status for ${queue.extension.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to get member status', ''], e.error ?? ''))
+            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to get member status', ''], e.error ?? '', queue))
             
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
@@ -193,7 +193,7 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
             console.log(`Failed to get queue managers ${queue.extension.name}`)
             console.log(e)
             postMessage(new Message(`Failed to get managers for ${queue.extension.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to get managers', ''], e.error ?? ''))
+            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to get managers', ''], e.error ?? '', queue))
 
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
@@ -227,7 +227,7 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
             console.log(`Failed to get notification settings ${queue.extension.name}`)
             console.log(e)
             postMessage(new Message(`Failed to get notification settings for ${queue.extension.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to get notifications', ''], e.error ?? ''))
+            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to get notifications', ''], e.error ?? '', queue))
             
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }

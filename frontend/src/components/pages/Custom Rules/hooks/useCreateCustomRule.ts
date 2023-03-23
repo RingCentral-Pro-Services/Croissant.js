@@ -40,7 +40,7 @@ const useCreateCustomRule = (postMessage: (message: Message) => void, postTimedM
             console.log(`Failed to make custom rule ${rule.data.name} for extension ${rule.extension.data.name} - Ext. ${rule.extension.data.extensionNumber}`)
             console.log(e)
             postMessage(new Message(`Failed to make custom rule ${rule.data.name} for extension ${rule.extension.data.name} - Ext. ${rule.extension.data.extensionNumber} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(rule.extension.data.name, parseInt(rule.extension.data.extensionNumber), ['Failed to create rule', ''], e.error ?? ''))
+            postError(new SyncError(rule.extension.data.name, parseInt(rule.extension.data.extensionNumber), ['Failed to create rule', ''], e.error ?? '', rule))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }

@@ -37,7 +37,7 @@ const useCreatePrompt = (postMessage: (message: Message) => void, postTimedMessa
             console.log(`Failed to generate audio for ${prompt.name}`)
             console.log(e)
             postMessage(new Message(`Failed to generate audio for ${prompt.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(prompt.name, 0, ['Failed to fetch members', ''], e.error ?? ''))
+            postError(new SyncError(prompt.name, 0, ['Failed to fetch members', ''], e.error ?? '', prompt))
         }
     }
 

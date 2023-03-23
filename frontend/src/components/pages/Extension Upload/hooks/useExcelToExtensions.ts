@@ -48,7 +48,7 @@ const useExcelToExtensions = (shouldAlterEmails: boolean, postMessage: (message:
 
             if (data.site?.id === '') {
                 postMessage(new Message(`Extension ${data.name} - Ext. ${data.extensionNumber} cannot be created because the site it's assigned to (${currentItem['Site Name']}) does not exist`, 'error'))
-                postError(new SyncError(data.name, parseInt(data.extensionNumber), ['Site not found', currentItem['Site Name']]))
+                postError(new SyncError(data.name, parseInt(data.extensionNumber), ['Site not found', currentItem['Site Name']], '', data))
                 continue
             }
 

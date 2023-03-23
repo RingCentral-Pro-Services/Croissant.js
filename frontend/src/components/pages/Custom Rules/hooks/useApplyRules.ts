@@ -50,7 +50,7 @@ const useApplyRules = (postMessage: (message: Message) => void, postTimedMessage
             console.log(`Failed to apply rule ${rule.name} to extension ${extension.name}`)
             console.log(e)
             postMessage(new Message(`Failed to apply rule ${rule.name} to extension ${extension.name}${e.error ?? ''}`, 'error'))
-            postError(new SyncError(extension.name, extension.extensionNumber, ['Failed to apply rule', rule.name], e.error ?? ''))
+            postError(new SyncError(extension.name, extension.extensionNumber, ['Failed to apply rule', rule.name], e.error ?? '', rule))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }

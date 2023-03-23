@@ -44,7 +44,7 @@ const useUploadPrompt = (postMessage: (message: Message) => void, postTimedMessa
             console.log(`Failed to upload prompt '${prompt.name}'`)
             console.log(e)
             postMessage(new Message(`Failed to upload prompt '${prompt.name}.' ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(prompt.name, 0, ['Failed to upload prompt', ''], e.error ?? ''))
+            postError(new SyncError(prompt.name, 0, ['Failed to upload prompt', ''], e.error ?? '', prompt))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
