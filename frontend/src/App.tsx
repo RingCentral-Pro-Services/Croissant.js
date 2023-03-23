@@ -27,6 +27,8 @@ import { Theme } from '@emotion/react';
 import Home from './components/pages/Home/components/Home';
 import ParkLocations from './components/pages/Park Locations/ParkLocations';
 import GeneratePrompts from './components/pages/Prompt Generation/GeneratePrompts';
+import { ErrorBoundary } from 'react-error-boundary';
+import FatalError from './components/shared/FatalError';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -69,39 +71,41 @@ function App() {
       <div className="App">
         <Sidebar setColorTheme={setcolorTheme} />
         <div className="content">
-          <Suspense fallback={<Loading/>}>
-            <Routes>
-              <Route path='/token' element={<Token />} />
-              <Route path='/' element={<CreateMenus />} />
-              <Route path='/auditmenus' element={<AuditMenus />} />
-              <Route path='/accountdump' element={<ExtensionAudit />} />
-              <Route path='/notificationsaudit' element={<NotificationAudit />} />
-              <Route path='/callqueues' element={<CallQueues />} />
-              <Route path='/auditcallqueues' element={<CallQueues />} />
-              <Route path='/createcallqueues' element={<CreateCallQueues />} />
-              <Route path='/callqueuetemplates' element={<CallQueueTemplates />} />
-              <Route path='/deleteextensions' element={<ExtensionDeleter />} />
-              {/* <Route path='/generateprompts' element={<PromptGeneration />} /> */}
-              <Route path='/editsites' element={<EditSites />} />
-              <Route path='/editextensions' element={<ExtensionEditor />} />
-              <Route path='/deskphones' element={<Deskphones />} />
-              <Route path='/copycustomrules' element={<CustomRules />} />
-              <Route path='/customruleedit' element={<ManipulateCustomRules />} />
-              <Route path='/intercom' element={<Intercom />} />
-              <Route path='/extensionupload' element={<ExtensionUpload />} />
-              <Route path='/callmonitoring' element={<CallMonitoring />} />
-              <Route path='/paginggroups' element={<PagingGroups />} />
-              <Route path='/sites' element={<Sites />} />
-              <Route path='/bulkassign' element={<BulkAssign />} />
-              <Route path='/locationupdates' element={<LocationUpdates />} />
-              <Route path='/presence' element={<Presence />} />
-              <Route path='/testbed' element={<Testbed />} />
-              <Route path='/customrules' element={<CustomRulesBuilder />} />
-              <Route path='/home' element={<Home />} />
-              <Route path='/parklocations' element={<ParkLocations />} />
-              <Route path='/prompts' element={<GeneratePrompts />} />
-            </Routes>
-          </Suspense>
+          <ErrorBoundary fallback={<FatalError />}>
+            <Suspense fallback={<Loading/>}>
+              <Routes>
+                <Route path='/token' element={<Token />} />
+                <Route path='/' element={<CreateMenus />} />
+                <Route path='/auditmenus' element={<AuditMenus />} />
+                <Route path='/accountdump' element={<ExtensionAudit />} />
+                <Route path='/notificationsaudit' element={<NotificationAudit />} />
+                <Route path='/callqueues' element={<CallQueues />} />
+                <Route path='/auditcallqueues' element={<CallQueues />} />
+                <Route path='/createcallqueues' element={<CreateCallQueues />} />
+                <Route path='/callqueuetemplates' element={<CallQueueTemplates />} />
+                <Route path='/deleteextensions' element={<ExtensionDeleter />} />
+                {/* <Route path='/generateprompts' element={<PromptGeneration />} /> */}
+                <Route path='/editsites' element={<EditSites />} />
+                <Route path='/editextensions' element={<ExtensionEditor />} />
+                <Route path='/deskphones' element={<Deskphones />} />
+                <Route path='/copycustomrules' element={<CustomRules />} />
+                <Route path='/customruleedit' element={<ManipulateCustomRules />} />
+                <Route path='/intercom' element={<Intercom />} />
+                <Route path='/extensionupload' element={<ExtensionUpload />} />
+                <Route path='/callmonitoring' element={<CallMonitoring />} />
+                <Route path='/paginggroups' element={<PagingGroups />} />
+                <Route path='/sites' element={<Sites />} />
+                <Route path='/bulkassign' element={<BulkAssign />} />
+                <Route path='/locationupdates' element={<LocationUpdates />} />
+                <Route path='/presence' element={<Presence />} />
+                <Route path='/testbed' element={<Testbed />} />
+                <Route path='/customrules' element={<CustomRulesBuilder />} />
+                <Route path='/home' element={<Home />} />
+                <Route path='/parklocations' element={<ParkLocations />} />
+                <Route path='/prompts' element={<GeneratePrompts />} />
+              </Routes>
+            </Suspense>
+          </ErrorBoundary>
         </div>
       </div>
     </Router>
