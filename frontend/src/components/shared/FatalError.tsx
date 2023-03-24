@@ -1,11 +1,28 @@
-import React from "react";
-import Header from "./Header";
+import React, { useEffect, useState } from "react";
+
+const headlines = [
+    "Uh-oh",
+    "Oh no",
+    "Oh dear",
+    "Aw, snap",
+    "That's not good",
+]
 
 const FatalError = () => {
+    const [headline, setHeadline] = useState<string>("");
+
+    useEffect(() => {
+        const randomIndex = Math.floor(Math.random() * headlines.length)
+        setHeadline(headlines[randomIndex])
+    }, [])
 
     return (
         <>
-            <Header title="Uh-oh" body="Croissant encountered an error that it could not recover from. Please check your file and try again." />
+            <div className="error-container">
+                <h2>{headline}</h2>
+                <p>We're sorry, but an unexpected error ocurred. Please check your file and try again.</p>
+                <p>Need help? Reach out in the Croissant Tool group.</p>
+            </div>
         </>
     )
 }

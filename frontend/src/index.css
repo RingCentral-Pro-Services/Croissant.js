@@ -462,3 +462,20 @@ html, body {
   cursor: pointer;
   background-color: gray;
 }
+
+.error-container {
+  display: grid;
+  gap: 15px;
+  justify-items: center;
+  margin-top: 5vh;
+  color: var(--tool-card-forground);
+}
+
+.error-container > p {
+  font-size: large;
+  margin: 0;
+}
+
+.error-container > h2 {
+  margin: 0;
+}
