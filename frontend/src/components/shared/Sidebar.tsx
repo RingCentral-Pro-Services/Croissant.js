@@ -47,6 +47,7 @@ const Sidebar: React.FC<SidebarProps> = ({setColorTheme}) => {
         {label: 'Notifications', destination: '/notificationsaudit'},
         {label: 'Desk Phones', destination: '/deskphones'},
         {label: 'Intercom', destination: '/intercom'},
+        {label: 'User Groups', destination: '/usergroups'},
         {label: 'Call Monitoring', destination: '/callmonitoring'},
         {label: 'Paging Groups', destination: '/paginggroups'},
         {label: 'Park Locations', destination: '/parklocations'},
