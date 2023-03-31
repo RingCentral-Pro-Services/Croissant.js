@@ -58,7 +58,7 @@ const useCreateUserGroup = (postMessage: (message: Message) => void, postTimedMe
                 "Authorization": `Bearer ${token}`
             }
             const url = baseUpdateURL.replace('groupID', group.data.id!)
-            const response = await RestCentral.put(baseCreateURL, headers, group.payload())
+            const response = await RestCentral.put(url, headers, group.payload())
 
             if (response.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)

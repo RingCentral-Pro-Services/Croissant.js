@@ -57,7 +57,7 @@ const UserGroups = () => {
 
     useEffect(() => {
         if (isUserGroupsListPending) return
-        const header = ['ID', 'Display Name', 'Description', 'Managers', 'Users']
+        const header = ['ID', 'Display Name', 'Description', 'Manager', 'Members']
         writeExcel(header, completedUserGroups, 'User Groups', 'user-groups.xlsx')
     }, [isUserGroupsListPending])
 
@@ -93,7 +93,7 @@ const UserGroups = () => {
                 <h2>User Groups</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                 <FileSelect enabled={!isSyncing || !isExtensionListPending} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
-                <Button className='healthy-margin-right' variant='contained' onClick={() => setIsSyncing(true)} disabled={!hasCustomerToken || isSyncing || isAuditing || isExtensionListPending || groups.length === 0}>Sync</Button>
+                <Button className='healthy-margin-righ' variant='contained' onClick={() => setIsSyncing(true)} disabled={!hasCustomerToken || isSyncing || isAuditing || isExtensionListPending || groups.length === 0}>Sync</Button>
                 <Button variant='contained' onClick={handleAuditButtonClick} disabled={!hasCustomerToken || isAuditing || isSyncing || isExtensionListPending}>Audit</Button>
                 {isAuditing ? <progress value={completedUserGroups.length} max={userGroups.length} /> : <></>}
                 {isSyncing ? <progress value={currentExtensionIndex} max={groups.length} /> : <></>}
