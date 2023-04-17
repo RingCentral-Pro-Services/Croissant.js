@@ -1,20 +1,30 @@
 import React, { useState } from "react";
 import {IconButton, Paper} from '@mui/material'
 import {ExpandMore, ExpandLess} from '@mui/icons-material'
+import ArticleIcon from '@mui/icons-material/Article';
 
-const Header = (props: {title: string, body: string, children?: React.ReactNode}) => {
-    const {title, body, children} = props
+interface HeaderProps {
+    title: string
+    body: string
+    documentationURL?: string
+    children?: React.ReactNode
+}
+
+const Header = (props: HeaderProps) => {
+    const {title, body, documentationURL, children} = props
     const [isExpanded, setIsExpanded] = useState(false)
 
     return (
         <div className="header">
-            <h1>{title}</h1>
+            <div>
+                <h2>{title}</h2>
+                {documentationURL ? <ArticleIcon /> : <></>}
+                {documentationURL ? <a href={documentationURL} target="_blank">Documentation</a>: <></>}
+                {/* <ArticleIcon /> */}
+                {/* <a href={documentationURL}>Documentation</a> */}
+            </div>
             <p>{body}</p>
-            <IconButton sx={{display: children ? 'inline-block' : 'none'}} onClick={() => setIsExpanded(!isExpanded)} >
-                {isExpanded ? <ExpandLess /> : <ExpandMore />}
-            </IconButton>
-            <br/>
-            {isExpanded ? <div className='header-body'>{props.children}</div>: <></>}
+            {/* {isExpanded ? <div className='header-body'>{props.children}</div>: <></>} */}
         </div>
     )
 }

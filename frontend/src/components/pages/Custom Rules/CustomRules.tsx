@@ -131,7 +131,7 @@ const CustomRules = () => {
 
     return (
         <>
-            <Header title="Copy Custom Rules" body="Copy custom rules to other extensions">
+            <Header title="Copy Custom Rules" body="Copy custom rules to other extensions" documentationURL="https://dqgriffin.com/blog/jrbhwHRfEahVdJzUeJdG">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Copy Custom Rules" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />

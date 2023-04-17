@@ -169,7 +169,7 @@ const ExtensionUpload = () => {
 
     return (
         <>
-            <Header title='Extension Upload' body={`Create extensions using the BRD's users tab`}>
+            <Header title='Extension Upload' body={`Create extensions using the BRD's users tab`} documentationURL="https://dqgriffin.com/blog/rgOq6D6cGUzNteQkEXE4">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <div className="tool-card">

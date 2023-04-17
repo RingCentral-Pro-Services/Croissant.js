@@ -20,7 +20,7 @@ const AuditMenus = () => {
 
     return ( 
         <>
-            <Header title='Audit IVR Menus' body='Generate an audit-friendly list of all IVR menus in an account'>
+            <Header title='Audit IVR Menus' body='Generate an audit-friendly list of all IVR menus in an account' documentationURL='https://dqgriffin.com/blog/VbhCfcUYShTARLrnBKYn'>
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <div className="tool-card">

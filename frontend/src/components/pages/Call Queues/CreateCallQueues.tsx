@@ -96,7 +96,7 @@ const CreateCallQueues = () => {
 
     return (
         <>
-            <Header title="Create Call Queues" body="Create and update call queues in bulk">
+            <Header title="Create Call Queues" body="Create and update call queues in bulk" documentationURL='https://dqgriffin.com/blog/3IfuqLAoOfN2fPXXFh19'>
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <div className="tool-card">

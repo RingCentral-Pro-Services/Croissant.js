@@ -141,7 +141,7 @@ const CallQueues = () => {
 
     return (
         <>
-            <Header title='Audit Call Queues' body='Export a spreadsheet of all queues in an account'>
+            <Header title='Audit Call Queues' body='Export a spreadsheet of all queues in an account' documentationURL='https://dqgriffin.com/blog/3IfuqLAoOfN2fPXXFh19'>
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <div className="tool-card">

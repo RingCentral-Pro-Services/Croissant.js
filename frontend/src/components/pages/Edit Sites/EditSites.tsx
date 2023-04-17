@@ -108,7 +108,7 @@ const EditSites = () => {
 
     return (
         <>
-            <Header title='Edit Sites' body='Edit site names and extension numbers in bulk'>
+            <Header title='Edit Sites' body='Edit site names and extension numbers in bulk' documentationURL="https://dqgriffin.com/blog/so8Z5rWf9Z4lWXRXqxK4">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Edit Sites" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />

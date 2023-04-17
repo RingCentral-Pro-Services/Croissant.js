@@ -18,7 +18,7 @@ const CreateMenus = () => {
 
     return (
         <>
-        <Header title='Create IVR Menus' body='Create IVRs using either the BRD or a Lucidchart document'>
+        <Header title='Create IVR Menus' body='Create IVRs using either the BRD or a Lucidchart document' documentationURL='https://dqgriffin.com/blog/VbhCfcUYShTARLrnBKYn'>
             <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
         </Header>
             <div className='tool-card'>

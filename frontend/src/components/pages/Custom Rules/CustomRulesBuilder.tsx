@@ -84,7 +84,7 @@ const CustomRulesBuilder = () => {
 
     return (
         <>
-            <Header title='Build Custom Rules' body='Build custom rules using a simple Excel spreadsheet'>
+            <Header title='Build Custom Rules' body='Build custom rules using a simple Excel spreadsheet' documentationURL="https://dqgriffin.com/blog/PC9PLU3H4ZIJZZIfv6Oy">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <div className="tool-card">

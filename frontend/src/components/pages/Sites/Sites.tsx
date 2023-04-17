@@ -84,7 +84,7 @@ const Sites = () => {
 
     return (
         <>
-            <Header title="Create Sites" body="Build sites in bulk">
+            <Header title="Create Sites" body="Build sites in bulk" documentationURL="https://dqgriffin.com/blog/KkZuGBUv3C7BabG7PdPA">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <div className="tool-card">

@@ -85,7 +85,7 @@ const BulkAssign = () => {
 
     return (
         <>
-            <Header title="Bulk Number Assign" body="Assign phone numbers in bulk">
+            <Header title="Bulk Number Assign" body="Assign phone numbers in bulk" documentationURL="https://dqgriffin.com/blog/jgEcv35VZJZlVnmcHZ2U">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <div className="tool-card">

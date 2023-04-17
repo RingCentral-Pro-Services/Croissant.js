@@ -109,7 +109,7 @@ const ManipulateCustomRules = () => {
 
     return (
         <>
-            <Header title="Enable / Disable Custom Rules" body="Enable, disable, an delete custom rules in bulk">
+            <Header title="Enable / Disable Custom Rules" body="Enable, disable, an delete custom rules in bulk" documentationURL="https://dqgriffin.com/blog/UxKvg9LxHgN8A8qlusBV">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Enable / Disable Custom Rules" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />

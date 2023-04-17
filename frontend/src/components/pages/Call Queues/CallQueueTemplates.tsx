@@ -210,7 +210,7 @@ const CallQueueTemplates = () => {
 
     return (
         <>
-            <Header  title="Call Queue Templates" body="Apply settings to call queues in bulk">
+            <Header  title="Call Queue Templates" body="Apply settings to call queues in bulk" documentationURL="https://dqgriffin.com/blog/E8pFhINKe0fKmW2YGsT7">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <div className="tool-card">
