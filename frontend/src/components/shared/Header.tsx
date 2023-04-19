@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import {IconButton, Paper} from '@mui/material'
-import {ExpandMore, ExpandLess} from '@mui/icons-material'
-import ArticleIcon from '@mui/icons-material/Article';
+import FeedIcon from '@mui/icons-material/Feed';
 
 interface HeaderProps {
     title: string
@@ -18,13 +16,10 @@ const Header = (props: HeaderProps) => {
         <div className="header">
             <div>
                 <h2>{title}</h2>
-                {documentationURL ? <ArticleIcon /> : <></>}
+                {documentationURL ? <FeedIcon /> : <></>}
                 {documentationURL ? <a href={documentationURL} target="_blank">Documentation</a>: <></>}
-                {/* <ArticleIcon /> */}
-                {/* <a href={documentationURL}>Documentation</a> */}
             </div>
             <p>{body}</p>
-            {/* {isExpanded ? <div className='header-body'>{props.children}</div>: <></>} */}
         </div>
     )
 }
