@@ -128,7 +128,7 @@ const Deskphones = () => {
 
     return (
         <>
-            <Header title="Desk Phones" body="Set ring time for physical phones in bulk">
+            <Header title="Desk Phones" body="Set ring time for physical phones in bulk" documentationURL="https://dqgriffin.com/blog/E56ORu2TkiCB4CviXQNJ">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Desk Phones" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />

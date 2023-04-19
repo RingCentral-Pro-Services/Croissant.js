@@ -88,7 +88,7 @@ const CallMonitoring = () => {
 
     return (
         <>
-            <Header title='Call Monitoring' body='Create call monitoring groups in bulk. Note that this tool is not for updating existing groups. If you try it, duplicate groups will be created.'>
+            <Header title='Call Monitoring' body='Create call monitoring groups in bulk. Note that this tool is not for updating existing groups. If you try it, duplicate groups will be created.' documentationURL="https://dqgriffin.com/blog/17i7vnnbekmjJNxzWBZs">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <div className="tool-card">

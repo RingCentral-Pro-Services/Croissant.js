@@ -60,7 +60,7 @@ const ExtensionAudit = () => {
 
     return (
         <>
-            <Header title='Account Dump' body='This tool generatates a list of all extensions in an account'>
+            <Header title='Account Dump' body='This tool generatates a list of all extensions in an account' documentationURL='https://dqgriffin.com/blog/2rchSy0wVOH7oiBCUeOZ'>
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <div className='tool-card'>

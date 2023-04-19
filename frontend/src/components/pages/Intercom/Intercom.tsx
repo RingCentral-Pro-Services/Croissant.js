@@ -164,7 +164,7 @@ const Intercom = () => {
 
     return (
         <>
-            <Header title='Intercom' body='Enable, disable, and audit intercom'>
+            <Header title='Intercom' body='Enable, disable, and audit intercom' documentationURL="https://dqgriffin.com/blog/oss6kFK8brP8o8gCWflc">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <div className="tool-card">

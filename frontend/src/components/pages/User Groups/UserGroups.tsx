@@ -88,7 +88,7 @@ const UserGroups = () => {
 
     return (
         <>
-            <Header title='User Groups' body='Create, update, and audit user groups' />
+            <Header title='User Groups' body='Create, update, and audit user groups' documentationURL="https://dqgriffin.com/blog/i2WLGk4HTAMiGiit4Xsy" />
             <div className="tool-card">
                 <h2>User Groups</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />

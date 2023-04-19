@@ -59,7 +59,7 @@ const ExtensionEditor = () => {
 
     return (
         <>
-            <Header title="Edit Extensions" body="Find & replace in extension names and email addresses">
+            <Header title="Edit Extensions" body="Find & replace in extension names and email addresses" documentationURL="https://dqgriffin.com/blog/3iskKnldBEh01MoOYvje">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Edit Extensions" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />

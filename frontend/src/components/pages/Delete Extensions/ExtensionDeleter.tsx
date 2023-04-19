@@ -188,7 +188,7 @@ const ExtensionDeleter = () => {
 
     return (
         <>
-            <Header title="Delete Extensions" body="Delete extensions in bulk">
+            <Header title="Delete Extensions" body="Delete extensions in bulk" documentationURL="https://dqgriffin.com/blog/LbdYZP9HvJYrBrZGqFjh">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Extension Deleter" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />

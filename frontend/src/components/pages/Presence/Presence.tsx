@@ -89,7 +89,7 @@ const Presence = () => {
     
     return (
         <>
-            <Header title='Presence' body='Export user presence settings' />
+            <Header title='Presence' body='Export user presence settings' documentationURL='https://dqgriffin.com/blog/3iskKnldBEh01MoOYvje'/>
             <div className="tool-card">
                 <h2>Presence</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />

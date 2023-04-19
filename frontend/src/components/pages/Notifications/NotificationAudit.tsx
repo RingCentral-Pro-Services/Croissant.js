@@ -135,7 +135,7 @@ const NotificationAudit = () => {
 
     return (
         <>
-            <Header title="Notifications" body="Audit and update notification emails">
+            <Header title="Notifications" body="Audit and update notification emails" documentationURL="https://dqgriffin.com/blog/LbdYZP9HvJYrBrZGqFjh">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Notifications" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
