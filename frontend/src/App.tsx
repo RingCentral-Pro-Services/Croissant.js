@@ -30,6 +30,7 @@ import GeneratePrompts from './components/pages/Prompt Generation/GeneratePrompt
 import { ErrorBoundary } from 'react-error-boundary';
 import FatalError from './components/shared/FatalError';
 import UserGroups from './components/pages/User Groups/UserGroups';
+import PushToTalk from './components/pages/Push To Talk/PushToTalk';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -105,6 +106,7 @@ function App() {
                 <Route path='/parklocations' element={<ParkLocations />} />
                 <Route path='/prompts' element={<GeneratePrompts />} />
                 <Route path='/usergroups' element={<UserGroups />} />
+                <Route path='/pushtotalk' element={<PushToTalk />} />
               </Routes>
             </Suspense>
           </ErrorBoundary>
