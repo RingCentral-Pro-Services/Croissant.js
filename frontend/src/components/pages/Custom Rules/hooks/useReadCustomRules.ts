@@ -51,7 +51,7 @@ const useReadCustomRules = (postMessage: (message: Message) => void, postError: 
                     }
                 },
                 unconditionalForwarding: {
-                    phoneNumber: getTransferPhoneNumber(`${data['Extermal Number']}`)
+                    phoneNumber: getTransferPhoneNumber(`${data['External Number']}`)
                 }
             }
             const rule = new CustomRule(extension, ruleData)

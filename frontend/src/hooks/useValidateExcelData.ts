@@ -14,8 +14,8 @@ const useValidateExcelData = (scehema: z.Schema, postMessage: (message: Message)
 
         for (let index = 0; index < excelData.length; index++) {
             try {
-                scehema.parse(excelData[index])
-                validItems.push(excelData[index])
+                const valid = scehema.parse(excelData[index])
+                validItems.push(valid)
             }
             catch(error: any) {
                 for (let errorIndex = 0; errorIndex < error.issues.length; errorIndex++) {

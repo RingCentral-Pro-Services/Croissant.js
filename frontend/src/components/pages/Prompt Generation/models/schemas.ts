@@ -1,7 +1,7 @@
 import z from 'zod'
 
 export const PromptSchema = z.object({
-    'Prompt Name': z.string({
+    'Prompt Name': z.coerce.string({
         required_error: 'Prompt Name is required',
         invalid_type_error: 'Prompt Name must be text'
     }),
