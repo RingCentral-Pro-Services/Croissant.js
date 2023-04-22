@@ -5,7 +5,7 @@ export class PTTChannel implements DataGridFormattable, ExcelFormattable {
     constructor(public data: PTTChannelData) {}
 
     toExcelRow(): string[] {
-        return [this.data.id, this.data.name, this.data.members.map((member) => member.extensionId).join(', ')]
+        return [this.data.id, this.data.name, this.data.members.map((member) => member.extensionNumber).join(', ')]
     }
 
     toDataGidHeader() {
@@ -19,12 +19,19 @@ export class PTTChannel implements DataGridFormattable, ExcelFormattable {
         return {
             id: this.data.name,
             name: this.data.name,
-            members: this.data.members.map((member) => member.extensionId).join(', ')
+            members: this.data.members.map((member) => member.extensionNumber).join(', ')
         }
     }
 
     property(key: string) {
         return this.data[key as keyof PTTChannelData]
+    }
+
+    payload() {
+        return {
+            name: this.data.name,
+            members: this.data.members
+        }
     }
 }
 
@@ -36,4 +43,5 @@ export interface PTTChannelData {
 
 export interface PTTChannelMember {
     extensionId: string
+    extensionNumber?: string
 }

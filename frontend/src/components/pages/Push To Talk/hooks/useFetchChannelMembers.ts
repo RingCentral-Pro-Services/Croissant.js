@@ -56,7 +56,8 @@ const useFetchChannelMembers = (postMessage: (message: Message) => void, postTim
             const user = extensions.find((extension) => `${extension.data.id}` === `${memberID.extensionId}`)
             if (!user) continue
             const member: PTTChannelMember = {
-                extensionId: user?.data.extensionNumber
+                extensionId: user?.data.extensionNumber,
+                extensionNumber: user?.data.extensionNumber
             }
             members.push(member)
         }
