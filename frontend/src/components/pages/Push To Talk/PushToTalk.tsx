@@ -119,7 +119,7 @@ const PushToTalk = () => {
     
     return (
         <>
-            <Header title="Push To Talk" body="Create, update, and export Push-to-talk channels" />
+            <Header title="Push To Talk" body="Create, update, and export Push-to-talk channels" documentationURL="https://dqgriffin.com/blog/MoMTlQc0JRL1kwL7PITs" />
             <div className="tool-card">
                 <h2>Push to Talk</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
