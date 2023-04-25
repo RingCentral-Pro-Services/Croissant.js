@@ -195,8 +195,10 @@ export const extensionSchema = z.object({
         invalid_type_error: 'User type data type invalid'
     }),
     'Department': z.coerce.string().optional(),
+    'Dept': z.string().optional(),
     'Pin': z.coerce.string().optional(),
     'Password': z.string().optional(),
+    'Role': z.string()
 })
 
 export const callMonitoringSchema = z.object({
