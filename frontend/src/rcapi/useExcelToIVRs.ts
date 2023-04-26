@@ -63,9 +63,11 @@ const useExcelToIVRs = (postMessage: (message: Message) => void, postError: (err
             id: "main-site"
         }
 
-        for (let index = 0; index < extensionList.length; index++) {
-            if (extensionList[index].name.trim() === siteName.trim()) {
-                site.id = `${extensionList[index].id}`
+        const sites = extensionList.filter((extension) => extension.prettyType[extension.type] === 'Site')
+
+        for (let index = 0; index < sites.length; index++) {
+            if (sites[index].name.trim() === siteName.trim()) {
+                site.id = `${sites[index].id}`
                 site.name = siteName
             }
         }
@@ -188,6 +190,19 @@ const useExcelToIVRs = (postMessage: (message: Message) => void, postError: (err
         for (let index = 0; index < extensionsList.length; index++) {
             if (`${extensionsList[index].extensionNumber}` === extension.toString().trim()) {
                 return extensionsList[index].id
+            }
+        }
+        return 0
+    }
+
+    const idForSite = (siteName: string, extensionList: RCExtension[]) => {
+        if (siteName.toLowerCase() === 'main site') return 'main-site'
+
+        const sites = extensionList.filter((extension) => extension.prettyType[extension.type] === 'Site')
+
+        for (let index = 0; index < sites.length; index++) {
+            if (sites[index].name.trim() === siteName.trim()) {
+                return sites[index].id
             }
         }
         return 0

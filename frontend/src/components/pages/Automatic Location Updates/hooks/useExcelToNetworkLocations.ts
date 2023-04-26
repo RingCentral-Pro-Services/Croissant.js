@@ -15,7 +15,7 @@ const useExcelToNetworkLocations = () => {
                 nickname: item["Nickname"],
                 site: {
                     name: item["Site"],
-                    id: idForSite(item['Site'], extensions)
+                    id: idForSite(item['Site'], extensions.filter((ext) => ext.prettyType() === 'Site'))
                 },
                 type: item['Type'],
                 id: item['Chassis ID / BSSID'],
