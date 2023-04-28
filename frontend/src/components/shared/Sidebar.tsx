@@ -72,6 +72,7 @@ const Sidebar: React.FC<SidebarProps> = ({setColorTheme}) => {
     ]
 
     const customRuleItems: SidebarItem[] = [
+        {label: 'Export Custom Rules', destination: '/exportrules'},
         {label: 'Build Custom Rules', destination: '/customrules'},
         {label: 'Copy Custom Rules', destination: '/copycustomrules'},
         {label: 'Enable / Disable Custom Rules', destination: '/customruleedit'}

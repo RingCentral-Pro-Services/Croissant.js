@@ -1,11 +1,72 @@
 import { DateRange } from "@mui/icons-material"
 import { VoicemailDestination } from "../../../../models/CustomRule"
 import { DataGridFormattable } from "../../../../models/DataGridFormattable"
+import ExcelFormattable from "../../../../models/ExcelFormattable"
 import { Extension } from "../../../../models/Extension"
 import { WeeklyRange } from "../../../../models/WeeklyRange"
 
-export class CustomRule implements DataGridFormattable {
+export class CustomRule implements DataGridFormattable, ExcelFormattable {
     constructor(public extension: Extension, public data: CustomRuleData) {}
+
+    toExcelRow(): string[] {
+        return [this.extension.data.extensionNumber,
+                this.extension.data.name,
+                this.data.name,
+                this.data.id ?? '',
+                this.data.enabled ? 'Yes' : 'No',
+                this.data.callers ? this.data.callers.map((caller) => caller.callerId).join(', ') : '',
+                this.data.calledNumbers ? this.data.calledNumbers.map((number) => number.phoneNumber).join(', ') : '',
+                this.getRef(),
+                this.data.schedule.weeklyRanges?.sunday ? `${this.convertTo12HourTime(this.data.schedule.weeklyRanges.sunday[0].from)} - ${this.convertTo12HourTime(this.data.schedule.weeklyRanges.sunday[0].to)}` : '',
+                this.data.schedule.weeklyRanges?.monday ? `${this.convertTo12HourTime(this.data.schedule.weeklyRanges.monday[0].from)} - ${this.convertTo12HourTime(this.data.schedule.weeklyRanges.monday[0].to)}` : '',
+                this.data.schedule.weeklyRanges?.tuesday ? `${this.convertTo12HourTime(this.data.schedule.weeklyRanges.tuesday[0].from)} - ${this.convertTo12HourTime(this.data.schedule.weeklyRanges.tuesday[0].to)}` : '',
+                this.data.schedule.weeklyRanges?.wednesday ? `${this.convertTo12HourTime(this.data.schedule.weeklyRanges.wednesday[0].from)} - ${this.convertTo12HourTime(this.data.schedule.weeklyRanges.wednesday[0].to)}` : '',
+                this.data.schedule.weeklyRanges?.thursday ? `${this.convertTo12HourTime(this.data.schedule.weeklyRanges.thursday[0].from)} - ${this.convertTo12HourTime(this.data.schedule.weeklyRanges.thursday[0].to)}` : '',
+                this.data.schedule.weeklyRanges?.friday ? `${this.convertTo12HourTime(this.data.schedule.weeklyRanges.friday[0].from)} - ${this.convertTo12HourTime(this.data.schedule.weeklyRanges.friday[0].to)}` : '',
+                this.data.schedule.weeklyRanges?.saturday ? `${this.convertTo12HourTime(this.data.schedule.weeklyRanges.saturday[0].from)} - ${this.convertTo12HourTime(this.data.schedule.weeklyRanges.saturday[0].to)}` : '',
+                this.data.ranges ? this.data.ranges.map(range => `${range.from} - ${range.to}`).join(', ') : '',
+                this.prettyCallHandlingAction(),
+                this.data.callHandlingAction === 'TransferToExtension' && this.data.transfer ? this.data.transfer.extension.id : '',
+                this.data.callHandlingAction === 'UnconditionalForwarding' && this.data.unconditionalForwarding ? this.data.unconditionalForwarding.phoneNumber : '',
+                this.data.callHandlingAction === 'TakeMessagesOnly' && this.data.voicemail ? `${this.data.voicemail.recipient.id}` : ''
+            ]
+    }
+
+    getRef() {
+        switch(this.data.ref) {
+            case 'BusinessHours':
+                return 'Work Hours'
+            case 'AfterHours':
+                return 'After Hours'
+            default:
+                return ''
+        }
+    }
+
+    convertTo12HourTime(time: string) {
+        const [hour, minute] = time.split(':')
+        const hourInt = parseInt(hour)
+        const minuteInt = parseInt(minute)
+        const minuteString = `${minuteInt}`.length === 1 ? `0${minuteInt}` : `${minuteInt}`
+        const ampm = hourInt >= 12 ? 'PM' : 'AM'
+        const hour12 = hourInt % 12 || 12
+        return `${hour12}:${minuteString} ${ampm}`
+    }
+
+    prettyCallHandlingAction() {
+        switch(this.data.callHandlingAction) {
+            case 'PlayAnnouncementOnly':
+                return 'Play Message and Disconnect'
+            case 'TakeMessagesOnly':
+                return 'Send to Voicemail'
+            case 'UnconditionalForwarding':
+                return 'Transfer to External'
+            case 'TransferToExtension':
+                return 'Transfer to Extension'
+            default:
+                return this.data.callHandlingAction
+        }
+    }
 
     toDataGidHeader() {
         return [
@@ -61,6 +122,7 @@ export class CustomRule implements DataGridFormattable {
 }
 
 export interface CustomRuleData {
+    id?: string
     name: string
     type: string
     enabled: boolean

@@ -1,0 +1,120 @@
+import { Button } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import useLogin from "../../../hooks/useLogin";
+import useMessageQueue from "../../../hooks/useMessageQueue";
+import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
+import useSidebar from "../../../hooks/useSidebar";
+import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel";
+import { Extension } from "../../../models/Extension";
+import useExtensions from "../../../rcapi/useExtensions";
+import useGetAccessToken from "../../../rcapi/useGetAccessToken";
+import AdaptiveFilter from "../../shared/AdaptiveFilter";
+import FeedbackArea from "../../shared/FeedbackArea";
+import Header from "../../shared/Header";
+import UIDInputField from "../../shared/UIDInputField";
+import useGetCustomRules from "./hooks/useGetCustomRules";
+import { CustomRule } from "./models/CustomRule";
+
+const CustomRulesExport = () => {
+    const supportedExtensionTypes = ['User', 'Call Queue', 'Site']
+    const [targetUID, setTargetUID] = useState('')
+    const [siteNames, setSiteNames] = useState<string[]>([])
+    const [selectedSiteNames, setSelectedSiteNames] = useState<string[]>([])
+    const [selectedExtensions, setSelectedExtensions] = useState<Extension[]>([])
+    const [isFilterReady, setIsFilterReady] = useState(false)
+    const [selectedExtensionTypes, setSelectedExtensionTypes] = useState<string[]>(supportedExtensionTypes)
+    const [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
+    const [auditedRules, setAuditedRules] = useState<CustomRule[]>([])
+    const [isAuditing, setIsAuditing] = useState(false)
+
+    const increaseProgress = (rules: CustomRule[]) => {
+        setCurrentExtensionIndex(currentExtensionIndex + 1)
+        setAuditedRules([...auditedRules, ...rules])
+    }
+
+    useLogin('exportrules', isAuditing)
+    useSidebar('Export Custom Rules')
+    const {fetchToken, companyName, hasCustomerToken, error: tokenError, isTokenPending, userName} = useGetAccessToken()
+    let {messages, errors, postMessage, postError} = useMessageQueue()
+    const {postTimedMessage, timedMessages} = usePostTimedMessage()
+    const { extensionsList, isExtensionListPending, isMultiSiteEnabled, fetchExtensions } = useExtensions(postMessage)
+    const {fetchRules} = useGetCustomRules(postMessage, postTimedMessage, postError, increaseProgress)
+    const {writePrettyExcel} = useWritePrettyExcel()
+
+    useEffect(() => {
+        if (targetUID.length < 5) return
+        localStorage.setItem('target_uid', targetUID)
+        fetchToken(targetUID)
+    },[targetUID])
+
+    useEffect(() => {
+        if (!hasCustomerToken) return
+        fetchExtensions()
+    }, [hasCustomerToken])
+
+    useEffect(() => {
+        if (isExtensionListPending) return
+
+        if (isMultiSiteEnabled) {
+            const sites = extensionsList.filter((ext) => ext.prettyType() === 'Site')
+            const names = sites.map((site) => site.data.name)
+            setSiteNames(['Main Site', ...names])
+            setSelectedSiteNames(['Main Site', ...names])
+        }
+        else {
+            setSelectedExtensions(extensionsList)
+        }
+        setIsFilterReady(true)
+    }, [extensionsList, isExtensionListPending])
+
+    useEffect(() => {
+        console.log('Selected Extension Types')
+        console.log(selectedExtensionTypes)
+
+        console.log('Selected Sites')
+        console.log(selectedSiteNames)
+        let selected: Extension[] = []
+
+        if (isMultiSiteEnabled && selectedExtensionTypes.includes('Site')) {
+            const sites = extensionsList.filter((ext) => ext.prettyType() === 'Site' && selectedSiteNames.includes(ext.data.name))
+            selected = [...selected, ...sites]
+        }
+
+        const supportedExtensions = extensionsList.filter((ext) => ['User', 'Call Queue'].includes(ext.prettyType()))
+        const selectedExtenstions = supportedExtensions.filter((ext) => selectedExtensionTypes.includes(ext.prettyType()) && selectedSiteNames.includes(ext.data.site!.name) && ext.data.status != 'Unassigned')
+        setSelectedExtensions([...selected, ...selectedExtenstions])
+    }, [selectedExtensionTypes, selectedSiteNames])
+
+    useEffect(() => {
+        if (currentExtensionIndex >= selectedExtensions.length || !isAuditing) return
+        fetchRules(selectedExtensions[currentExtensionIndex], extensionsList)
+    }, [currentExtensionIndex, isAuditing])
+
+    useEffect(() => {
+        if (isAuditing && currentExtensionIndex >= selectedExtensions.length) {
+            writePrettyExcel([], auditedRules, 'Custom Rules', 'custom-rules.xlsx', '/custom-rules-template.xlsx')
+        }
+    }, [currentExtensionIndex, isAuditing])
+    
+
+    const handleButtonClick = () => {
+        setIsAuditing(true)
+    }
+
+
+    return (
+        <>
+            <Header title="Export Custom Rules" body="Generate a spreadsheet with all custom rules assigned to extensions" />
+            <div className="tool-card">
+                <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
+                {isFilterReady && isMultiSiteEnabled ? <AdaptiveFilter options={siteNames} defaultSelected={siteNames} title='Sites' placeholder='Search...' setSelected={setSelectedSiteNames} />  : <></>}
+                {isFilterReady && isMultiSiteEnabled ? <AdaptiveFilter options={supportedExtensionTypes} defaultSelected={supportedExtensionTypes} title='Extension types' placeholder='Search...' setSelected={setSelectedExtensionTypes} />  : <></>}
+                <Button variant='contained' onClick={handleButtonClick} disabled={isAuditing}>Go</Button>
+                {isAuditing ? <progress value={currentExtensionIndex} max={selectedExtensions.length} /> : <></>}
+                <FeedbackArea gridData={selectedExtensions} messages={messages} errors={errors} timedMessages={timedMessages} />
+            </div>
+        </>
+    )
+}
+
+export default CustomRulesExport
