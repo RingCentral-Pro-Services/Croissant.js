@@ -23,7 +23,6 @@ import Sites from './components/pages/Sites/Sites';
 import BulkAssign from './components/pages/Phone Numbers/Bulk Assign/BulkAssign';
 import LocationUpdates from './components/pages/Automatic Location Updates/LocationUpdates';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { Theme } from '@emotion/react';
 import Home from './components/pages/Home/components/Home';
 import ParkLocations from './components/pages/Park Locations/ParkLocations';
 import GeneratePrompts from './components/pages/Prompt Generation/GeneratePrompts';
@@ -31,13 +30,13 @@ import { ErrorBoundary } from 'react-error-boundary';
 import FatalError from './components/shared/FatalError';
 import UserGroups from './components/pages/User Groups/UserGroups';
 import PushToTalk from './components/pages/Push To Talk/PushToTalk';
-import CustomRulesExport from './components/pages/Custom Rules/CustomRulesExport';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
 const Presence = React.lazy(() => import('./components/pages/Presence/Presence'));
 const Testbed = React.lazy(() => import('./components/pages/Testbed/Testbed'));
 const CustomRulesBuilder = React.lazy(() => import('./components/pages/Custom Rules/CustomRulesBuilder'));
+const CustomRulesExport = React.lazy(() => import('./components/pages/Custom Rules/CustomRulesExport'))
 
 const darkTheme = createTheme({
   palette: {

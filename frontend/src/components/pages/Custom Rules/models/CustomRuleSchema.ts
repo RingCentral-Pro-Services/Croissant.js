@@ -3,6 +3,7 @@ import z from 'zod'
 export const CustomRuleSchema = z.object({
     'Ext Number': z.coerce.string(),
     'Rule Name': z.coerce.string(),
+    'Rule ID': z.coerce.string().optional(),
     'Enabled': z.string({
         required_error: 'Rule status is required',
         invalid_type_error: 'Rule status must be "Yes" or "No"',

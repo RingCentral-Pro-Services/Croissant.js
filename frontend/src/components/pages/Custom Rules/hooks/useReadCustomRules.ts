@@ -30,6 +30,7 @@ const useReadCustomRules = (postMessage: (message: Message) => void, postError: 
             const transferExtensionID = getTransferExtensionID(`${data['Transfer Extension']}`, extensionsList)
 
             const ruleData: CustomRuleData = {
+                id: data['Rule ID'],
                 name: data['Rule Name'],
                 type: 'Custom',
                 enabled: data['Enabled'] === 'Yes',
