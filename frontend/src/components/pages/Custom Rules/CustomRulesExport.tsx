@@ -1,5 +1,6 @@
 import { Button } from "@mui/material";
 import React, { useEffect, useState } from "react";
+import { sanitize } from "../../../helpers/Sanatize";
 import useLogin from "../../../hooks/useLogin";
 import useMessageQueue from "../../../hooks/useMessageQueue";
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
@@ -92,7 +93,7 @@ const CustomRulesExport = () => {
 
     useEffect(() => {
         if (isAuditing && currentExtensionIndex >= selectedExtensions.length) {
-            writePrettyExcel([], auditedRules, 'Custom Rules', 'custom-rules.xlsx', '/custom-rules-template.xlsx')
+            writePrettyExcel([], auditedRules, 'Custom Rules', `Custom Rules - ${sanitize(companyName)}.xlsx`, '/custom-rules-template.xlsx')
         }
     }, [currentExtensionIndex, isAuditing])
     
@@ -106,12 +107,13 @@ const CustomRulesExport = () => {
         <>
             <Header title="Export Custom Rules" body="Generate a spreadsheet with all custom rules assigned to extensions" />
             <div className="tool-card">
+                <h2>Export Custom Rules</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                 {isFilterReady && isMultiSiteEnabled ? <AdaptiveFilter options={siteNames} defaultSelected={siteNames} title='Sites' placeholder='Search...' setSelected={setSelectedSiteNames} />  : <></>}
                 {isFilterReady && isMultiSiteEnabled ? <AdaptiveFilter options={supportedExtensionTypes} defaultSelected={supportedExtensionTypes} title='Extension types' placeholder='Search...' setSelected={setSelectedExtensionTypes} />  : <></>}
                 <Button variant='contained' onClick={handleButtonClick} disabled={isAuditing}>Go</Button>
                 {isAuditing ? <progress value={currentExtensionIndex} max={selectedExtensions.length} /> : <></>}
-                <FeedbackArea gridData={selectedExtensions} messages={messages} errors={errors} timedMessages={timedMessages} />
+                {isExtensionListPending ? <></> : <FeedbackArea gridData={selectedExtensions} messages={messages} errors={errors} timedMessages={timedMessages} />}
             </div>
         </>
     )
