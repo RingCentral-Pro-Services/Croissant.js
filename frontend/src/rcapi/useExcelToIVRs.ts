@@ -186,10 +186,12 @@ const useExcelToIVRs = (postMessage: (message: Message) => void, postError: (err
     }
 
     const idForExtension = (extension: string, extensionsList: RCExtension[]) => {
+        const nonSites = extensionsList.filter((ext) => ext.prettyType[ext.type] != 'Site')
+
         if (extension === undefined) return 0
-        for (let index = 0; index < extensionsList.length; index++) {
-            if (`${extensionsList[index].extensionNumber}` === extension.toString().trim()) {
-                return extensionsList[index].id
+        for (let index = 0; index < nonSites.length; index++) {
+            if (`${nonSites[index].extensionNumber}` === extension.toString().trim()) {
+                return nonSites[index].id
             }
         }
         return 0
