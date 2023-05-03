@@ -56,7 +56,7 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
             this.handlingRules?.holdAudioInterruptionPeriod ?? 0),
             this.handlingRules?.holdAudioInterruptionPeriod ? this.greeting('InterruptPrompt') : '' ,
             this.prettyRingType(this.handlingRules?.transferMode ?? ''),
-            this.prettyTime(this.handlingRules?.agentTimeout ?? 0),
+            this.handlingRules?.transferMode === 'Simultaneous' ? 'N/A (simultaneous)' : this.prettyTime(this.handlingRules?.agentTimeout ?? 0),
             this.prettyTime(this.handlingRules?.holdTime ?? 0),
             this.prettyTime(this.handlingRules?.wrapUpTime ?? 0),
             this.editableMemberStatus ?? '',
