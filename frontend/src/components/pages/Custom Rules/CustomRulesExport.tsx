@@ -111,7 +111,7 @@ const CustomRulesExport = () => {
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                 {isFilterReady && isMultiSiteEnabled ? <AdaptiveFilter options={siteNames} defaultSelected={siteNames} title='Sites' placeholder='Search...' setSelected={setSelectedSiteNames} />  : <></>}
                 {isFilterReady && isMultiSiteEnabled ? <AdaptiveFilter options={supportedExtensionTypes} defaultSelected={supportedExtensionTypes} title='Extension types' placeholder='Search...' setSelected={setSelectedExtensionTypes} />  : <></>}
-                <Button variant='contained' onClick={handleButtonClick} disabled={isAuditing}>Go</Button>
+                <Button variant='contained' onClick={handleButtonClick} disabled={isExtensionListPending || isAuditing}>Go</Button>
                 {isAuditing ? <progress value={currentExtensionIndex} max={selectedExtensions.length} /> : <></>}
                 {isExtensionListPending ? <></> : <FeedbackArea gridData={selectedExtensions} messages={messages} errors={errors} timedMessages={timedMessages} />}
             </div>
