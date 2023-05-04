@@ -48,6 +48,14 @@ const useExcelToIVRs = (postMessage: (message: Message) => void, postError: (err
                 id: `${existingID === 0 ? randomID() : existingID}`
             }
             let menu = new IVRMenu(menuData)
+            if (!menu.data.name || menu.data.name === '' || menu.data.name === 'undefined') {
+                postMessage(new Message('Validation: Missing menu name', 'error'))
+                continue
+            }
+            if (!menu.data.extensionNumber) {
+                postMessage(new Message('Validation: Missing extension number', 'error'))
+                continue
+            }
             if (prompt.audio) {
                 menu.audioPromptFilename = currentItem['Prompt Name/Script']
             }
@@ -119,6 +127,12 @@ const useExcelToIVRs = (postMessage: (message: Message) => void, postError: (err
                 if (translatedAction!= undefined && translatedAction !== "") {
                     if (translatedAction !== 'DialByName') {
                         let rawDestination = data[destinationKey]
+
+                        if (!rawDestination || rawDestination === '') {
+                            postMessage(new Message(`Key press ${keyPressIndex} was removed from menu ${data['Menu Name']} because it's missing a destination`, 'error'))
+                            continue
+                        }
+
                         let destination = ""
                         if (translatedAction !== "Transfer") {
                             if (rawDestination != undefined) {
