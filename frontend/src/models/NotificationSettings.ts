@@ -14,9 +14,18 @@ class NotificationSettings implements CSVFormattable, ExcelFormattable, DataTabl
     }
 
     toExcelRow(): string[] {
-        return [`${this.extension.id}`, this.extension.name, `${this.extension.extensionNumber}`, this.extension.prettyType[this.extension.type] ?? this.extension.type,
-                `${this.data.emailAddresses ?? ''}`, `${this.data.advancedMode}`, this.data.advancedMode ? `${this.data.voicemails.advancedEmailAddresses ?? ''}` : '', this.data.advancedMode ? `${this.data.inboundFaxes.advancedEmailAddresses ?? ''}` : '',
-                this.data.advancedMode ? `${this.data.outboundFaxes.advancedEmailAddresses ?? ''}` : '', this.data.advancedMode ? `${this.data.inboundTexts.advancedEmailAddresses ?? ''}` : '', this.data.advancedMode ? `${this.data.missedCalls.advancedEmailAddresses ?? ''}` : '']
+        return [
+            `${this.extension.id}`,
+             this.extension.name,
+             `${this.extension.extensionNumber}`,
+             this.extension.prettyType[this.extension.type] ?? this.extension.type,
+             `${this.data.emailAddresses ?? ''}`,
+             `${this.data.advancedMode}`,
+             this.data.advancedMode ? `${this.data.voicemails.advancedEmailAddresses ?? ''}` : '',
+             this.data.advancedMode && this.data.inboundFaxes.notifyByEmail ? `${this.data.inboundFaxes.advancedEmailAddresses ?? ''}` : '',
+             this.data.advancedMode && this.data.outboundFaxes.notifyByEmail ? `${this.data.outboundFaxes.advancedEmailAddresses ?? ''}` : '',
+             this.data.advancedMode && this.data.inboundFaxes.notifyByEmail ? `${this.data.inboundTexts.advancedEmailAddresses ?? ''}` : '',
+             this.data.advancedMode && this.data.missedCalls.notifyByEmail ? `${this.data.missedCalls.advancedEmailAddresses ?? ''}` : '']
     }
 
     toDataTableRow(): string[] {
