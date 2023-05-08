@@ -19,6 +19,7 @@ const Sidebar: React.FC<SidebarProps> = ({setColorTheme}) => {
     const [isCustomRuleListOpen, setIsCustomRuleListOpen] = useState(false)
     const [isSiteListOpen, setIsSiteListOpen] = useState(false)
     const [isPhoneNumbersListOpen, setIsPhoneNumbersListOpen] = useState(false)
+    const [isMigrationListOpen, setIsMigrationListOpen] = useState(false)
     const initialTheme = localStorage.getItem('theme') || 'light'
     const [theme, setTheme] = useState(initialTheme)
     const navigate = useNavigate()
@@ -71,6 +72,10 @@ const Sidebar: React.FC<SidebarProps> = ({setColorTheme}) => {
         {label: 'Call Queue Templates', destination: '/callqueuetemplates'},
     ]
 
+    const migrationItems: SidebarItem[] = [
+        {label: 'Migrate Sites', destination: '/migratesites'},
+    ]
+
     const customRuleItems: SidebarItem[] = [
         {label: 'Export Custom Rules', destination: '/exportrules'},
         {label: 'Build Custom Rules', destination: '/customrules'},
@@ -100,6 +105,10 @@ const Sidebar: React.FC<SidebarProps> = ({setColorTheme}) => {
 
     const handlePhoneNumberToggle = () => {
         setIsPhoneNumbersListOpen(!isPhoneNumbersListOpen)
+    }
+
+    const handleMigrationToggle = () => {
+        setIsMigrationListOpen(!isMigrationListOpen)
     }
 
     return ( 
@@ -195,6 +204,22 @@ const Sidebar: React.FC<SidebarProps> = ({setColorTheme}) => {
             <Collapse in={isPhoneNumbersListOpen} timeout='auto'>
                 <List>
                     {phoneNumberItems.map((item) => (
+                        <ListItem className={selectedItem === item.label ? 'nav-item-selected' : ''} key={item.label} disablePadding>
+                        <ListItemButton onClick={() => handleClick(item.label, item.destination)}>
+                        <ListItemText primary={item.label} />
+                        </ListItemButton>
+                    </ListItem>
+                    ))}
+                </List>
+            </Collapse>
+            <Divider />
+            <ListItemButton onClick={handleMigrationToggle}>
+                <ListItemText primary="Migration" />
+                {isMigrationListOpen ? <ExpandLess /> : <ExpandMore />}
+            </ListItemButton>
+            <Collapse in={isMigrationListOpen} timeout='auto'>
+                <List>
+                    {migrationItems.map((item) => (
                         <ListItem className={selectedItem === item.label ? 'nav-item-selected' : ''} key={item.label} disablePadding>
                         <ListItemButton onClick={() => handleClick(item.label, item.destination)}>
                         <ListItemText primary={item.label} />
