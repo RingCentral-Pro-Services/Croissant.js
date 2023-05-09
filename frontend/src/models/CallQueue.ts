@@ -365,7 +365,7 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
 
     notificationPayload() {
         return {
-            includeManagers: false,
+            includeManagers: this.managers ? true : false,
             advancedMode: false,
             emailAddresses: this.notificationEmails,
             voicemails: {

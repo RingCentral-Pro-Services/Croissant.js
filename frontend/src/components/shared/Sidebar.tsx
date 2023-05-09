@@ -74,6 +74,7 @@ const Sidebar: React.FC<SidebarProps> = ({setColorTheme}) => {
 
     const migrationItems: SidebarItem[] = [
         {label: 'Migrate Sites', destination: '/migratesites'},
+        {label: 'Migrate Queues', destination: '/migratequeues'},
     ]
 
     const customRuleItems: SidebarItem[] = [

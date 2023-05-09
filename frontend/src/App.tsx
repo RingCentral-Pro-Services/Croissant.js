@@ -31,6 +31,7 @@ import FatalError from './components/shared/FatalError';
 import UserGroups from './components/pages/User Groups/UserGroups';
 import PushToTalk from './components/pages/Push To Talk/PushToTalk';
 import MigrateSites from './components/pages/Migration/Sites/MigrateSites';
+import MigrateQueues from './components/pages/Migration/Queues/MigrateQueues';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -110,6 +111,7 @@ function App() {
                 <Route path='/pushtotalk' element={<PushToTalk />} />
                 <Route path='/exportrules' element={<CustomRulesExport />} />
                 <Route path='/migratesites' element={<MigrateSites />} />
+                <Route path='/migratequeues' element={<MigrateQueues />} />
               </Routes>
             </Suspense>
           </ErrorBoundary>
