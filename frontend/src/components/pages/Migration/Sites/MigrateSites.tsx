@@ -80,6 +80,7 @@ const MigrateSites = () => {
                 <p>Enter the UID that you are migrating <em>to</em></p>
                 <UIDInputField disabled={hasTargetAccountToken} disabledText={targetCompanyName} setTargetUID={setTargetUID} loading={isTargetAccountTokenPending} error={targetAccountTokenError} />
                 <Button variant='contained' onClick={handlMigrateButtonClick} disabled={!hasTargetAccountToken}>Sync</Button>
+                {isSyncing ? <progress value={currentExtensionIndex} max={sites.length} /> : <></>}
                 {isSyncing ? <FeedbackArea gridData={[]} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
             </ToolCard>
         </>
