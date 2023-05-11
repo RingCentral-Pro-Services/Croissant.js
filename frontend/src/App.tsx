@@ -32,6 +32,7 @@ import UserGroups from './components/pages/User Groups/UserGroups';
 import PushToTalk from './components/pages/Push To Talk/PushToTalk';
 import MigrateSites from './components/pages/Migration/Sites/MigrateSites';
 import MigrateQueues from './components/pages/Migration/Queues/MigrateQueues';
+import UserDataDownload from './components/pages/Migration/User Data Download/UserDataDownload';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -112,6 +113,7 @@ function App() {
                 <Route path='/exportrules' element={<CustomRulesExport />} />
                 <Route path='/migratesites' element={<MigrateSites />} />
                 <Route path='/migratequeues' element={<MigrateQueues />} />
+                <Route path='/userexport' element={<UserDataDownload />} />
               </Routes>
             </Suspense>
           </ErrorBoundary>
