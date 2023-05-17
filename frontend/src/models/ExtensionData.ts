@@ -80,6 +80,10 @@ export interface ExtensionData {
     ivrPin?: string,
     password?: string,
     phoneNumbers?: PhoneNumber[],
+    costCenter?: {
+        id: string
+        name: string
+    }
 }
 
 export interface CustomField {

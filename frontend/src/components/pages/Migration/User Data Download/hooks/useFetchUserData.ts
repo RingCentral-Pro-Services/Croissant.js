@@ -2,7 +2,7 @@ import { Extension } from "../../../../../models/Extension"
 import { Message } from "../../../../../models/Message"
 import { SyncError } from "../../../../../models/SyncError"
 import { RestCentral } from "../../../../../rcapi/RestCentral"
-import { UserDataBundle } from "../models/UserDataBundle"
+import { ERL, Role, UserDataBundle } from "../models/UserDataBundle"
 
 const useFetchUserData = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void, callback: () => void) => {
     const baseDataURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId'
@@ -17,6 +17,10 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
     const basePresenseAllowedUsersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/presence/permission'
     const baseIntercomURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/intercom'
     const baseDelegatesURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/delegates'
+    const basePERLURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/emergency-locations'
+    const baseRoleURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/assigned-role'
+    const baseIncommingCallInfoURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/incoming-call-info'
+    const baseBusinessHoursURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/business-hours'
     const baseWaitingPeriod = 250
 
     const fetchUserData = async (userDataBundle: UserDataBundle, extensions: Extension[]) => {
@@ -27,8 +31,8 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
 
         await fetchBaseData(userDataBundle, accessToken)
         await fetchDevices(userDataBundle, accessToken)
-        await fetchBusinessHoursCallHandling(userDataBundle, accessToken)
-        await fetchAfterHoursCallHandling(userDataBundle, accessToken)
+        await fetchBusinessHoursCallHandling(userDataBundle, extensions, accessToken)
+        await fetchAfterHoursCallHandling(userDataBundle, extensions, accessToken)
         await fetchNotificationSettings(userDataBundle, accessToken)
         await fetchCallerID(userDataBundle, accessToken)
         await fetchBlockedCallSettings(userDataBundle, accessToken)
@@ -38,6 +42,10 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
         await fetchPresenseAllowedUsers(userDataBundle, extensions, accessToken)
         await fetchIntercomStatus(userDataBundle, accessToken)
         await fetchDelegates(userDataBundle, accessToken)
+        await fetchPERLs(userDataBundle, accessToken)
+        await fetchRoles(userDataBundle, accessToken)
+        await fetchIncommingCallInfo(userDataBundle, accessToken)
+        await fetchBusinessHours(userDataBundle, accessToken)
         callback()
     }
 
@@ -99,7 +107,7 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
         }
     }
 
-    const fetchBusinessHoursCallHandling = async (userDataBundle: UserDataBundle, token: string) => {
+    const fetchBusinessHoursCallHandling = async (userDataBundle: UserDataBundle, extensions: Extension[], token: string) => {
         try {
             const headers = {
                 "Accept": "application/json",
@@ -108,6 +116,22 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
             }
             const response = await RestCentral.get(baseCallHandlingURL.replace('extensionId', `${userDataBundle.extension.data.id}`).replace('ruleId', 'business-hours-rule'), headers)
             userDataBundle.extendedData!.businessHoursCallHandling = response.data
+
+            if (userDataBundle.extendedData?.businessHoursCallHandling?.missedCall && userDataBundle.extendedData.businessHoursCallHandling.missedCall.actionType === 'ConnectToExtension') {
+                const extensionID = userDataBundle.extendedData.businessHoursCallHandling.missedCall.extension.id
+                const extension = extensions.find((ext) => `${ext.data.id}` === `${extensionID}`)
+                if (extension) {
+                    userDataBundle.extendedData.businessHoursCallHandling.missedCall.extension.id = `${extension.data.name} - ${extension.data.extensionNumber}`
+                }
+            }
+
+            if (userDataBundle.extendedData?.businessHoursCallHandling?.voicemail) {
+                const extensionID = userDataBundle.extendedData.businessHoursCallHandling.voicemail.recipient.id
+                const extension = extensions.find((ext) => `${ext.data.id}` === `${extensionID}`)
+                if (extension) {
+                    userDataBundle.extendedData.businessHoursCallHandling.voicemail.recipient.id = `${extension.data.name} - ${extension.data.extensionNumber}`
+                }
+            }
 
             if (response.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
@@ -127,7 +151,7 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
         }
     }
 
-    const fetchAfterHoursCallHandling = async (userDataBundle: UserDataBundle, token: string) => {
+    const fetchAfterHoursCallHandling = async (userDataBundle: UserDataBundle, extensions: Extension[], token: string) => {
         try {
             const headers = {
                 "Accept": "application/json",
@@ -136,6 +160,22 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
             }
             const response = await RestCentral.get(baseCallHandlingURL.replace('extensionId', `${userDataBundle.extension.data.id}`).replace('ruleId', 'after-hours-rule'), headers)
             userDataBundle.extendedData!.afterHoursCallHandling = response.data
+
+            if (userDataBundle.extendedData?.afterHoursCallHandling?.missedCall && userDataBundle.extendedData.afterHoursCallHandling.missedCall.actionType === 'ConnectToExtension') {
+                const extensionID = userDataBundle.extendedData.afterHoursCallHandling.missedCall.extension.id
+                const extension = extensions.find((ext) => `${ext.data.id}` === `${extensionID}`)
+                if (extension) {
+                    userDataBundle.extendedData.afterHoursCallHandling.missedCall.extension.id = `${extension.data.name} - ${extension.data.extensionNumber}`
+                }
+            }
+
+            if (userDataBundle.extendedData?.afterHoursCallHandling?.voicemail) {
+                const extensionID = userDataBundle.extendedData.afterHoursCallHandling.voicemail.recipient.id
+                const extension = extensions.find((ext) => `${ext.data.id}` === `${extensionID}`)
+                if (extension) {
+                    userDataBundle.extendedData.afterHoursCallHandling.voicemail.recipient.id = `${extension.data.name} - ${extension.data.extensionNumber}`
+                }
+            }
 
             if (response.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
@@ -417,6 +457,125 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
             console.log(e)
             postMessage(new Message(`Failed to get delegates for ${userDataBundle.extension.data.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(userDataBundle.extension.data.name, parseInt(userDataBundle.extension.data.extensionNumber), ['Failed to fetch delegates', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const fetchPERLs = async (userDataBundle: UserDataBundle, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const response = await RestCentral.get(basePERLURL.replace('extensionId', `${userDataBundle.extension.data.id}`), headers)
+            const responseLocations = response.data.records as ERL[]
+            const personalResponseLocations = responseLocations.filter((erl) => erl.visibility === 'Private')
+            userDataBundle.extendedData!.pERLs = personalResponseLocations
+            
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to get PERLs`)
+            console.log(e)
+            postMessage(new Message(`Failed to get PERLs for ${userDataBundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(userDataBundle.extension.data.name, parseInt(userDataBundle.extension.data.extensionNumber), ['Failed to fetch PERLs', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const fetchRoles = async (userDataBundle: UserDataBundle, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const response = await RestCentral.get(baseRoleURL.replace('extensionId', `${userDataBundle.extension.data.id}`), headers)
+            const roles = response.data.records as Role[]
+            userDataBundle.extendedData!.roles = roles
+            
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to get role`)
+            console.log(e)
+            postMessage(new Message(`Failed to get role for ${userDataBundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(userDataBundle.extension.data.name, parseInt(userDataBundle.extension.data.extensionNumber), ['Failed to fetch role', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const fetchIncommingCallInfo = async (userDataBundle: UserDataBundle, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const response = await RestCentral.get(baseIncommingCallInfoURL.replace('extensionId', `${userDataBundle.extension.data.id}`), headers)
+            userDataBundle.extendedData!.incommingCallInfo = response.data
+            
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to get incomming call info`)
+            console.log(e)
+            postMessage(new Message(`Failed to get incomming call info for ${userDataBundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(userDataBundle.extension.data.name, parseInt(userDataBundle.extension.data.extensionNumber), ['Failed to fetch incomming call info', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const fetchBusinessHours = async (userDataBundle: UserDataBundle, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const response = await RestCentral.get(baseBusinessHoursURL.replace('extensionId', `${userDataBundle.extension.data.id}`), headers)
+            userDataBundle.extendedData!.businessHours = response.data
+            
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to get business hours`)
+            console.log(e)
+            postMessage(new Message(`Failed to get business hours for ${userDataBundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(userDataBundle.extension.data.name, parseInt(userDataBundle.extension.data.extensionNumber), ['Failed to fetch business hours', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }

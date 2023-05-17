@@ -11,7 +11,7 @@ export class UserDataBundle {
         if (!this.extendedData?.devices) return []
 
         for (let i = 0; i < this.extendedData?.devices.length; i++) {
-            const row = new UserDataRow(this.extension, this.extendedData.devices[i], this.extendedData.businessHoursCallHandling, this.extendedData.afterHoursCallHandling, this.extendedData.notifications, this.extendedData.callerID, this.extendedData.blockedCallSettings, this.extendedData.blockedPhoneNumbers, this.extendedData.presenseLines, this.extendedData.presenseSettings, this.extendedData.presenseAllowedUsers, this.extendedData.intercomStatus, this.extendedData.delegates)
+            const row = new UserDataRow(this.extension, this.extendedData.devices[i], this.extendedData.businessHoursCallHandling, this.extendedData.afterHoursCallHandling, this.extendedData.notifications, this.extendedData.callerID, this.extendedData.blockedCallSettings, this.extendedData.blockedPhoneNumbers, this.extendedData.presenseLines, this.extendedData.presenseSettings, this.extendedData.presenseAllowedUsers, this.extendedData.intercomStatus, this.extendedData.delegates, this.extendedData.pERLs, this.extendedData.roles, this.extendedData.incommingCallInfo, this.extendedData.businessHours)
             rows.push(row)
         }
 
@@ -32,6 +32,10 @@ export interface ExtendedUserData {
     presenseAllowedUsers?: PresenseAllowedUser[]
     intercomStatus?: IntercomStatus
     delegates?: Delegate[]
+    pERLs?: ERL[]
+    roles?: Role[]
+    incommingCallInfo?: IncommingCallInfo
+    businessHours?: BusinessHours
 }
 
 export interface Device {
@@ -71,10 +75,11 @@ export interface Device {
 export interface CallHandling {
     greetings: Greeting[]
     screening: string
+    callHandlingAction: string
     forwarding: {
         notifyMySoftPhones: boolean
         notifyAdminSoftPhones: boolean
-        softPhonesRingCount: boolean
+        softPhonesRingCount: number
         softPhonesAlwaysRing: boolean
         ringingMode: string
         softPhonesPositionTop: boolean
@@ -96,6 +101,9 @@ export interface CallHandling {
     }
     missedCall: {
         actionType: string
+        externalNumber: {
+            phoneNumber: string
+        }
         extension: {
             id: string
             externalNumber: {
@@ -127,6 +135,23 @@ export interface Notifications {
     advancedMode: boolean
     voicemails: {
         includeTranscription: boolean
+        notifyByEmail: boolean
+        includeAttachment: boolean
+        markAsRead: boolean
+    }
+    inboundFaxes: {
+        notifyByEmail: boolean
+        includeAttachment: boolean
+        markAsRead: boolean
+    }
+    missedCalls: {
+        notifyByEmail: boolean
+    }
+    inboundTexts: {
+        notifyByEmail: boolean
+    }
+    outboundFaxes: {
+        notifyByEmail: boolean
     }
 }
 
@@ -162,7 +187,7 @@ export interface CallerID {
 export interface BlockedCallSettings {
     mode: string
     noCallerId: string
-    payphones: string
+    payPhones: string
 }
 
 export interface BlockedPhoneNumber {
@@ -200,5 +225,77 @@ export interface Delegate {
     extension: {
         extensionNumber: string
         name: string
+    }
+}
+
+export interface ERL {
+    name: string
+    visibility: string
+    address: {
+        street: string
+        street2: string
+        city: string
+        stateName: string
+        zip: string
+        country: string
+        customerName: string
+    }
+}
+
+export interface Role {
+    displayName: string
+    siteCompatible: string
+    siteRestricted: string
+}
+
+export interface IncommingCallInfo {
+    displayedNumber: string
+    maskUnknown: boolean
+    additionalDigits: {
+        enabled: boolean
+        position: string
+        template: string
+    }
+    condition: string
+    announcement: {
+        directCalls: string
+        callQueueCalls: string
+        includeCalledExtensionName: boolean
+    }
+    pinRequired: boolean
+}
+
+export interface BusinessHours {
+    schedule: {
+        weeklyRanges: {
+            monday?: [{
+                from: string
+                to: string
+            }]
+            tuesday?: [{
+                from: string
+                to: string
+            }]
+            wednesday?: [{
+                from: string
+                to: string
+            }]
+            thursday?: [{
+                from: string
+                to: string
+            }]
+            friday?: [{
+                from: string
+                to: string
+            }]
+            saturday?: [{
+                from: string
+                to: string
+            }]
+            sunday?: [{
+                from: string
+                to: string
+            }]
+        }
     }
 }

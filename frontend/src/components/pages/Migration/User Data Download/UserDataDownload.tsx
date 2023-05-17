@@ -87,7 +87,14 @@ const UserDataDownload = () => {
                             'Phone Nickname', 'Default Area Code', 'E911 Customer Name', 'E911  Street Address - Line 1', 'E911  Street Address - Line 2', 'E911  Town/City/Locality/Municipality',
                             'E911  State/Province/County', 'Postal Code', 'E911  Country', 'Is Device Locked?', 'Is WMI Enabled?', 'Appearance', 'Appearance: Ring my phone when any user I am monitoring rings',
                             'Appearance: Enable me to pick up a monitored line on hold', 'Permission: Allow other users to see my Presence status', 'Permission: Permitted to answer call',
-                            'Intercom', 'Delegates', 'Personal Meeting ID & Host Key', 'User Greeting', 'Screening', 'Connecting Message', 'Audio While Connecting', 'Hold Music']
+                            'Intercom', 'Delegates', 'Personal Meeting ID & Host Key', 'User Greeting', 'Screening', 'Connecting Message', 'Audio While Connecting', 'Hold Music',
+                            'User Greeting', 'Screening', 'Connecting Message', 'Audio While Connecting', 'Hold Music', 'Block option', 'Blocked Numbers', 'Robocalls', 'Trusted numbers',
+                            'Block calls with no caller ID', 'Block calls from pay phones Block option', 'Foward All Calls', 'Ring Type', 'Softphone Ring Time (My desktop & mobile apps)',
+                            'Device/Number Forward and Ring Time', 'Missed Calls', 'Voicemail Greeting', 'Voicemail Recipient', 'Ring Type', 'Softphone Ring Time (My desktop & mobile apps)',
+                            'Device/Number Forward and Ring Time', 'Missed Calls', 'Voicemail Greeting', 'Voicemail Recipient', 'Custom rules (Create a separate Google Sheet and link here if Ext has multiple rules)',
+                            'Incoming Call Information: Display Number & Play Announcement', 'Voicemail to Text', 'Personal ERL', 'Notification Email', 'Voicemail Notifications', 'Fax Notifications',
+                            'Missed Call Notifications', 'Fax Transmission Results', 'Text Message Notifications', 'Device Caller ID(s)', 'Fax Number Caller ID', 'Call Flip Caller ID', 'Ring Out Caller ID',
+                            'Ring Me Caller ID', 'AdditionalSoftphone Caller ID', 'Alternate Caller ID', 'Common Phone Caller ID', 'Mobile App Caller ID', 'Delegated Caller ID', 'Cost Center']
 
             const rows: UserDataRow[] = []
 
