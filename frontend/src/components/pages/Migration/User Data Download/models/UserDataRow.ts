@@ -1,14 +1,14 @@
 import ExcelFormattable from "../../../../../models/ExcelFormattable";
 import { Extension } from "../../../../../models/Extension";
-import { BlockedCallSettings, BlockedPhoneNumber, BusinessHours, CallerID, CallHandling, Delegate, Device, ERL, IncommingCallInfo, IntercomStatus, Notifications, PresenseAllowedUser, PresenseLine, PresenseSettings, Role } from "./UserDataBundle";
+import { BlockedCallSettings, BlockedPhoneNumber, BusinessHours, CallerID, CallHandling, Delegate, Device, ERL, ForwardAllCalls, IncommingCallInfo, IntercomStatus, Notifications, PresenseAllowedUser, PresenseLine, PresenseSettings, Role } from "./UserDataBundle";
 
 export class UserDataRow implements ExcelFormattable {
-    constructor(public extension: Extension, public device: Device, 
+    constructor(public extension: Extension, public device?: Device, public directNumber?: string, 
                 public businessHoursCallHandling?: CallHandling, public afterHoursCallHandling?: CallHandling,
                 public notifications?: Notifications, public callerID?: CallerID, public blockedCallSettings?: BlockedCallSettings,
                 public blockedPhoneNumbers?: BlockedPhoneNumber[], public presenseLines?: PresenseLine[], public presenseSettings?: PresenseSettings,
                 public presenseAllowedUsers?: PresenseAllowedUser[], public intercomStatus?: IntercomStatus, public delegates?: Delegate[], public erls?: ERL[],
-                public roles?: Role[], public incommingCallInfo?: IncommingCallInfo, public businessHours?: BusinessHours) {}
+                public roles?: Role[], public incommingCallInfo?: IncommingCallInfo, public businessHours?: BusinessHours, public forwardAllCalls?: ForwardAllCalls) {}
 
     toExcelRow(): string[] {
         console.log(this)
@@ -35,19 +35,19 @@ export class UserDataRow implements ExcelFormattable {
             '', // Receive RC communications
             '', // Send email when phone added
             this.extension.data.site?.name ?? '',
-            this.device.phoneLines[0].phoneInfo.phoneNumber, // Phone number
+            this.device?.phoneLines[0].phoneInfo.phoneNumber ?? this.directNumber ?? '', // Phone number
             '', // Temp number
-            this.device.model?.name ?? 'RingCentral Phone App',
-            this.device.serial,
-            this.device.name,
+            this.device ? this.device?.model?.name ?? 'RingCentral Phone App' : '',
+            this.device?.serial ?? '',
+            this.device?.name ?? '',
             '', // Default area code
-            this.device.emergencyServiceAddress?.customerName ?? '',
-            this.device.emergencyServiceAddress?.street ?? '',
-            this.device.emergencyServiceAddress?.street2 ?? '',
-            this.device.emergencyServiceAddress?.city ?? '',
-            this.device.emergencyServiceAddress?.stateName ?? '',
-            this.device.emergencyServiceAddress?.zip ?? '',
-            this.device.emergencyServiceAddress?.countryName ?? '',
+            this.device?.emergencyServiceAddress?.customerName ?? '',
+            this.device?.emergencyServiceAddress?.street ?? '',
+            this.device?.emergencyServiceAddress?.street2 ?? '',
+            this.device?.emergencyServiceAddress?.city ?? '',
+            this.device?.emergencyServiceAddress?.stateName ?? '',
+            this.device?.emergencyServiceAddress?.zip ?? '',
+            this.device?.emergencyServiceAddress?.countryName ?? '',
             '', // Device locked?
             '', // WMI
             this.prettyPresenseLines(),
@@ -74,7 +74,7 @@ export class UserDataRow implements ExcelFormattable {
             '', // Trusted numbers
             this.blockedCallSettings?.noCallerId ?? '',
             this.blockedCallSettings?.payPhones ?? '',
-            '', // Forward all calls
+            this.prettyForwardAllCalls(),
             this.businessHoursCallHandling?.forwarding.ringingMode ?? '',
             this.prettyRingTime(this.businessHoursCallHandling?.forwarding.softPhonesRingCount),
             this.prettyDeviceRingTime(),
@@ -376,6 +376,25 @@ export class UserDataRow implements ExcelFormattable {
             result += `Saturday: ${this.convertTo12HourTime(weeklyRanges.saturday[0].from)} - ${this.convertTo12HourTime(weeklyRanges.saturday[0].to)}\n`
         }
         return result
+    }
+
+    prettyForwardAllCalls() {
+        if (!this.forwardAllCalls || !this.forwardAllCalls.enabled) return 'Disabled'
+
+        // UnconditionalForwarding, TransferToExtension, TakeMessagesOnly, PlayAnnouncementOnly
+        if (this.forwardAllCalls.callHandlingAction === 'UnconditionalForwarding') {
+            return `Forward to ${this.forwardAllCalls.phoneNumber.phoneNumber}`
+        }
+        else if (this.forwardAllCalls.callHandlingAction === 'TransferToExtension') {
+            return `Forward to ${this.forwardAllCalls.extension?.name}`
+        }
+        else if (this.forwardAllCalls.callHandlingAction === 'TakeMessagesOnly') {
+            return `Forward to voicemail`
+        }
+        else if (this.forwardAllCalls.callHandlingAction === 'PlayAnnouncementOnly') {
+            return `Forward to announcement`
+        }
+        return ''
     }
 
     convertTo12HourTime(time: string) {

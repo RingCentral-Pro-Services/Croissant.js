@@ -8,11 +8,20 @@ export class UserDataBundle {
 
     toRows(): UserDataRow[] {
         const rows: UserDataRow[] = []
-        if (!this.extendedData?.devices) return []
+        if (!this.extendedData) return []
 
-        for (let i = 0; i < this.extendedData?.devices.length; i++) {
-            const row = new UserDataRow(this.extension, this.extendedData.devices[i], this.extendedData.businessHoursCallHandling, this.extendedData.afterHoursCallHandling, this.extendedData.notifications, this.extendedData.callerID, this.extendedData.blockedCallSettings, this.extendedData.blockedPhoneNumbers, this.extendedData.presenseLines, this.extendedData.presenseSettings, this.extendedData.presenseAllowedUsers, this.extendedData.intercomStatus, this.extendedData.delegates, this.extendedData.pERLs, this.extendedData.roles, this.extendedData.incommingCallInfo, this.extendedData.businessHours)
-            rows.push(row)
+        if (this.extendedData.devices) {
+            for (let i = 0; i < this.extendedData?.devices.length; i++) {
+                const row = new UserDataRow(this.extension, this.extendedData.devices[i], undefined, this.extendedData.businessHoursCallHandling, this.extendedData.afterHoursCallHandling, this.extendedData.notifications, this.extendedData.callerID, this.extendedData.blockedCallSettings, this.extendedData.blockedPhoneNumbers, this.extendedData.presenseLines, this.extendedData.presenseSettings, this.extendedData.presenseAllowedUsers, this.extendedData.intercomStatus, this.extendedData.delegates, this.extendedData.pERLs, this.extendedData.roles, this.extendedData.incommingCallInfo, this.extendedData.businessHours, this.extendedData.forwardAllCalls)
+                rows.push(row)
+            }
+        }
+
+        if (this.extendedData.directNumbers) {
+            for (const directNumber of this.extendedData.directNumbers) {
+                const row = new UserDataRow(this.extension, undefined, directNumber.phoneNumber, this.extendedData.businessHoursCallHandling, this.extendedData.afterHoursCallHandling, this.extendedData.notifications, this.extendedData.callerID, this.extendedData.blockedCallSettings, this.extendedData.blockedPhoneNumbers, this.extendedData.presenseLines, this.extendedData.presenseSettings, this.extendedData.presenseAllowedUsers, this.extendedData.intercomStatus, this.extendedData.delegates, this.extendedData.pERLs, this.extendedData.roles, this.extendedData.incommingCallInfo, this.extendedData.businessHours, this.extendedData.forwardAllCalls)
+                rows.push(row)
+            }
         }
 
         return rows
@@ -36,6 +45,8 @@ export interface ExtendedUserData {
     roles?: Role[]
     incommingCallInfo?: IncommingCallInfo
     businessHours?: BusinessHours
+    directNumbers?: PhoneNumber[]
+    forwardAllCalls?: ForwardAllCalls
 }
 
 export interface Device {
@@ -297,5 +308,31 @@ export interface BusinessHours {
                 to: string
             }]
         }
+    }
+}
+
+export interface PhoneNumber {
+    id: string
+    phoneNumber: string
+    usageType: string
+    extension?: {
+        id: string
+        extensionNumber: string
+    }
+}
+
+export interface ForwardAllCalls {
+    enabled: boolean
+    ranges: [{
+        from: string
+        to: string
+    }]
+    callHandlingAction: string
+    extension?: {
+        name: string
+        extensionNumber: string
+    }
+    phoneNumber: {
+        phoneNumber: string
     }
 }

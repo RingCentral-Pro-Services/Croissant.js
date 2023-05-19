@@ -2,7 +2,7 @@ import { Extension } from "../../../../../models/Extension"
 import { Message } from "../../../../../models/Message"
 import { SyncError } from "../../../../../models/SyncError"
 import { RestCentral } from "../../../../../rcapi/RestCentral"
-import { ERL, Role, UserDataBundle } from "../models/UserDataBundle"
+import { ERL, PhoneNumber, Role, UserDataBundle } from "../models/UserDataBundle"
 
 const useFetchUserData = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void, callback: () => void) => {
     const baseDataURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId'
@@ -21,6 +21,8 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
     const baseRoleURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/assigned-role'
     const baseIncommingCallInfoURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/incoming-call-info'
     const baseBusinessHoursURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/business-hours'
+    const basePhoneNumbersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/phone-number?usageType=DirectNumber&perPage=1000'
+    const baseForwardAllCallsURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/forward-all-calls'
     const baseWaitingPeriod = 250
 
     const fetchUserData = async (userDataBundle: UserDataBundle, extensions: Extension[]) => {
@@ -46,6 +48,8 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
         await fetchRoles(userDataBundle, accessToken)
         await fetchIncommingCallInfo(userDataBundle, accessToken)
         await fetchBusinessHours(userDataBundle, accessToken)
+        await fetchDirectNumbers(userDataBundle, accessToken)
+        await fetchForwardAllCalls(userDataBundle, accessToken)
         callback()
     }
 
@@ -576,6 +580,69 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
             console.log(e)
             postMessage(new Message(`Failed to get business hours for ${userDataBundle.extension.data.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(userDataBundle.extension.data.name, parseInt(userDataBundle.extension.data.extensionNumber), ['Failed to fetch business hours', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const fetchDirectNumbers = async (userDataBundle: UserDataBundle, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const response = await RestCentral.get(basePhoneNumbersURL.replace('extensionId', `${userDataBundle.extension.data.id}`), headers)
+            const numbers = response.data.records as PhoneNumber[]
+            const deviceNumbers = userDataBundle.extendedData!.devices.map((device) => device.phoneLines[0].phoneInfo.phoneNumber)
+            const nonDeviceNumbers = numbers.filter((number) => !deviceNumbers.includes(number.phoneNumber))
+            const directNumbers = nonDeviceNumbers.filter((number) => !number.extension)
+
+            userDataBundle.extendedData!.directNumbers = directNumbers
+            
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to get direct numbers`)
+            console.log(e)
+            postMessage(new Message(`Failed to get direct numbers for ${userDataBundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(userDataBundle.extension.data.name, parseInt(userDataBundle.extension.data.extensionNumber), ['Failed to fetch direct numbers', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const fetchForwardAllCalls = async (userDataBundle: UserDataBundle, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const response = await RestCentral.get(baseForwardAllCallsURL.replace('extensionId', `${userDataBundle.extension.data.id}`), headers)
+            userDataBundle.extendedData!.forwardAllCalls = response.data
+            
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to get forward all calls settings`)
+            console.log(e)
+            postMessage(new Message(`Failed to get forward all calls settings for ${userDataBundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(userDataBundle.extension.data.name, parseInt(userDataBundle.extension.data.extensionNumber), ['Failed to fetch forward all calls settings', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
