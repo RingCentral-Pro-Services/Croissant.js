@@ -23,7 +23,7 @@ export class UserDataRow implements ExcelFormattable {
             this.extension.data.contact.department ?? '',
             this.extension.data.contact.jobTitle ?? '',
             '', // User groups
-            '', // Contact phone
+            this.extension.data.contact.businessPhone ?? '', // Contact phone
             this.extension.data.contact.mobilePhone ?? '',
             this.extension.data.regionalSettings?.formattingLocale.name ?? '',
             this.extension.data.regionalSettings?.formattingLocale.name ?? '',
@@ -305,7 +305,7 @@ export class UserDataRow implements ExcelFormattable {
     prettyDeviceCallerID() {
         let result = ''
 
-        if (!this.callerID) return ''
+        if (!this.callerID || !this.device) return ''
 
         for (const callerIdOption of this.callerID?.byDevice) {
             if (Object.keys(callerIdOption.callerId).length === 0) result += `${callerIdOption.device.name} - Not set\n`
