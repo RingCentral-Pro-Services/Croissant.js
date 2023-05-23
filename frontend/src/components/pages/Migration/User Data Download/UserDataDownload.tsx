@@ -9,8 +9,10 @@ import useExtensions from "../../../../rcapi/useExtensions";
 import useGetAccessToken from "../../../../rcapi/useGetAccessToken";
 import AdaptiveFilter from "../../../shared/AdaptiveFilter";
 import Header from "../../../shared/Header";
+import MessagesArea from "../../../shared/MessagesArea";
 import ToolCard from "../../../shared/ToolCard";
 import UIDInputField from "../../../shared/UIDInputField";
+import useUserGroupsList from "../../User Groups/hooks/useUserGroupsList";
 import useFetchUserData from "./hooks/useFetchUserData";
 import { UserDataBundle } from "./models/UserDataBundle";
 import { UserDataRow } from "./models/UserDataRow";
@@ -33,6 +35,7 @@ const UserDataDownload = () => {
     const {fetchToken, companyName, hasCustomerToken, error: tokenError, isTokenPending, userName} = useGetAccessToken()
     const {postMessage, messages, errors, postError} = useMessageQueue()
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
+    const {fetchUserGroups, userGroups, completedUserGroups, isUserGroupsListPending} = useUserGroupsList(postMessage, postTimedMessage, postError)
     const {extensionsList, fetchExtensions, isExtensionListPending, isMultiSiteEnabled} = useExtensions(postMessage)
     const {fetchUserData} = useFetchUserData(postMessage, postTimedMessage, postError,increaseProgress)
     const {writeExcel} = useWriteExcelFile()
@@ -50,13 +53,18 @@ const UserDataDownload = () => {
 
     useEffect(() => {
         if (isExtensionListPending) return
+        fetchUserGroups()
+    }, [isExtensionListPending])
+
+    useEffect(() => {
+        if (isUserGroupsListPending) return
         if (!isMultiSiteEnabled) return
 
         const siteNames = extensionsList.filter((ext) => ext.prettyType() === 'Site').map((ext) => ext.data.name)
         setSites(['Main Site', ...siteNames])
         setSelectedSites(['Main Site', ...siteNames])
         setShouldShowSiteFilter(true)
-    }, [isExtensionListPending])
+    }, [isUserGroupsListPending])
 
     useEffect(() => {
         const selectedExtensions = extensionsList.filter((ext) => ext.prettyType() === 'User' && ext.data.status !== 'Unassigned' && selectedSites.includes(ext.data.site?.name ?? ''))
@@ -96,6 +104,12 @@ const UserDataDownload = () => {
                             'Missed Call Notifications', 'Fax Transmission Results', 'Text Message Notifications', 'Device Caller ID(s)', 'Fax Number Caller ID', 'Call Flip Caller ID', 'Ring Out Caller ID',
                             'Ring Me Caller ID', 'AdditionalSoftphone Caller ID', 'Alternate Caller ID', 'Common Phone Caller ID', 'Mobile App Caller ID', 'Delegated Caller ID', 'Cost Center']
 
+            for (let i = 0; i < userDataBundles.length; i++) {
+                let bundle = userDataBundles[i]
+                const memberGroups = userGroups.filter((group) => group.data.users.map((user) => user.extensionNumber).includes(bundle.extension.data.extensionNumber)).map((group) => group.data.displayName)
+                bundle.userGroups = memberGroups.join('\n')
+            }
+
             const rows: UserDataRow[] = []
 
             for (const bundle of userDataBundles) {
@@ -119,8 +133,9 @@ const UserDataDownload = () => {
                 <h2>User Data Export</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                 {shouldShowSiteFilter ? <AdaptiveFilter options={sites} defaultSelected={sites} title='Sites' placeholder='Search' setSelected={setSelectedSites} /> : <></>}
-                <Button variant='contained' onClick={handleButtonClick} disabled={isExtensionListPending || isSyncing}>Go</Button>
+                <Button variant='contained' onClick={handleButtonClick} disabled={isUserGroupsListPending || isSyncing}>Go</Button>
                 {isSyncing ? <progress className="healthy-margin-top" value={currentExtensionIndex} max={userDataBundles.length} /> : <></>}
+                <MessagesArea messages={messages} />
             </ToolCard>
         </>
     )

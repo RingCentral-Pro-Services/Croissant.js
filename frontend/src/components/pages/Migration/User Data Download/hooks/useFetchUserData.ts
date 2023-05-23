@@ -23,6 +23,7 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
     const baseBusinessHoursURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/business-hours'
     const basePhoneNumbersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/phone-number?usageType=DirectNumber&perPage=1000'
     const baseForwardAllCallsURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/forward-all-calls'
+    const basePMIURL = 'https://platform.ringcentral.com/rcvideo/v2/account/~/extension/extensionId/bridges/default'
     const baseWaitingPeriod = 250
 
     const fetchUserData = async (userDataBundle: UserDataBundle, extensions: Extension[]) => {
@@ -33,6 +34,7 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
 
         await fetchBaseData(userDataBundle, accessToken)
         await fetchDevices(userDataBundle, accessToken)
+        await fetchBusinessHours(userDataBundle, accessToken)
         await fetchBusinessHoursCallHandling(userDataBundle, extensions, accessToken)
         await fetchAfterHoursCallHandling(userDataBundle, extensions, accessToken)
         await fetchNotificationSettings(userDataBundle, accessToken)
@@ -47,9 +49,10 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
         await fetchPERLs(userDataBundle, accessToken)
         await fetchRoles(userDataBundle, accessToken)
         await fetchIncommingCallInfo(userDataBundle, accessToken)
-        await fetchBusinessHours(userDataBundle, accessToken)
+        // await fetchBusinessHours(userDataBundle, accessToken)
         await fetchDirectNumbers(userDataBundle, accessToken)
         await fetchForwardAllCalls(userDataBundle, accessToken)
+        await fetchPMI(userDataBundle, accessToken)
         callback()
     }
 
@@ -156,6 +159,8 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
     }
 
     const fetchAfterHoursCallHandling = async (userDataBundle: UserDataBundle, extensions: Extension[], token: string) => {
+        if (Object.keys(userDataBundle.extendedData!.businessHours!.schedule).length === 0) return
+
         try {
             const headers = {
                 "Accept": "application/json",
@@ -643,6 +648,34 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
             console.log(e)
             postMessage(new Message(`Failed to get forward all calls settings for ${userDataBundle.extension.data.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(userDataBundle.extension.data.name, parseInt(userDataBundle.extension.data.extensionNumber), ['Failed to fetch forward all calls settings', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const fetchPMI = async (userDataBundle: UserDataBundle, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const response = await RestCentral.get(basePMIURL.replace('extensionId', `${userDataBundle.extension.data.id}`), headers)
+            userDataBundle.extendedData!.defaultBridge = response.data
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to get PMI`)
+            console.log(e)
+            postMessage(new Message(`Failed to get PMI for ${userDataBundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(userDataBundle.extension.data.name, parseInt(userDataBundle.extension.data.extensionNumber), ['Failed to fetch PMI', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }

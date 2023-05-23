@@ -1,20 +1,21 @@
 import ExcelFormattable from "../../../../../models/ExcelFormattable";
 import { Extension } from "../../../../../models/Extension";
-import { BlockedCallSettings, BlockedPhoneNumber, BusinessHours, CallerID, CallHandling, Delegate, Device, ERL, ForwardAllCalls, IncommingCallInfo, IntercomStatus, Notifications, PresenseAllowedUser, PresenseLine, PresenseSettings, Role } from "./UserDataBundle";
+import { BlockedCallSettings, BlockedPhoneNumber, BusinessHours, CallerID, CallHandling, DefaultBridge, Delegate, Device, ERL, ForwardAllCalls, IncommingCallInfo, IntercomStatus, Notifications, PresenseAllowedUser, PresenseLine, PresenseSettings, Role } from "./UserDataBundle";
 
 export class UserDataRow implements ExcelFormattable {
-    constructor(public extension: Extension, public device?: Device, public directNumber?: string, 
+    constructor(public extension: Extension, public type: string, public device?: Device, public directNumber?: string, 
                 public businessHoursCallHandling?: CallHandling, public afterHoursCallHandling?: CallHandling,
                 public notifications?: Notifications, public callerID?: CallerID, public blockedCallSettings?: BlockedCallSettings,
                 public blockedPhoneNumbers?: BlockedPhoneNumber[], public presenseLines?: PresenseLine[], public presenseSettings?: PresenseSettings,
                 public presenseAllowedUsers?: PresenseAllowedUser[], public intercomStatus?: IntercomStatus, public delegates?: Delegate[], public erls?: ERL[],
-                public roles?: Role[], public incommingCallInfo?: IncommingCallInfo, public businessHours?: BusinessHours, public forwardAllCalls?: ForwardAllCalls) {}
+                public roles?: Role[], public incommingCallInfo?: IncommingCallInfo, public businessHours?: BusinessHours, public forwardAllCalls?: ForwardAllCalls,
+                public defaultBridge?: DefaultBridge, public userGroups?: string) {}
 
     toExcelRow(): string[] {
         console.log(this)
         return [
             '', // Initial upon completion
-            '', // User type
+            this.type,
             this.extension.data.extensionNumber,
             '', // Temporary extension
             this.extension.data.contact.firstName,
@@ -22,20 +23,20 @@ export class UserDataRow implements ExcelFormattable {
             this.extension.data.contact.email,
             this.extension.data.contact.department ?? '',
             this.extension.data.contact.jobTitle ?? '',
-            '', // User groups
-            this.extension.data.contact.businessPhone ?? '', // Contact phone
+            this.userGroups ?? '', // User groups
+            this.extension.data.contact.businessPhone ?? '',
             this.extension.data.contact.mobilePhone ?? '',
             this.extension.data.regionalSettings?.formattingLocale.name ?? '',
             this.extension.data.regionalSettings?.formattingLocale.name ?? '',
             this.extension.data.regionalSettings?.language.name ?? '',
             this.extension.data.regionalSettings?.timeFormat ?? '',
-            this.prettyBusinessHours(), // User hours
+            this.prettyBusinessHours(),
             this.roles?.at(0)?.displayName ?? '',
             this.extension.data.hidden ? 'ON' : 'OFF',
             '', // Receive RC communications
             '', // Send email when phone added
             this.extension.data.site?.name ?? '',
-            this.device?.phoneLines[0].phoneInfo.phoneNumber ?? this.directNumber ?? '', // Phone number
+            this.device?.phoneLines[0].phoneInfo.phoneNumber ?? this.directNumber ?? '',
             '', // Temp number
             this.device ? this.device?.model?.name ?? 'RingCentral Phone App' : '',
             this.device?.serial ?? '',
@@ -57,7 +58,7 @@ export class UserDataRow implements ExcelFormattable {
             this.prettyPresenseUsers(),
             this.intercomStatus?.enabled ? 'ON' : 'OFF',
             this.prettyDelegates(),
-            '', // PMI
+            this.defaultBridge?.pins.web ?? '',
             this.greeting('Introductory'),
             this.businessHoursCallHandling?.screening ?? '',
             this.greeting('ConnectingMessage'),
@@ -88,16 +89,16 @@ export class UserDataRow implements ExcelFormattable {
             this.afterHoursGreeting('Voicemail'),
             this.afterHoursCallHandling?.voicemail.recipient.id ?? '',
             '', // Custom roles
-            this.prettyIncommingCallInfo(), // Incoming call info
+            this.prettyIncommingCallInfo(),
             this.notifications?.voicemails.includeTranscription ? 'ON' : 'OFF',
-            this.prettyPERLs(), // Personal ERL
+            this.prettyPERLs(),
             this.notifications?.emailAddresses.join('\n') ?? '',
             this.prettyVoicemailNotificationSettings(),
             this.prettyFaxNotificationSettings(),
             this.notifications?.missedCalls.notifyByEmail ? 'Notify' : 'Do not notify',
             this.notifications?.outboundFaxes.notifyByEmail ? 'Notify' : 'Do not notify',
             this.notifications?.inboundTexts.notifyByEmail ? 'Notify' : 'Do not notify',
-            this.prettyDeviceCallerID(), // Device caller IDs
+            this.prettyDeviceCallerID(),
             this.callerIDNumber('FaxNumber'),
             this.callerIDNumber('CallFlip'),
             this.callerIDNumber('RingOut'),
@@ -383,7 +384,7 @@ export class UserDataRow implements ExcelFormattable {
 
         // UnconditionalForwarding, TransferToExtension, TakeMessagesOnly, PlayAnnouncementOnly
         if (this.forwardAllCalls.callHandlingAction === 'UnconditionalForwarding') {
-            return `Forward to ${this.forwardAllCalls.phoneNumber.phoneNumber}`
+            return `Forward to ${this.forwardAllCalls.externalNumber.phoneNumber}`
         }
         else if (this.forwardAllCalls.callHandlingAction === 'TransferToExtension') {
             return `Forward to ${this.forwardAllCalls.extension?.name}`
