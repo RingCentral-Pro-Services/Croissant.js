@@ -8,6 +8,7 @@ import useWriteExcelFile from "../../../../hooks/useWriteExcelFile";
 import useExtensions from "../../../../rcapi/useExtensions";
 import useGetAccessToken from "../../../../rcapi/useGetAccessToken";
 import AdaptiveFilter from "../../../shared/AdaptiveFilter";
+import FeedbackArea from "../../../shared/FeedbackArea";
 import Header from "../../../shared/Header";
 import MessagesArea from "../../../shared/MessagesArea";
 import ToolCard from "../../../shared/ToolCard";
@@ -135,7 +136,7 @@ const UserDataDownload = () => {
                 {shouldShowSiteFilter ? <AdaptiveFilter options={sites} defaultSelected={sites} title='Sites' placeholder='Search' setSelected={setSelectedSites} /> : <></>}
                 <Button variant='contained' onClick={handleButtonClick} disabled={isUserGroupsListPending || isSyncing}>Go</Button>
                 {isSyncing ? <progress className="healthy-margin-top" value={currentExtensionIndex} max={userDataBundles.length} /> : <></>}
-                <MessagesArea messages={messages} />
+                <FeedbackArea gridData={[]} messages={messages} timedMessages={timedMessages} errors={errors} />
             </ToolCard>
         </>
     )

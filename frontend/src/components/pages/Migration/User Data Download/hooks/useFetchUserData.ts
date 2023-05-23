@@ -462,10 +462,8 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
             if (e.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
-            console.log(`Failed to get delegates`)
-            console.log(e)
-            postMessage(new Message(`Failed to get delegates for ${userDataBundle.extension.data.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(userDataBundle.extension.data.name, parseInt(userDataBundle.extension.data.extensionNumber), ['Failed to fetch delegates', ''], e.error ?? ''))
+            // postMessage(new Message(`Failed to get delegates for ${userDataBundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            // postError(new SyncError(userDataBundle.extension.data.name, parseInt(userDataBundle.extension.data.extensionNumber), ['Failed to fetch delegates', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
