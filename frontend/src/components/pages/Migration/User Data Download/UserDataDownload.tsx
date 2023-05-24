@@ -136,7 +136,7 @@ const UserDataDownload = () => {
                 {shouldShowSiteFilter ? <AdaptiveFilter options={sites} defaultSelected={sites} title='Sites' placeholder='Search' setSelected={setSelectedSites} /> : <></>}
                 <Button variant='contained' onClick={handleButtonClick} disabled={isUserGroupsListPending || isSyncing}>Go</Button>
                 {isSyncing ? <progress className="healthy-margin-top" value={currentExtensionIndex} max={userDataBundles.length} /> : <></>}
-                <FeedbackArea gridData={[]} messages={messages} timedMessages={timedMessages} errors={errors} />
+                <FeedbackArea gridData={[]} defaultTab={1} messages={messages} timedMessages={timedMessages} errors={errors} />
             </ToolCard>
         </>
     )

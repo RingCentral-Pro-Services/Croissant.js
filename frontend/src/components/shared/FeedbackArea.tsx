@@ -28,10 +28,11 @@ interface TabPanelProps {
     onFilterSelection?: (selected: DataGridFormattable[]) => void
     showSiteFilter?: boolean
     additiveFilter?: boolean
+    defaultTab?: number
   }
 
-const FeedbackArea: React.FC<FeedbackAreaProps> = ({messages, timedMessages, errors, gridData = [], onFilterSelection, showSiteFilter = false, additiveFilter = false}) => {
-    const [value, setValue] = React.useState(0);
+const FeedbackArea: React.FC<FeedbackAreaProps> = ({messages, timedMessages, errors, gridData = [], onFilterSelection, showSiteFilter = false, additiveFilter = false, defaultTab = 0}) => {
+    const [value, setValue] = React.useState(defaultTab);
     const {writeExcel} = useWriteExcelFile()
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {

@@ -97,27 +97,6 @@ const MigrateQueues = () => {
         console.log(extensions)
     }
 
-    const handlePayloadButtonClick = () => {
-        for (const queue of adjustedQueues) {
-            console.log('Queue')
-            console.log(queue)
-
-            console.log('Payload')
-            console.log(queue.createPayload())
-
-            console.log('Call Handling payload')
-            console.log(queue.payload())
-
-            console.log('Aftet hours payload')
-            console.log(queue.afterHoursPayload())
-
-            console.log('Managers payload')
-            console.log(queue.managersPayload())
-
-            console.log("----------------------------")
-        }
-    }
-
     return (
         <>
             <Header title='Migrate Queues' body='Migrate queues from one account to another' />
@@ -129,7 +108,6 @@ const MigrateQueues = () => {
             <ToolCard>
                 <h2>Select Queues</h2>
                 <Button variant='contained' onClick={() => setIsAuditing(true)} disabled={!hasOriginalAccountToken || isExtensionListPending || isAuditing}>Discover Queues</Button>
-                <p>Audited Queues: {auditedQueues.length}</p>
                 {isAuditing ? <progress value={currentExtensionIndex} max={selectedExtensions.length} /> : <></>}
                 {isExtensionListPending ? <></> : <FeedbackArea gridData={callQueues} onFilterSelection={handleFilterSelection} messages={[]} errors={[]} timedMessages={[]} />}
             </ToolCard>
@@ -137,7 +115,6 @@ const MigrateQueues = () => {
                 <h2>Target Account</h2>
                 <p>Enter the UID that you are migrating <em>to</em></p>
                 <UIDInputField disabled={hasTargetAccountToken} disabledText={targetCompanyName} setTargetUID={setTargetUID} loading={isTargetAccountTokenPending} error={targetAccountTokenError} />
-                <Button onClick={handlePayloadButtonClick}>Payload</Button>
                 <Button variant='contained' onClick={() => setIsSyncing(true)} disabled={isQueueAdjustmentPending}>Migrate</Button>
                 {isSyncing ? <progress value={migrationIndex} max={adjustedQueues.length} /> : <></>}
             </ToolCard>
