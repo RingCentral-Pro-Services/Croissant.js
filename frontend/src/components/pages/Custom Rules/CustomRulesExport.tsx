@@ -13,6 +13,7 @@ import AdaptiveFilter from "../../shared/AdaptiveFilter";
 import FeedbackArea from "../../shared/FeedbackArea";
 import Header from "../../shared/Header";
 import UIDInputField from "../../shared/UIDInputField";
+import useGetCompanyRules from "./hooks/useGetCompanyRules";
 import useGetCustomRules from "./hooks/useGetCustomRules";
 import { CustomRule } from "./models/CustomRule";
 
@@ -27,6 +28,7 @@ const CustomRulesExport = () => {
     const [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
     const [auditedRules, setAuditedRules] = useState<CustomRule[]>([])
     const [isAuditing, setIsAuditing] = useState(false)
+    const [isAuditingCompanyRules, setIsAuditingCompanyRules] = useState(false)
 
     const increaseProgress = (rules: CustomRule[]) => {
         setCurrentExtensionIndex(currentExtensionIndex + 1)
@@ -39,6 +41,7 @@ const CustomRulesExport = () => {
     let {messages, errors, postMessage, postError} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const { extensionsList, isExtensionListPending, isMultiSiteEnabled, fetchExtensions } = useExtensions(postMessage)
+    const {fetchCompanyRules, isCompanyRuleListPending, companyRules, maxCompanyRuleProgress, companyRuleProgress} = useGetCompanyRules(postMessage, postTimedMessage, postError)
     const {fetchRules} = useGetCustomRules(postMessage, postTimedMessage, postError, increaseProgress)
     const {writePrettyExcel} = useWritePrettyExcel()
 
@@ -52,6 +55,11 @@ const CustomRulesExport = () => {
         if (!hasCustomerToken) return
         fetchExtensions()
     }, [hasCustomerToken])
+
+    // useEffect(() => {
+    //     if (isExtensionListPending) return
+    //     fetchCompanyRules(extensionsList)
+    // }, [isExtensionListPending])
 
     useEffect(() => {
         if (isExtensionListPending) return
@@ -69,11 +77,6 @@ const CustomRulesExport = () => {
     }, [extensionsList, isExtensionListPending])
 
     useEffect(() => {
-        console.log('Selected Extension Types')
-        console.log(selectedExtensionTypes)
-
-        console.log('Selected Sites')
-        console.log(selectedSiteNames)
         let selected: Extension[] = []
 
         if (isMultiSiteEnabled && selectedExtensionTypes.includes('Site')) {
@@ -93,13 +96,24 @@ const CustomRulesExport = () => {
 
     useEffect(() => {
         if (isAuditing && currentExtensionIndex >= selectedExtensions.length) {
-            writePrettyExcel([], auditedRules, 'Custom Rules', `Custom Rules - ${sanitize(companyName)}.xlsx`, '/custom-rules-template.xlsx')
+            writePrettyExcel([], [...companyRules, ...auditedRules], 'Custom Rules', `Custom Rules - ${sanitize(companyName)}.xlsx`, '/custom-rules-template.xlsx')
         }
     }, [currentExtensionIndex, isAuditing])
+
+    useEffect(() => {
+        if (isCompanyRuleListPending) return
+        setIsAuditing(true)
+    }, [isCompanyRuleListPending])
     
 
     const handleButtonClick = () => {
-        setIsAuditing(true)
+        if (selectedExtensionTypes.includes('Site')) {
+            setIsAuditingCompanyRules(true)
+            fetchCompanyRules(extensionsList)
+        }
+        else {
+            setIsAuditing(true)
+        }
     }
 
 
@@ -110,9 +124,10 @@ const CustomRulesExport = () => {
                 <h2>Export Custom Rules</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                 {isFilterReady && isMultiSiteEnabled ? <AdaptiveFilter options={siteNames} defaultSelected={siteNames} title='Sites' placeholder='Search...' setSelected={setSelectedSiteNames} />  : <></>}
-                {isFilterReady && isMultiSiteEnabled ? <AdaptiveFilter options={supportedExtensionTypes} defaultSelected={supportedExtensionTypes} title='Extension types' placeholder='Search...' setSelected={setSelectedExtensionTypes} />  : <></>}
-                <Button variant='contained' onClick={handleButtonClick} disabled={isExtensionListPending || isAuditing}>Go</Button>
-                {isAuditing ? <progress value={currentExtensionIndex} max={selectedExtensions.length} /> : <></>}
+                {isFilterReady ? <AdaptiveFilter options={supportedExtensionTypes} defaultSelected={supportedExtensionTypes} title='Extension types' placeholder='Search...' setSelected={setSelectedExtensionTypes} />  : <></>}
+                <Button variant='contained' onClick={handleButtonClick} disabled={isExtensionListPending || isAuditingCompanyRules || isAuditing}>Go</Button>
+                {isAuditingCompanyRules ? <> <p>Main Site Rules</p> <progress value={companyRuleProgress} max={maxCompanyRuleProgress} /> </> : <></>}
+                {isAuditing && selectedExtensions.length != 0 ? <progress value={currentExtensionIndex} max={selectedExtensions.length} /> : <></>}
                 {isExtensionListPending ? <></> : <FeedbackArea gridData={selectedExtensions} messages={messages} errors={errors} timedMessages={timedMessages} />}
             </div>
         </>

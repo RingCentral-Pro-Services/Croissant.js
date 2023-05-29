@@ -26,7 +26,7 @@ export class CustomRule implements DataGridFormattable, ExcelFormattable {
                 this.data.schedule.weeklyRanges?.saturday ? `${this.convertTo12HourTime(this.data.schedule.weeklyRanges.saturday[0].from)} - ${this.convertTo12HourTime(this.data.schedule.weeklyRanges.saturday[0].to)}` : '',
                 this.data.ranges ? this.data.ranges.map(range => `${range.from} - ${range.to}`).join(', ') : '',
                 this.prettyCallHandlingAction(),
-                this.data.callHandlingAction === 'TransferToExtension' && this.data.transfer ? this.data.transfer.extension.id : '',
+                (this.data.callHandlingAction === 'TransferToExtension' || this.data.callHandlingAction === 'Bypass') && this.data.transfer ? this.data.transfer.extension.id : '',
                 this.data.callHandlingAction === 'UnconditionalForwarding' && this.data.unconditionalForwarding ? this.data.unconditionalForwarding.phoneNumber : '',
                 this.data.callHandlingAction === 'TakeMessagesOnly' && this.data.voicemail ? `${this.data.voicemail.recipient.id}` : ''
             ]

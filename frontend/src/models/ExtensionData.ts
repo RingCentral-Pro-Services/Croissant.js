@@ -1,7 +1,7 @@
 import { PhoneNumber } from "./PhoneNumber"
 
 export interface ExtensionData {
-    id: number
+    id: number | string
     uri?: string
     account?: {
         id: string
