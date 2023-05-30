@@ -59,7 +59,18 @@ const UserDataDownload = () => {
 
     useEffect(() => {
         if (isUserGroupsListPending) return
-        if (!isMultiSiteEnabled) return
+        if (!isMultiSiteEnabled) {
+            const users = extensionsList.filter((ext) => ext.prettyType() === 'User' && ext.data.status !== 'Unassigned')
+            const dataBundles: UserDataBundle[] = []
+
+            for (const extenson of users) {
+                const bundle = new UserDataBundle(extenson, undefined)
+                dataBundles.push(bundle)
+            }
+            console.log(dataBundles)
+
+            setUserDataBundles(dataBundles)
+        }
 
         const siteNames = extensionsList.filter((ext) => ext.prettyType() === 'Site').map((ext) => ext.data.name)
         setSites(['Main Site', ...siteNames])

@@ -92,7 +92,7 @@ export class UserDataRow implements ExcelFormattable {
             this.prettyIncommingCallInfo(),
             this.notifications?.voicemails.includeTranscription ? 'ON' : 'OFF',
             this.prettyPERLs(),
-            this.notifications?.emailAddresses.join('\n') ?? '',
+            this.notifications?.emailAddresses?.join('\n') ?? '',
             this.prettyVoicemailNotificationSettings(),
             this.prettyFaxNotificationSettings(),
             this.notifications?.missedCalls.notifyByEmail ? 'Notify' : 'Do not notify',
