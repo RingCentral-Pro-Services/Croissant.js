@@ -127,7 +127,7 @@ const CustomRulesExport = () => {
                 {isFilterReady ? <AdaptiveFilter options={supportedExtensionTypes} defaultSelected={supportedExtensionTypes} title='Extension types' placeholder='Search...' setSelected={setSelectedExtensionTypes} />  : <></>}
                 <Button variant='contained' onClick={handleButtonClick} disabled={isExtensionListPending || isAuditingCompanyRules || isAuditing}>Go</Button>
                 {isAuditingCompanyRules ? <> <p>Main Site Rules</p> <progress value={companyRuleProgress} max={maxCompanyRuleProgress} /> </> : <></>}
-                {isAuditing && selectedExtensions.length != 0 ? <progress value={currentExtensionIndex} max={selectedExtensions.length} /> : <></>}
+                {isAuditing && selectedExtensions.length != 0 ? <> <p>Extension Rules</p> <progress value={currentExtensionIndex} max={selectedExtensions.length} /> </> : <></>}
                 {isExtensionListPending ? <></> : <FeedbackArea gridData={selectedExtensions} messages={messages} errors={errors} timedMessages={timedMessages} />}
             </div>
         </>
