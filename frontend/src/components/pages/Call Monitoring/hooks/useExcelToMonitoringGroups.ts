@@ -16,8 +16,8 @@ const useExcelToMonitoringGroups = (postMessage: (message: Message) => void, pos
         const isolator = new ExtensionIsolator()
 
         for (const item of data) {
-            let monitoredRaw = item['Users that can be monitored']
-            let monitoringRaw = item['Users that can monitor']
+            let monitoredRaw = item['Can be Monitored']
+            let monitoringRaw = item['Can Monitor']
 
             let prospectiveMonitored: ProspectiveExtension[] = []
             let prospectiveMonitoring: ProspectiveExtension[] = []

@@ -76,7 +76,7 @@ const CallMonitoring = () => {
 
     useEffect(() => {
         if (isGroupAdjustmentPending) return
-        writeExcel(['Group Name', 'Users that can monitor', 'Users that can be monitored'], auditedGroups, 'Call Monitoring Audit', 'Call Monitoring Audit.xlsx')
+        writeExcel(['Group Name', 'Can be Monitored', 'Can Monitor'], auditedGroups, 'Call Monitoring Audit', 'Call Monitoring Audit.xlsx')
     }, [isGroupAdjustmentPending])
 
     const handleSync = () => {

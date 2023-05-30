@@ -206,11 +206,11 @@ export const callMonitoringSchema = z.object({
         required_error: 'Missing group name',
         invalid_type_error: 'Group name data type invalid'
     }),
-    'Users that can monitor': z.coerce.string({
+    'Can Monitor': z.coerce.string({
         required_error: 'Missing Users that can monitor',
         invalid_type_error: 'Users that can monitor data type invalid'
     }),
-    'Users that can be monitored': z.coerce.string({
+    'Can be Monitored': z.coerce.string({
         required_error: 'Missing Users that can be monitored',
         invalid_type_error: 'Users that can be monitored data type invalid'
     }),
