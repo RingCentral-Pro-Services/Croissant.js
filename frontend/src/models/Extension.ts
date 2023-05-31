@@ -134,7 +134,7 @@ export class Extension implements ExcelFormattable, DataGridFormattable {
             type: this.data.type === 'VirtualUser' ? 'User' : this.data.type,
             status: this.status(),
             ...(this.data.type === 'VirtualUser' && {subType: 'VideoPro'}),
-            ...(isMultiSiteEnable && { site: { id: this.data.site?.id } }),
+            ...((isMultiSiteEnable && this.data.site?.id !== 'main-site') && { site: { id: this.data.site?.id } }),
             ...((this.data.ivrPin && this.data.ivrPin != '') && {ivrPin: this.data.ivrPin}),
             ...((this.data.password && this.data.password != '') && {password: this.data.password}),
             ...(this.data.regionalSettings && {regionalSettings: this.data.regionalSettings}),

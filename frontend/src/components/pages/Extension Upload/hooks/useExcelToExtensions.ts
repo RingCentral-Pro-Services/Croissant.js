@@ -116,6 +116,8 @@ const useExcelToExtensions = (shouldAlterEmails: boolean, postMessage: (message:
     }
 
     const idForSite = (siteName: string, siteList: RCExtension[]) => {
+        if (siteName === 'Main Site') return 'main-site'
+
         let site = siteList.filter((ext) => ext.prettyType[ext.type] === 'Site').find(site => site.name === siteName)
         if (site) {
             return `${site.id}`
