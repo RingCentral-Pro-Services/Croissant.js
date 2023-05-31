@@ -122,10 +122,16 @@ const MigrateUsers = () => {
         setIsPending(true)
         if (shouldMigrateSites) {
             const selectedSites = sites.filter((site) => selectedSiteNames.includes(site.name))
-            migrateSites(selectedSites)
+            await migrateSites(selectedSites)
         }
-        await migrateUsers(userDataBundles, targetExtensionList)
+
+        let unassignedExtensions = targetExtensionList.filter((ext) => ext.data.status === 'Unassigned')
+        console.log(`Pre build unassigned extensions: ${unassignedExtensions.length}`)
+
+        await migrateUsers(userDataBundles, unassignedExtensions, targetExtensionList)
         await configureUsers(userDataBundles)
+        
+        console.log(`Post build unassigned extensions: ${unassignedExtensions.length}`)
     }
 
     return (

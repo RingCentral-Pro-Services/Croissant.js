@@ -35,10 +35,10 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
             if (e.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
-            console.log(`Failed to get base data`)
+            console.log(`Failed to set schedule`)
             console.log(e)
-            postMessage(new Message(`Failed to get base data for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to fetch base data', ''], e.error ?? ''))
+            postMessage(new Message(`Failed to set schedule for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to set schedule', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }

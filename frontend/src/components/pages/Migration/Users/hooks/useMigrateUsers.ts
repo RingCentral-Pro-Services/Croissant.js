@@ -7,18 +7,16 @@ import useMigrateUser from "./useMigrateUser";
 const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
     const {migrateUser} = useMigrateUser(postMessage, postTimedMessage, postError)
 
-    const migrateUsers = async (dataBundles: UserDataBundle[], extensions: Extension[]) => {
+    const migrateUsers = async (dataBundles: UserDataBundle[], unassignedExtensions: Extension[], extensions: Extension[]) => {
         const accessToken = localStorage.getItem('cs_access_token')
         if (!accessToken) {
             throw new Error('No access token')
         }
 
-        let unassignedExtensions = extensions.filter((ext) => ext.data.status === 'Unassigned')
-        console.log(`Unassigned extensions: ${unassignedExtensions.length}`)
-
         for (let i = 0; i < dataBundles.length; i++) {
             let bundle = dataBundles[i]
             const site = extensions.find((ext) => ext.prettyType() === 'Site' && ext.data.name === bundle.extension.data.site?.name)
+            
             if (!site) {
                 postMessage(new Message(`${bundle.extension.data.name} can't be migrated because the site it's assigned to (${bundle.extension.data.site?.name}) does not exist`, 'error'))
                 continue
