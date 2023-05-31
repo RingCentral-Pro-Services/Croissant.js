@@ -16,7 +16,8 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
         let unassignedExtensions = extensions.filter((ext) => ext.data.status === 'Unassigned')
         console.log(`Unassigned extensions: ${unassignedExtensions.length}`)
 
-        for (const bundle of dataBundles) {
+        for (let i = 0; i < dataBundles.length; i++) {
+            let bundle = dataBundles[i]
             const site = extensions.find((ext) => ext.prettyType() === 'Site' && ext.data.name === bundle.extension.data.site?.name)
             if (!site) {
                 postMessage(new Message(`${bundle.extension.data.name} can't be migrated because the site it's assigned to (${bundle.extension.data.site?.name}) does not exist`, 'error'))

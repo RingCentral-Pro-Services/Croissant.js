@@ -125,6 +125,9 @@ export class Extension implements ExcelFormattable, DataGridFormattable {
                 ...((this.data.type === 'User' || this.data.type == 'VirtualUser') && {lastName: this.data.contact?.lastName}),
                 email: this.data.contact?.email,
                 ...(((this.data.type === 'User' || this.data.type == 'VirtualUser') && (this.data.contact.department && this.data.contact?.department !== '')) && {department: this.data.contact?.department ?? ''}),
+                ...(this.data.contact.businessPhone && {businessPhone: this.data.contact.businessPhone}),
+                ...(this.data.contact.mobilePhone && {mobilePhone: this.data.contact.mobilePhone}),
+                ...(this.data.contact.jobTitle && {jobTitle: this.data.contact.jobTitle}),
                 ... (this.data.type === 'Limited' && {lastName: ''})
             },
             extensionNumber: this.data.extensionNumber,
@@ -134,6 +137,8 @@ export class Extension implements ExcelFormattable, DataGridFormattable {
             ...(isMultiSiteEnable && { site: { id: this.data.site?.id } }),
             ...((this.data.ivrPin && this.data.ivrPin != '') && {ivrPin: this.data.ivrPin}),
             ...((this.data.password && this.data.password != '') && {password: this.data.password}),
+            ...(this.data.regionalSettings && {regionalSettings: this.data.regionalSettings}),
+            ...(this.data.hidden !== undefined && {hidden: this.data.hidden})
         }
     }
 

@@ -16,6 +16,7 @@ import ToolCard from "../../../shared/ToolCard";
 import UIDInputField from "../../../shared/UIDInputField";
 import useSiteList from "../Sites/hooks/useSiteList";
 import { UserDataBundle } from "../User Data Download/models/UserDataBundle";
+import useConfigureUsers from "./hooks/useConfigureUsers";
 import useFetchUsers from "./hooks/useFetchUsers";
 import useMigrateSites from "./hooks/useMigrateSites";
 import useMigrateUsers from "./hooks/useMigrateUsers";
@@ -55,6 +56,7 @@ const MigrateUsers = () => {
 
     const {migrateSites, maxProgress: maxSiteProgress, progressValue: siteMigrationProgress} = useMigrateSites(postMessage, postTimedMessage, postError)
     const {migrateUsers} = useMigrateUsers(postMessage, postTimedMessage, postError)
+    const {configureUsers} = useConfigureUsers(postMessage, postTimedMessage, postError)
     
     useEffect(() => {
         if (originalUID.length < 5) return
@@ -123,6 +125,7 @@ const MigrateUsers = () => {
             migrateSites(selectedSites)
         }
         await migrateUsers(userDataBundles, targetExtensionList)
+        await configureUsers(userDataBundles)
     }
 
     return (
