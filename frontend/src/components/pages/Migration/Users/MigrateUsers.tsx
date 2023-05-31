@@ -125,12 +125,12 @@ const MigrateUsers = () => {
             await migrateSites(selectedSites)
         }
 
-        let unassignedExtensions = targetExtensionList.filter((ext) => ext.data.status === 'Unassigned')
+        let unassignedExtensions = targetExtensionList.filter((ext) => ext.data.status === 'Unassigned' && ext.prettyType() === 'User')
         console.log(`Pre build unassigned extensions: ${unassignedExtensions.length}`)
 
         await migrateUsers(userDataBundles, unassignedExtensions, targetExtensionList)
         await configureUsers(userDataBundles)
-        
+
         console.log(`Post build unassigned extensions: ${unassignedExtensions.length}`)
     }
 

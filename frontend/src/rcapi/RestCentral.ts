@@ -66,6 +66,38 @@ export class RestCentral {
         }
     }
 
+    static patch = async (url: string, headers: any, body: any) => {
+        if (this.isCustomerTokenAboutToExpire()) {
+            console.log('Customer token is about to expire. Fetching new token.')
+            await this.fetchCustomerTokenAsync()
+        }
+        if (this.isRCTokenAboutToExpire()) {
+            console.log('RC token is about to expire. Fetching new token.')
+            await this.refreshRCRokenAsync()
+        }
+
+        try {
+            const res = await axios({
+                method: "PATCH",
+                url: url,
+                headers: headers,
+                data: body
+            })
+            const response: APIResponse = {
+                data: res.data,
+                rateLimitInterval: rateLimit(res.headers)
+            }
+            return response
+        } catch (res: any) {
+            let response: APIResponse = {
+                data: res.response.data,
+                rateLimitInterval: rateLimit(res.response.headers),
+                error: res.response.data.message
+            }
+            throw response
+        }
+    }
+
     static put = async (url: string, headers: any, body: any) => {
         if (this.isCustomerTokenAboutToExpire()) {
             console.log('Customer token is about to expire. Fetching new token.')

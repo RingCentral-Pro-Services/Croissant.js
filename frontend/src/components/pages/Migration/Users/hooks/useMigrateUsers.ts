@@ -27,10 +27,25 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
             bundle.extension.data.status = 'NotActivated'
 
             if (bundle.extendedData?.devices.length != 0) {
-                await migrateUser(bundle, `${unassignedExtensions[unassignedExtensions.length - 1].data.id}`)
-                unassignedExtensions.pop()
+                const deviceCount = bundle.extendedData!.devices.length
+                let unassignedIDs: string[] = []
+                for (let i = 0; i < deviceCount; i++) {
+                    if (unassignedExtensions.length === 0) {
+                        postMessage(new Message('Ran out of unassigned extensions', 'error'))
+                        continue
+                    }
+                    console.log('Adding unassigned extension')
+                    unassignedIDs.push(`${unassignedExtensions.pop()?.data.id}`)
+                }
+
+                await migrateUser(bundle, unassignedIDs)
             }
         }
+        await wait(15000)
+    }
+
+    const wait = (ms: number) => {
+        return new Promise(resolve => setTimeout(resolve, ms))
     }
 
     return {migrateUsers}
