@@ -29,6 +29,7 @@ const useSwapNotificationEmails = (notifications: NotificationSettings[], excelD
 
             for (let notification of validNotifications) {
                 if (notification.extension.id == targetID) {
+                    if (notification.data.emailRecipients) delete notification.data.emailRecipients
                     notification.data.emailAddresses = newEmailAddresses
                     handleAdvancedMode(notification, data)
                     workingNotications.push(notification)

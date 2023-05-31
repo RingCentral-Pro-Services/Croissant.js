@@ -87,6 +87,7 @@ export interface NotificationSettingsPayload {
     outboundFaxes: NotificationBundle
     inboundTexts: NotificationBundle
     missedCalls: NotificationBundle
+    emailRecipients?: {}
 }
 
 export default NotificationSettings
