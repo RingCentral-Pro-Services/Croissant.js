@@ -4,6 +4,7 @@ import useLogin from "../../../../hooks/useLogin";
 import useMessageQueue from "../../../../hooks/useMessageQueue";
 import usePostTimedMessage from "../../../../hooks/usePostTimedMessage";
 import useSidebar from "../../../../hooks/useSidebar";
+import useWriteExcelFile from "../../../../hooks/useWriteExcelFile";
 import { DataGridFormattable } from "../../../../models/DataGridFormattable";
 import { Extension } from "../../../../models/Extension";
 import useExtensions from "../../../../rcapi/useExtensions";
@@ -14,10 +15,12 @@ import Header from "../../../shared/Header";
 import ProgressBar from "../../../shared/ProgressBar";
 import ToolCard from "../../../shared/ToolCard";
 import UIDInputField from "../../../shared/UIDInputField";
+import useFetchERLs from "../../Automatic Location Updates/hooks/useFetchERLs";
 import useSiteList from "../Sites/hooks/useSiteList";
 import { UserDataBundle } from "../User Data Download/models/UserDataBundle";
 import useConfigureUsers from "./hooks/useConfigureUsers";
 import useFetchUsers from "./hooks/useFetchUsers";
+import useMigrateERLs from "./hooks/useMigrateERLs";
 import useMigrateSites from "./hooks/useMigrateSites";
 import useMigrateUsers from "./hooks/useMigrateUsers";
 
@@ -33,8 +36,10 @@ const MigrateUsers = () => {
     const [shouldShowSiteFilter, setShouldShowSiteFilter] = useState(false)
     const [isDoneFetchingSites, setIsDoneFetchingSites] = useState(false)
     const [shouldMigrateSites, setShouldMigrateSites] = useState(true)
+    const [isPullingData, setIsPullingData] = useState(false)
+    const [isMigrating, setIsMigrating] = useState(false)
     const [isPending, setIsPending] = useState(false)
-    const supportedExtensionTypes = ['User', 'Limited Extension', 'Call Queue', 'IVR Menu', 'Message-Only', 'Announcement-Only']
+    const supportedExtensionTypes = ['ERLs', 'User', 'Limited Extension', 'Call Queue', 'IVR Menu', 'Message-Only', 'Announcement-Only']
     const [sites, setSites] = useState<SiteData[]>([])
 
     const handleSiteFetchCompletion = (sites: SiteData[]) => {
@@ -42,7 +47,7 @@ const MigrateUsers = () => {
         setIsDoneFetchingSites(true)
     }
 
-    useLogin('migrateusers', false)
+    useLogin('migrateusers', isPullingData || isMigrating)
     useSidebar('Migrate Users')
     const {fetchToken: fetchOriginalAccountToken, companyName: originalCompanyName, hasCustomerToken: hasOriginalAccountToken, error: originalAccountTokenError, isTokenPending: isOriginalAccountTokenPending, userName: originalUserName} = useGetAccessToken()
     const {fetchToken: fetchTargetAccountToken, companyName: targetCompanyName, hasCustomerToken: hasTargetAccountToken, error: targetAccountTokenError, isTokenPending: isTargetAccountTokenPending, userName: targetUserName} = useGetAccessToken()
@@ -52,11 +57,16 @@ const MigrateUsers = () => {
     const {extensionsList: originalExtensionList, fetchExtensions: fetchOriginalExtensions, isExtensionListPending: isOriginalExtensionListPending, isMultiSiteEnabled} = useExtensions(postMessage)
     const {extensionsList: targetExtensionList, fetchExtensions: fetchTargetExtensions, isExtensionListPending: isTargetExtensionListPending, isMultiSiteEnabled: targetAccountHasMultisite} = useExtensions(postMessage)
 
+    const {fetchERLs, erls, isERLListPending} = useFetchERLs()
+    const {fetchERLs: fetchTargetERLs, erls: targetERLList, isERLListPending: isTargetERLListPending} = useFetchERLs()
     const {fetchUsers, progressValue: userFetchProgress, maxProgress: maxUserFetchProgress} = useFetchUsers(postMessage, postTimedMessage, postError)
 
     const {migrateSites, maxProgress: maxSiteProgress, progressValue: siteMigrationProgress} = useMigrateSites(postMessage, postTimedMessage, postError)
+    const {migrateERLs, progressValue: erlProgress, maxProgress: maxERLProgress} = useMigrateERLs(postMessage, postTimedMessage, postError)
     const {migrateUsers} = useMigrateUsers(postMessage, postTimedMessage, postError)
     const {configureUsers} = useConfigureUsers(postMessage, postTimedMessage, postError)
+
+    const {writeExcel} = useWriteExcelFile()
     
     useEffect(() => {
         if (originalUID.length < 5) return
@@ -76,6 +86,11 @@ const MigrateUsers = () => {
     }, [hasTargetAccountToken])
 
     useEffect(() => {
+        if (isTargetExtensionListPending) return
+        fetchTargetERLs()
+    }, [isTargetExtensionListPending])
+
+    useEffect(() => {
         if (!isDoneFetchingSites) return
         fetchOriginalExtensions()
     }, [isDoneFetchingSites])
@@ -84,6 +99,11 @@ const MigrateUsers = () => {
         if (!hasOriginalAccountToken) return
         fetchSites()
     }, [hasOriginalAccountToken])
+
+    useEffect(() => {
+        if (!isDoneFetchingSites) return
+        fetchERLs()
+    }, [isDoneFetchingSites])
 
     useEffect(() => {
         if (isOriginalExtensionListPending) return
@@ -112,6 +132,7 @@ const MigrateUsers = () => {
     }
 
     const handleDisoverButtonClick = async () => {
+        setIsPullingData(true)
         const userDataBundles = await fetchUsers(selectedExtensions.filter((ext) => ext.prettyType() === 'User'), originalExtensionList)
         setUserDataBundles(userDataBundles)
         console.log('Fetched users')
@@ -120,18 +141,29 @@ const MigrateUsers = () => {
 
     const handleMigrateButtonClick = async () => {
         setIsPending(true)
+        setIsMigrating(true)
+        let targetExts = targetExtensionList
+        let targetERLs = targetERLList
+
         if (shouldMigrateSites) {
             const selectedSites = sites.filter((site) => selectedSiteNames.includes(site.name))
-            await migrateSites(selectedSites)
+            const siteExtensions = await migrateSites(selectedSites)
+            targetExts = [...targetExts, ...siteExtensions]
         }
 
         let unassignedExtensions = targetExtensionList.filter((ext) => ext.data.status === 'Unassigned' && ext.prettyType() === 'User')
-        console.log(`Pre build unassigned extensions: ${unassignedExtensions.length}`)
 
-        await migrateUsers(userDataBundles, unassignedExtensions, targetExtensionList)
-        await configureUsers(userDataBundles)
+        if (selectedExtensionTypes.includes('ERLs')) {
+            const migratedERLs = await migrateERLs(erls, targetExts)
+            targetERLs = [...targetERLs, ...migratedERLs]
+        }
+        await migrateUsers(userDataBundles, unassignedExtensions, targetExts)
 
-        console.log(`Post build unassigned extensions: ${unassignedExtensions.length}`)
+        const migratedUsers = userDataBundles.map((bundle) => bundle.extension)
+        targetExts = [...targetExts, ...migratedUsers]
+
+        // writeExcel([], targetExts, 'Exts', 'target-ext.xlsx')
+        await configureUsers(userDataBundles, targetERLs, originalExtensionList, targetExts)
     }
 
     return (
@@ -147,7 +179,7 @@ const MigrateUsers = () => {
                 <AdaptiveFilter options={supportedExtensionTypes} title='Extension Types' placeholder='Search' setSelected={setSelectedExtensionTypes} />
                 {shouldShowSiteFilter ? <AdaptiveFilter options={siteNames} title='Sites' placeholder='Search' setSelected={setSelectedSiteNames} /> : <></>}
                 <FormControlLabel control={<Checkbox defaultChecked value={shouldMigrateSites} onChange={(e) => setShouldMigrateSites(e.target.checked)} />} label="Migrate Sites" />
-                <Button variant='contained' onClick={handleDisoverButtonClick} >Discover</Button>
+                <Button variant='contained' onClick={handleDisoverButtonClick} disabled={isPullingData} >Discover</Button>
                 <ProgressBar value={userFetchProgress} max={maxUserFetchProgress} label='Users' />
                 <FeedbackArea gridData={filteredExtensions} onFilterSelection={handleFilterSelection} messages={[]} errors={[]} timedMessages={[]} />
             </ToolCard>
@@ -155,7 +187,8 @@ const MigrateUsers = () => {
                 <h2>Target Account</h2>
                 <p>Enter the UID that you are migrating <em>to</em></p>
                 <UIDInputField disabled={hasTargetAccountToken} disabledText={targetCompanyName} setTargetUID={setTargetUID} loading={isTargetAccountTokenPending} error={targetAccountTokenError} />
-                <Button variant='contained' onClick={handleMigrateButtonClick} disabled={!hasTargetAccountToken || isTargetExtensionListPending} >Migrate</Button>
+                <Button variant='contained' onClick={handleMigrateButtonClick} disabled={!hasTargetAccountToken || isERLListPending || isTargetERLListPending || isMigrating} >Migrate</Button>
+                <ProgressBar label='ERLs' value={erlProgress} max={maxERLProgress} />
                 <FeedbackArea messages={messages} timedMessages={timedMessages} errors={errors} />
             </ToolCard>
         </>

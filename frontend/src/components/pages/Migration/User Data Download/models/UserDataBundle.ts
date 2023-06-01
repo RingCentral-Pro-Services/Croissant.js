@@ -84,6 +84,13 @@ export interface Device {
         countryName: string
 
     }
+    emergency: {
+        location?: {
+            id: string
+            name: string
+        }
+        visibility: string
+    }
     phoneLines: [{
         lineType: string
         phoneInfo: {
@@ -220,9 +227,13 @@ export interface PresenseLine {
     id: string
     extension: {
         id: string
-        extensionNumber: string
-        extensionName: string
+        extensionNumber?: string
+        extensionName?: string
+        type?: string
+        uri?: string
     }
+    uri?: string
+    notEditableOnHud?: boolean
 }
 
 export interface PresenseSettings {

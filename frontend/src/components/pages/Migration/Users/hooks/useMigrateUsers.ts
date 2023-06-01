@@ -21,8 +21,8 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
                 postMessage(new Message(`${bundle.extension.data.name} can't be migrated because the site it's assigned to (${bundle.extension.data.site?.name}) does not exist`, 'error'))
                 continue
             }
-            bundle.extension.data.site!.id = `${site!.data.id}`
 
+            bundle.extension.data.site!.id = `${site!.data.id}`
             bundle.extension.data.contact.email = `${bundle.extension.data.contact.email}.ps.ringcentral.com`
             bundle.extension.data.status = 'NotActivated'
 
@@ -34,7 +34,6 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
                         postMessage(new Message('Ran out of unassigned extensions', 'error'))
                         continue
                     }
-                    console.log('Adding unassigned extension')
                     unassignedIDs.push(`${unassignedExtensions.pop()?.data.id}`)
                 }
 
