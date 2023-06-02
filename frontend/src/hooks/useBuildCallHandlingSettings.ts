@@ -140,11 +140,16 @@ const useBuildCallHandlingSettings = (extensions: RCExtension[]) => {
     // Call Handling: Max Callers
     useEffect(() => {
         if (maxCallersInQueue === '' || !maxCallersInQueue) {
-            setmaxCallersPayload(-1)
+            let newCallHandling = {...callHandling}
+            newCallHandling.maxCallers = -1
+            setCallHandling(newCallHandling)
             return
         }
 
-        setmaxCallersPayload(map.get(maxCallersInQueue)!)
+        // setmaxCallersPayload(map.get(maxCallersInQueue)!)
+        let newCallHandling = {...callHandling}
+        newCallHandling.maxCallers = map.get(maxCallersInQueue)!
+        setCallHandling(newCallHandling)
     }, [maxCallersInQueue])
 
     // Call Handling: Max Callers Action
@@ -345,7 +350,8 @@ const useBuildCallHandlingSettings = (extensions: RCExtension[]) => {
             ...(callHandling.unconditionalForwarding?.length != 0 && {unconditionalForwarding: callHandling.unconditionalForwarding}),
             ...(callHandling.transfer!.length > 0 && {transfer: callHandling.transfer}),
             ...(callHandling.holdAudioInterruptionMode != '' && {holdAudioInterruptionMode: callHandling.holdAudioInterruptionMode}),
-            ...(callHandling.holdAudioInterruptionPeriod != -1 && {holdAudioInterruptionPeriod: callHandling.holdAudioInterruptionPeriod})
+            ...(callHandling.holdAudioInterruptionPeriod != -1 && {holdAudioInterruptionPeriod: callHandling.holdAudioInterruptionPeriod}),
+            ...(callHandling.maxCallers != -1 && {maxCallers: callHandling.maxCallers}),
         }
         console.log('Payload')
         console.log(newPayload)
