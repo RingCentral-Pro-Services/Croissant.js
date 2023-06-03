@@ -49,7 +49,7 @@ export interface ExtendedUserData {
     presenseAllowedUsers?: PresenseAllowedUser[]
     intercomStatus?: IntercomStatus
     delegates?: Delegate[]
-    pERLs?: ERL[]
+    pERLs?: PERL[]
     roles?: Role[]
     incommingCallInfo?: IncommingCallInfo
     businessHours?: BusinessHours
@@ -221,6 +221,8 @@ export interface BlockedPhoneNumber {
     phoneNumber: string
     label: string
     status: string
+    uri?: string
+    id?: string
 }
 
 export interface PresenseLine {
@@ -259,7 +261,7 @@ export interface Delegate {
     }
 }
 
-export interface ERL {
+export interface PERL {
     name: string
     visibility: string
     address: {
@@ -351,6 +353,7 @@ export interface ForwardAllCalls {
     extension?: {
         name: string
         extensionNumber: string
+        id: string
     }
     externalNumber: {
         phoneNumber: string

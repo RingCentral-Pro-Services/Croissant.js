@@ -34,6 +34,9 @@ const useMigrateSites = (postMessage: (message: Message) => void, postTimedMessa
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             }
+
+            // if (site.code) delete site.code
+
             const response = await RestCentral.post(baseURL, headers, site)
             site.id = response.data.id
 

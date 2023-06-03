@@ -157,6 +157,9 @@ const MigrateUsers = () => {
             const migratedERLs = await migrateERLs(erls, targetExts)
             targetERLs = [...targetERLs, ...migratedERLs]
         }
+
+        console.log(`Should be migrating ${userDataBundles.length} users`)
+        console.log(userDataBundles)
         await migrateUsers(userDataBundles, unassignedExtensions, targetExts)
 
         const migratedUsers = userDataBundles.map((bundle) => bundle.extension)

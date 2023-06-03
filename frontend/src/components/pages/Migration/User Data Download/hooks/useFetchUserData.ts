@@ -2,7 +2,7 @@ import { Extension } from "../../../../../models/Extension"
 import { Message } from "../../../../../models/Message"
 import { SyncError } from "../../../../../models/SyncError"
 import { RestCentral } from "../../../../../rcapi/RestCentral"
-import { ERL, PhoneNumber, Role, UserDataBundle } from "../models/UserDataBundle"
+import { PERL, PhoneNumber, Role, UserDataBundle } from "../models/UserDataBundle"
 
 const useFetchUserData = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void, callback: () => void) => {
     const baseDataURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId'
@@ -476,7 +476,7 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
                 "Authorization": `Bearer ${token}`
             }
             const response = await RestCentral.get(basePERLURL.replace('extensionId', `${userDataBundle.extension.data.id}`), headers)
-            const responseLocations = response.data.records as ERL[]
+            const responseLocations = response.data.records as PERL[]
             const personalResponseLocations = responseLocations.filter((erl) => erl.visibility === 'Private')
             userDataBundle.extendedData!.pERLs = personalResponseLocations
             

@@ -3,7 +3,7 @@ import { Message } from "../../../../../models/Message";
 import { SyncError } from "../../../../../models/SyncError";
 import { RestCentral } from "../../../../../rcapi/RestCentral";
 import { ERL } from "../../../Automatic Location Updates/models/ERL";
-import { Device, PresenseLine, UserDataBundle } from "../../User Data Download/models/UserDataBundle";
+import { BlockedPhoneNumber, CallHandling, Device, PERL, PresenseLine, UserDataBundle } from "../../User Data Download/models/UserDataBundle";
 
 interface DeviceModelPayload {
     deviceId: string
@@ -27,6 +27,13 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
     const basePresenseLineURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/presence/line'
     const basePresenceSettingsURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/presence'
     const baseNotificationsSettingsURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/notification-settings'
+    const baseIntercomURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/intercom'
+    const baseCallHandlingURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/answering-rule/ruleId'
+    const baseBlockedCallsURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/caller-blocking'
+    const baseBlockedPnoneNumbersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/caller-blocking/phone-numbers'
+    const baseForwardingNumbersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/forwarding-number'
+    const baseForwardAllCallsURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/forward-all-calls'
+    const basePERLURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/emergency-locations'
     const baseWaitingPeriod = 250
 
     const configureUser = async (bundle: UserDataBundle, companyERLs: ERL[], originalExtensions: Extension[], targetExtensions: Extension[]) => {
@@ -41,10 +48,23 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
         for (const data of deviceData) {
             await setDeviceName(bundle, data, accessToken)
             await setDeviceERL(bundle, data, companyERLs, accessToken)
+            await addForwardingDevice(bundle, data.newDeviceID, accessToken)
         }
         await setPresenseLines(bundle, originalExtensions, targetExtensions, accessToken)
         await setPresenseStatus(bundle, accessToken)
         await setNotifications(bundle, accessToken)
+        await enableIntercom(bundle, deviceIDs[0], accessToken)
+        const customBusinessHoursGreetings = await setDuringHoursGreetings(bundle, accessToken)
+        const customAfterHoursGreetings = await setAfterHoursGreetings(bundle, accessToken)
+        await setBlockedCallSettings(bundle, accessToken)
+        for (const number of bundle.extendedData!.blockedPhoneNumbers!) {
+            await addBlockedNumber(bundle, number, accessToken)
+        }
+        await setForwardAllCalls(bundle, originalExtensions, targetExtensions, accessToken)
+        const currentCallHandling = await getBusinessHoursCallHandling(bundle, accessToken)
+        for (const erl of bundle.extendedData!.pERLs!) {
+            addPERL(bundle, erl, accessToken)
+        }
     }
 
     const setSchedule = async (bundle: UserDataBundle, token: string) => {
@@ -282,10 +302,6 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
                 goodPresenseLines.push(presenseLine)
             }
 
-            const body = {
-                records: goodPresenseLines
-            }
-
             const response = await RestCentral.put(basePresenseLineURL.replace('extensionId', `${bundle.extension.data.id}`), headers, goodPresenseLines)
 
             if (response.rateLimitInterval > 0) {
@@ -358,6 +374,339 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
             postMessage(new Message(`Failed to set notifications ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to set notifications', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const enableIntercom = async (bundle: UserDataBundle, deviceID: string, token: string) => {
+        if (!bundle.extendedData?.intercomStatus?.enabled) return
+
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+
+            const body = {
+                enabled: true,
+                device: {
+                    id: deviceID
+                }
+            }
+
+            const response = await RestCentral.put(baseIntercomURL.replace('extensionId', `${bundle.extension.data.id}`), headers, body)
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to enable intercom`)
+            console.log(e)
+            postMessage(new Message(`Failed to enable intercom for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to enable intercom', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const setDuringHoursGreetings = async (bundle: UserDataBundle, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+
+            const greetings = bundle.extendedData?.businessHoursCallHandling?.greetings
+            const nonCustomGreetings = greetings?.filter((greeting) => greeting.preset)
+            const customGreetings = greetings?.filter((greeting) => !greeting.preset)
+
+            const body = {
+                greetings: nonCustomGreetings
+            }
+
+            const response = await RestCentral.put(baseCallHandlingURL.replace('extensionId', `${bundle.extension.data.id}`).replace('ruleId', 'business-hours-rule'), headers, body)
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+
+            return customGreetings
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to set business hours greetings`)
+            console.log(e)
+            postMessage(new Message(`Failed to set business hours greetings for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to set business hours greetings', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const setAfterHoursGreetings = async (bundle: UserDataBundle, token: string) => {
+        if (Object.keys(bundle.extendedData!.businessHours!.schedule).length === 0) return
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+
+            const greetings = bundle.extendedData?.afterHoursCallHandling?.greetings
+            const nonCustomGreetings = greetings?.filter((greeting) => greeting.preset)
+            const customGreetings = greetings?.filter((greeting) => !greeting.preset)
+
+            const body = {
+                greetings: nonCustomGreetings
+            }
+
+            const response = await RestCentral.put(baseCallHandlingURL.replace('extensionId', `${bundle.extension.data.id}`).replace('ruleId', 'after-hours-rule'), headers, body)
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+
+            return customGreetings
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to set after hours greetings`)
+            console.log(e)
+            postMessage(new Message(`Failed to set after hours greetings for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to set after hours greetings', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const setBlockedCallSettings = async (bundle: UserDataBundle, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const response = await RestCentral.put(baseBlockedCallsURL.replace('extensionId', `${bundle.extension.data.id}`), headers, bundle.extendedData?.blockedCallSettings)
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to set blocked call settings`)
+            console.log(e)
+            postMessage(new Message(`Failed to set blocked call settings for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to set blocked call settings', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const addBlockedNumber = async (bundle: UserDataBundle, number: BlockedPhoneNumber, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+
+            delete number.id
+            delete number.uri
+
+            const response = await RestCentral.post(baseBlockedPnoneNumbersURL.replace('extensionId', `${bundle.extension.data.id}`), headers, number)
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to add blocked / allowed number`)
+            console.log(e)
+            postMessage(new Message(`Failed to add blocked / allowed number for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to add blocked / allowed number', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const setForwardAllCalls = async (bundle: UserDataBundle, originalExtensions: Extension[], targetExtensions: Extension[], token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+
+            const forwardAllCalls = bundle.extendedData!.forwardAllCalls
+            if (!forwardAllCalls?.enabled) {
+                return
+            }
+
+            if (forwardAllCalls?.extension) {
+                const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === forwardAllCalls.extension?.id)
+
+                if (!originalExtension) {
+                    postMessage(new Message(`Failed to find old forward all calls extension ID for user ${bundle.extension.data.name}`, 'error'))
+                    postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to set forward all calls', ''], '', forwardAllCalls))
+                    return
+                }
+
+                const newExtension = targetExtensions.find((ext) => `${ext.data.name}` === `${originalExtension.data.name}`)
+
+                if (!newExtension) {
+                    postMessage(new Message(`Failed to find target forward all calls extension ID for user ${bundle.extension.data.name}`, 'error'))
+                    postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to set forward all calls', ''], '', forwardAllCalls))
+                    return
+                }
+
+                forwardAllCalls.extension.id = `${newExtension.data.id}`
+            }
+
+            const response = await RestCentral.post(baseForwardAllCallsURL.replace('extensionId', `${bundle.extension.data.id}`), headers, forwardAllCalls)
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to set forward all calls`)
+            console.log(e)
+            postMessage(new Message(`Failed to set forward all calls for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to set forward all calls', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const addForwardingDevice = async (bundle: UserDataBundle, deviceID: string, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+
+            const body = {
+                type: "PhoneLine",
+                device: {
+                    id: deviceID
+                }
+            }
+
+            const response = await RestCentral.post(baseForwardingNumbersURL.replace('extensionId', `${bundle.extension.data.id}`), headers, body)
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to add forwarding device`)
+            console.log(e)
+            postMessage(new Message(`Failed to add forwarding device to ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to add forwarding device', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const getBusinessHoursCallHandling = async (bundle: UserDataBundle, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const response = await RestCentral.get(baseCallHandlingURL.replace('extensionId', `${bundle.extension.data.id}`).replace('ruleId', 'business-hours-rule'), headers)
+            const callHandling = response.data as CallHandling
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+            return callHandling
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to set schedule`)
+            console.log(e)
+            postMessage(new Message(`Failed to set schedule for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to set schedule', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const addPERL = async (bundle: UserDataBundle, erl: PERL, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const response = await RestCentral.post(basePERLURL.replace('extensionId', `${bundle.extension.data.id}`), headers, erl)
+            
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to add pERL`)
+            console.log(e)
+            postMessage(new Message(`Failed to add pERL to ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to add pERL', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const adjustCallHandling = (bundle: UserDataBundle, currentCallHandling: CallHandling) => {
+        let result = currentCallHandling
+        const originalCallHandling = bundle.extendedData!.businessHoursCallHandling
+        if (!originalCallHandling) return
+
+        if (result.forwarding) {
+            const originalRules = originalCallHandling.forwarding.rules
+            const currentRules = result.forwarding.rules
+            let newRules = []
+
+            for (let rule of currentRules) {
+                const matchingRule = originalRules.find((originalRule) => originalRule.forwardingNumbers[0].label === rule.forwardingNumbers[0].label)
+            }
         }
     }
 

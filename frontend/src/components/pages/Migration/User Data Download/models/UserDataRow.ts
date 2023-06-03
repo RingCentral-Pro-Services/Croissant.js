@@ -1,13 +1,13 @@
 import ExcelFormattable from "../../../../../models/ExcelFormattable";
 import { Extension } from "../../../../../models/Extension";
-import { BlockedCallSettings, BlockedPhoneNumber, BusinessHours, CallerID, CallHandling, DefaultBridge, Delegate, Device, ERL, ForwardAllCalls, IncommingCallInfo, IntercomStatus, Notifications, PresenseAllowedUser, PresenseLine, PresenseSettings, Role } from "./UserDataBundle";
+import { BlockedCallSettings, BlockedPhoneNumber, BusinessHours, CallerID, CallHandling, DefaultBridge, Delegate, Device, PERL, ForwardAllCalls, IncommingCallInfo, IntercomStatus, Notifications, PresenseAllowedUser, PresenseLine, PresenseSettings, Role } from "./UserDataBundle";
 
 export class UserDataRow implements ExcelFormattable {
     constructor(public extension: Extension, public type: string, public device?: Device, public directNumber?: string, 
                 public businessHoursCallHandling?: CallHandling, public afterHoursCallHandling?: CallHandling,
                 public notifications?: Notifications, public callerID?: CallerID, public blockedCallSettings?: BlockedCallSettings,
                 public blockedPhoneNumbers?: BlockedPhoneNumber[], public presenseLines?: PresenseLine[], public presenseSettings?: PresenseSettings,
-                public presenseAllowedUsers?: PresenseAllowedUser[], public intercomStatus?: IntercomStatus, public delegates?: Delegate[], public erls?: ERL[],
+                public presenseAllowedUsers?: PresenseAllowedUser[], public intercomStatus?: IntercomStatus, public delegates?: Delegate[], public erls?: PERL[],
                 public roles?: Role[], public incommingCallInfo?: IncommingCallInfo, public businessHours?: BusinessHours, public forwardAllCalls?: ForwardAllCalls,
                 public defaultBridge?: DefaultBridge, public userGroups?: string) {}
 

@@ -39,6 +39,9 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
 
                 await migrateUser(bundle, unassignedIDs)
             }
+            else {
+                await migrateUser(bundle)
+            }
         }
         await wait(15000)
     }
