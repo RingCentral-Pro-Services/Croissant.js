@@ -22,9 +22,11 @@ import { UserDataBundle } from "../User Data Download/models/UserDataBundle";
 import useConfigureUsers from "./hooks/useConfigureUsers";
 import useCustomRoleList from "./hooks/useCustomRoleList";
 import useFetchUsers from "./hooks/useFetchUsers";
+import useMigrateCustomRoles from "./hooks/useMigrateCustomRoles";
 import useMigrateERLs from "./hooks/useMigrateERLs";
 import useMigrateSites from "./hooks/useMigrateSites";
 import useMigrateUsers from "./hooks/useMigrateUsers";
+import usePredefinedRoleList from "./hooks/useRoleList";
 import { Role } from "./models/Role";
 
 const MigrateUsers = () => {
@@ -65,8 +67,10 @@ const MigrateUsers = () => {
     const {fetchERLs: fetchTargetERLs, erls: targetERLList, isERLListPending: isTargetERLListPending} = useFetchERLs()
     const {fetchUsers, progressValue: userFetchProgress, maxProgress: maxUserFetchProgress} = useFetchUsers(postMessage, postTimedMessage, postError)
     const {fetchCustomRoles} = useCustomRoleList(postMessage, postTimedMessage, postError)
+    const {fetchPredefinedRoles} = usePredefinedRoleList(postMessage, postTimedMessage, postError)
 
     const {migrateSites, maxProgress: maxSiteProgress, progressValue: siteMigrationProgress} = useMigrateSites(postMessage, postTimedMessage, postError)
+    const {migrateCustomRoles, progressValue: customRoleProgress, maxProgress: maxCustomRoleProgress} = useMigrateCustomRoles(postMessage, postTimedMessage, postError)
     const {migrateERLs, progressValue: erlProgress, maxProgress: maxERLProgress} = useMigrateERLs(postMessage, postTimedMessage, postError)
     const {migrateUsers} = useMigrateUsers(postMessage, postTimedMessage, postError)
     const {configureUsers} = useConfigureUsers(postMessage, postTimedMessage, postError)
@@ -151,22 +155,35 @@ const MigrateUsers = () => {
         setIsMigrating(true)
         let targetExts = targetExtensionList
         let targetERLs = targetERLList
+        let roles: Role[] = []
 
+        // Migrate sites
         if (shouldMigrateSites) {
             const selectedSites = sites.filter((site) => selectedSiteNames.includes(`${site.name}`))
             const siteExtensions = await migrateSites(selectedSites)
             targetExts = [...targetExts, ...siteExtensions]
         }
 
+        // Fetch predefined roles
+        const predefinedRoles = await fetchPredefinedRoles()
+        roles = [...predefinedRoles]
+
+        // Migrate custom roles
+        if (selectedExtensionTypes.includes('Custom Roles')) {
+            const migratedCustomRoles = await migrateCustomRoles(customRoles)
+            roles = [...roles, ...migratedCustomRoles]
+        }
+
         let unassignedExtensions = targetExtensionList.filter((ext) => ext.data.status === 'Unassigned' && ext.prettyType() === 'User')
 
+        // Migrate ERLs
         if (selectedExtensionTypes.includes('ERLs')) {
             const selectedERLs = erls.filter((erl) => selectedSiteNames.includes(erl.site.name))
             const migratedERLs = await migrateERLs(selectedERLs, targetExts)
             targetERLs = [...targetERLs, ...migratedERLs]
         }
 
-        console.log(`Should be migrating ${userDataBundles.length} users`)
+        console.log(`Migrating ${userDataBundles.length} users`)
         console.log(userDataBundles)
         await migrateUsers(userDataBundles, unassignedExtensions, targetExts)
 
@@ -174,7 +191,7 @@ const MigrateUsers = () => {
         targetExts = [...targetExts, ...migratedUsers]
 
         // writeExcel([], targetExts, 'Exts', 'target-ext.xlsx')
-        await configureUsers(userDataBundles, targetERLs, originalExtensionList, targetExts)
+        await configureUsers(userDataBundles, targetERLs, originalExtensionList, targetExts, roles)
         postMessage(new Message('Finished', 'info'))
     }
 
@@ -201,6 +218,7 @@ const MigrateUsers = () => {
                 <UIDInputField disabled={hasTargetAccountToken} disabledText={targetCompanyName} setTargetUID={setTargetUID} loading={isTargetAccountTokenPending} error={targetAccountTokenError} />
                 <Button variant='contained' onClick={handleMigrateButtonClick} disabled={!hasTargetAccountToken || isERLListPending || isTargetERLListPending || isMigrating} >Migrate</Button>
                 <ProgressBar label='ERLs' value={erlProgress} max={maxERLProgress} />
+                <ProgressBar label='Custom Roles' value={customRoleProgress} max={maxCustomRoleProgress} />
                 <FeedbackArea messages={messages} timedMessages={timedMessages} errors={errors} />
             </ToolCard>
         </>

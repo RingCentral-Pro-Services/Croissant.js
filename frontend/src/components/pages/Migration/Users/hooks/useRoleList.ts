@@ -4,12 +4,12 @@ import { SyncError } from "../../../../../models/SyncError"
 import { RestCentral } from "../../../../../rcapi/RestCentral"
 import { Role } from "../models/Role"
 
-const useCustomRoleList = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void,) => {
+const usePredefinedRoleList = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
     const [isFetchingRoles, setIsFetchingRoles] = useState(false)
-    const url = 'https://platform.ringcentral.com/restapi/v1.0/account/~/user-role?custom=true&perPage=1000'
+    const url = 'https://platform.ringcentral.com/restapi/v1.0/account/~/user-role?custom=false&perPage=1000'
     const baseWaitingPeriod = 250
 
-    const fetchCustomRoles = async () => {
+    const fetchPredefinedRoles = async () => {
         const accessToken = localStorage.getItem('cs_access_token')
         if (!accessToken) {
             throw new Error('No access token')
@@ -63,7 +63,7 @@ const useCustomRoleList = (postMessage: (message: Message) => void, postTimedMes
         return new Promise(resolve => setTimeout(resolve, ms))
     }
 
-    return {fetchCustomRoles}
+    return {fetchPredefinedRoles}
 }
 
-export default useCustomRoleList
+export default usePredefinedRoleList

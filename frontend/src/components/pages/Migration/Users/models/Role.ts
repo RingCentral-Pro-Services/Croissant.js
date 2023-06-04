@@ -13,7 +13,7 @@ export interface Role {
 export interface RolePermission {
     uri: string
     id: string 
-    assignable: boolean
-    readOnly: boolean
-    siteCompatible: boolean
+    assignable?: boolean
+    readOnly?: boolean
+    siteCompatible?: boolean
 }

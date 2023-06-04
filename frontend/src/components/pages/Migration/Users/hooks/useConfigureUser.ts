@@ -4,6 +4,7 @@ import { SyncError } from "../../../../../models/SyncError";
 import { RestCentral } from "../../../../../rcapi/RestCentral";
 import { ERL } from "../../../Automatic Location Updates/models/ERL";
 import { BlockedPhoneNumber, CallHandling, Device, PERL, PresenseLine, UserDataBundle } from "../../User Data Download/models/UserDataBundle";
+import { Role } from "../models/Role";
 
 interface DeviceModelPayload {
     deviceId: string
@@ -20,6 +21,7 @@ interface DeviceData {
 
 const useConfigureUser = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
     const baseScheduleURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/business-hours'
+    const baseRoleURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/assigned-role'
     const baseDeviceModelURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/device/bulk-update'
     const baseDeviceListURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/device'
     const baseDeviceUpdateURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/device/deviceId'
@@ -36,12 +38,13 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
     const basePERLURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/emergency-locations'
     const baseWaitingPeriod = 250
 
-    const configureUser = async (bundle: UserDataBundle, companyERLs: ERL[], originalExtensions: Extension[], targetExtensions: Extension[]) => {
+    const configureUser = async (bundle: UserDataBundle, companyERLs: ERL[], originalExtensions: Extension[], targetExtensions: Extension[], roles: Role[]) => {
         const accessToken = localStorage.getItem('cs_access_token')
         if (!accessToken) {
             throw new Error('No access token')
         }
 
+        await setRole(bundle, roles, accessToken)
         await setSchedule(bundle, accessToken)
         const deviceIDs = await getDeviceIDs(bundle, accessToken)
         const deviceData = await setDeviceModels(bundle, deviceIDs, accessToken)
@@ -83,6 +86,50 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
 
         for (const erl of bundle.extendedData!.pERLs!) {
             await addPERL(bundle, erl, accessToken)
+        }
+    }
+
+    const setRole = async (bundle: UserDataBundle, roles: Role[], token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+
+            const originalRole = bundle.extendedData!.roles![0]
+            const newRole = roles.find((role) => role.displayName === originalRole.displayName)
+            if (!newRole) {
+                postMessage(new Message(`Failed to set role for ${bundle.extension.data.name}`, 'error'))
+                postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to set role', `${originalRole.displayName}`]))
+                return
+            }
+
+            const body = {
+                records: [
+                    {
+                        id: newRole?.id
+                    }
+                ]
+            }
+
+            const response = await RestCentral.put(baseRoleURL.replace('extensionId', `${bundle.extension.data.id}`), headers, body)
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to set role`)
+            console.log(e)
+            postMessage(new Message(`Failed to set role for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to set role', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
 
