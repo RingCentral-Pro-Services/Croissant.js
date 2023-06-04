@@ -2,45 +2,39 @@ import { useState } from "react"
 import { Message } from "../../../../../models/Message"
 import { SyncError } from "../../../../../models/SyncError"
 import { RestCentral } from "../../../../../rcapi/RestCentral"
+import { Role } from "../models/Role"
 
-const useSiteList = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void, callback: (siteData: SiteData[]) => void) => {
-    const baseURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/sites?perPage=1000'
+const useCustomRoleList = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void,) => {
+    const [isFetchingRoles, setIsFetchingRoles] = useState(false)
+    const url = 'https://platform.ringcentral.com/restapi/v1.0/account/~/user-role?custom=true&perPage=1000'
     const baseWaitingPeriod = 250
-    const [isFetchingSites, setIsFetchingSites] = useState(false)
 
-    const fetchSites = async () => {
+    const fetchCustomRoles = async () => {
         const accessToken = localStorage.getItem('cs_access_token')
         if (!accessToken) {
             throw new Error('No access token')
         }
-        setIsFetchingSites(true)
 
-        const sites: SiteData[] = []
-        await getSites(sites, accessToken)
-        setIsFetchingSites(false)
-        callback(sites)
+        setIsFetchingRoles(true)
+        let roles: Role[] = []
+        await fetchRoles(roles, accessToken)
+        setIsFetchingRoles(false)
+        return roles
     }
 
-    const getSites = async (sites: SiteData[], token: string) => {
+    const fetchRoles = async (roles: Role[], token: string) => {
         try {
             const headers = {
                 "Accept": "application/json",
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             }
-            const response = await RestCentral.get(baseURL, headers)
-            const records = response.data.records as SiteData[]
+            const response = await RestCentral.get(url, headers)
+            const records = response.data.records as Role[]
 
-            for (let site of records) {
-                if (site.id === 'main-site') {
-                    continue
-                }
-                delete site.id
-                delete site.uri
-                sites.push(site)
+            for (const record of records) {
+                roles.push(record)
             }
-
-            console.log(sites)
 
             if (response.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
@@ -52,10 +46,10 @@ const useSiteList = (postMessage: (message: Message) => void, postTimedMessage: 
             if (e.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
-            console.log(`Failed to make fetch sits`)
+            console.log(`Failed to fetch custom roles`)
             console.log(e)
-            postMessage(new Message(`Failed to fetch sites ${e.error ?? ''}`, 'error'))
-            postError(new SyncError('', 0, ['Failed to fetch sites', ''], e.error ?? ''))
+            postMessage(new Message(`Failed to fetch custom roles ${e.error ?? ''}`, 'error'))
+            postError(new SyncError('', 0, ['Failed to fetch custom roles', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
@@ -64,7 +58,7 @@ const useSiteList = (postMessage: (message: Message) => void, postTimedMessage: 
         return new Promise(resolve => setTimeout(resolve, ms))
     }
 
-    return { fetchSites, isFetchingSites }
+    return {fetchCustomRoles}
 }
 
-export default useSiteList
+export default useCustomRoleList

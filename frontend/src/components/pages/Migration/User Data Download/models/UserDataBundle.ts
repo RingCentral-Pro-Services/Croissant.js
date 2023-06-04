@@ -117,10 +117,11 @@ export interface CallHandling {
                 enabled: boolean
                 forwardingNumbers: [
                     {
-                        id: string
+                        id?: string
                         phoneNumber: string
                         label: string
-                        tyoe: string
+                        type: string
+                        uri?: string
                     }
                 ]
             }
@@ -133,6 +134,7 @@ export interface CallHandling {
         }
         extension: {
             id: string
+            displayName?: string
             externalNumber: {
                 phoneNumber: string
             }
@@ -142,6 +144,15 @@ export interface CallHandling {
         enabled: boolean
         recipient: {
             id: string
+            displayName?: string
+            uri?: string
+        }
+    }
+    transfer: {
+        extension: {
+            id: string
+            uri?: string
+            extensionNumber?: string
         }
     }
 }

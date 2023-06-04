@@ -7,6 +7,7 @@ import useSidebar from "../../../../hooks/useSidebar";
 import useWriteExcelFile from "../../../../hooks/useWriteExcelFile";
 import { DataGridFormattable } from "../../../../models/DataGridFormattable";
 import { Extension } from "../../../../models/Extension";
+import { Message } from "../../../../models/Message";
 import useExtensions from "../../../../rcapi/useExtensions";
 import useGetAccessToken from "../../../../rcapi/useGetAccessToken";
 import AdaptiveFilter from "../../../shared/AdaptiveFilter";
@@ -19,10 +20,12 @@ import useFetchERLs from "../../Automatic Location Updates/hooks/useFetchERLs";
 import useSiteList from "../Sites/hooks/useSiteList";
 import { UserDataBundle } from "../User Data Download/models/UserDataBundle";
 import useConfigureUsers from "./hooks/useConfigureUsers";
+import useCustomRoleList from "./hooks/useCustomRoleList";
 import useFetchUsers from "./hooks/useFetchUsers";
 import useMigrateERLs from "./hooks/useMigrateERLs";
 import useMigrateSites from "./hooks/useMigrateSites";
 import useMigrateUsers from "./hooks/useMigrateUsers";
+import { Role } from "./models/Role";
 
 const MigrateUsers = () => {
     const [originalUID, setOriginalUID] = useState('')
@@ -39,8 +42,9 @@ const MigrateUsers = () => {
     const [isPullingData, setIsPullingData] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
     const [isPending, setIsPending] = useState(false)
-    const supportedExtensionTypes = ['ERLs', 'User', 'Limited Extension', 'Call Queue', 'IVR Menu', 'Message-Only', 'Announcement-Only']
+    const supportedExtensionTypes = ['ERLs', 'Custom Roles', 'User', 'Limited Extension', 'Call Queue', 'IVR Menu', 'Message-Only', 'Announcement-Only']
     const [sites, setSites] = useState<SiteData[]>([])
+    const [customRoles, setCustomRoles] = useState<Role[]>([])
 
     const handleSiteFetchCompletion = (sites: SiteData[]) => {
         setSites(sites)
@@ -48,7 +52,7 @@ const MigrateUsers = () => {
     }
 
     useLogin('migrateusers', isPullingData || isMigrating)
-    useSidebar('Migrate Users')
+    useSidebar('Auto-Migrate')
     const {fetchToken: fetchOriginalAccountToken, companyName: originalCompanyName, hasCustomerToken: hasOriginalAccountToken, error: originalAccountTokenError, isTokenPending: isOriginalAccountTokenPending, userName: originalUserName} = useGetAccessToken()
     const {fetchToken: fetchTargetAccountToken, companyName: targetCompanyName, hasCustomerToken: hasTargetAccountToken, error: targetAccountTokenError, isTokenPending: isTargetAccountTokenPending, userName: targetUserName} = useGetAccessToken()
     const {postMessage, messages, errors, postError} = useMessageQueue()
@@ -60,6 +64,7 @@ const MigrateUsers = () => {
     const {fetchERLs, erls, isERLListPending} = useFetchERLs()
     const {fetchERLs: fetchTargetERLs, erls: targetERLList, isERLListPending: isTargetERLListPending} = useFetchERLs()
     const {fetchUsers, progressValue: userFetchProgress, maxProgress: maxUserFetchProgress} = useFetchUsers(postMessage, postTimedMessage, postError)
+    const {fetchCustomRoles} = useCustomRoleList(postMessage, postTimedMessage, postError)
 
     const {migrateSites, maxProgress: maxSiteProgress, progressValue: siteMigrationProgress} = useMigrateSites(postMessage, postTimedMessage, postError)
     const {migrateERLs, progressValue: erlProgress, maxProgress: maxERLProgress} = useMigrateERLs(postMessage, postTimedMessage, postError)
@@ -133,8 +138,10 @@ const MigrateUsers = () => {
 
     const handleDisoverButtonClick = async () => {
         setIsPullingData(true)
+        const roles = await fetchCustomRoles()
         const userDataBundles = await fetchUsers(selectedExtensions.filter((ext) => ext.prettyType() === 'User'), originalExtensionList)
         setUserDataBundles(userDataBundles)
+        setCustomRoles(roles)
         console.log('Fetched users')
         console.log(userDataBundles)
     }
@@ -146,7 +153,7 @@ const MigrateUsers = () => {
         let targetERLs = targetERLList
 
         if (shouldMigrateSites) {
-            const selectedSites = sites.filter((site) => selectedSiteNames.includes(site.name))
+            const selectedSites = sites.filter((site) => selectedSiteNames.includes(`${site.name}`))
             const siteExtensions = await migrateSites(selectedSites)
             targetExts = [...targetExts, ...siteExtensions]
         }
@@ -154,7 +161,8 @@ const MigrateUsers = () => {
         let unassignedExtensions = targetExtensionList.filter((ext) => ext.data.status === 'Unassigned' && ext.prettyType() === 'User')
 
         if (selectedExtensionTypes.includes('ERLs')) {
-            const migratedERLs = await migrateERLs(erls, targetExts)
+            const selectedERLs = erls.filter((erl) => selectedSiteNames.includes(erl.site.name))
+            const migratedERLs = await migrateERLs(selectedERLs, targetExts)
             targetERLs = [...targetERLs, ...migratedERLs]
         }
 
@@ -167,6 +175,7 @@ const MigrateUsers = () => {
 
         // writeExcel([], targetExts, 'Exts', 'target-ext.xlsx')
         await configureUsers(userDataBundles, targetERLs, originalExtensionList, targetExts)
+        postMessage(new Message('Finished', 'info'))
     }
 
     return (

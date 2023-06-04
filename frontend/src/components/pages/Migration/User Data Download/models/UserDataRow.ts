@@ -81,13 +81,13 @@ export class UserDataRow implements ExcelFormattable {
             this.prettyDeviceRingTime(),
             this.prettyVoicemailAction(),
             this.greeting('Voicemail'),
-            this.businessHoursCallHandling?.voicemail.recipient.id ?? '',
+            this.businessHoursCallHandling?.voicemail.recipient.displayName ?? '',
             this.afterHoursCallHandling?.callHandlingAction === 'ForwardCalls' ? this.afterHoursCallHandling?.forwarding.ringingMode ?? '' : '',
             this.afterHoursCallHandling?.callHandlingAction === 'ForwardCalls' ? this.prettyRingTime(this.afterHoursCallHandling?.forwarding.softPhonesRingCount) : '',
             this.prettyAfterHoursDeviceRingTime(),
             this.prettyAfterHoursVoicemailAction(),
             this.afterHoursGreeting('Voicemail'),
-            this.afterHoursCallHandling?.voicemail.recipient.id ?? '',
+            this.afterHoursCallHandling?.voicemail.recipient.displayName ?? '',
             '', // Custom roles
             this.prettyIncommingCallInfo(),
             this.notifications?.voicemails.includeTranscription ? 'ON' : 'OFF',
@@ -151,7 +151,7 @@ export class UserDataRow implements ExcelFormattable {
                 result = 'Play Announcement'
                 break
             case 'ConnectToExtension':
-                result = `Transfer to ${this.businessHoursCallHandling.missedCall.extension.id}`
+                result = `Transfer to ${this.businessHoursCallHandling.missedCall.extension.displayName}`
                 break
             case 'ConnectToExternalNumber':
                 result = `Transfer to ${this.businessHoursCallHandling.missedCall.externalNumber.phoneNumber}`
@@ -172,7 +172,7 @@ export class UserDataRow implements ExcelFormattable {
                 result = 'Play Announcement'
                 break
             case 'ConnectToExtension':
-                result = `Transfer to ${this.afterHoursCallHandling.missedCall.extension.id}`
+                result = `Transfer to ${this.afterHoursCallHandling.missedCall.extension.displayName}`
                 break
             case 'ConnectToExternalNumber':
                 result = `Transfer to ${this.afterHoursCallHandling.missedCall.externalNumber.phoneNumber}`

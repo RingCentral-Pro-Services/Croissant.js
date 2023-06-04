@@ -37,6 +37,7 @@ const useMigrateSites = (postMessage: (message: Message) => void, postTimedMessa
 
             // if (site.code) delete site.code
 
+            site.email = `${site.email}.ps.ringcentral.com`
             const response = await RestCentral.post(baseURL, headers, site)
             site.id = response.data.id
 

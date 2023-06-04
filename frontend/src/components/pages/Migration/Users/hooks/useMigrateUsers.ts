@@ -43,7 +43,7 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
                 await migrateUser(bundle)
             }
         }
-        await wait(15000)
+        await wait(3000)
     }
 
     const wait = (ms: number) => {

@@ -61,9 +61,28 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
             await addBlockedNumber(bundle, number, accessToken)
         }
         await setForwardAllCalls(bundle, originalExtensions, targetExtensions, accessToken)
+        await wait(10000)
+
         const currentCallHandling = await getBusinessHoursCallHandling(bundle, accessToken)
+        if (currentCallHandling) {
+            const adjustedCallHandling = adjustCallHandling(bundle, currentCallHandling, originalExtensions, targetExtensions)
+            if (adjustedCallHandling) {
+                await setBusinessHoursCallHandling(bundle, adjustedCallHandling, accessToken)
+            }
+        }
+
+        if (Object.keys(bundle.extendedData!.businessHours!.schedule).length !== 0) {
+            const currentAfterHoursCallHandling = await getAfterHoursCallHandling(bundle, accessToken)
+            if (currentAfterHoursCallHandling) {
+                const adjustedCallHandling = adjustAfterHoursCallHandling(bundle, currentAfterHoursCallHandling, originalExtensions, targetExtensions)
+                if (adjustedCallHandling) {
+                    await setAfterHoursCallHandling(bundle, adjustedCallHandling, accessToken)
+                }
+            }    
+        }
+
         for (const erl of bundle.extendedData!.pERLs!) {
-            addPERL(bundle, erl, accessToken)
+            await addPERL(bundle, erl, accessToken)
         }
     }
 
@@ -186,6 +205,8 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
     }
 
     const setDeviceName = async (bundle: UserDataBundle, deviceData: DeviceData, token: string) => {
+        console.log('setting device name')
+        console.log(deviceData.device.name)
         try {
             const headers = {
                 "Accept": "application/json",
@@ -666,6 +687,35 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
         }
     }
 
+    const getAfterHoursCallHandling = async (bundle: UserDataBundle, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const response = await RestCentral.get(baseCallHandlingURL.replace('extensionId', `${bundle.extension.data.id}`).replace('ruleId', 'after-hours-rule'), headers)
+            const callHandling = response.data as CallHandling
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+            return callHandling
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to get after hours call handling`)
+            console.log(e)
+            postMessage(new Message(`Failed to get after hours call handling for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to get after hours call handling', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
     const addPERL = async (bundle: UserDataBundle, erl: PERL, token: string) => {
         try {
             const headers = {
@@ -694,20 +744,227 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
         }
     }
 
-    const adjustCallHandling = (bundle: UserDataBundle, currentCallHandling: CallHandling) => {
+    const setBusinessHoursCallHandling = async (bundle: UserDataBundle, callHandling: CallHandling, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const body = {
+                forwarding: callHandling.forwarding,
+                missedCall: callHandling.missedCall,
+                voicemail: callHandling.voicemail,
+                screening: callHandling.screening
+            }
+
+            const response = await RestCentral.put(baseCallHandlingURL.replace('extensionId', `${bundle.extension.data.id}`).replace('ruleId', 'business-hours-rule'), headers, body)
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to set business hours call handling`)
+            console.log(e)
+            postMessage(new Message(`Failed to set business hours call handling for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to set business hours call handling', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const setAfterHoursCallHandling = async (bundle: UserDataBundle, callHandling: CallHandling, token: string) => {
+        // Don't try to set call handling if user is set to 24/7
+        if (Object.keys(bundle.extendedData!.businessHours!.schedule).length === 0) return
+
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const body = {
+                forwarding: callHandling.forwarding,
+                missedCall: callHandling.missedCall,
+                voicemail: callHandling.voicemail,
+                screening: callHandling.screening
+            }
+
+            const response = await RestCentral.put(baseCallHandlingURL.replace('extensionId', `${bundle.extension.data.id}`).replace('ruleId', 'after-hours-rule'), headers, body)
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to set after hours call handling`)
+            console.log(e)
+            postMessage(new Message(`Failed to set after hours call handling for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to set after hours call handling', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const adjustCallHandling = (bundle: UserDataBundle, currentCallHandling: CallHandling, originalExtensions: Extension[], targetExtensions: Extension[]) => {
         let result = currentCallHandling
-        const originalCallHandling = bundle.extendedData!.businessHoursCallHandling
+        let originalCallHandling = bundle.extendedData!.businessHoursCallHandling
         if (!originalCallHandling) return
 
-        if (result.forwarding) {
-            const originalRules = originalCallHandling.forwarding.rules
+        // Adjust call forwarding
+        // Need to swap out phone numbers and IDs to that of the newly created extension
+        if (originalCallHandling.forwarding) {
+            let originalRules = originalCallHandling.forwarding.rules
             const currentRules = result.forwarding.rules
+            if (!currentRules || !originalRules) return
+            const currentForwardingNumbers = currentRules.flatMap((rule) => rule.forwardingNumbers)
             let newRules = []
 
-            for (let rule of currentRules) {
-                const matchingRule = originalRules.find((originalRule) => originalRule.forwardingNumbers[0].label === rule.forwardingNumbers[0].label)
+            if (currentRules && originalRules) {
+                for (let i = 0; i < originalRules.length; i++) {
+                    let rule = originalRules[i]
+    
+                    for (let j = 0; j < rule.forwardingNumbers.length; j++) {
+                        let forwardingNumber = rule.forwardingNumbers[j]
+                        if (forwardingNumber.type !== 'PhoneLine') continue
+    
+                        const matchingForwardingNumber = currentForwardingNumbers.find((number) => number.label === forwardingNumber.label)
+                        if (!matchingForwardingNumber) {
+                            postMessage(new Message(`Failed to find matching forwarding rule for ${forwardingNumber.label} on ${bundle.extension.data.name}`, 'error'))
+                            continue
+                        }
+    
+                        forwardingNumber.id = matchingForwardingNumber.id
+                        forwardingNumber.phoneNumber = matchingForwardingNumber.phoneNumber
+                    }
+                }
             }
         }
+
+        // Adjust voicemail recipient
+        if (originalCallHandling.voicemail && originalCallHandling.voicemail.enabled) {
+            console.log('original call handling')
+            console.log(originalCallHandling.voicemail.recipient)
+            const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === `${originalCallHandling?.voicemail.recipient.id}`)
+            if (!originalExtension) {
+                postMessage(new Message(`Failed to find original ID for voicemail recipient on ${bundle.extension.data.name}. Original ID: ${originalCallHandling.voicemail.recipient.id}`, 'error'))
+                postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to set voicemail recipient', 'Original ID not found']))
+            }
+
+            const newExtension = targetExtensions.find((ext) => ext.prettyType() === originalExtension?.prettyType() && ext.data.name === originalExtension.data.name)
+            if (!newExtension) {
+                postMessage(new Message(`Failed to find new ID for voicemail recipient on ${bundle.extension.data.name}`, 'error'))
+                postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to set voicemail recipient', 'New ID not found']))
+            }
+
+            originalCallHandling.voicemail.recipient.id = `${newExtension?.data.id}`
+            delete originalCallHandling.voicemail.recipient.uri
+            delete originalCallHandling.voicemail.recipient.displayName
+        }
+
+        // Adjust missed call recipient
+        if (originalCallHandling.missedCall && originalCallHandling.missedCall.actionType === 'ConnectToExtension') {
+            const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === `${originalCallHandling?.missedCall.extension.id}`)
+            if (!originalExtension) {
+                postMessage(new Message(`Failed to find original ID for missed call recipient on ${bundle.extension.data.name}`, 'error'))
+                postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to set missed call recipient', 'Original ID not found']))
+            }
+
+            const newExtension = targetExtensions.find((ext) => ext.prettyType() === originalExtension?.prettyType() && ext.data.name === originalExtension.data.name)
+            if (!newExtension) {
+                postMessage(new Message(`Failed to find new ID for missed call recipient on ${bundle.extension.data.name}`, 'error'))
+                postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to set missed call recipient', 'New ID not found']))
+            }
+
+            originalCallHandling.missedCall.extension.id = `${newExtension?.data.id}`
+            delete originalCallHandling.missedCall.extension.displayName
+        }
+
+        return originalCallHandling
+    }
+
+    const adjustAfterHoursCallHandling = (bundle: UserDataBundle, currentCallHandling: CallHandling, originalExtensions: Extension[], targetExtensions: Extension[]) => {
+        let result = currentCallHandling
+        let originalCallHandling = bundle.extendedData!.afterHoursCallHandling
+        if (!originalCallHandling) return
+
+        // Adjust call forwarding
+        // Need to swap out phone numbers and IDs to that of the newly created extension
+        if (originalCallHandling.forwarding) {
+            let originalRules = originalCallHandling.forwarding.rules
+            const currentRules = result.forwarding.rules
+            const currentForwardingNumbers = currentRules.flatMap((rule) => rule.forwardingNumbers)
+            let newRules = []
+
+            for (let i = 0; i < originalRules.length; i++) {
+                let rule = originalRules[i]
+
+                for (let j = 0; j < rule.forwardingNumbers.length; j++) {
+                    let forwardingNumber = rule.forwardingNumbers[j]
+                    if (forwardingNumber.type !== 'PhoneLine') continue
+
+                    const matchingForwardingNumber = currentForwardingNumbers.find((number) => number.label === forwardingNumber.label)
+                    if (!matchingForwardingNumber) {
+                        postMessage(new Message(`Failed to find matching forwarding rule for ${forwardingNumber.label} on ${bundle.extension.data.name}`, 'error'))
+                        continue
+                    }
+
+                    forwardingNumber.id = matchingForwardingNumber.id
+                    forwardingNumber.phoneNumber = matchingForwardingNumber.phoneNumber
+                }
+                
+            }
+        }
+
+        // Adjust voicemail recipient
+        if (originalCallHandling.voicemail && originalCallHandling.voicemail.enabled) {
+            console.log('original call handling')
+            console.log(originalCallHandling.voicemail.recipient)
+            const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === `${originalCallHandling?.voicemail.recipient.id}`)
+            if (!originalExtension) {
+                postMessage(new Message(`Failed to find original ID for after hours voicemail recipient on ${bundle.extension.data.name}. Original ID: ${originalCallHandling.voicemail.recipient.id}`, 'error'))
+                postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to set voicemail recipient', 'Original ID not found']))
+            }
+
+            const newExtension = targetExtensions.find((ext) => ext.prettyType() === originalExtension?.prettyType() && ext.data.name === originalExtension.data.name)
+            if (!newExtension) {
+                postMessage(new Message(`Failed to find new ID for voicemail recipient on ${bundle.extension.data.name}`, 'error'))
+                postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to set voicemail recipient', 'New ID not found']))
+            }
+
+            originalCallHandling.voicemail.recipient.id = `${newExtension?.data.id}`
+            delete originalCallHandling.voicemail.recipient.uri
+            delete originalCallHandling.voicemail.recipient.displayName
+        }
+
+        // Adjust missed call recipient
+        if (originalCallHandling.missedCall && originalCallHandling.missedCall.actionType === 'ConnectToExtension') {
+            const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === `${originalCallHandling?.missedCall.extension.id}`)
+            if (!originalExtension) {
+                postMessage(new Message(`Failed to find original ID for missed call recipient on ${bundle.extension.data.name}`, 'error'))
+                postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to set missed call recipient', 'Original ID not found']))
+            }
+
+            const newExtension = targetExtensions.find((ext) => ext.prettyType() === originalExtension?.prettyType() && ext.data.name === originalExtension.data.name)
+            if (!newExtension) {
+                postMessage(new Message(`Failed to find new ID for missed call recipient on ${bundle.extension.data.name}`, 'error'))
+                postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to set missed call recipient', 'New ID not found']))
+            }
+
+            originalCallHandling.missedCall.extension.id = `${newExtension?.data.id}`
+            delete originalCallHandling.missedCall.extension.displayName
+        }
+
+        return originalCallHandling
     }
 
     const wait = (ms: number) => {

@@ -136,7 +136,7 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
                 const extensionID = userDataBundle.extendedData.businessHoursCallHandling.voicemail.recipient.id
                 const extension = extensions.find((ext) => `${ext.data.id}` === `${extensionID}`)
                 if (extension) {
-                    userDataBundle.extendedData.businessHoursCallHandling.voicemail.recipient.id = `${extension.data.name} - ${extension.data.extensionNumber}`
+                    userDataBundle.extendedData.businessHoursCallHandling.voicemail.recipient.displayName = `${extension.data.name} - ${extension.data.extensionNumber}`
                 }
             }
 
@@ -174,7 +174,7 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
                 const extensionID = userDataBundle.extendedData.afterHoursCallHandling.missedCall.extension.id
                 const extension = extensions.find((ext) => `${ext.data.id}` === `${extensionID}`)
                 if (extension) {
-                    userDataBundle.extendedData.afterHoursCallHandling.missedCall.extension.id = `${extension.data.name} - ${extension.data.extensionNumber}`
+                    userDataBundle.extendedData.afterHoursCallHandling.missedCall.extension.displayName = `${extension.data.name} - ${extension.data.extensionNumber}`
                 }
             }
 
@@ -182,7 +182,7 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
                 const extensionID = userDataBundle.extendedData.afterHoursCallHandling.voicemail.recipient.id
                 const extension = extensions.find((ext) => `${ext.data.id}` === `${extensionID}`)
                 if (extension) {
-                    userDataBundle.extendedData.afterHoursCallHandling.voicemail.recipient.id = `${extension.data.name} - ${extension.data.extensionNumber}`
+                    userDataBundle.extendedData.afterHoursCallHandling.voicemail.recipient.displayName = `${extension.data.name} - ${extension.data.extensionNumber}`
                 }
             }
 
