@@ -3,6 +3,7 @@ import { Message } from "../../../../../models/Message"
 import { SyncError } from "../../../../../models/SyncError"
 import { RestCentral } from "../../../../../rcapi/RestCentral"
 import { PERL, PhoneNumber, Role, UserDataBundle } from "../models/UserDataBundle"
+const FileSaver = require('file-saver');
 
 const useFetchUserData = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void, callback: () => void) => {
     const baseDataURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId'
@@ -24,6 +25,7 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
     const basePhoneNumbersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/phone-number?usageType=DirectNumber&perPage=1000'
     const baseForwardAllCallsURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/forward-all-calls'
     const basePMIURL = 'https://platform.ringcentral.com/rcvideo/v2/account/~/extension/extensionId/bridges/default'
+    const baseCustomGreetingURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/greeting/greetingId'
     const baseWaitingPeriod = 250
 
     const fetchUserData = async (userDataBundle: UserDataBundle, extensions: Extension[]) => {
@@ -49,10 +51,33 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
         await fetchPERLs(userDataBundle, accessToken)
         await fetchRoles(userDataBundle, accessToken)
         await fetchIncommingCallInfo(userDataBundle, accessToken)
-        // await fetchBusinessHours(userDataBundle, accessToken)
         await fetchDirectNumbers(userDataBundle, accessToken)
         await fetchForwardAllCalls(userDataBundle, accessToken)
         await fetchPMI(userDataBundle, accessToken)
+
+        for (let i = 0; i < userDataBundle.extendedData!.businessHoursCallHandling!.greetings.length; i++) {
+            if (userDataBundle.extendedData?.businessHoursCallHandling?.greetings[i].custom) {
+                const url = await getCustomGreetingURL(userDataBundle, userDataBundle.extendedData.businessHoursCallHandling.greetings[i].custom!.id, accessToken)
+                if (!url) continue
+                const data = await getCustomGreetingData(userDataBundle, url![0], accessToken)
+                if (!data) continue
+                userDataBundle.extendedData.businessHoursCallHandling.greetings[i].custom!.data = data
+                userDataBundle.extendedData.businessHoursCallHandling.greetings[i].custom!.contentType = url![1]
+            }
+        }
+
+        if (userDataBundle.extendedData?.afterHoursCallHandling) {
+            for (let i = 0; i < userDataBundle.extendedData!.afterHoursCallHandling!.greetings.length; i++) {
+                if (userDataBundle.extendedData?.afterHoursCallHandling?.greetings[i].custom) {
+                    const url = await getCustomGreetingURL(userDataBundle, userDataBundle.extendedData.afterHoursCallHandling.greetings[i].custom!.id, accessToken)
+                    if (!url) continue
+                    const data = await getCustomGreetingData(userDataBundle, url![0], accessToken)
+                    if (!data) continue
+                    userDataBundle.extendedData.afterHoursCallHandling.greetings[i].custom!.data = data
+                    userDataBundle.extendedData.afterHoursCallHandling.greetings[i].custom!.contentType = url![1]
+                }
+            }
+        }
         callback()
     }
 
@@ -674,6 +699,72 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
             console.log(e)
             postMessage(new Message(`Failed to get PMI for ${userDataBundle.extension.data.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(userDataBundle.extension.data.name, parseInt(userDataBundle.extension.data.extensionNumber), ['Failed to fetch PMI', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const getCustomGreetingURL = async (bundle: UserDataBundle, greetingID: string, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const response = await RestCentral.get(baseCustomGreetingURL.replace('extensionId', `${bundle.extension.data.id}`).replace('greetingId', greetingID), headers)
+            
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+
+            return [response.data.contentUri, response.data.contentType]
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to get custom greeting URL`)
+            console.log(e)
+            postMessage(new Message(`Failed to get custom greeting URL for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to get custom greeting URL', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const getCustomGreetingData = async (bundle: UserDataBundle, url: string, token: string) => {
+        try {
+            const headers = {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            // const response = await RestCentral.get(url, headers)
+            const res = await fetch(url, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+            // const blob = new Blob([response.data])
+            const buffer = await res.arrayBuffer()
+
+            // if (response.rateLimitInterval > 0) {
+            //     postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            // }
+            
+            // response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+
+            return buffer
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to get custom greeting URL`)
+            console.log(e)
+            postMessage(new Message(`Failed to get custom greeting URL for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to get custom greeting URL', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }

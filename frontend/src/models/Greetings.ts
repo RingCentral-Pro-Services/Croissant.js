@@ -5,6 +5,11 @@ export interface Greetings {
 export interface Greeting {
     type: string
     preset: GreetingPreset
+    custom?: {
+        id: string
+        data?: any
+        contentType?: string
+    }
 }
 
 export interface GreetingPreset {

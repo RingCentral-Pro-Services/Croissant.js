@@ -1,4 +1,5 @@
 import { Extension } from "../../../../../models/Extension";
+import { Greeting } from "../../../../../models/Greetings";
 import { Message } from "../../../../../models/Message";
 import { SyncError } from "../../../../../models/SyncError";
 import { RestCentral } from "../../../../../rcapi/RestCentral";
@@ -36,6 +37,7 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
     const baseForwardingNumbersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/forwarding-number'
     const baseForwardAllCallsURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/forward-all-calls'
     const basePERLURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/emergency-locations'
+    const baseCustomGreetingURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/greeting'
     const baseWaitingPeriod = 250
 
     const configureUser = async (bundle: UserDataBundle, companyERLs: ERL[], originalExtensions: Extension[], targetExtensions: Extension[], roles: Role[]) => {
@@ -57,8 +59,18 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
         await setPresenseStatus(bundle, accessToken)
         await setNotifications(bundle, accessToken)
         await enableIntercom(bundle, deviceIDs[0], accessToken)
+
+
         const customBusinessHoursGreetings = await setDuringHoursGreetings(bundle, accessToken)
         const customAfterHoursGreetings = await setAfterHoursGreetings(bundle, accessToken)
+
+        if (customBusinessHoursGreetings) {
+            for (const greeting of customBusinessHoursGreetings) {
+                console.log('setting custom greeting')
+                await setCustomGreeting(bundle, 'business-hours-rule', greeting, accessToken)
+            }
+        }
+
         await setBlockedCallSettings(bundle, accessToken)
         for (const number of bundle.extendedData!.blockedPhoneNumbers!) {
             await addBlockedNumber(bundle, number, accessToken)
@@ -1012,6 +1024,44 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
         }
 
         return originalCallHandling
+    }
+
+    const setCustomGreeting = async (bundle: UserDataBundle, ruleID: string, greeting: Greeting, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "multipart/form-data",
+                "Content-Disposition": `attachment; filename="greeting.mp3"`,
+                "Authorization": `Bearer ${token}`
+            }
+
+            const formData = new FormData()
+            const filename = `audio.${greeting.custom?.contentType === 'audio/mpeg' ? 'mp3' : 'wav'}`
+            const file = new File([greeting.custom?.data], filename, {
+                type: greeting.custom?.contentType === 'audio/mpeg' ? 'audio/mpeg' : 'audio/wav'
+            })
+            formData.append('type', greeting.type)
+            formData.append('answeringRuleId', ruleID)
+            formData.append('binary', file, file.name)
+
+            const response = await RestCentral.post(baseCustomGreetingURL.replace('extensionId', `${bundle.extension.data.id}`), headers, formData)
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to set custom ${greeting.type} greeting`)
+            console.log(e)
+            postMessage(new Message(`Failed to set custom ${greeting.type} greeting for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to set custom greeting', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
     }
 
     const wait = (ms: number) => {
