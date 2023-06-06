@@ -1,7 +1,7 @@
 import { Message } from "../../../../../models/Message";
 import { SyncError } from "../../../../../models/SyncError";
 import { RestCentral } from "../../../../../rcapi/RestCentral";
-import { UserDataBundle } from "../../User Data Download/models/UserDataBundle";
+import { PhoneNumber, UserDataBundle } from "../../User Data Download/models/UserDataBundle";
 
 const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
     const baseUpdateURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId'
@@ -11,7 +11,7 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
     const baseNumberAssignURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/phone-number/phoneNumberId'
     const baseWaitingPeriod = 250
 
-    const migrateUser = async (dataBundle: UserDataBundle, extensionIDs?: string[]) => {
+    const migrateUser = async (dataBundle: UserDataBundle, phoneNumbers: PhoneNumber[], extensionIDs?: string[]) => {
         const accessToken = localStorage.getItem('cs_access_token')
         if (!accessToken) {
             throw new Error('No access token')
@@ -24,13 +24,14 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
         
         else {
             // This is a licensed user
-            console.log('Extension IDs')
-            console.log(extensionIDs)
             await createLicensedUser(dataBundle, extensionIDs[0], accessToken)
             for (let i = 1; i < extensionIDs.length; i++) {
-                console.log('adding digital line')
                 await addDigitalLine(dataBundle, extensionIDs[i], accessToken)
             }
+        }
+
+        for (const phoneNumber of phoneNumbers) {
+            await assignPhoneNumber(dataBundle, phoneNumber.id, accessToken)
         }
     }
 

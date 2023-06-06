@@ -1,3 +1,4 @@
+import { Bundle } from "typescript";
 import { Extension } from "../../../../../models/Extension";
 import { Greeting } from "../../../../../models/Greetings";
 import { Message } from "../../../../../models/Message";
@@ -50,9 +51,15 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
         await setSchedule(bundle, accessToken)
         const deviceIDs = await getDeviceIDs(bundle, accessToken)
         const deviceData = await setDeviceModels(bundle, deviceIDs, accessToken)
+        console.log('PERLS')
+        console.log(bundle.extendedData?.pERLs)
+        for (let i = 0; i < bundle.extendedData!.pERLs!.length; i++) {
+            await addPERL(bundle, bundle.extendedData!.pERLs![i], accessToken)
+            console.log('Adding pERL')
+        }
         for (const data of deviceData) {
             await setDeviceName(bundle, data, accessToken)
-            await setDeviceERL(bundle, data, companyERLs, accessToken)
+            await setDeviceERL(bundle, data, companyERLs, bundle.extendedData!.pERLs!, accessToken)
             await addForwardingDevice(bundle, data.newDeviceID, accessToken)
         }
         await setPresenseLines(bundle, originalExtensions, targetExtensions, accessToken)
@@ -96,9 +103,9 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
             }    
         }
 
-        for (const erl of bundle.extendedData!.pERLs!) {
-            await addPERL(bundle, erl, accessToken)
-        }
+        // for (const erl of bundle.extendedData!.pERLs!) {
+        //     await addPERL(bundle, erl, accessToken)
+        // }
     }
 
     const setRole = async (bundle: UserDataBundle, roles: Role[], token: string) => {
@@ -297,7 +304,7 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
         }
     }
 
-    const setDeviceERL = async (bundle: UserDataBundle, deviceData: DeviceData, companyERLs: ERL[], token: string) => {
+    const setDeviceERL = async (bundle: UserDataBundle, deviceData: DeviceData, companyERLs: ERL[], personalERLs: PERL[], token: string) => {
         try {
             const headers = {
                 "Accept": "application/json",
@@ -306,7 +313,8 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
             }
 
             const erl = companyERLs.find((erl) => erl.name === deviceData.device.emergency.location?.name && erl.visibility === deviceData.device.emergency.visibility)
-            if (!erl) {
+            const perl = personalERLs.find((erl) => erl.name === deviceData.device.emergency.location?.name)
+            if (!erl && !perl) {
                 postMessage(new Message(`ERL for ${bundle.extension.data.name} was not found. ERL not set`, 'error'))
                 return
             }
@@ -314,7 +322,7 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
             const body = {
                 emergency: {
                     location: {
-                        id: erl?.id
+                        id: erl?.id ?? perl?.id
                     }
                 }
             }
@@ -783,7 +791,7 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
                 "Authorization": `Bearer ${token}`
             }
             const response = await RestCentral.post(basePERLURL.replace('extensionId', `${bundle.extension.data.id}`), headers, erl)
-            
+            erl.id = response.data.id
 
             if (response.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)

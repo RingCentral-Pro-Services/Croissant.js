@@ -1,5 +1,6 @@
-import { Button, Checkbox, FormControlLabel } from "@mui/material";
+import { Button, Checkbox, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
+import ExtensionIsolator from "../../../../helpers/ExtensionIsolator";
 import useLogin from "../../../../hooks/useLogin";
 import useMessageQueue from "../../../../hooks/useMessageQueue";
 import usePostTimedMessage from "../../../../hooks/usePostTimedMessage";
@@ -18,7 +19,7 @@ import ToolCard from "../../../shared/ToolCard";
 import UIDInputField from "../../../shared/UIDInputField";
 import useFetchERLs from "../../Automatic Location Updates/hooks/useFetchERLs";
 import useSiteList from "../Sites/hooks/useSiteList";
-import { UserDataBundle } from "../User Data Download/models/UserDataBundle";
+import { PhoneNumber, UserDataBundle } from "../User Data Download/models/UserDataBundle";
 import useConfigureUsers from "./hooks/useConfigureUsers";
 import useCustomRoleList from "./hooks/useCustomRoleList";
 import useFetchUsers from "./hooks/useFetchUsers";
@@ -26,6 +27,7 @@ import useMigrateCustomRoles from "./hooks/useMigrateCustomRoles";
 import useMigrateERLs from "./hooks/useMigrateERLs";
 import useMigrateSites from "./hooks/useMigrateSites";
 import useMigrateUsers from "./hooks/useMigrateUsers";
+import usePhoneNumberList from "./hooks/usePhoneNumberList";
 import usePredefinedRoleList from "./hooks/useRoleList";
 import { Role } from "./models/Role";
 
@@ -47,6 +49,8 @@ const MigrateUsers = () => {
     const supportedExtensionTypes = ['ERLs', 'Custom Roles', 'User', 'Limited Extension', 'Call Queue', 'IVR Menu', 'Message-Only', 'Announcement-Only']
     const [sites, setSites] = useState<SiteData[]>([])
     const [customRoles, setCustomRoles] = useState<Role[]>([])
+    const [numberSourceSelection, setNumberSourceSelection] = useState('Inventory')
+    const [specificExtension, setSpecificExtension] = useState('')
 
     const handleSiteFetchCompletion = (sites: SiteData[]) => {
         setSites(sites)
@@ -68,14 +72,13 @@ const MigrateUsers = () => {
     const {fetchUsers, progressValue: userFetchProgress, maxProgress: maxUserFetchProgress} = useFetchUsers(postMessage, postTimedMessage, postError)
     const {fetchCustomRoles} = useCustomRoleList(postMessage, postTimedMessage, postError)
     const {fetchPredefinedRoles} = usePredefinedRoleList(postMessage, postTimedMessage, postError)
+    const {getPhoneNumberMap, phoneNumbers, isPhoneNumberMapPending} = usePhoneNumberList()
 
     const {migrateSites, maxProgress: maxSiteProgress, progressValue: siteMigrationProgress} = useMigrateSites(postMessage, postTimedMessage, postError)
     const {migrateCustomRoles, progressValue: customRoleProgress, maxProgress: maxCustomRoleProgress} = useMigrateCustomRoles(postMessage, postTimedMessage, postError)
     const {migrateERLs, progressValue: erlProgress, maxProgress: maxERLProgress} = useMigrateERLs(postMessage, postTimedMessage, postError)
     const {migrateUsers} = useMigrateUsers(postMessage, postTimedMessage, postError)
     const {configureUsers} = useConfigureUsers(postMessage, postTimedMessage, postError)
-
-    const {writeExcel} = useWriteExcelFile()
     
     useEffect(() => {
         if (originalUID.length < 5) return
@@ -108,6 +111,11 @@ const MigrateUsers = () => {
         if (!hasOriginalAccountToken) return
         fetchSites()
     }, [hasOriginalAccountToken])
+
+    useEffect(() => {
+        if (isTargetExtensionListPending) return
+        getPhoneNumberMap()
+    }, [isTargetExtensionListPending])
 
     useEffect(() => {
         if (!isDoneFetchingSites) return
@@ -156,6 +164,30 @@ const MigrateUsers = () => {
         let targetExts = targetExtensionList
         let targetERLs = targetERLList
         let roles: Role[] = []
+        let availablePhoneNumbers: PhoneNumber[] = []
+
+        if (numberSourceSelection === 'Inventory') {
+            availablePhoneNumbers = phoneNumbers.filter((number) => number.usageType === 'Inventory')
+            postMessage(new Message(`Discovered ${availablePhoneNumbers.length} numbers in number inventory`, 'info'))
+        }
+        else if (numberSourceSelection === 'Auto-Receptionist') {
+            // do this
+            availablePhoneNumbers = phoneNumbers.filter((number) => number.usageType === 'CompanyNumber')
+            postMessage(new Message(`Discovered ${availablePhoneNumbers.length} numbers on auto-receptionist`, 'info'))
+        }
+        else {
+            // specific extension
+            const isolator = new ExtensionIsolator()
+            const targetExtension = isolator.isolateExtension(specificExtension)
+            const extension = targetExtensionList.find((ext) => ext.data.extensionNumber === targetExtension)
+            if (!extension) {
+                postMessage(new Message(`Cannot pull numbers from extension ${specificExtension} because the extension was not found`, 'error'))
+                setIsMigrating(false)
+                return
+            }
+            availablePhoneNumbers = phoneNumbers.filter((number) => number.extension && `${number.extension.id}` === `${extension.data.id}`)
+            postMessage(new Message(`Discovered ${availablePhoneNumbers.length} numbers on extension ${specificExtension}`, 'info'))
+        }
 
         // Migrate sites
         if (shouldMigrateSites) {
@@ -185,12 +217,11 @@ const MigrateUsers = () => {
 
         console.log(`Migrating ${userDataBundles.length} users`)
         console.log(userDataBundles)
-        await migrateUsers(userDataBundles, unassignedExtensions, targetExts)
+        await migrateUsers(phoneNumbers, userDataBundles, unassignedExtensions, targetExts)
 
         const migratedUsers = userDataBundles.map((bundle) => bundle.extension)
         targetExts = [...targetExts, ...migratedUsers]
 
-        // writeExcel([], targetExts, 'Exts', 'target-ext.xlsx')
         await configureUsers(userDataBundles, targetERLs, originalExtensionList, targetExts, roles)
         postMessage(new Message('Finished', 'info'))
     }
@@ -209,6 +240,23 @@ const MigrateUsers = () => {
                 {shouldShowSiteFilter ? <AdaptiveFilter options={siteNames} title='Sites' placeholder='Search' setSelected={setSelectedSiteNames} /> : <></>}
                 <FormControlLabel control={<Checkbox defaultChecked value={shouldMigrateSites} onChange={(e) => setShouldMigrateSites(e.target.checked)} />} label="Migrate Sites" />
                 <Button variant='contained' onClick={handleDisoverButtonClick} disabled={isPullingData} >Discover</Button>
+                <div className="healthy-margin-top">
+                    <FormControl>
+                        <FormLabel id="demo-row-radio-buttons-group-label">Pull numbers from</FormLabel>
+                        <RadioGroup
+                            row
+                            aria-labelledby="number-selection-controll"
+                            name="row-radio-buttons-group"
+                            value={numberSourceSelection}
+                            onChange={(e, value) => setNumberSourceSelection(value)}
+                        >
+                            <FormControlLabel value="Inventory" control={<Radio />} label="Inventory" />
+                            <FormControlLabel value="Auto-Receptionist" control={<Radio />} label="Auto-Receptionist" />
+                            <FormControlLabel value="Specific Extension" control={<Radio />} label="Specific Extension" />
+                        </RadioGroup>
+                    </FormControl>
+                    {numberSourceSelection === 'Specific Extension' ? <TextField className='vertical-bottom' size='small' id="outlined-basic" label="Specific Extension" variant="outlined" value={specificExtension} onChange={(e) => setSpecificExtension(e.target.value)} /> : <></>}
+                </div>
                 <ProgressBar value={userFetchProgress} max={maxUserFetchProgress} label='Users' />
                 <FeedbackArea gridData={filteredExtensions} onFilterSelection={handleFilterSelection} messages={[]} errors={[]} timedMessages={[]} />
             </ToolCard>

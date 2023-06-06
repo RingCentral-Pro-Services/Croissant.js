@@ -273,6 +273,7 @@ export interface Delegate {
 }
 
 export interface PERL {
+    id?: string
     name: string
     visibility: string
     address: {

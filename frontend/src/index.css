@@ -394,6 +394,10 @@ progress::-webkit-progress-value {
   vertical-align: middle!important;
 }
 
+.vertical-bottom {
+  vertical-align: bottom!important;
+}
+
 .messages-area {
   max-height: 500px;
   overflow-y: auto;

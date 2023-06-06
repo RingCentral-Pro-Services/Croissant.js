@@ -1,13 +1,13 @@
 import { Extension } from "../../../../../models/Extension";
 import { Message } from "../../../../../models/Message";
 import { SyncError } from "../../../../../models/SyncError";
-import { UserDataBundle } from "../../User Data Download/models/UserDataBundle";
+import { PhoneNumber, UserDataBundle } from "../../User Data Download/models/UserDataBundle";
 import useMigrateUser from "./useMigrateUser";
 
 const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
     const {migrateUser} = useMigrateUser(postMessage, postTimedMessage, postError)
 
-    const migrateUsers = async (dataBundles: UserDataBundle[], unassignedExtensions: Extension[], extensions: Extension[]) => {
+    const migrateUsers = async (phoneNumbers: PhoneNumber[], dataBundles: UserDataBundle[], unassignedExtensions: Extension[], extensions: Extension[]) => {
         const accessToken = localStorage.getItem('cs_access_token')
         if (!accessToken) {
             throw new Error('No access token')
@@ -26,6 +26,16 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
             bundle.extension.data.contact.email = `${bundle.extension.data.contact.email}.ps.ringcentral.com`
             bundle.extension.data.status = 'NotActivated'
 
+            const phoneNumberBundle: PhoneNumber[] = []
+
+            if (bundle.extendedData?.directNumbers) {
+                for (let i = 0; i < bundle.extendedData!.directNumbers!.length; i++) {
+                    if (phoneNumbers.length !== 0) {
+                        phoneNumberBundle.push(phoneNumbers.pop()!)
+                    }
+                }
+            }
+
             if (bundle.extendedData?.devices.length != 0) {
                 const deviceCount = bundle.extendedData!.devices.length
                 let unassignedIDs: string[] = []
@@ -37,10 +47,10 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
                     unassignedIDs.push(`${unassignedExtensions.pop()?.data.id}`)
                 }
 
-                await migrateUser(bundle, unassignedIDs)
+                await migrateUser(bundle, phoneNumberBundle, unassignedIDs)
             }
             else {
-                await migrateUser(bundle)
+                await migrateUser(bundle, phoneNumberBundle)
             }
         }
         await wait(3000)

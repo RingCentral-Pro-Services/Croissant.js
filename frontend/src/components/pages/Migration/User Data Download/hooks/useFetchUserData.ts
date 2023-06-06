@@ -18,7 +18,7 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
     const basePresenseAllowedUsersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/presence/permission'
     const baseIntercomURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/intercom'
     const baseDelegatesURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/delegates'
-    const basePERLURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/emergency-locations'
+    const basePERLURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/emergency-locations?perPage=1000'
     const baseRoleURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/assigned-role'
     const baseIncommingCallInfoURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/incoming-call-info'
     const baseBusinessHoursURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/business-hours'
