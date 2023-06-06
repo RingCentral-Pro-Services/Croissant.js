@@ -8,7 +8,7 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
     const baseVirtualUserURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension'
     const basePhoneNumbersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/phone-number'
     // const baseNumberAssignURL = 'https://platform.ringcentral.com/restapi/v2/accounts/~/phone-numbers/phoneNumberId'
-    const baseNumberAssignURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/phone-number/phoneNumberId'
+    const baseNumberAssignURL = 'https://platform.ringcentral.com/restapi/v2/accounts/~/phone-numbers/phoneNumberId'
     const baseWaitingPeriod = 250
 
     const migrateUser = async (dataBundle: UserDataBundle, phoneNumbers: PhoneNumber[], extensionIDs?: string[]) => {
@@ -158,7 +158,7 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
             if (e.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
-            console.log(`Failed to create user`)
+            console.log(`Failed to assign additional number`)
             console.log(e)
             postMessage(new Message(`Failed to get phone number ID ${e.error ?? ''}`, 'error'))
             postError(new SyncError('', 0, ['Failed to get phone number ID', ''], e.error ?? ''))

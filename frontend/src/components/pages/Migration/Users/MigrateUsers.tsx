@@ -20,8 +20,11 @@ import UIDInputField from "../../../shared/UIDInputField";
 import useFetchERLs from "../../Automatic Location Updates/hooks/useFetchERLs";
 import useSiteList from "../Sites/hooks/useSiteList";
 import { PhoneNumber, UserDataBundle } from "../User Data Download/models/UserDataBundle";
+import useConfigureMOs from "./hooks/useConfigureMOs";
 import useConfigureUsers from "./hooks/useConfigureUsers";
+import useCreateMOs from "./hooks/useCreateMOs";
 import useCustomRoleList from "./hooks/useCustomRoleList";
+import useFetchMOs from "./hooks/useFetchMOs";
 import useFetchUsers from "./hooks/useFetchUsers";
 import useMigrateCustomRoles from "./hooks/useMigrateCustomRoles";
 import useMigrateERLs from "./hooks/useMigrateERLs";
@@ -29,6 +32,7 @@ import useMigrateSites from "./hooks/useMigrateSites";
 import useMigrateUsers from "./hooks/useMigrateUsers";
 import usePhoneNumberList from "./hooks/usePhoneNumberList";
 import usePredefinedRoleList from "./hooks/useRoleList";
+import { MessageOnlyDataBundle } from "./models/MessageOnlyDataBundle";
 import { Role } from "./models/Role";
 
 const MigrateUsers = () => {
@@ -51,6 +55,7 @@ const MigrateUsers = () => {
     const [customRoles, setCustomRoles] = useState<Role[]>([])
     const [numberSourceSelection, setNumberSourceSelection] = useState('Inventory')
     const [specificExtension, setSpecificExtension] = useState('')
+    const [messageOnlyBundles, setMessageOnlyBundles] = useState<MessageOnlyDataBundle[]>([])
 
     const handleSiteFetchCompletion = (sites: SiteData[]) => {
         setSites(sites)
@@ -73,12 +78,15 @@ const MigrateUsers = () => {
     const {fetchCustomRoles} = useCustomRoleList(postMessage, postTimedMessage, postError)
     const {fetchPredefinedRoles} = usePredefinedRoleList(postMessage, postTimedMessage, postError)
     const {getPhoneNumberMap, phoneNumbers, isPhoneNumberMapPending} = usePhoneNumberList()
+    const {fetchMOs, progressValue: messageOnlyFetchProgress , maxProgress: maxMessageOnlyFetchProgress} = useFetchMOs(postMessage, postTimedMessage, postError)
 
     const {migrateSites, maxProgress: maxSiteProgress, progressValue: siteMigrationProgress} = useMigrateSites(postMessage, postTimedMessage, postError)
     const {migrateCustomRoles, progressValue: customRoleProgress, maxProgress: maxCustomRoleProgress} = useMigrateCustomRoles(postMessage, postTimedMessage, postError)
     const {migrateERLs, progressValue: erlProgress, maxProgress: maxERLProgress} = useMigrateERLs(postMessage, postTimedMessage, postError)
     const {migrateUsers} = useMigrateUsers(postMessage, postTimedMessage, postError)
     const {configureUsers} = useConfigureUsers(postMessage, postTimedMessage, postError)
+    const {createMOs} = useCreateMOs(postMessage, postTimedMessage, postError)
+    const {configureMOs} = useConfigureMOs(postMessage, postTimedMessage, postError)
     
     useEffect(() => {
         if (originalUID.length < 5) return
@@ -152,8 +160,16 @@ const MigrateUsers = () => {
         setIsPullingData(true)
         const roles = await fetchCustomRoles()
         const userDataBundles = await fetchUsers(selectedExtensions.filter((ext) => ext.prettyType() === 'User'), originalExtensionList)
+        
+        // Message-only extensions
+        const selectedMOs = selectedExtensions.filter((ext) => ext.prettyType() === 'Message-Only')
+        const messageOnlyDataBundles = await fetchMOs(selectedMOs)
+        console.log('Message Only')
+        console.log(messageOnlyDataBundles)
+
         setUserDataBundles(userDataBundles)
         setCustomRoles(roles)
+        setMessageOnlyBundles(messageOnlyDataBundles)
         console.log('Fetched users')
         console.log(userDataBundles)
     }
@@ -196,6 +212,10 @@ const MigrateUsers = () => {
             targetExts = [...targetExts, ...siteExtensions]
         }
 
+        // Message only extensions
+        const createdMOs = await createMOs(messageOnlyBundles, targetExts, availablePhoneNumbers)
+        targetExts = [...targetExts, ...createdMOs]
+
         // Fetch predefined roles
         const predefinedRoles = await fetchPredefinedRoles()
         roles = [...predefinedRoles]
@@ -223,6 +243,7 @@ const MigrateUsers = () => {
         targetExts = [...targetExts, ...migratedUsers]
 
         await configureUsers(userDataBundles, targetERLs, originalExtensionList, targetExts, roles)
+        await configureMOs(messageOnlyBundles, originalExtensionList, targetExts)
         postMessage(new Message('Finished', 'info'))
     }
 
@@ -258,6 +279,7 @@ const MigrateUsers = () => {
                     {numberSourceSelection === 'Specific Extension' ? <TextField className='vertical-bottom' size='small' id="outlined-basic" label="Specific Extension" variant="outlined" value={specificExtension} onChange={(e) => setSpecificExtension(e.target.value)} /> : <></>}
                 </div>
                 <ProgressBar value={userFetchProgress} max={maxUserFetchProgress} label='Users' />
+                <ProgressBar value={messageOnlyFetchProgress} max={maxMessageOnlyFetchProgress} label='Message-Only Extensions' />
                 <FeedbackArea gridData={filteredExtensions} onFilterSelection={handleFilterSelection} messages={[]} errors={[]} timedMessages={[]} />
             </ToolCard>
             <ToolCard>
