@@ -25,6 +25,8 @@ const useConfigureMO = (postMessage: (message: Message) => void, postTimedMessag
     }
 
     const setNotifications = async (bundle: MessageOnlyDataBundle, token: string) => {
+        if (bundle.extension.prettyType() !== 'Message-Only') return
+        
         try {
             const headers = {
                 "Accept": "application/json",
@@ -52,6 +54,8 @@ const useConfigureMO = (postMessage: (message: Message) => void, postTimedMessag
     }
 
     const setVoicemailRecipient = async (bundle: MessageOnlyDataBundle, originalExtensions: Extension[], targetExtensions: Extension[], token: string) => {
+        if (bundle.extension.prettyType() !== 'Message-Only') return
+        
         try {
             const headers = {
                 "Accept": "application/json",

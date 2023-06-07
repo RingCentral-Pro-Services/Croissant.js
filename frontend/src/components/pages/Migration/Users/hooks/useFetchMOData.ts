@@ -39,7 +39,7 @@ const useFetchMOData = (postMessage: (message: Message) => void, postTimedMessag
                 voicemailGreeting.custom.contentType = greetingData[1]
             }
         }
-        return new MessageOnlyDataBundle(newExtension, {notifications: notifications, directNumbers: directNumbers, vmRecipientID: callHandling?.voicemail.recipient.id, greeting: voicemailGreeting})
+        return new MessageOnlyDataBundle(newExtension, {notifications: notifications, directNumbers: directNumbers, vmRecipientID: callHandling?.voicemail?.recipient?.id ?? '', greeting: voicemailGreeting})
     }
 
     const fetchBaseData = async (extension: Extension, token: string) => {
@@ -73,6 +73,8 @@ const useFetchMOData = (postMessage: (message: Message) => void, postTimedMessag
     }
 
     const fetchNotificationSettings = async (extension: Extension, token: string) => {
+        if (extension.prettyType() !== 'Message-Only') return
+
         try {
             const headers = {
                 "Accept": "application/json",

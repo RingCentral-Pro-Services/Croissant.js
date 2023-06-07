@@ -161,10 +161,10 @@ const MigrateUsers = () => {
         const roles = await fetchCustomRoles()
         const userDataBundles = await fetchUsers(selectedExtensions.filter((ext) => ext.prettyType() === 'User'), originalExtensionList)
         
-        // Message-only extensions
-        const selectedMOs = selectedExtensions.filter((ext) => ext.prettyType() === 'Message-Only')
+        // Message-only extensions and announcement-only extensions
+        const selectedMOs = selectedExtensions.filter((ext) => ext.prettyType() === 'Message-Only' || ext.prettyType() === 'Announcement-Only')
         const messageOnlyDataBundles = await fetchMOs(selectedMOs)
-        console.log('Message Only')
+        console.log('Message Only / Announcement-Only')
         console.log(messageOnlyDataBundles)
 
         setUserDataBundles(userDataBundles)
@@ -279,7 +279,7 @@ const MigrateUsers = () => {
                     {numberSourceSelection === 'Specific Extension' ? <TextField className='vertical-bottom' size='small' id="outlined-basic" label="Specific Extension" variant="outlined" value={specificExtension} onChange={(e) => setSpecificExtension(e.target.value)} /> : <></>}
                 </div>
                 <ProgressBar value={userFetchProgress} max={maxUserFetchProgress} label='Users' />
-                <ProgressBar value={messageOnlyFetchProgress} max={maxMessageOnlyFetchProgress} label='Message-Only Extensions' />
+                <ProgressBar value={messageOnlyFetchProgress} max={maxMessageOnlyFetchProgress} label='Message-Only Extensions & Accouncement-Only Extensions' />
                 <FeedbackArea gridData={filteredExtensions} onFilterSelection={handleFilterSelection} messages={[]} errors={[]} timedMessages={[]} />
             </ToolCard>
             <ToolCard>
