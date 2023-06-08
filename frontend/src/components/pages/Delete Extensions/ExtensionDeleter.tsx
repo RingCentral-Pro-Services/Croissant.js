@@ -20,6 +20,11 @@ import useExtensions from "../../../rcapi/useExtensions"
 import { Extension } from "../../../models/Extension"
 import { sanitize } from "../../../helpers/Sanatize"
 import usePhoneNumberMap from "../../../rcapi/usePhoneNumberMap"
+import useReadExcel from "../../../hooks/useReadExcel"
+import useValidateExcelData from "../../../hooks/useValidateExcelData"
+import { DeleteExtensionsSchema } from "./models/model"
+import useReadFromFile from "./hooks/useReadFromFile"
+import FileSelect from "../../shared/FileSelect"
 
 const ExtensionDeleter = () => {
     const {fireEvent} = useAnalytics()
@@ -49,6 +54,12 @@ const ExtensionDeleter = () => {
     const [maxProgressValue, setMaxProgressValue] = useState(0)
     const {deleteExtensions, isExtensionDeletePending} = useDeleteExtensions(postMessage, postTimedMessage, setProgressValue, setMaxProgressValue, postError)
     const {writeExcel} = useWriteExcelFile()
+
+    const [selectedFile, setSelectedFile] = useState<File | null>(null)
+    const [selectedSheet, setSelectedSheet] = useState('')
+    const {readFile, isExcelDataPending, excelData} = useReadExcel()
+    const {validate, validatedData, isDataValidationPending} = useValidateExcelData(DeleteExtensionsSchema, postMessage, postError)
+    const {readFromFile, isFileReadPending, extensionList: extensionsReadFromFile} = useReadFromFile(postMessage, postTimedMessage, postError)
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -186,6 +197,33 @@ const ExtensionDeleter = () => {
         setIsPending(false)
     }, [isExtensionDeletePending])
 
+    //--------------------------------------
+    // TODO: Add proper support for uploading files. Maybe a tabbed view
+    const handleFileSelect = () => {
+        if (!selectedFile) return
+        readFile(selectedFile, selectedSheet)
+    }
+
+    useEffect(() => {
+        if (isExcelDataPending) return
+        validate(excelData)
+    }, [isExcelDataPending])
+
+    useEffect(() => {
+        if (isDataValidationPending) return
+        readFromFile(validatedData, extensionsList)
+    }, [isDataValidationPending])
+
+    useEffect(() => {
+        if (isFileReadPending) return
+        console.log('Found extensions')
+        console.log(extensionsReadFromFile)
+        setSelectedExtensions(extensionsReadFromFile)
+        setFilteredExtensions(extensionsReadFromFile)
+    }, [isFileReadPending])
+
+    //--------------------------------------
+
     return (
         <>
             <Header title="Delete Extensions" body="Delete extensions in bulk" documentationURL="https://dqgriffin.com/blog/LbdYZP9HvJYrBrZGqFjh">
@@ -201,6 +239,7 @@ const ExtensionDeleter = () => {
                     <AdditiveFilter options={prettyExtensionTypes} title='Extension Types' placeholder='Extension Types' setSelected={setSelectedExtensionTypes} />
                     <AdditiveFilter options={sites} title='Sites' placeholder='Sites' setSelected={setSelectedSites} />
                     {/* <Button className="vertical-middle" sx={{top: 9}} variant="contained" onClick={() => deleteExtensions(filteredExtensions)}>Delete</Button> */}
+                    {/* <FileSelect enabled={true} handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={false} setSelectedSheet={setSelectedSheet} defaultSheet={"Delete Extensions"} accept={".xlsx"} /> */}
                     <Button disabled={isPending || selectedExtensions.length === 0} className="vertical-middle" sx={{top: 9}} variant="contained" onClick={handleDeleteButtonClick}>Delete</Button>
                     <Button disabled={filteredExtensions.length === 0} className="vertical-middle healthy-margin-left" sx={{top: 9}} variant="outlined" startIcon={ <FileDownload/>} onClick={handleDownloadButtonClick} >Download</Button>
                     <Modal open={isShowingModal} setOpen={setIsShowingModal} handleAccept={handleModalAcceptance} title='Are you sure about that?' body={`You're about to delete ${selectedExtensions.length} extensions. Be sure that you understand the implications of this.`} acceptLabel={`Yes, delete ${selectedExtensions.length} extensions`} rejectLabel='Go back' />
