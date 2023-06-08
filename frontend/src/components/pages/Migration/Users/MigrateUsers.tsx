@@ -24,6 +24,7 @@ import useConfigureMOs from "./hooks/useConfigureMOs";
 import useConfigureUsers from "./hooks/useConfigureUsers";
 import useCreateMOs from "./hooks/useCreateMOs";
 import useCustomRoleList from "./hooks/useCustomRoleList";
+import useFetchCallQueues from "./hooks/useFetchCallQueues";
 import useFetchMOs from "./hooks/useFetchMOs";
 import useFetchUsers from "./hooks/useFetchUsers";
 import useMigrateCustomRoles from "./hooks/useMigrateCustomRoles";
@@ -79,6 +80,7 @@ const MigrateUsers = () => {
     const {fetchPredefinedRoles} = usePredefinedRoleList(postMessage, postTimedMessage, postError)
     const {getPhoneNumberMap, phoneNumbers, isPhoneNumberMapPending} = usePhoneNumberList()
     const {fetchMOs, progressValue: messageOnlyFetchProgress , maxProgress: maxMessageOnlyFetchProgress} = useFetchMOs(postMessage, postTimedMessage, postError)
+    const {fetchCallQueues, progressValue: callQueueFetchProgress, maxProgress: maxCallQueueFetchProgress} = useFetchCallQueues(postMessage, postTimedMessage, postError)
 
     const {migrateSites, maxProgress: maxSiteProgress, progressValue: siteMigrationProgress} = useMigrateSites(postMessage, postTimedMessage, postError)
     const {migrateCustomRoles, progressValue: customRoleProgress, maxProgress: maxCustomRoleProgress} = useMigrateCustomRoles(postMessage, postTimedMessage, postError)
@@ -166,6 +168,12 @@ const MigrateUsers = () => {
         const messageOnlyDataBundles = await fetchMOs(selectedMOs)
         console.log('Message Only / Announcement-Only')
         console.log(messageOnlyDataBundles)
+
+        // Call Queues
+        const selectedQueues = selectedExtensions.filter((ext) => ext.prettyType() === 'Call Queue')
+        const callQueueDataBundles = await fetchCallQueues(selectedQueues)
+        console.log('Call Queues')
+        console.log(callQueueDataBundles)
 
         setUserDataBundles(userDataBundles)
         setCustomRoles(roles)
@@ -280,6 +288,7 @@ const MigrateUsers = () => {
                 </div>
                 <ProgressBar value={userFetchProgress} max={maxUserFetchProgress} label='Users' />
                 <ProgressBar value={messageOnlyFetchProgress} max={maxMessageOnlyFetchProgress} label='Message-Only Extensions & Accouncement-Only Extensions' />
+                <ProgressBar value={callQueueFetchProgress} max={maxCallQueueFetchProgress} label='Call Queues' />
                 <FeedbackArea gridData={filteredExtensions} onFilterSelection={handleFilterSelection} messages={[]} errors={[]} timedMessages={[]} />
             </ToolCard>
             <ToolCard>

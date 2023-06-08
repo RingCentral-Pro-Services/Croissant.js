@@ -14,6 +14,13 @@ export interface CallHandlingRules {
     maxCallers: number
     transfer?: TransferPayload[]
     unconditionalForwarding?: UnconditionalForwardingPayload[]
+    voicemail?: {
+        enabled: boolean
+        recipient: {
+            uri?: string
+            id: string
+        }
+    }
 }
 
 export interface FixedOrderAgent {

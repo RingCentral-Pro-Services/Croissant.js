@@ -155,6 +155,10 @@ export interface CallHandling {
             extensionNumber?: string
         }
     }
+    queue?: {
+        transferMode: string
+        
+    }
 }
 
 export interface Notifications {
