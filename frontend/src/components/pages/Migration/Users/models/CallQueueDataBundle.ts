@@ -13,10 +13,42 @@ export interface ExtendedQueueData {
     afterHoursCallHandling?: CallHandlingRules
     members?: CallQueueMember[]
     notifications?: Notifications
+    otherSettings?: OtherSettings
+    memberPresense?: MemberPresenseStatus
+    pickupMembers?: PickupMember[]
 }
 
 interface CallQueueMember {
     uri?: string
     id: string
     extensionNumber: string
+}
+
+interface OtherSettings {
+    editableMemberStatus: boolean
+    alertTimer: number
+}
+
+interface MemberPresenseStatus {
+    member: {
+        id: string
+        name?: string
+        extensionNumber?: string
+        site?: {
+            id: string
+            name: string
+        }
+    }
+    acceptQueueCalls: boolean
+    acceptCurrentQueueCalls: boolean
+}
+
+interface PickupMember {
+    id: string
+    name?: string
+    extensionNumber?: string
+    site?: {
+        id: string
+        name?: string
+    }
 }

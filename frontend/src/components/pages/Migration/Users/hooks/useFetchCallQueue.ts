@@ -12,6 +12,9 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
     const baseCallHandlingURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/answering-rule/ruleId'
     const baseMembersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId/members'
     const baseNotificationsURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/notification-settings'
+    const baseOtherSettingsURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId'
+    const baseMemberStatusURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId/presence'
+    const basePickupMemberURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId/pickup-members'
     const baseWaitingPeriod = 250
 
     const fetchCallQueue = async (bundle: CallQueueDataBundle) => {
@@ -27,6 +30,9 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
         await fetchAfterHoursCallHandling(bundle, accessToken)
         await fetchMembers(bundle, accessToken)
         await fetchNotificationSettings(bundle, accessToken)
+        await fetchOtherSettings(bundle, accessToken)
+        await fetchMemberPresense(bundle, accessToken)
+        await fetchPickupMembers(bundle, accessToken)
     }
 
     const fetchBaseData = async (bundle: CallQueueDataBundle, token: string) => {
@@ -68,7 +74,6 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
             bundle.extendedData = {
                 businessHours: response.data
             }
-            // bundle.extendedData!.businessHours = response.data
             
 
             if (response.rateLimitInterval > 0) {
@@ -231,6 +236,93 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
             console.log(e)
             postMessage(new Message(`Failed to get notification settings for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to fetch notification settings', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const fetchOtherSettings = async (bundle: CallQueueDataBundle, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const response = await RestCentral.get(baseOtherSettingsURL.replace('groupId', `${bundle.extension.data.id}`), headers)
+            bundle.extendedData!.otherSettings = {
+                editableMemberStatus: response.data.editableMemberStatus,
+                alertTimer: response.data.alertTimer
+            }
+           
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to get other settings`)
+            console.log(e)
+            postMessage(new Message(`Failed to get other settings for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to fetch other settings', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const fetchMemberPresense = async (bundle: CallQueueDataBundle, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const response = await RestCentral.get(baseMemberStatusURL.replace('groupId', `${bundle.extension.data.id}`), headers)
+            bundle.extendedData!.memberPresense = response.data
+           
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to get member presense status`)
+            console.log(e)
+            postMessage(new Message(`Failed to get member presense status for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to fetch member presense status', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const fetchPickupMembers = async (bundle: CallQueueDataBundle, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const response = await RestCentral.get(basePickupMemberURL.replace('groupId', `${bundle.extension.data.id}`), headers)
+            bundle.extendedData!.pickupMembers = response.data.records
+           
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to get pickup members`)
+            console.log(e)
+            postMessage(new Message(`Failed to get pickup members for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to fetch pickup members', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }

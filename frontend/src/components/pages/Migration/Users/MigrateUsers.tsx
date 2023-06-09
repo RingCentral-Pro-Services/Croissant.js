@@ -23,6 +23,7 @@ import { PhoneNumber, UserDataBundle } from "../User Data Download/models/UserDa
 import useConfigureMOs from "./hooks/useConfigureMOs";
 import useConfigureUsers from "./hooks/useConfigureUsers";
 import useCreateMOs from "./hooks/useCreateMOs";
+import useCreateQueues from "./hooks/useCreateQueues";
 import useCustomRoleList from "./hooks/useCustomRoleList";
 import useFetchCallQueues from "./hooks/useFetchCallQueues";
 import useFetchMOs from "./hooks/useFetchMOs";
@@ -33,6 +34,7 @@ import useMigrateSites from "./hooks/useMigrateSites";
 import useMigrateUsers from "./hooks/useMigrateUsers";
 import usePhoneNumberList from "./hooks/usePhoneNumberList";
 import usePredefinedRoleList from "./hooks/useRoleList";
+import { CallQueueDataBundle } from "./models/CallQueueDataBundle";
 import { MessageOnlyDataBundle } from "./models/MessageOnlyDataBundle";
 import { Role } from "./models/Role";
 
@@ -57,6 +59,7 @@ const MigrateUsers = () => {
     const [numberSourceSelection, setNumberSourceSelection] = useState('Inventory')
     const [specificExtension, setSpecificExtension] = useState('')
     const [messageOnlyBundles, setMessageOnlyBundles] = useState<MessageOnlyDataBundle[]>([])
+    const [callQueueBundles, setCallQueueBundles] = useState<CallQueueDataBundle[]>([])
 
     const handleSiteFetchCompletion = (sites: SiteData[]) => {
         setSites(sites)
@@ -89,6 +92,7 @@ const MigrateUsers = () => {
     const {configureUsers} = useConfigureUsers(postMessage, postTimedMessage, postError)
     const {createMOs} = useCreateMOs(postMessage, postTimedMessage, postError)
     const {configureMOs} = useConfigureMOs(postMessage, postTimedMessage, postError)
+    const {createQueues, progressValue: createQueuesProgress, maxProgress: maxCreateQueueProgess} = useCreateQueues(postMessage, postTimedMessage, postError)
     
     useEffect(() => {
         if (originalUID.length < 5) return
@@ -178,6 +182,7 @@ const MigrateUsers = () => {
         setUserDataBundles(userDataBundles)
         setCustomRoles(roles)
         setMessageOnlyBundles(messageOnlyDataBundles)
+        setCallQueueBundles(callQueueDataBundles)
         console.log('Fetched users')
         console.log(userDataBundles)
     }
@@ -223,6 +228,9 @@ const MigrateUsers = () => {
         // Message only extensions
         const createdMOs = await createMOs(messageOnlyBundles, targetExts, availablePhoneNumbers)
         targetExts = [...targetExts, ...createdMOs]
+
+        // Create queues
+        const createdQueues = await createQueues(callQueueBundles, targetExts, availablePhoneNumbers)
 
         // Fetch predefined roles
         const predefinedRoles = await fetchPredefinedRoles()
@@ -287,7 +295,7 @@ const MigrateUsers = () => {
                     {numberSourceSelection === 'Specific Extension' ? <TextField className='vertical-bottom' size='small' id="outlined-basic" label="Specific Extension" variant="outlined" value={specificExtension} onChange={(e) => setSpecificExtension(e.target.value)} /> : <></>}
                 </div>
                 <ProgressBar value={userFetchProgress} max={maxUserFetchProgress} label='Users' />
-                <ProgressBar value={messageOnlyFetchProgress} max={maxMessageOnlyFetchProgress} label='Message-Only Extensions & Accouncement-Only Extensions' />
+                <ProgressBar value={messageOnlyFetchProgress} max={maxMessageOnlyFetchProgress} label='Message-Only Extensions & Announcement-Only Extensions' />
                 <ProgressBar value={callQueueFetchProgress} max={maxCallQueueFetchProgress} label='Call Queues' />
                 <FeedbackArea gridData={filteredExtensions} onFilterSelection={handleFilterSelection} messages={[]} errors={[]} timedMessages={[]} />
             </ToolCard>
@@ -298,6 +306,7 @@ const MigrateUsers = () => {
                 <Button variant='contained' onClick={handleMigrateButtonClick} disabled={!hasTargetAccountToken || isERLListPending || isTargetERLListPending || isMigrating} >Migrate</Button>
                 <ProgressBar label='ERLs' value={erlProgress} max={maxERLProgress} />
                 <ProgressBar label='Custom Roles' value={customRoleProgress} max={maxCustomRoleProgress} />
+                <ProgressBar label='Create Queues' value={createQueuesProgress} max={maxCreateQueueProgess} />
                 <FeedbackArea messages={messages} timedMessages={timedMessages} errors={errors} />
             </ToolCard>
         </>
