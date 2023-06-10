@@ -65,7 +65,9 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
         await setPresenseLines(bundle, originalExtensions, targetExtensions, accessToken)
         await setPresenseStatus(bundle, accessToken)
         await setNotifications(bundle, accessToken)
-        await enableIntercom(bundle, deviceIDs[0], accessToken)
+        if (deviceIDs && deviceIDs.length > 0) {
+            await enableIntercom(bundle, deviceIDs[0], accessToken)
+        }
 
 
         const customBusinessHoursGreetings = await setDuringHoursGreetings(bundle, accessToken)
@@ -719,8 +721,8 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
             }
             console.log(`Failed to add forwarding device`)
             console.log(e)
-            postMessage(new Message(`Failed to add forwarding device to ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to add forwarding device', ''], e.error ?? ''))
+            // postMessage(new Message(`Failed to add forwarding device to ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            // postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to add forwarding device', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
@@ -960,78 +962,84 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
     }
 
     const adjustAfterHoursCallHandling = (bundle: UserDataBundle, currentCallHandling: CallHandling, originalExtensions: Extension[], targetExtensions: Extension[]) => {
-        let result = currentCallHandling
-        let originalCallHandling = bundle.extendedData!.afterHoursCallHandling
-        if (!originalCallHandling) return
+        try{
+            let result = currentCallHandling
+            let originalCallHandling = bundle.extendedData!.afterHoursCallHandling
+            if (!originalCallHandling) return
 
-        // Adjust call forwarding
-        // Need to swap out phone numbers and IDs to that of the newly created extension
-        if (originalCallHandling.forwarding) {
-            let originalRules = originalCallHandling.forwarding.rules
-            const currentRules = result.forwarding.rules
-            const currentForwardingNumbers = currentRules.flatMap((rule) => rule.forwardingNumbers)
-            let newRules = []
+            // Adjust call forwarding
+            // Need to swap out phone numbers and IDs to that of the newly created extension
+            if (originalCallHandling.forwarding) {
+                let originalRules = originalCallHandling.forwarding.rules
+                const currentRules = result.forwarding.rules
+                if (!currentRules || !originalRules) return
+                const currentForwardingNumbers = currentRules.flatMap((rule) => rule.forwardingNumbers)
+                let newRules = []
 
-            for (let i = 0; i < originalRules.length; i++) {
-                let rule = originalRules[i]
+                for (let i = 0; i < originalRules.length; i++) {
+                    let rule = originalRules[i]
 
-                for (let j = 0; j < rule.forwardingNumbers.length; j++) {
-                    let forwardingNumber = rule.forwardingNumbers[j]
-                    if (forwardingNumber.type !== 'PhoneLine') continue
+                    for (let j = 0; j < rule.forwardingNumbers.length; j++) {
+                        let forwardingNumber = rule.forwardingNumbers[j]
+                        if (forwardingNumber.type !== 'PhoneLine') continue
 
-                    const matchingForwardingNumber = currentForwardingNumbers.find((number) => number.label === forwardingNumber.label)
-                    if (!matchingForwardingNumber) {
-                        postMessage(new Message(`Failed to find matching forwarding rule for ${forwardingNumber.label} on ${bundle.extension.data.name}`, 'error'))
-                        continue
+                        const matchingForwardingNumber = currentForwardingNumbers.find((number) => number.label === forwardingNumber.label)
+                        if (!matchingForwardingNumber) {
+                            postMessage(new Message(`Failed to find matching forwarding rule for ${forwardingNumber.label} on ${bundle.extension.data.name}`, 'error'))
+                            continue
+                        }
+
+                        forwardingNumber.id = matchingForwardingNumber.id
+                        forwardingNumber.phoneNumber = matchingForwardingNumber.phoneNumber
                     }
-
-                    forwardingNumber.id = matchingForwardingNumber.id
-                    forwardingNumber.phoneNumber = matchingForwardingNumber.phoneNumber
+                    
                 }
-                
             }
+
+            // Adjust voicemail recipient
+            if (originalCallHandling.voicemail && originalCallHandling.voicemail.enabled) {
+                console.log('original call handling')
+                console.log(originalCallHandling.voicemail.recipient)
+                const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === `${originalCallHandling?.voicemail.recipient.id}`)
+                if (!originalExtension) {
+                    postMessage(new Message(`Failed to find original ID for after hours voicemail recipient on ${bundle.extension.data.name}. Original ID: ${originalCallHandling.voicemail.recipient.id}`, 'error'))
+                    postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to set voicemail recipient', 'Original ID not found']))
+                }
+
+                const newExtension = targetExtensions.find((ext) => ext.prettyType() === originalExtension?.prettyType() && ext.data.name === originalExtension.data.name)
+                if (!newExtension) {
+                    postMessage(new Message(`Failed to find new ID for voicemail recipient on ${bundle.extension.data.name}`, 'error'))
+                    postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to set voicemail recipient', 'New ID not found']))
+                }
+
+                originalCallHandling.voicemail.recipient.id = `${newExtension?.data.id}`
+                delete originalCallHandling.voicemail.recipient.uri
+                delete originalCallHandling.voicemail.recipient.displayName
+            }
+
+            // Adjust missed call recipient
+            if (originalCallHandling.missedCall && originalCallHandling.missedCall.actionType === 'ConnectToExtension') {
+                const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === `${originalCallHandling?.missedCall.extension.id}`)
+                if (!originalExtension) {
+                    postMessage(new Message(`Failed to find original ID for missed call recipient on ${bundle.extension.data.name}`, 'error'))
+                    postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to set missed call recipient', 'Original ID not found']))
+                }
+
+                const newExtension = targetExtensions.find((ext) => ext.prettyType() === originalExtension?.prettyType() && ext.data.name === originalExtension.data.name)
+                if (!newExtension) {
+                    postMessage(new Message(`Failed to find new ID for missed call recipient on ${bundle.extension.data.name}`, 'error'))
+                    postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to set missed call recipient', 'New ID not found']))
+                }
+
+                originalCallHandling.missedCall.extension.id = `${newExtension?.data.id}`
+                delete originalCallHandling.missedCall.extension.displayName
+            }
+
+            return originalCallHandling
         }
-
-        // Adjust voicemail recipient
-        if (originalCallHandling.voicemail && originalCallHandling.voicemail.enabled) {
-            console.log('original call handling')
-            console.log(originalCallHandling.voicemail.recipient)
-            const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === `${originalCallHandling?.voicemail.recipient.id}`)
-            if (!originalExtension) {
-                postMessage(new Message(`Failed to find original ID for after hours voicemail recipient on ${bundle.extension.data.name}. Original ID: ${originalCallHandling.voicemail.recipient.id}`, 'error'))
-                postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to set voicemail recipient', 'Original ID not found']))
-            }
-
-            const newExtension = targetExtensions.find((ext) => ext.prettyType() === originalExtension?.prettyType() && ext.data.name === originalExtension.data.name)
-            if (!newExtension) {
-                postMessage(new Message(`Failed to find new ID for voicemail recipient on ${bundle.extension.data.name}`, 'error'))
-                postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to set voicemail recipient', 'New ID not found']))
-            }
-
-            originalCallHandling.voicemail.recipient.id = `${newExtension?.data.id}`
-            delete originalCallHandling.voicemail.recipient.uri
-            delete originalCallHandling.voicemail.recipient.displayName
+        catch {
+            postMessage(new Message(`Failed to adjust after hours call handling for ${bundle.extension.data.name}`, 'warning'))
         }
-
-        // Adjust missed call recipient
-        if (originalCallHandling.missedCall && originalCallHandling.missedCall.actionType === 'ConnectToExtension') {
-            const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === `${originalCallHandling?.missedCall.extension.id}`)
-            if (!originalExtension) {
-                postMessage(new Message(`Failed to find original ID for missed call recipient on ${bundle.extension.data.name}`, 'error'))
-                postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to set missed call recipient', 'Original ID not found']))
-            }
-
-            const newExtension = targetExtensions.find((ext) => ext.prettyType() === originalExtension?.prettyType() && ext.data.name === originalExtension.data.name)
-            if (!newExtension) {
-                postMessage(new Message(`Failed to find new ID for missed call recipient on ${bundle.extension.data.name}`, 'error'))
-                postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to set missed call recipient', 'New ID not found']))
-            }
-
-            originalCallHandling.missedCall.extension.id = `${newExtension?.data.id}`
-            delete originalCallHandling.missedCall.extension.displayName
-        }
-
-        return originalCallHandling
     }
 
     const setCustomGreeting = async (bundle: UserDataBundle, ruleID: string, greeting: Greeting, token: string) => {

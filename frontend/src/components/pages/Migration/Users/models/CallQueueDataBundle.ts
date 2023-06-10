@@ -1,6 +1,5 @@
-import { CallHandlingRules } from "../../../../../models/CallHandlingRules";
 import { Extension } from "../../../../../models/Extension";
-import { BusinessHours, Notifications, PhoneNumber } from "../../User Data Download/models/UserDataBundle";
+import { BusinessHours, CallHandling, Notifications, PhoneNumber } from "../../User Data Download/models/UserDataBundle";
 
 export class CallQueueDataBundle {
     constructor(public extension: Extension, public extendedData?: ExtendedQueueData) {}
@@ -9,8 +8,8 @@ export class CallQueueDataBundle {
 export interface ExtendedQueueData {
     businessHours?: BusinessHours
     directNumbers?: PhoneNumber[]
-    businessHoursCallHandling?: CallHandlingRules
-    afterHoursCallHandling?: CallHandlingRules
+    businessHoursCallHandling?: CallHandling
+    afterHoursCallHandling?: CallHandling
     members?: CallQueueMember[]
     notifications?: Notifications
     otherSettings?: OtherSettings

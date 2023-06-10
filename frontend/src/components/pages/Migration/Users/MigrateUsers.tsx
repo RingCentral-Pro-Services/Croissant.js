@@ -21,6 +21,7 @@ import useFetchERLs from "../../Automatic Location Updates/hooks/useFetchERLs";
 import useSiteList from "../Sites/hooks/useSiteList";
 import { PhoneNumber, UserDataBundle } from "../User Data Download/models/UserDataBundle";
 import useConfigureMOs from "./hooks/useConfigureMOs";
+import useConfigureQueues from "./hooks/useConfigureQueues";
 import useConfigureUsers from "./hooks/useConfigureUsers";
 import useCreateMOs from "./hooks/useCreateMOs";
 import useCreateQueues from "./hooks/useCreateQueues";
@@ -88,11 +89,12 @@ const MigrateUsers = () => {
     const {migrateSites, maxProgress: maxSiteProgress, progressValue: siteMigrationProgress} = useMigrateSites(postMessage, postTimedMessage, postError)
     const {migrateCustomRoles, progressValue: customRoleProgress, maxProgress: maxCustomRoleProgress} = useMigrateCustomRoles(postMessage, postTimedMessage, postError)
     const {migrateERLs, progressValue: erlProgress, maxProgress: maxERLProgress} = useMigrateERLs(postMessage, postTimedMessage, postError)
-    const {migrateUsers} = useMigrateUsers(postMessage, postTimedMessage, postError)
-    const {configureUsers} = useConfigureUsers(postMessage, postTimedMessage, postError)
+    const {migrateUsers, progressValue: createUsersProgress, maxProgress: maxCreateUsersProgress} = useMigrateUsers(postMessage, postTimedMessage, postError)
+    const {configureUsers, progressValue: configureUsersProgress, maxProgress: maxConfigureUsersProgress} = useConfigureUsers(postMessage, postTimedMessage, postError)
     const {createMOs} = useCreateMOs(postMessage, postTimedMessage, postError)
     const {configureMOs} = useConfigureMOs(postMessage, postTimedMessage, postError)
     const {createQueues, progressValue: createQueuesProgress, maxProgress: maxCreateQueueProgess} = useCreateQueues(postMessage, postTimedMessage, postError)
+    const {configureQueues, progressValue: configureQueuesProgress, maxProgress: maxConfigureQueuesProgress} = useConfigureQueues(postMessage, postTimedMessage, postError)
     
     useEffect(() => {
         if (originalUID.length < 5) return
@@ -231,6 +233,7 @@ const MigrateUsers = () => {
 
         // Create queues
         const createdQueues = await createQueues(callQueueBundles, targetExts, availablePhoneNumbers)
+        targetExts = [...targetExts, ...createdQueues]
 
         // Fetch predefined roles
         const predefinedRoles = await fetchPredefinedRoles()
@@ -260,6 +263,7 @@ const MigrateUsers = () => {
 
         await configureUsers(userDataBundles, targetERLs, originalExtensionList, targetExts, roles)
         await configureMOs(messageOnlyBundles, originalExtensionList, targetExts)
+        await configureQueues(callQueueBundles, originalExtensionList, targetExts)
         postMessage(new Message('Finished', 'info'))
     }
 
@@ -306,7 +310,10 @@ const MigrateUsers = () => {
                 <Button variant='contained' onClick={handleMigrateButtonClick} disabled={!hasTargetAccountToken || isERLListPending || isTargetERLListPending || isMigrating} >Migrate</Button>
                 <ProgressBar label='ERLs' value={erlProgress} max={maxERLProgress} />
                 <ProgressBar label='Custom Roles' value={customRoleProgress} max={maxCustomRoleProgress} />
+                <ProgressBar label='Create Users' value={createUsersProgress} max={maxCreateUsersProgress} />
                 <ProgressBar label='Create Queues' value={createQueuesProgress} max={maxCreateQueueProgess} />
+                <ProgressBar label='Configure Users' value={configureUsersProgress} max={maxConfigureUsersProgress} />
+                <ProgressBar label='Configure Queues' value={configureQueuesProgress} max={maxConfigureQueuesProgress} />
                 <FeedbackArea messages={messages} timedMessages={timedMessages} errors={errors} />
             </ToolCard>
         </>

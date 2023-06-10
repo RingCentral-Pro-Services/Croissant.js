@@ -1,6 +1,8 @@
+import { FixedOrderAgent } from "../../../../../models/CallHandlingRules";
 import ExcelFormattable from "../../../../../models/ExcelFormattable";
 import { Extension } from "../../../../../models/Extension";
 import { Greeting } from "../../../../../models/Greetings";
+import { TransferPayload, UnconditionalForwardingPayload } from "../../../../../models/TransferPayload";
 import { UserDataRow } from "./UserDataRow";
 
 export class UserDataBundle {
@@ -157,7 +159,25 @@ export interface CallHandling {
     }
     queue?: {
         transferMode: string
-        
+        noAnswerAction: string
+        fixedOrderAgents?: FixedOrderAgent[]
+        holdAudioInterruptionMode: string
+        holdAudioInterruptionPeriod?: number
+        holdTimeExpirationAction: string
+        agentTimeout?: number
+        holdTime: number
+        wrapUpTime?: number
+        maxCallersAction?: string
+        maxCallers: number
+        transfer?: TransferPayload[]
+        unconditionalForwarding?: UnconditionalForwardingPayload[]
+        voicemail?: {
+            enabled: boolean
+            recipient: {
+                uri?: string
+                id: string
+            }
+        }
     }
 }
 

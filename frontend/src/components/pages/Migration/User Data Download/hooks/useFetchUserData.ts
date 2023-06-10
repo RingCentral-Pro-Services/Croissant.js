@@ -697,8 +697,8 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
             }
             console.log(`Failed to get PMI`)
             console.log(e)
-            postMessage(new Message(`Failed to get PMI for ${userDataBundle.extension.data.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(userDataBundle.extension.data.name, parseInt(userDataBundle.extension.data.extensionNumber), ['Failed to fetch PMI', ''], e.error ?? ''))
+            // postMessage(new Message(`Failed to get PMI for ${userDataBundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            // postError(new SyncError(userDataBundle.extension.data.name, parseInt(userDataBundle.extension.data.extensionNumber), ['Failed to fetch PMI', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }

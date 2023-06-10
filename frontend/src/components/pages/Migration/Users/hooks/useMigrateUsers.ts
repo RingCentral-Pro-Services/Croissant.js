@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Extension } from "../../../../../models/Extension";
 import { Message } from "../../../../../models/Message";
 import { SyncError } from "../../../../../models/SyncError";
@@ -5,6 +6,8 @@ import { PhoneNumber, UserDataBundle } from "../../User Data Download/models/Use
 import useMigrateUser from "./useMigrateUser";
 
 const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
+    const [progressValue, setProgressValue] = useState(0)
+    const [maxProgress, setMaxProgress] = useState(2)
     const {migrateUser} = useMigrateUser(postMessage, postTimedMessage, postError)
 
     const migrateUsers = async (phoneNumbers: PhoneNumber[], dataBundles: UserDataBundle[], unassignedExtensions: Extension[], extensions: Extension[]) => {
@@ -13,6 +16,7 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
             throw new Error('No access token')
         }
 
+        setMaxProgress(dataBundles.length)
         for (let i = 0; i < dataBundles.length; i++) {
             let bundle = dataBundles[i]
             const site = extensions.find((ext) => ext.prettyType() === 'Site' && ext.data.name === bundle.extension.data.site?.name)
@@ -52,6 +56,7 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
             else {
                 await migrateUser(bundle, phoneNumberBundle)
             }
+            setProgressValue((prev) => prev + 1)
         }
         await wait(3000)
     }
@@ -60,7 +65,7 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
         return new Promise(resolve => setTimeout(resolve, ms))
     }
 
-    return {migrateUsers}
+    return {migrateUsers, progressValue, maxProgress}
 }
 
 export default useMigrateUsers

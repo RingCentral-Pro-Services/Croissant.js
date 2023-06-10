@@ -49,6 +49,7 @@ const useCreateQueues = (postMessage: (message: Message) => void, postTimedMessa
             createdQueues.push(bundle.extension)
             setProgressValue((prev) => prev + 1)
         }
+        return createdQueues
     }
     return {createQueues, progressValue, maxProgress}
 }
