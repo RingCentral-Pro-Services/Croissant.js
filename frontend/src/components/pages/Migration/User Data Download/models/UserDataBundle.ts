@@ -183,13 +183,13 @@ export interface CallHandling {
 
 export interface Notifications {
     uri: string
-    emailRecipients: [
+    emailRecipients?: [
         {
             extensionId: string
-            fullName: string
-            extensionNumber: string
-            status: string
-            emailAddresses: string
+            fullName?: string
+            extensionNumber?: string
+            status?: string
+            emailAddresses?: string
         }
     ]
     emailAddresses: string[]

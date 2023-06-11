@@ -1,10 +1,16 @@
+import { CallQueueManager } from "../../../../../models/CallQueueManager"
 import { Extension } from "../../../../../models/Extension"
 import { Greeting } from "../../../../../models/Greetings"
 import { Message } from "../../../../../models/Message"
 import { SyncError } from "../../../../../models/SyncError"
 import { RestCentral } from "../../../../../rcapi/RestCentral"
 import { CallHandling } from "../../User Data Download/models/UserDataBundle"
-import { CallQueueDataBundle } from "../models/CallQueueDataBundle"
+import { CallQueueDataBundle, MemberPresenseStatus, QueueManager } from "../models/CallQueueDataBundle"
+
+interface PickupMemberPayload {
+    id: string
+    configurePresenseLine: boolean
+}
 
 const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
     const baseNotificationsSettingsURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/notification-settings'
@@ -12,6 +18,10 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
     const baseCustomGreetingURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/greeting'
     const baseScheduleURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/business-hours'
     const baseMembersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId/bulk-assign'
+    const baseManagersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId/permissions-bulk-assign'
+    const baseOtherSettingsURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId'
+    const basePickupMemberURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId/pickup-members'
+    const baseMemberStatusURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId/presence'
     const baseWaitingPeriod = 250
 
     const configureQueue = async (bundle: CallQueueDataBundle, originalExtensions: Extension[], targetExtensions: Extension[]) => {
@@ -22,7 +32,11 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
 
         await setSchedule(bundle, accessToken)
         await setMembers(bundle, originalExtensions, targetExtensions, accessToken)
+        await setManagers(bundle, originalExtensions, targetExtensions, accessToken)
         await setNotifications(bundle, originalExtensions, targetExtensions, accessToken)
+        await setOtherSettings(bundle, accessToken)
+        await setPickupMembers(bundle, originalExtensions, targetExtensions, accessToken)
+        await setMemberPresenseStatus(bundle, originalExtensions, targetExtensions, accessToken)
         const customBusinessHoursGreetings = await setDuringHoursGreetings(bundle, accessToken)
         const customAfterHoursGreetings = await setAfterHoursGreetings(bundle, accessToken)
         if (customBusinessHoursGreetings) {
@@ -70,6 +84,72 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
         }
     }
 
+    const setManagers = async (bundle: CallQueueDataBundle, originalExtensions: Extension[], targetExtensions: Extension[], token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+
+            const foundManagers: QueueManager[] = []
+            for (let manager of bundle.extendedData!.managers!) {
+                const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === `${manager.extension.id}`)
+                if (!originalExtension) {
+                    postMessage(new Message(`${manager.extension.name} could not be set as a manager of queue ${bundle.extension.data.name} because its original ID could not be found`, 'warning'))
+                    postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to set queue manager', `${manager.extension.name}`], undefined, manager))
+                    continue
+                }
+
+                const newExtension = targetExtensions.find((ext) => ext.data.name === originalExtension.data.name && ext.prettyType() === originalExtension.prettyType())
+                if (!newExtension) {
+                    postMessage(new Message(`${manager.extension.name} could not be set as a manager of queue ${bundle.extension.data.name} because its new ID could not be found`, 'warning'))
+                    postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to set queue manager', `${manager.extension.name}`], undefined, manager))
+                    continue
+                }
+
+                manager.extension.id = `${newExtension.data.id}`
+                delete manager.extension.extensionNumber
+                delete manager.extension.name
+                delete manager.extension.site
+                foundManagers.push(manager)
+            }
+
+            if (foundManagers.length === 0) return
+
+            const payload: CallQueueManager[] = []
+            for (const manager of foundManagers) {
+                const queueManager: CallQueueManager = {
+                    id: manager.extension.id,
+                    permission: manager.permission
+                }
+                payload.push(queueManager)
+            }
+
+            const body = {
+                updatedExtensions: payload
+            }
+
+            const response = await RestCentral.post(baseManagersURL.replace('groupId', `${bundle.extension.data.id}`), headers, body)
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to set managers`)
+            console.log(e)
+            postMessage(new Message(`Failed to set managers for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to set managers', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
     const setNotifications = async (bundle: CallQueueDataBundle, originalExtensions: Extension[], targetExtensions: Extension[], token: string) => {
         try {
             const headers = {
@@ -79,21 +159,7 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
             }
 
             if (bundle.extendedData?.notifications?.emailRecipients) {
-                for (let index = 0; index < bundle.extendedData.notifications.emailRecipients.length; index++) {
-                    let recipient = bundle.extendedData?.notifications?.emailRecipients[index]
-
-                    const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === `${recipient.extensionId}`)
-                    if (!originalExtension) {
-                        postMessage(new Message(`Failed to set email recipients for queue ${bundle.extension.data.name}. Old ID for ${recipient.fullName} not found`, 'warning'))
-                    }
-
-                    const newExtension = targetExtensions.find((ext) => ext.data.name === originalExtension?.data.name && `${ext.data.extensionNumber}` === `${originalExtension.data.extensionNumber}`)
-                    if (!newExtension) {
-                        postMessage(new Message(`Failed to set email recipients for queue ${bundle.extension.data.name}. New ID for ${recipient.fullName} not found`, 'warning'))
-                    }
-
-                    recipient.extensionId = `${newExtension?.data.id}`
-                }
+                delete bundle.extendedData.notifications.emailRecipients
             }
 
             const response = await RestCentral.put(baseNotificationsSettingsURL.replace('extensionId', `${bundle.extension.data.id}`), headers, bundle.extendedData?.notifications)
@@ -306,6 +372,148 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
         }
     }
 
+    const setOtherSettings = async (bundle: CallQueueDataBundle, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+
+            const response = await RestCentral.put(baseOtherSettingsURL.replace('groupId', `${bundle.extension.data.id}`), headers, bundle.extendedData?.otherSettings)
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to set editable member status`)
+            console.log(e)
+            postMessage(new Message(`Failed to set editable member status ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to set editable member status', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const setPickupMembers = async (bundle: CallQueueDataBundle, originalExtensions: Extension[], targetExtensions: Extension[], token: string) => {
+        if (!bundle.extendedData?.pickupMembers || bundle.extendedData.pickupMembers.length === 0) return
+
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+
+            const foundPickupMembers: PickupMemberPayload[] = []
+            for (const member of bundle.extendedData!.pickupMembers!) {
+                const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === `${member.id}`)
+                if (!originalExtension) {
+                    postMessage(new Message(`Ext ${member.extensionNumber} was removed from queue ${bundle.extension.data.name} because it's original ID could not be found`, 'warning'))
+                    continue
+                }
+
+                const newExtension = targetExtensions.find((ext) => ext.data.name === originalExtension?.data.name && `${ext.data.extensionNumber}` === `${originalExtension.data.extensionNumber}`)
+                if (!newExtension) {
+                    postMessage(new Message(`Ext ${member.extensionNumber} was removed from queue ${bundle.extension.data.name} because it's new ID could not be found`, 'warning'))
+                    continue
+                }
+
+                const payload: PickupMemberPayload = {
+                    id: `${newExtension.data.id}`,
+                    configurePresenseLine: true
+                }
+
+                foundPickupMembers.push(payload)
+            }
+
+            const body = {
+                addedMembers: foundPickupMembers
+            }
+
+            const response = await RestCentral.post(basePickupMemberURL.replace('groupId', `${bundle.extension.data.id}`), headers, body)
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to set queue pickup members`)
+            console.log(e)
+            postMessage(new Message(`Failed to set pickup members ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to set pickup members', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const setMemberPresenseStatus = async (bundle: CallQueueDataBundle, originalExtensions: Extension[], targetExtensions: Extension[], token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+
+            const foundMembers: MemberPresenseStatus[] = []
+            for (const member of bundle.extendedData!.memberPresense!) {
+                const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === `${member.member.id}`)
+                if (!originalExtension) {
+                    postMessage(new Message(`Could not set queue status for ${member.member.name} because the original ID could not be found`, 'warning'))
+                    postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Could not set queue member status', `${member.member.name}`]))
+                    continue
+                }
+
+                const newExtension = targetExtensions.find((ext) => ext.data.name === originalExtension?.data.name && `${ext.data.extensionNumber}` === `${originalExtension.data.extensionNumber}`)
+                if (!newExtension) {
+                    postMessage(new Message(`Could not set queue status for ${member.member.name} because the new ID could not be found`, 'warning'))
+                    postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Could not set queue member status', `${member.member.name}`]))
+                    continue
+                }
+
+                let foundMember = {...member}
+                foundMember.member.id = `${newExtension.data.id}`
+                delete foundMember.member.name
+                delete foundMember.member.site
+                delete foundMember.member.extensionNumber
+                delete foundMember.acceptQueueCalls
+                foundMembers.push(foundMember)
+            }
+
+            const body = {
+                records: foundMembers
+            }
+
+            const response = await RestCentral.put(baseMemberStatusURL.replace('groupId', `${bundle.extension.data.id}`), headers, body)
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to set member status`)
+            console.log(e)
+            postMessage(new Message(`Failed to set member statuses for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to set member status', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    // This should probably be split into multiple functions
     const adjustCallHandling = (bundle: CallQueueDataBundle, callHandling: CallHandling, originalExtensions: Extension[], targetExtensions: Extension[]) => {
 
         // Adjust transfer extension

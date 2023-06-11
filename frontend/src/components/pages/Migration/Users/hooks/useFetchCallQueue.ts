@@ -16,6 +16,7 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
     const baseMemberStatusURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId/presence'
     const basePickupMemberURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId/pickup-members'
     const baseCustomGreetingURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/greeting/greetingId'
+    const baseManagersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId/permissions?managersOnly=true'
     const baseWaitingPeriod = 250
 
     const fetchCallQueue = async (bundle: CallQueueDataBundle) => {
@@ -26,6 +27,7 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
 
         await fetchBaseData(bundle, accessToken)
         await fetchBusinessHours(bundle, accessToken)
+        await fetchManagers(bundle, accessToken)
         await fetchDirectNumbers(bundle, accessToken)
         await fetchBusinessHoursCallHandling(bundle, accessToken)
         await fetchAfterHoursCallHandling(bundle, accessToken)
@@ -115,6 +117,34 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
             console.log(e)
             postMessage(new Message(`Failed to get business hours for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to fetch business hours', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const fetchManagers = async (bundle: CallQueueDataBundle, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const response = await RestCentral.get(baseManagersURL.replace('groupId', `${bundle.extension.data.id}`), headers)
+            bundle.extendedData!.managers = response.data.records
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to get managers`)
+            console.log(e)
+            postMessage(new Message(`Failed to get managers for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to get managers', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
@@ -304,7 +334,7 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
                 "Authorization": `Bearer ${token}`
             }
             const response = await RestCentral.get(baseMemberStatusURL.replace('groupId', `${bundle.extension.data.id}`), headers)
-            bundle.extendedData!.memberPresense = response.data
+            bundle.extendedData!.memberPresense = response.data.records
            
             if (response.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)

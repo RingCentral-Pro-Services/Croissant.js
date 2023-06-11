@@ -13,8 +13,9 @@ export interface ExtendedQueueData {
     members?: CallQueueMember[]
     notifications?: Notifications
     otherSettings?: OtherSettings
-    memberPresense?: MemberPresenseStatus
+    memberPresense?: MemberPresenseStatus[]
     pickupMembers?: PickupMember[]
+    managers?: QueueManager[]
 }
 
 interface CallQueueMember {
@@ -28,7 +29,7 @@ interface OtherSettings {
     alertTimer: number
 }
 
-interface MemberPresenseStatus {
+export interface MemberPresenseStatus {
     member: {
         id: string
         name?: string
@@ -38,7 +39,7 @@ interface MemberPresenseStatus {
             name: string
         }
     }
-    acceptQueueCalls: boolean
+    acceptQueueCalls?: boolean
     acceptCurrentQueueCalls: boolean
 }
 
@@ -50,4 +51,17 @@ interface PickupMember {
         id: string
         name?: string
     }
+}
+
+export interface QueueManager {
+    extension: {
+        id: string
+        name?: string
+        extensionNumber?: string
+        site?: {
+            id: string
+            name?: string
+        }
+    }
+    permission: string
 }
