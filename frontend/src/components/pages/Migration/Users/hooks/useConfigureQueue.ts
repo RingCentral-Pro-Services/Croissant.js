@@ -37,6 +37,7 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
         await setOtherSettings(bundle, accessToken)
         await setPickupMembers(bundle, originalExtensions, targetExtensions, accessToken)
         await setMemberPresenseStatus(bundle, originalExtensions, targetExtensions, accessToken)
+
         const customBusinessHoursGreetings = await setDuringHoursGreetings(bundle, accessToken)
         const customAfterHoursGreetings = await setAfterHoursGreetings(bundle, accessToken)
         if (customBusinessHoursGreetings) {
@@ -51,9 +52,15 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
                 await setCustomGreeting(bundle, 'after-hours-rule', greeting, accessToken)
             }
         }
+
         const adjustedBusinessHoursCallHandling = adjustCallHandling(bundle, bundle.extendedData!.businessHoursCallHandling!, originalExtensions, targetExtensions)
         if (adjustedBusinessHoursCallHandling) {
             await setCallHandling(bundle, adjustedBusinessHoursCallHandling, accessToken)
+        }
+
+        const adjustedAfterHoursCallHandling = adjustCallHandling(bundle, bundle.extendedData!.afterHoursCallHandling!, originalExtensions, targetExtensions)
+        if (adjustedAfterHoursCallHandling) {
+            await setAfterHoursCallHandling(bundle, adjustedAfterHoursCallHandling, accessToken)
         }
     }
 
@@ -368,6 +375,33 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
             console.log(e)
             postMessage(new Message(`Failed to set call handling for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to set call handling', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const setAfterHoursCallHandling = async (bundle: CallQueueDataBundle, callHandling: CallHandling, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const response = await RestCentral.put(baseCallHandlingURL.replace('extensionId', `${bundle.extension.data.id}`).replace('ruleId', 'after-hours-rule'), headers, callHandling)
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to set after hours call handling`)
+            console.log(e)
+            postMessage(new Message(`Failed to set after hours call handling for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to set after hours call handling', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
