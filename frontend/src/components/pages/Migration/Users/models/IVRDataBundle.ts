@@ -40,7 +40,7 @@ export interface IVRPrompt {
         id: string
     }
     text?: string
-    language: {
+    language?: {
         uri?: string
         id: string
         name: string

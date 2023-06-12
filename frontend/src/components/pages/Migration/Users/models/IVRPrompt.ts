@@ -4,4 +4,5 @@ export interface IVRAudioPrompt {
     contentType: string
     contentUri: string
     filename: string
+    content?: any
 }

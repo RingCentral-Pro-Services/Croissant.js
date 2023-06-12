@@ -18,3 +18,7 @@ export const idForExtension = (targetExtension: string | number, extensionList: 
 export const extensionForID = (targetID: string | number, extensions: Extension[]) => {
     return extensions.find((ext) => `${ext.data.id}` === `${targetID}`)
 }
+
+export const wait = (ms: number) => {
+    return new Promise(resolve => setTimeout(resolve, ms))
+}

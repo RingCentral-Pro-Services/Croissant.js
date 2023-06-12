@@ -120,6 +120,14 @@ const useConfigureIVR = (postMessage: (message: Message) => void, postTimedMessa
     }
 
     const adjustPrompt = (bundle: IVRDataBundle, prompt: IVRPrompt, originalPromptsList: IVRAudioPrompt[], targetPromptsList: IVRAudioPrompt[]) => {
+        if (!prompt) {
+            const newPrompt: IVRPrompt = {
+                mode: 'TextToSpeech',
+                text: 'Thank you for calling'
+            }
+            return newPrompt
+        }
+
         if (prompt.mode !== 'Audio') {
             if (prompt.audio) delete prompt.audio
             return prompt
