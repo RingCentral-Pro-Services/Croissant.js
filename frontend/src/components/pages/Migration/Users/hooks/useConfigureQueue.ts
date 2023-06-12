@@ -58,9 +58,11 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
             await setCallHandling(bundle, adjustedBusinessHoursCallHandling, accessToken)
         }
 
-        const adjustedAfterHoursCallHandling = adjustCallHandling(bundle, bundle.extendedData!.afterHoursCallHandling!, originalExtensions, targetExtensions)
-        if (adjustedAfterHoursCallHandling) {
-            await setAfterHoursCallHandling(bundle, adjustedAfterHoursCallHandling, accessToken)
+        if (Object.keys(bundle.extendedData!.businessHours!.schedule).length !== 0) {
+            const adjustedAfterHoursCallHandling = adjustCallHandling(bundle, bundle.extendedData!.afterHoursCallHandling!, originalExtensions, targetExtensions)
+            if (adjustedAfterHoursCallHandling) {
+                await setAfterHoursCallHandling(bundle, adjustedAfterHoursCallHandling, accessToken)
+            }
         }
     }
 

@@ -20,13 +20,16 @@ import UIDInputField from "../../../shared/UIDInputField";
 import useFetchERLs from "../../Automatic Location Updates/hooks/useFetchERLs";
 import useSiteList from "../Sites/hooks/useSiteList";
 import { PhoneNumber, UserDataBundle } from "../User Data Download/models/UserDataBundle";
+import useConfigureIVRs from "./hooks/useConfigureIVRs";
 import useConfigureMOs from "./hooks/useConfigureMOs";
 import useConfigureQueues from "./hooks/useConfigureQueues";
 import useConfigureUsers from "./hooks/useConfigureUsers";
+import useCreateIVRs from "./hooks/useCreateIVRs";
 import useCreateMOs from "./hooks/useCreateMOs";
 import useCreateQueues from "./hooks/useCreateQueues";
 import useCustomRoleList from "./hooks/useCustomRoleList";
 import useFetchCallQueues from "./hooks/useFetchCallQueues";
+import useFetchIVRs from "./hooks/useFetchIVRs";
 import useFetchMOs from "./hooks/useFetchMOs";
 import useFetchUsers from "./hooks/useFetchUsers";
 import useMigrateCustomRoles from "./hooks/useMigrateCustomRoles";
@@ -36,6 +39,7 @@ import useMigrateUsers from "./hooks/useMigrateUsers";
 import usePhoneNumberList from "./hooks/usePhoneNumberList";
 import usePredefinedRoleList from "./hooks/useRoleList";
 import { CallQueueDataBundle } from "./models/CallQueueDataBundle";
+import { IVRDataBundle } from "./models/IVRDataBundle";
 import { MessageOnlyDataBundle } from "./models/MessageOnlyDataBundle";
 import { Role } from "./models/Role";
 
@@ -61,6 +65,7 @@ const MigrateUsers = () => {
     const [specificExtension, setSpecificExtension] = useState('')
     const [messageOnlyBundles, setMessageOnlyBundles] = useState<MessageOnlyDataBundle[]>([])
     const [callQueueBundles, setCallQueueBundles] = useState<CallQueueDataBundle[]>([])
+    const [ivrBundles, setIVRBundles] = useState<IVRDataBundle[]>([])
 
     const handleSiteFetchCompletion = (sites: SiteData[]) => {
         setSites(sites)
@@ -85,6 +90,7 @@ const MigrateUsers = () => {
     const {getPhoneNumberMap, phoneNumbers, isPhoneNumberMapPending} = usePhoneNumberList()
     const {fetchMOs, progressValue: messageOnlyFetchProgress , maxProgress: maxMessageOnlyFetchProgress} = useFetchMOs(postMessage, postTimedMessage, postError)
     const {fetchCallQueues, progressValue: callQueueFetchProgress, maxProgress: maxCallQueueFetchProgress} = useFetchCallQueues(postMessage, postTimedMessage, postError)
+    const {fetchIVRs, progressValue: ivrFetchProgress, maxProgress: maxIVRFetchProgress} = useFetchIVRs(postMessage, postTimedMessage, postError)
 
     const {migrateSites, maxProgress: maxSiteProgress, progressValue: siteMigrationProgress} = useMigrateSites(postMessage, postTimedMessage, postError)
     const {migrateCustomRoles, progressValue: customRoleProgress, maxProgress: maxCustomRoleProgress} = useMigrateCustomRoles(postMessage, postTimedMessage, postError)
@@ -95,6 +101,8 @@ const MigrateUsers = () => {
     const {configureMOs} = useConfigureMOs(postMessage, postTimedMessage, postError)
     const {createQueues, progressValue: createQueuesProgress, maxProgress: maxCreateQueueProgess} = useCreateQueues(postMessage, postTimedMessage, postError)
     const {configureQueues, progressValue: configureQueuesProgress, maxProgress: maxConfigureQueuesProgress} = useConfigureQueues(postMessage, postTimedMessage, postError)
+    const {createIVRs, progressValue: createIVRsProgress, maxProgress: maxCreateIVRsProgress} = useCreateIVRs(postMessage, postTimedMessage, postError)
+    const {configureIVRs, progressValue: configureIVRsProgress, maxProgress: maxConfigureIVRsProgress} = useConfigureIVRs(postMessage, postTimedMessage, postError)
     
     useEffect(() => {
         if (originalUID.length < 5) return
@@ -181,10 +189,17 @@ const MigrateUsers = () => {
         console.log('Call Queues')
         console.log(callQueueDataBundles)
 
+        // IVRs
+        const selectedIVRs = selectedExtensions.filter((ext) => ext.prettyType() === 'IVR Menu')
+        const ivrDataBundles = await fetchIVRs(selectedIVRs)
+        console.log('IVRs')
+        console.log(ivrDataBundles)
+
         setUserDataBundles(userDataBundles)
         setCustomRoles(roles)
         setMessageOnlyBundles(messageOnlyDataBundles)
         setCallQueueBundles(callQueueDataBundles)
+        setIVRBundles(ivrDataBundles)
         console.log('Fetched users')
         console.log(userDataBundles)
     }
@@ -235,6 +250,10 @@ const MigrateUsers = () => {
         const createdQueues = await createQueues(callQueueBundles, targetExts, availablePhoneNumbers)
         targetExts = [...targetExts, ...createdQueues]
 
+        // Create IVRs
+        const createdIVRs = await createIVRs(ivrBundles, targetExts, availablePhoneNumbers)
+        targetExts = [...targetExts, ...createdIVRs]
+
         // Fetch predefined roles
         const predefinedRoles = await fetchPredefinedRoles()
         roles = [...predefinedRoles]
@@ -264,6 +283,7 @@ const MigrateUsers = () => {
         await configureUsers(userDataBundles, targetERLs, originalExtensionList, targetExts, roles)
         await configureMOs(messageOnlyBundles, originalExtensionList, targetExts)
         await configureQueues(callQueueBundles, originalExtensionList, targetExts)
+        await configureIVRs(ivrBundles, originalExtensionList, targetExts)
         postMessage(new Message('Finished', 'info'))
     }
 
@@ -301,6 +321,7 @@ const MigrateUsers = () => {
                 <ProgressBar value={userFetchProgress} max={maxUserFetchProgress} label='Users' />
                 <ProgressBar value={messageOnlyFetchProgress} max={maxMessageOnlyFetchProgress} label='Message-Only Extensions & Announcement-Only Extensions' />
                 <ProgressBar value={callQueueFetchProgress} max={maxCallQueueFetchProgress} label='Call Queues' />
+                <ProgressBar value={ivrFetchProgress} max={maxIVRFetchProgress} label='IVR Menus' />
                 <FeedbackArea gridData={filteredExtensions} onFilterSelection={handleFilterSelection} messages={[]} errors={[]} timedMessages={[]} />
             </ToolCard>
             <ToolCard>
@@ -312,8 +333,10 @@ const MigrateUsers = () => {
                 <ProgressBar label='Custom Roles' value={customRoleProgress} max={maxCustomRoleProgress} />
                 <ProgressBar label='Create Users' value={createUsersProgress} max={maxCreateUsersProgress} />
                 <ProgressBar label='Create Queues' value={createQueuesProgress} max={maxCreateQueueProgess} />
+                <ProgressBar label='Create IVRs' value={createIVRsProgress} max={maxCreateIVRsProgress} />
                 <ProgressBar label='Configure Users' value={configureUsersProgress} max={maxConfigureUsersProgress} />
                 <ProgressBar label='Configure Queues' value={configureQueuesProgress} max={maxConfigureQueuesProgress} />
+                <ProgressBar label='Configure IVRs' value={configureIVRsProgress} max={maxConfigureIVRsProgress} />
                 <FeedbackArea messages={messages} timedMessages={timedMessages} errors={errors} />
             </ToolCard>
         </>
