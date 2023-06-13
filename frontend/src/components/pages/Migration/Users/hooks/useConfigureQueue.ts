@@ -508,14 +508,14 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
             for (const member of bundle.extendedData!.memberPresense!) {
                 const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === `${member.member.id}`)
                 if (!originalExtension) {
-                    postMessage(new Message(`Could not set queue status for ${member.member.name} because the original ID could not be found`, 'warning'))
+                    postMessage(new Message(`Could not set queue status for ${member.member.name} on queue ${bundle.extension.data.name} because the original ID could not be found`, 'warning'))
                     postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Could not set queue member status', `${member.member.name}`]))
                     continue
                 }
 
                 const newExtension = targetExtensions.find((ext) => ext.data.name === originalExtension?.data.name && `${ext.data.extensionNumber}` === `${originalExtension.data.extensionNumber}`)
                 if (!newExtension) {
-                    postMessage(new Message(`Could not set queue status for ${member.member.name} because the new ID could not be found`, 'warning'))
+                    postMessage(new Message(`Could not set queue status for ${member.member.name} on queue ${bundle.extension.data.name} because the new ID could not be found`, 'warning'))
                     postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Could not set queue member status', `${member.member.name}`]))
                     continue
                 }

@@ -678,7 +678,7 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
                 forwardAllCalls.extension.id = `${newExtension.data.id}`
             }
 
-            const response = await RestCentral.post(baseForwardAllCallsURL.replace('extensionId', `${bundle.extension.data.id}`), headers, forwardAllCalls)
+            const response = await RestCentral.patch(baseForwardAllCallsURL.replace('extensionId', `${bundle.extension.data.id}`), headers, forwardAllCalls)
 
             if (response.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)

@@ -216,6 +216,7 @@ const MigrateUsers = () => {
         setIVRBundles(ivrDataBundles)
         console.log('Fetched users')
         console.log(userDataBundles)
+        postMessage(new Message('Finished disovery', 'info'))
     }
 
     const handleMigrateButtonClick = async () => {
@@ -309,7 +310,7 @@ const MigrateUsers = () => {
         await configureMOs(messageOnlyBundles, originalExtensionList, targetExts)
         await configureQueues(callQueueBundles, originalExtensionList, targetExts)
         await configureIVRs(ivrBundles, originalExtensionList, targetExts, originalAccountPrompts, prompts)
-        postMessage(new Message('Finished', 'info'))
+        postMessage(new Message('Finished migrating', 'info'))
     }
 
     return (
