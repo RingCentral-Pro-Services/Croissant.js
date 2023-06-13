@@ -57,10 +57,12 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
             await addPERL(bundle, bundle.extendedData!.pERLs![i], accessToken)
             console.log('Adding pERL')
         }
-        for (const data of deviceData) {
-            await setDeviceName(bundle, data, accessToken)
-            await setDeviceERL(bundle, data, companyERLs, bundle.extendedData!.pERLs!, accessToken)
-            await addForwardingDevice(bundle, data.newDeviceID, accessToken)
+        if (deviceData) {
+            for (const data of deviceData) {
+                await setDeviceName(bundle, data, accessToken)
+                await setDeviceERL(bundle, data, companyERLs, bundle.extendedData!.pERLs!, accessToken)
+                await addForwardingDevice(bundle, data.newDeviceID, accessToken)
+            }
         }
         await setPresenseLines(bundle, originalExtensions, targetExtensions, accessToken)
         await setPresenseStatus(bundle, accessToken)
@@ -213,6 +215,8 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
     }
 
     const setDeviceModels = async (bundle: UserDataBundle, deviceIDs: string[], token: string) => {
+        if (!deviceIDs || deviceIDs.length === 0) return
+
         try {
             const headers = {
                 "Accept": "application/json",
@@ -243,6 +247,8 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
                 deviceData.push(data)
                 devices.push(device)
             }
+
+            if (devices.length === 0) return
 
             const body = {
                 records: devices

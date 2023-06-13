@@ -274,7 +274,8 @@ const MigrateUsers = () => {
 
         // Upload prompts
         if (selectedExtensionTypes.includes('Prompt Library')) {
-            const uploadedPrompts = await uploadPrompts(originalAccountPrompts)
+            const originalPromptsCopy = structuredClone(originalAccountPrompts)
+            const uploadedPrompts = await uploadPrompts(originalPromptsCopy)
             prompts = [...prompts, ...uploadedPrompts]
         }
 

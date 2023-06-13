@@ -361,6 +361,8 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             }
+            const nonCustomGreetings = callHandling.greetings.filter((greeting) => !greeting.custom)
+            callHandling.greetings = nonCustomGreetings
             const response = await RestCentral.put(baseCallHandlingURL.replace('extensionId', `${bundle.extension.data.id}`).replace('ruleId', 'business-hours-rule'), headers, callHandling)
 
             if (response.rateLimitInterval > 0) {
@@ -388,6 +390,8 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             }
+            const nonCustomGreetings = callHandling.greetings.filter((greeting) => !greeting.custom)
+            callHandling.greetings = nonCustomGreetings
             const response = await RestCentral.put(baseCallHandlingURL.replace('extensionId', `${bundle.extension.data.id}`).replace('ruleId', 'after-hours-rule'), headers, callHandling)
 
             if (response.rateLimitInterval > 0) {

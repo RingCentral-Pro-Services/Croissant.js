@@ -19,14 +19,16 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
         setMaxProgress(dataBundles.length)
         for (let i = 0; i < dataBundles.length; i++) {
             let bundle = dataBundles[i]
-            const site = extensions.find((ext) => ext.prettyType() === 'Site' && ext.data.name === bundle.extension.data.site?.name)
-            
-            if (!site) {
-                postMessage(new Message(`${bundle.extension.data.name} can't be migrated because the site it's assigned to (${bundle.extension.data.site?.name}) does not exist`, 'error'))
-                continue
-            }
 
-            bundle.extension.data.site!.id = `${site!.data.id}`
+            if (bundle.extension.data.site && bundle.extension.data.site.name !== 'Main Site') {
+                const site = extensions.find((ext) => ext.prettyType() === 'Site' && ext.data.name === bundle.extension.data.site?.name)
+                if (!site) {
+                    postMessage(new Message(`${bundle.extension.data.name} can't be migrated because the site it's assigned to (${bundle.extension.data.site?.name}) does not exist`, 'error'))
+                    continue
+                }
+
+                bundle.extension.data.site!.id = `${site!.data.id}`
+            }
             bundle.extension.data.contact.email = `${bundle.extension.data.contact.email}.ps.ringcentral.com`
             bundle.extension.data.status = 'NotActivated'
 
