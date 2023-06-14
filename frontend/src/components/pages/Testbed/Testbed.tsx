@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import { Button } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import useGetAccessToken from "../../../rcapi/useGetAccessToken";
 import Header from "../../shared/Header";
@@ -23,7 +23,8 @@ const Testbed = () => {
             <Header title="Testbed" body="For testing things" />
             <div className="tool-card">
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
-                <Button variant='contained' onClick={handleButtonClick}>Go</Button>
+                <Button variant='filled' onClick={handleButtonClick}>Go</Button>
+                {/* <Text>This is Mantine text!</Text> */}
             </div>
         </>
     )
