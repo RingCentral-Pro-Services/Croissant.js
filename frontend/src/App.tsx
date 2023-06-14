@@ -34,6 +34,7 @@ import MigrateSites from './components/pages/Migration/Sites/MigrateSites';
 import MigrateQueues from './components/pages/Migration/Queues/MigrateQueues';
 import UserDataDownload from './components/pages/Migration/User Data Download/UserDataDownload';
 import MigrateUsers from './components/pages/Migration/Users/MigrateUsers';
+import { MantineProvider } from '@mantine/core';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -72,6 +73,7 @@ function App() {
   }
 
   return (
+    <MantineProvider withGlobalStyles withNormalizeCSS>
     <ThemeProvider theme={theme === 'light'? lightTheme : darkTheme}>
        <Router>
       <div className="App">
@@ -123,6 +125,7 @@ function App() {
       </div>
     </Router>
     </ThemeProvider>
+    </MantineProvider>
   );
 }
 
