@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import {Button} from '@mui/material'
+import {Button} from '@mantine/core'
 import useReadExcel from "../../hooks/useReadExcel"
 import ExcelSheetSelector from "./ExcelSheetSelector"
 
@@ -24,10 +24,10 @@ const FileSelect = (props: {enabled: boolean, handleSubmit: () => void, setSelec
     return (
         <div className="file-select">
             <form>
-                <Button disabled={!enabled} className="inline browse-button" variant="outlined" type="button" onClick={handleFileOpenClick}>Browse...</Button>
+                <Button disabled={!enabled} className="inline browse-button" variant='outline' type="button" onClick={handleFileOpenClick}>Browse...</Button>
                 <p className="inline healthy-margin-right">{selectedFileName ? selectedFileName : "No file selected"}</p>
                 {selectedFileName && selectedFileName.includes('.xlsx') ? <ExcelSheetSelector disabled={!enabled} sheets={excelSheets} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} /> : <></>}
-                <Button disabled={!enabled} variant="outlined" type="button" onClick={handleSubmit}>{isPending ? "Processing" : "Submit"}</Button>
+                <Button disabled={!enabled} variant="outline" type="button" onClick={handleSubmit}>{isPending ? "Processing" : "Submit"}</Button>
                 <input id="file-select" type="file" onInput={(e) => handleFileInput(e)} accept={accept} hidden/>
             </form>
         </div>
