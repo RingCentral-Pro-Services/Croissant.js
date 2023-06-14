@@ -132,19 +132,6 @@ body {
   display: inline-block!important;
 }
 
-button {
-  background-color: #e4e4e6;
-  color: black;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 12px;
-  font-size: 15px;
-}
-
-button:hover {
-  background-color: #ccc;
-}
-
 .browse-button {
   width: 150px;
   margin-right: 10px!important;
