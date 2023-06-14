@@ -6,7 +6,7 @@ import useExtensionList from "../../../rcapi/useExtensionList"
 import useFetchCallQueueMembers from "../../../rcapi/useFetchCallQueueMembers"
 import useWriteExcelFile from "../../../hooks/useWriteExcelFile"
 import Header from "../../shared/Header"
-import {Button, Checkbox, FormControlLabel, FormGroup} from '@mui/material'
+import {Button} from '@mantine/core'
 import useAnalytics from "../../../hooks/useAnalytics"
 import UIDInputField from "../../shared/UIDInputField"
 import useGetCallQueueSettings from "../../../rcapi/useGetCallQueueSettings"
@@ -148,7 +148,7 @@ const CallQueues = () => {
                 <h2>Export Call Queues</h2>
                 <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} loading={isTokenPending} error={tokenError} />
                 {!isPhoneNumberMapPending && isMultiSiteEnabled ? <AdaptiveFilter options={siteNames} defaultSelected={siteNames} title='Sites' placeholder='Search...' setSelected={setSelectedSiteNames} />  : <></>}
-                <Button className='healthy-margin-right' disabled={!hasCustomerToken || isPhoneNumberMapPending || isPending} variant="contained" onClick={handleClick}>Go</Button>
+                <Button className='healthy-margin-right' disabled={!hasCustomerToken || isPhoneNumberMapPending || isPending} variant="filled" onClick={handleClick}>Go</Button>
                 {isCallQueueSettingsPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 {isPending ? <progress className='healthy-margin-top' value={currentExtensionIndex} max={selectedExtensions.length} /> : <></>}
                 {timedMessages.length > 0 ? <MessagesArea messages={timedMessages} /> : <></>}

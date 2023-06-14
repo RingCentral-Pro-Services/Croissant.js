@@ -6,7 +6,7 @@ import useExtensionList from "../../../rcapi/useExtensionList"
 import useExcelToQueues from "../../../rcapi/useExcelToQueues"
 import useCreateCallQueues from "../../../rcapi/useCreateCallQueues"
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage"
-import {Button, Checkbox, FormControlLabel, FormGroup} from '@mui/material'
+import {Button} from '@mantine/core'
 import FeedbackArea from "../../shared/FeedbackArea"
 import UIDInputField from "../../shared/UIDInputField"
 import useGetAccessToken from "../../../rcapi/useGetAccessToken"
@@ -19,6 +19,7 @@ import FeedbackForm from "../../shared/FeedbackForm"
 import useSidebar from "../../../hooks/useSidebar"
 import useCallQueue from "./hooks/useCallQueue"
 import LaunchIcon from '@mui/icons-material/Launch';
+import { IconExternalLink } from "@tabler/icons-react"
 
 const CreateCallQueues = () => {
     let [isPending, setIsPending] = useState(true)
@@ -104,8 +105,8 @@ const CreateCallQueues = () => {
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                 <FileSelect enabled={hasCustomerToken} accept=".xlsx" handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Create Call Queues" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
-                {isPending ? <></> : <Button disabled={isSyncing} variant="contained" onClick={handleSyncButtonClick}>Sync</Button>}
-                <Button className='healthy-margin-left' variant='outlined' onClick={() => window.open('https://docs.google.com/spreadsheets/d/1NW5wnPJFJKAfZQ6jc57JMRP4ddJr4-qSoLlQXZ3g_ko/edit?usp=sharing', '_blank')} endIcon={<LaunchIcon />} >Template</Button>
+                {isPending ? <></> : <Button disabled={isSyncing} variant="filled" onClick={handleSyncButtonClick}>Sync</Button>}
+                <Button className='healthy-margin-left' variant='outline' onClick={() => window.open('https://docs.google.com/spreadsheets/d/1NW5wnPJFJKAfZQ6jc57JMRP4ddJr4-qSoLlQXZ3g_ko/edit?usp=sharing', '_blank')} rightIcon={<IconExternalLink />} >Template</Button>
                 {(isSyncing && currentExtensionIndex >= queues.length) ? <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button> : <></>}
                 {!(queues.length > 0) ? <></> : <progress id='sync_progress' value={currentExtensionIndex} max={queues.length} />}
                 {isQueueConvertPending ? <></> : <FeedbackArea gridData={queues} messages={messages} timedMessages={timedMessages} errors={errors} />}

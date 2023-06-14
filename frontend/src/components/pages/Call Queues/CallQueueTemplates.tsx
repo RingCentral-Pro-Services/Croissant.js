@@ -1,4 +1,5 @@
-import { Button, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
+import { Button, Accordion } from '@mantine/core'
 import React, { useEffect, useState } from "react";
 import useLogin from "../../../hooks/useLogin";
 import useMessageQueue from "../../../hooks/useMessageQueue";
@@ -7,9 +8,9 @@ import useExtensionList from "../../../rcapi/useExtensionList";
 import useGetAccessToken from "../../../rcapi/useGetAccessToken";
 import SimpleSelection from "../../shared/SimpleSelection";
 import UIDInputField from "../../shared/UIDInputField";
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
+// import Accordion from '@mui/material/Accordion';
+// import AccordionSummary from '@mui/material/AccordionSummary';
+// import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import useTimezoneList from "../../../rcapi/useTimezoneList";
 import useRegionalFormats from "../../../rcapi/useRegionalFormats";
@@ -217,7 +218,7 @@ const CallQueueTemplates = () => {
                 <h2>Call Queue Templates</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                 {isRegionalFormatListPenging ? <></> : <AdaptiveFilter options={siteNames} showAllOption={true} setSelected={setSelectedSites} title='Sites' placeholder='Search' disabled={isRegionalFormatListPenging || isSyncing} defaultSelected={siteNames}  />}
-                <Button disabled={selectedExtensions.length === 0 || isRegionalFormatListPenging || isSyncing} variant="contained" onClick={handleSyncButtonClick} >Sync</Button>
+                <Button disabled={selectedExtensions.length === 0 || isRegionalFormatListPenging || isSyncing} variant="filled" onClick={handleSyncButtonClick} >Sync</Button>
                 {isMemberStatusPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 <ScheduleBuilder isOpen={isShowingHours} setIsOpen={setIsShowingHours} setPayload={setSchedulePayload} />
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Call Queue Templates" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
@@ -228,74 +229,68 @@ const CallQueueTemplates = () => {
                 {isSyncing && willSetMemberStatus ? <> <Typography>Member Status</Typography> <progress value={memberStatusProgress} max={memberStatusMaxProgress} /> </> : <></>}
                 <div className="healthy-margin-bottom"></div>
                 <div hidden={isRegionalFormatListPenging || isSyncing}>
-                    <Accordion>
-                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                            <Typography>Call Queue Details</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            <div className="inline">
-                                <SimpleSelection label="Timezone" placeholder="" options={timezones.map((timezone) => timezone.prettyName)} defaultSelected='' onSelect={setTimezone} />
-                                <SimpleSelection label="Time Format" placeholder="" options={['12h', '24h']} defaultSelected='' onSelect={setTimeFormat} />
-                                <SimpleSelection label="User Language" placeholder="" options={regionalFormats.map((format) => format.name)} defaultSelected='' onSelect={setUserLanguage} />
-                            </div>
-                            <div className="inline">
-                                <Button sx={{marginBottom: 2}} onClick={() => setIsShowingHours(true)}>Edit Schedule</Button>
-                                <SimpleSelection label="Greetings Language" placeholder="" options={regionalFormats.map((format) => format.name)} defaultSelected='' onSelect={setGreetingsLanguage} />
-                                <SimpleSelection label="Regional Format" placeholder="" options={regionalFormats.map((format) => format.name)} defaultSelected='' onSelect={setRegionalFormat} />
-                            </div>
-                        </AccordionDetails>
-                    </Accordion>
-                    <Accordion>
-                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                            <Typography>Screening, Greeting & Hold Music</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            <div className="inline">
-                                <SimpleSelection label="Call Queue Greeting" placeholder="" allowFileSelection={true} options={callQueueGreetingAudio} defaultSelected='' onSelect={setIntroGreeting} onFileSelect={setIntroGreetingFile} />
-                                <SimpleSelection label="Audio While Connecting" placeholder="" allowFileSelection={true} options={callQueueConnectingAudio} defaultSelected='' onSelect={setAudioWhileConnecting} onFileSelect={setConnectingGreetingFile} />
-                                <SimpleSelection label="Hold Music" placeholder="" allowFileSelection={true} options={holdMusicAudio} defaultSelected='Music (Acoustic)' onSelect={setHoldMusic} onFileSelect={setOnHoldGreetingFile} />
-                            </div>
-                            <div className="inline">
-                                <SimpleSelection label="Interrupt Audio" placeholder="" options={['Never', 'Only when music ends', 'Every 15 seconds', 'Every 20 seconds', 'Every 25 seconds', 'Every 30 seconds', 'Every 40 seconds', 'Every 50 seconds', 'Every 60 seconds']} defaultSelected='' onSelect={setInterruptPeriod} />
-                                <SimpleSelection label="Interrupt Prompt" placeholder=""  allowFileSelection={true} options={callQueueInterruptAudio} defaultSelected='e' onSelect={setInterruptAudio} onFileSelect={setIntterruptGreetingFile} />
-                            </div>
-                        </AccordionDetails>
-                    </Accordion>
-                    <Accordion>
-                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                            <Typography>Call Handling & Members</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            <div className="inline">
-                                <SimpleSelection label="Route calls to members" placeholder="" options={['Rotating', 'Sequential', 'Simultaneous']} defaultSelected='' onSelect={setRingType} />
-                                <SimpleSelection label="Number of rings before trying next member" placeholder="" options={['2 Rings / 10 Seconds', '3 Rings / 15 Seconds', '4 Rings / 20 Seconds', '5 Rings / 25 Seconds', '6 Rings / 30 Seconds', '9 Rings / 45 Seconds', '12 Rings / 1 Minute', '24 Rings / 2 Minutes', '60 Rings / 5 Minutes']} defaultSelected='' onSelect={setUserRingTime} />
-                                <SimpleSelection label="After call wrap-up time" placeholder="" options={['0 Seconds', '10 Seconds', '15 Seconds', '20 Seconds', '25 Seconds', '30 Seconds', '45 Seconds', '1 Minute', '3 Minutes', '5 Minutes']} defaultSelected='' onSelect={setWrapUpTime} />
-                            </div>
-                            <div className="inline">
-                                <SimpleSelection label="Number of callers allowed in queue" placeholder="" options={['5 Callers', '10 Callers', '15 Callers', '20 Callers', '25 Callers']} defaultSelected='' onSelect={setMaxCallersInQueue} />
-                                <SimpleSelection label="When queue is full" placeholder="" options={['Send new callers to voicemail', 'Advise callers of heavy call volume and disconnect', 'Send new callers to extension', 'Forward new callers to external number']} defaultSelected='' onSelect={setQueueFullAction} />
-                                <FreeResponse label="Queue full destination" onInput={setQueueFullDestination} />
-                            </div>
-                            <div className="inline">
-                                <SimpleSelection label="Maximum caller wait time in queue" placeholder="" options={["Don't Wait", '10 Seconds', '15 Seconds', '20 Seconds', '25 Seconds', '30 Seconds', '1 Minute', '2 Minutes', '3 Minutes', '4 Minutes', '5 Minutes', '10 Minutes', '15 Minutes']} defaultSelected='' onSelect={setMaxWaitTime} />
-                                <SimpleSelection label="When max wait time reached, send caller to" placeholder="" options={['Voicemail', 'Extension', 'External number']} defaultSelected='' onSelect={setMaxWaitTimeAction} />
-                                <FreeResponse label="Max wait time destination" onInput={setMaxWaitTimeDestination} />
-                            </div>
-                            <div className="inline">
-                                <SimpleSelection label="Allow members to change status" placeholder="" options={['Allowed', 'Not Allowed']} defaultSelected='' onSelect={setEditableMemberStatus} />
-                            </div>
-                        </AccordionDetails>
-                    </Accordion>
-                    <Accordion>
-                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                            <Typography>Voicemail & Notifications</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            <div className="inline">
-                                <SimpleSelection label="Voicemail Greeting" placeholder="" options={['Default', 'Custom']} defaultSelected='' onSelect={setVoicemailGreeting} onFileSelect={setVoicemailGreetingFile} />
-                                <SimpleSelection label="After Hours Voicemail Greeting" placeholder="" options={['Default', 'Custom']} defaultSelected='' onSelect={setAfterHoursVoicemailGreeting} onFileSelect={setAfterHoursVoicemailGreetingFile} />
-                            </div>
-                        </AccordionDetails>
+                    <Accordion defaultValue=''>
+                        <Accordion.Item value='call-queue-details'>
+                            <Accordion.Control>Call Queue Details</Accordion.Control>
+                            <Accordion.Panel>
+                                <div className="inline">
+                                    <SimpleSelection label="Timezone" placeholder="" options={timezones.map((timezone) => timezone.prettyName)} defaultSelected='' onSelect={setTimezone} />
+                                    <SimpleSelection label="Time Format" placeholder="" options={['12h', '24h']} defaultSelected='' onSelect={setTimeFormat} />
+                                    <SimpleSelection label="User Language" placeholder="" options={regionalFormats.map((format) => format.name)} defaultSelected='' onSelect={setUserLanguage} />
+                                </div>
+                                <div className="inline">
+                                    <Button sx={{marginBottom: 2}} variant='outline' onClick={() => setIsShowingHours(true)}>Edit Schedule</Button>
+                                    <SimpleSelection label="Greetings Language" placeholder="" options={regionalFormats.map((format) => format.name)} defaultSelected='' onSelect={setGreetingsLanguage} />
+                                    <SimpleSelection label="Regional Format" placeholder="" options={regionalFormats.map((format) => format.name)} defaultSelected='' onSelect={setRegionalFormat} />
+                                </div>
+                            </Accordion.Panel>
+                        </Accordion.Item>
+                        <Accordion.Item value='screening-greeting'>
+                            <Accordion.Control>Screening, Greeting & Hold Music</Accordion.Control>
+                            <Accordion.Panel>
+                                <div className="inline">
+                                    <SimpleSelection label="Call Queue Greeting" placeholder="" allowFileSelection={true} options={callQueueGreetingAudio} defaultSelected='' onSelect={setIntroGreeting} onFileSelect={setIntroGreetingFile} />
+                                    <SimpleSelection label="Audio While Connecting" placeholder="" allowFileSelection={true} options={callQueueConnectingAudio} defaultSelected='' onSelect={setAudioWhileConnecting} onFileSelect={setConnectingGreetingFile} />
+                                    <SimpleSelection label="Hold Music" placeholder="" allowFileSelection={true} options={holdMusicAudio} defaultSelected='Music (Acoustic)' onSelect={setHoldMusic} onFileSelect={setOnHoldGreetingFile} />
+                                </div>
+                                <div className="inline">
+                                    <SimpleSelection label="Interrupt Audio" placeholder="" options={['Never', 'Only when music ends', 'Every 15 seconds', 'Every 20 seconds', 'Every 25 seconds', 'Every 30 seconds', 'Every 40 seconds', 'Every 50 seconds', 'Every 60 seconds']} defaultSelected='' onSelect={setInterruptPeriod} />
+                                    <SimpleSelection label="Interrupt Prompt" placeholder=""  allowFileSelection={true} options={callQueueInterruptAudio} defaultSelected='e' onSelect={setInterruptAudio} onFileSelect={setIntterruptGreetingFile} />
+                                </div>
+                            </Accordion.Panel>
+                        </Accordion.Item>
+                        <Accordion.Item value='call-handling'>
+                            <Accordion.Control>Call Handling & Members</Accordion.Control>
+                            <Accordion.Panel>
+                                <div className="inline">
+                                    <SimpleSelection label="Route calls to members" placeholder="" options={['Rotating', 'Sequential', 'Simultaneous']} defaultSelected='' onSelect={setRingType} />
+                                    <SimpleSelection label="Number of rings before trying next member" placeholder="" options={['2 Rings / 10 Seconds', '3 Rings / 15 Seconds', '4 Rings / 20 Seconds', '5 Rings / 25 Seconds', '6 Rings / 30 Seconds', '9 Rings / 45 Seconds', '12 Rings / 1 Minute', '24 Rings / 2 Minutes', '60 Rings / 5 Minutes']} defaultSelected='' onSelect={setUserRingTime} />
+                                    <SimpleSelection label="After call wrap-up time" placeholder="" options={['0 Seconds', '10 Seconds', '15 Seconds', '20 Seconds', '25 Seconds', '30 Seconds', '45 Seconds', '1 Minute', '3 Minutes', '5 Minutes']} defaultSelected='' onSelect={setWrapUpTime} />
+                                </div>
+                                <div className="inline">
+                                    <SimpleSelection label="Number of callers allowed in queue" placeholder="" options={['5 Callers', '10 Callers', '15 Callers', '20 Callers', '25 Callers']} defaultSelected='' onSelect={setMaxCallersInQueue} />
+                                    <SimpleSelection label="When queue is full" placeholder="" options={['Send new callers to voicemail', 'Advise callers of heavy call volume and disconnect', 'Send new callers to extension', 'Forward new callers to external number']} defaultSelected='' onSelect={setQueueFullAction} />
+                                    <FreeResponse label="Queue full destination" onInput={setQueueFullDestination} />
+                                </div>
+                                <div className="inline">
+                                    <SimpleSelection label="Maximum caller wait time in queue" placeholder="" options={["Don't Wait", '10 Seconds', '15 Seconds', '20 Seconds', '25 Seconds', '30 Seconds', '1 Minute', '2 Minutes', '3 Minutes', '4 Minutes', '5 Minutes', '10 Minutes', '15 Minutes']} defaultSelected='' onSelect={setMaxWaitTime} />
+                                    <SimpleSelection label="When max wait time reached, send caller to" placeholder="" options={['Voicemail', 'Extension', 'External number']} defaultSelected='' onSelect={setMaxWaitTimeAction} />
+                                    <FreeResponse label="Max wait time destination" onInput={setMaxWaitTimeDestination} />
+                                </div>
+                                <div className="inline">
+                                    <SimpleSelection label="Allow members to change status" placeholder="" options={['Allowed', 'Not Allowed']} defaultSelected='' onSelect={setEditableMemberStatus} />
+                                </div>
+                            </Accordion.Panel>
+                        </Accordion.Item>
+                        <Accordion.Item value='voicemail'>
+                            <Accordion.Control>Voicemail</Accordion.Control>
+                            <Accordion.Panel>
+                                <div className="inline">
+                                    <SimpleSelection label="Voicemail Greeting" placeholder="" options={['Default', 'Custom']} defaultSelected='' onSelect={setVoicemailGreeting} onFileSelect={setVoicemailGreetingFile} />
+                                    <SimpleSelection label="After Hours Voicemail Greeting" placeholder="" options={['Default', 'Custom']} defaultSelected='' onSelect={setAfterHoursVoicemailGreeting} onFileSelect={setAfterHoursVoicemailGreetingFile} />
+                                </div>
+                            </Accordion.Panel>
+                        </Accordion.Item>
                     </Accordion>
                 </div>
                 {!isRegionalFormatListPenging && filteredExtensions.length > 0 ? <FeedbackArea gridData={filteredExtensions} onFilterSelection={handleFilterSelection} messages={messages} errors={errors} timedMessages={timedMessages} /> : <></>}
