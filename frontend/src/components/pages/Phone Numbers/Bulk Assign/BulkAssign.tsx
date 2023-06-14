@@ -1,4 +1,4 @@
-import { Button, Typography } from "@mui/material";
+import { Button } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import { PhoneNumberPayloadSchema } from "../../../../helpers/schemas";
 import useLogin from "../../../../hooks/useLogin";
@@ -17,7 +17,7 @@ import Header from "../../../shared/Header";
 import UIDInputField from "../../../shared/UIDInputField";
 import useAssignPhoneNumbers from "./hooks/useAssignPhoneNumbers";
 import useExcelToPhoneNumbers from "./hooks/useExcelToPhoneNumbers";
-import LaunchIcon from '@mui/icons-material/Launch';
+import { IconExternalLink } from "@tabler/icons-react";
 
 const BulkAssign = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -92,8 +92,8 @@ const BulkAssign = () => {
                 <h2>Bulk Assign</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} error={tokenError} loading={isTokenPending} />
                 <FileSelect enabled={!isPhoneNumberMapPending} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
-                <Button variant='contained' disabled={phoneNumberPayloads.length === 0 || isSyncing} onClick={handleSync}>Sync</Button>
-                <Button className='healthy-margin-left' variant='outlined' onClick={() => window.open('https://docs.google.com/spreadsheets/d/1r9ou59vA5iOLAx2pDOjIl6GfTBpF6bR8gZhtTj9hheo/edit?usp=sharing', '_blank')} endIcon={<LaunchIcon />} >Template</Button>
+                <Button variant='filled' disabled={phoneNumberPayloads.length === 0 || isSyncing} onClick={handleSync}>Sync</Button>
+                <Button className='healthy-margin-left' variant='outline' onClick={() => window.open('https://docs.google.com/spreadsheets/d/1r9ou59vA5iOLAx2pDOjIl6GfTBpF6bR8gZhtTj9hheo/edit?usp=sharing', '_blank')} rightIcon={<IconExternalLink />} >Template</Button>
                 {isAssignmentPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Bulk Number Assign" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
                 {isSyncing ? <progress value={progressValue} max={progessMax} /> : <></>}
