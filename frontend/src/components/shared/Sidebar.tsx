@@ -8,240 +8,179 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 
+import { Navbar, Group, Code, ScrollArea, createStyles, rem } from '@mantine/core';
+import {
+  IconNotes,
+  IconCalendarStats,
+  IconPresentationAnalytics,
+  IconFileAnalytics,
+  IconAdjustments,
+  IconLock,
+  IconSitemap,
+  IconLayoutList,
+  IconBuildingCommunity,
+  Icon123,
+  IconArrowRightCircle,
+  IconSettings2,
+} from '@tabler/icons-react';
+import { LinksGroup } from "./NavBarLinksGroup";
+
+const mockdata = [
+    {
+      label: 'IVRs',
+      icon: IconSitemap,
+      initiallyOpened: false,
+      links: [
+        { label: 'Create IVRs', link: '/' },
+        { label: 'Audit IVRs', link: '/auditmenus' },
+      ],
+    },
+    {
+        label: 'Call Queues',
+        icon: IconLayoutList,
+        initiallyOpened: false,
+        links: [
+          { label: 'Create Call Queues', link: '/createcallqueues' },
+          { label: 'Audit Call Queues', link: '/auditcallqueues' },
+          { label: 'Call Queue Templates', link: '/callqueuetemplates' },
+        ],
+    },
+    {
+        label: 'Custom Rules',
+        icon: IconNotes,
+        initiallyOpened: false,
+        links: [
+          { label: 'Export Custom Rules', link: '/exportrules' },
+          { label: 'Build Custom Rules', link: '/customrules' },
+          { label: 'Copy Custom Rules', link: '/copycustomrules' },
+          { label: 'Delete Custom Rules', link: '/customruleedit' },
+        ],
+    },
+    {
+        label: 'Sites',
+        icon: IconBuildingCommunity,
+        initiallyOpened: false,
+        links: [
+          { label: 'Create Sites', link: '/sites' },
+          { label: 'Edit Sites', link: '/editsites' },
+        ],
+    },
+    {
+        label: 'Phone Numbers',
+        icon: Icon123,
+        initiallyOpened: false,
+        links: [
+          { label: 'Bulk Assign', link: '/bulkassign' },
+        ],
+    },
+    {
+        label: 'Migration',
+        icon: IconArrowRightCircle,
+        initiallyOpened: false,
+        links: [
+          { label: 'Auto Migrate', link: '/migrateusers' },
+          { label: 'Export User Data', link: '/userexport' },
+        ],
+    },
+    {
+        label: 'Utilities',
+        icon: IconSettings2,
+        initiallyOpened: false,
+        links: [
+            { label: 'Account Dump', link: '/accountdump' },
+            { label: 'Extension Upload', link: '/extensionupload' },
+            { label: 'Delete Extensions', link: '/deleteextensions' },
+            { label: 'Edit Extensions', link: '/editextensions' },
+            { label: 'Notifications', link: '/notificationsaudit' },
+            { label: 'Desk Phones', link: '/deskphones' },
+            { label: 'Intercom', link: '/intercom' },
+            { label: 'Presense', link: '/presence' },
+            { label: 'Automatic Location Updates', link: '/locationupdates' },
+        ],
+    },
+    {
+        label: 'Groups',
+        icon: IconSettings2,
+        initiallyOpened: false,
+        links: [
+            { label: 'Push to Talk', link: '/pushtotalk' },
+            { label: 'User Groups', link: '/usergroups' },
+            { label: 'Call Monitoring', link: '/callmonitoring' },
+            { label: 'Paging Groups', link: '/paginggroups' },
+            { label: 'Park Locations', link: '/parklocations' },
+        ],
+    },
+  ];
+
+  const useStyles = createStyles((theme) => ({
+    navbar: {
+      backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.white,
+      paddingBottom: 0,
+    },
+  
+    header: {
+      padding: theme.spacing.md,
+      paddingTop: 0,
+      marginLeft: `calc(${theme.spacing.md} * -1)`,
+      marginRight: `calc(${theme.spacing.md} * -1)`,
+      color: theme.colorScheme === 'dark' ? theme.white : theme.black,
+      borderBottom: `${rem(1)} solid ${
+        theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[3]
+      }`,
+    },
+  
+    links: {
+      marginLeft: `calc(${theme.spacing.md} * -1)`,
+      marginRight: `calc(${theme.spacing.md} * -1)`,
+    },
+  
+    linksInner: {
+      paddingTop: theme.spacing.xl,
+      paddingBottom: theme.spacing.xl,
+    },
+  
+    footer: {
+      marginLeft: `calc(${theme.spacing.md} * -1)`,
+      marginRight: `calc(${theme.spacing.md} * -1)`,
+      borderTop: `${rem(1)} solid ${
+        theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[3]
+      }`,
+    },
+  }));
+
+
+   function Sidebar({setColorTheme} : SidebarProps) {
+    const { classes } = useStyles();
+    const links = mockdata.map((item) => <LinksGroup {...item} key={item.label} />);
+  
+    return (
+      <Navbar width={{ sm: 230 }} p="md" className={classes.navbar}>
+        <Navbar.Section className={classes.header}>
+          <Group position="apart">
+            {/* <Logo width={rem(120)} /> */}
+            <Code sx={{ fontWeight: 700 }}>Croissant v3.1.2</Code>
+          </Group>
+        </Navbar.Section>
+  
+        <Navbar.Section grow className={classes.links} component={ScrollArea}>
+          <div className={classes.linksInner}>{links}</div>
+        </Navbar.Section>
+  
+        <Navbar.Section className={classes.footer}>
+          {/* <UserButton
+            image="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=255&q=80"
+            name="Ann Nullpointer"
+            email="anullpointer@yahoo.com"
+          /> */}
+        </Navbar.Section>
+      </Navbar>
+    );
+  }
+
+  // ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 interface SidebarProps {
     setColorTheme: (theme: 'light' | 'dark') => void
-}
-
-const Sidebar: React.FC<SidebarProps> = ({setColorTheme}) => {
-    const [selectedItem, setSelectedItem] = useState("")
-    const [isIVRListOpen, setIsIVRListOpen] = useState(false)
-    const [isCallQueueListOpen, setIsCallQueueListOpen] = useState(false)
-    const [isCustomRuleListOpen, setIsCustomRuleListOpen] = useState(false)
-    const [isSiteListOpen, setIsSiteListOpen] = useState(false)
-    const [isPhoneNumbersListOpen, setIsPhoneNumbersListOpen] = useState(false)
-    const [isMigrationListOpen, setIsMigrationListOpen] = useState(false)
-    const initialTheme = localStorage.getItem('theme') || 'light'
-    const [theme, setTheme] = useState(initialTheme)
-    const navigate = useNavigate()
-
-    const handleClick = (text: string, destination: string) => {
-        setSelectedItem(text)
-        navigate(destination)
-    }
-
-    const handleThemeChange = () => {
-        if (theme === "dark") {
-            setTheme("light")
-            setColorTheme("light")
-        } else {
-            setTheme("dark")
-            setColorTheme("dark")
-        }
-    }
-
-    const sidebarItems: SidebarItem[] = [
-        {label: 'Extension Upload', destination: '/extensionupload'},
-        {label: 'Edit Extensions', destination: '/editextensions'},
-        {label: 'Presence', destination: '/presence'},
-        {label: 'Push to Talk', destination: '/pushtotalk'},
-        {label: 'Account Dump', destination: '/accountdump'},
-        {label: 'Delete Extensions', destination: '/deleteextensions'},
-        {label: 'Notifications', destination: '/notificationsaudit'},
-        {label: 'Desk Phones', destination: '/deskphones'},
-        {label: 'Intercom', destination: '/intercom'},
-        {label: 'User Groups', destination: '/usergroups'},
-        {label: 'Call Monitoring', destination: '/callmonitoring'},
-        {label: 'Paging Groups', destination: '/paginggroups'},
-        {label: 'Park Locations', destination: '/parklocations'},
-        {label: 'Automatic Location Updates', destination: '/locationupdates'},
-    ]
-
-    const siteItems: SidebarItem[] = [
-        {label: 'Create Sites', destination: '/sites'},
-        {label: 'Edit Sites', destination: '/editsites'},
-    ]
-
-    const ivrItems: SidebarItem[] = [
-        {label: 'Create IVRs', destination: '/'},
-        {label: 'Audit IVRs', destination: '/auditmenus'},
-    ]
-
-    const callQueueItems: SidebarItem[] = [
-        {label: 'Create Call Queues', destination: '/createcallqueues'},
-        {label: 'Audit Call Queues', destination: '/auditcallqueues'},
-        {label: 'Call Queue Templates', destination: '/callqueuetemplates'},
-    ]
-
-    const migrationItems: SidebarItem[] = [
-        // {label: 'Migrate Sites', destination: '/migratesites'},
-        // {label: 'Migrate Queues', destination: '/migratequeues'},
-        {label: 'Auto Migrate', destination: '/migrateusers'},
-        {label: 'Export User Data', destination: '/userexport'},
-    ]
-
-    const customRuleItems: SidebarItem[] = [
-        {label: 'Export Custom Rules', destination: '/exportrules'},
-        {label: 'Build Custom Rules', destination: '/customrules'},
-        {label: 'Copy Custom Rules', destination: '/copycustomrules'},
-        {label: 'Enable / Disable Custom Rules', destination: '/customruleedit'}
-    ]
-
-    const phoneNumberItems: SidebarItem[] = [
-        {label: 'Bulk Assign', destination: '/bulkassign'},
-    ]
-
-    const handleToggle = () => {
-        setIsIVRListOpen(!isIVRListOpen)
-    }
-
-    const handleCallQueueToggle = () => {
-        setIsCallQueueListOpen(!isCallQueueListOpen)
-    }
-
-    const handleCustomRuleToggle = () => {
-        setIsCustomRuleListOpen(!isCustomRuleListOpen)
-    }
-
-    const handleSiteToggle = () => {
-        setIsSiteListOpen(!isSiteListOpen)
-    }
-
-    const handlePhoneNumberToggle = () => {
-        setIsPhoneNumbersListOpen(!isPhoneNumbersListOpen)
-    }
-
-    const handleMigrationToggle = () => {
-        setIsMigrationListOpen(!isMigrationListOpen)
-    }
-
-    return ( 
-        <Drawer
-        className='nav-toolbar'
-        sx={{
-          width: 230,
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
-            width: 230,
-            boxSizing: 'border-box',
-          },
-        }}
-        variant="permanent"
-        anchor="left"
-      >
-        <Toolbar className="nav-header" >
-            <Typography variant="h6">Croissant</Typography>
-            <IconButton className='settings-button' color="primary" aria-label="upload picture" component="label" onClick={handleThemeChange}>
-                {theme === "light" ? <DarkModeIcon /> : <LightModeIcon />}
-            </IconButton>
-        </Toolbar>
-        <Divider />
-        <List className='nav-toolbar'>
-            <ListItemButton onClick={handleToggle}>
-                <ListItemText primary="IVRs" />
-                {isIVRListOpen ? <ExpandLess /> : <ExpandMore />}
-            </ListItemButton>
-            <Collapse in={isIVRListOpen} timeout='auto' unmountOnExit>
-                <List>
-                    {ivrItems.map((item) => (
-                        <ListItem className={selectedItem === item.label ? 'nav-item-selected' : ''} key={item.label} disablePadding>
-                        <ListItemButton onClick={() => handleClick(item.label, item.destination)}>
-                        <ListItemText primary={item.label} />
-                        </ListItemButton>
-                    </ListItem>
-                    ))}
-                </List>
-            </Collapse>
-            <Divider />
-            <ListItemButton onClick={handleCallQueueToggle}>
-                <ListItemText primary="Call Queues" />
-                {isCallQueueListOpen ? <ExpandLess /> : <ExpandMore />}
-            </ListItemButton>
-            <Collapse in={isCallQueueListOpen} timeout='auto'>
-                <List>
-                    {callQueueItems.map((item) => (
-                        <ListItem className={selectedItem === item.label ? 'nav-item-selected' : ''} key={item.label} disablePadding>
-                        <ListItemButton onClick={() => handleClick(item.label, item.destination)}>
-                        <ListItemText primary={item.label} />
-                        </ListItemButton>
-                    </ListItem>
-                    ))}
-                </List>
-            </Collapse>
-            <Divider />
-            <ListItemButton onClick={handleCustomRuleToggle}>
-                <ListItemText primary="Custom Rules" />
-                {isCustomRuleListOpen ? <ExpandLess /> : <ExpandMore />}
-            </ListItemButton>
-            <Collapse in={isCustomRuleListOpen} timeout='auto'>
-                <List>
-                    {customRuleItems.map((item) => (
-                        <ListItem className={selectedItem === item.label ? 'nav-item-selected' : ''} key={item.label} disablePadding>
-                        <ListItemButton onClick={() => handleClick(item.label, item.destination)}>
-                        <ListItemText primary={item.label} />
-                        </ListItemButton>
-                    </ListItem>
-                    ))}
-                </List>
-            </Collapse>
-            <Divider />
-            <ListItemButton onClick={handleSiteToggle}>
-                <ListItemText primary="Sites" />
-                {isSiteListOpen ? <ExpandLess /> : <ExpandMore />}
-            </ListItemButton>
-            <Collapse in={isSiteListOpen} timeout='auto'>
-                <List>
-                    {siteItems.map((item) => (
-                        <ListItem className={selectedItem === item.label ? 'nav-item-selected' : ''} key={item.label} disablePadding>
-                        <ListItemButton onClick={() => handleClick(item.label, item.destination)}>
-                        <ListItemText primary={item.label} />
-                        </ListItemButton>
-                    </ListItem>
-                    ))}
-                </List>
-            </Collapse>
-            <Divider />
-            <ListItemButton onClick={handlePhoneNumberToggle}>
-                <ListItemText primary="Phone Numbers" />
-                {isPhoneNumbersListOpen ? <ExpandLess /> : <ExpandMore />}
-            </ListItemButton>
-            <Collapse in={isPhoneNumbersListOpen} timeout='auto'>
-                <List>
-                    {phoneNumberItems.map((item) => (
-                        <ListItem className={selectedItem === item.label ? 'nav-item-selected' : ''} key={item.label} disablePadding>
-                        <ListItemButton onClick={() => handleClick(item.label, item.destination)}>
-                        <ListItemText primary={item.label} />
-                        </ListItemButton>
-                    </ListItem>
-                    ))}
-                </List>
-            </Collapse>
-            <Divider />
-            <ListItemButton onClick={handleMigrationToggle}>
-                <ListItemText primary="Migration" />
-                {isMigrationListOpen ? <ExpandLess /> : <ExpandMore />}
-            </ListItemButton>
-            <Collapse in={isMigrationListOpen} timeout='auto'>
-                <List>
-                    {migrationItems.map((item) => (
-                        <ListItem className={selectedItem === item.label ? 'nav-item-selected' : ''} key={item.label} disablePadding>
-                        <ListItemButton onClick={() => handleClick(item.label, item.destination)}>
-                        <ListItemText primary={item.label} />
-                        </ListItemButton>
-                    </ListItem>
-                    ))}
-                </List>
-            </Collapse>
-            <Divider />
-          {sidebarItems.map((item) => (
-            <ListItem className={selectedItem === item.label ? 'nav-item-selected' : ''} key={item.label} disablePadding>
-              <ListItemButton onClick={() => handleClick(item.label, item.destination)}>
-                <ListItemText primary={item.label} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-      </Drawer>
-     );
 }
  
 export default Sidebar;
