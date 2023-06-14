@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import {TextField, Autocomplete, CircularProgress, Typography} from '@mui/material'
+// import {TextField, Autocomplete, CircularProgress, Typography} from '@mui/material'
+import { Autocomplete, createStyles, Loader, rem, TextInput } from '@mantine/core';
 import { AccountUID } from "../../models/AccountUID";
 
 interface UIDInputFieldProps {
@@ -10,8 +11,47 @@ interface UIDInputFieldProps {
     loading?: boolean
 }
 
+const useStyles = createStyles((theme, { floating }: { floating: boolean }) => ({
+    root: {
+      position: 'relative',
+    },
+  
+    label: {
+      position: 'absolute',
+      zIndex: 2,
+      top: rem(7),
+      left: theme.spacing.sm,
+      pointerEvents: 'none',
+      color: floating
+        ? theme.colorScheme === 'dark'
+          ? theme.white
+          : theme.black
+        : theme.colorScheme === 'dark'
+        ? theme.colors.dark[3]
+        : theme.colors.gray[5],
+      transition: 'transform 150ms ease, color 150ms ease, font-size 150ms ease',
+      transform: floating ? `translate(-${theme.spacing.sm}, ${rem(-28)})` : 'none',
+      fontSize: floating ? theme.fontSizes.xs : theme.fontSizes.sm,
+      fontWeight: floating ? 500 : 400,
+    },
+  
+    required: {
+      transition: 'opacity 150ms ease',
+      opacity: floating ? 1 : 0,
+    },
+  
+    input: {
+      '&::placeholder': {
+        transition: 'color 150ms ease',
+        color: !floating ? 'transparent' : undefined,
+      },
+    },
+  }));
+
 const UIDInputField: React.FC<UIDInputFieldProps> = ({setTargetUID, disabled, disabledText, error = '', loading = true}) => {
+    const [focused, setFocused] = useState(false);
     const [accounts, setAccounts] = useState<AccountUID[]>([])
+    const { classes } = useStyles({ floating: disabledText.trim().length !== 0 || focused });
 
     useEffect(() => {
         let accountData = localStorage.getItem('accounts')
@@ -20,7 +60,7 @@ const UIDInputField: React.FC<UIDInputFieldProps> = ({setTargetUID, disabled, di
         setAccounts(JSON.parse(accountData))
     }, [])
 
-    const handleInput = (e: any, value: string | null) => {
+    const handleInput = (value: string | null) => {
         if (!value) return
 
         if (containsLetters(value)) {
@@ -41,36 +81,33 @@ const UIDInputField: React.FC<UIDInputFieldProps> = ({setTargetUID, disabled, di
 
     if (disabled) {
         return (
-            <TextField 
-                className="vertical-middle healthy-margin-right"
-                autoComplete="off"
-                id="outline-required"
-                label="Account"
-                defaultValue=""
+            <TextInput
+                className="healthy-margin-right"
+                placeholder=""
+                required
+                classNames={classes}
                 value={disabledText}
-                size="small"
-                onChange={(e) => setTargetUID(e.target.value)}
-                disabled={disabled}
-            ></TextField>
+                autoComplete="nope"
+                disabled
+                sx={{width: 200, display: 'inline-block'}}
+            />
         )
     }
     else {
         return (
             <>
                 <div style={{display: 'inline-table'}} >
-                    <Autocomplete
-                        className="vertical-middle healthy-margin-right"
-                        size="small"
-                        id="free-solo-demo"
-                        sx={{width: 200, display: 'inline-block'}}
-                        freeSolo
-                        options={accounts.map((account) => account.name)}
-                        onChange={handleInput}
-                        renderInput={(params) => <TextField {...params} label="Account UID" />}
-                    />
-                    {error === '' ? <></> : <Typography sx={{display: 'block', color: 'red'}} variant='caption' >{error}</Typography>}
+                <Autocomplete
+                    className="healthy-margin-right"
+                    sx={{width: 200, display: 'inline-block'}}
+                    data={accounts.map((account) => account.name)}
+                    onChange={handleInput}
+                    rightSection={loading ? <Loader size="1rem" /> : null}
+                    placeholder="Account UID"
+                />
+                    {/* {error === '' ? <></> : <Typography sx={{display: 'block', color: 'red'}} variant='caption' >{error}</Typography>} */}
                 </div>
-                {loading ? <CircularProgress className='vertical-middle healthy-margin-right' /> : <></>}
+                {/* {loading ? <CircularProgress className='vertical-middle healthy-margin-right' /> : <></>} */}
             </>
         )
     }
