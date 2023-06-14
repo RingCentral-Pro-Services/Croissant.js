@@ -154,7 +154,7 @@ const mockdata = [
     const links = mockdata.map((item) => <LinksGroup {...item} key={item.label} />);
   
     return (
-      <Navbar width={{ sm: 230 }} p="md" className={classes.navbar}>
+      <Navbar sx={{position: 'fixed'}} width={{ sm: 230 }} p="md" className={classes.navbar}>
         <Navbar.Section className={classes.header}>
           <Group position="apart">
             {/* <Logo width={rem(120)} /> */}
