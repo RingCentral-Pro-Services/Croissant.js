@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import { Button } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import { sanitize } from "../../../helpers/Sanatize";
 import useLogin from "../../../hooks/useLogin";
@@ -81,7 +81,7 @@ const ParkLocations = () => {
             <div className="tool-card">
                 <h2>Park Locations</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
-                <Button variant='contained' onClick={handleAuditButtonClick} disabled={isExtensionListPending || !isReadyToSync || isSyncing}>Audit</Button>
+                <Button variant='filled' onClick={handleAuditButtonClick} disabled={isExtensionListPending || !isReadyToSync || isSyncing}>Audit</Button>
                 {isSyncing ? <progress value={currentExtensionIndex} max={parkLocationExtensions.length} /> : <></>}
                 {isSyncing ? <FeedbackArea gridData={parkLocationExtensions} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
             </div>

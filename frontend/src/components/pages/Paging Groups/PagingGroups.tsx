@@ -1,4 +1,5 @@
-import { Button, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
+import { Button } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import { pagingGroupSchema } from "../../../helpers/schemas";
 import useAnalytics from "../../../hooks/useAnalytics";
@@ -19,7 +20,7 @@ import Header from "../../shared/Header";
 import UIDInputField from "../../shared/UIDInputField";
 import useCreatePagingGroups from "./hooks/useCreatePagingGroups";
 import useExcelToPagingGroups from "./hooks/useExcelToPagingGroups";
-import LaunchIcon from '@mui/icons-material/Launch';
+import { IconExternalLink } from "@tabler/icons-react";
 
 const PagingGroups = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -129,8 +130,8 @@ const PagingGroups = () => {
                 <h2>Paging Groups</h2>
                 <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} error={tokenError} loading={isTokenPending} />
                 <FileSelect enabled={!isSyncing} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
-                <Button disabled={isConvertPending || validatedData.length === 0 || isDeviceMapPending || isSyncing} variant='contained' onClick={handleSync} >Sync</Button>
-                <Button className='healthy-margin-left' variant='outlined' onClick={() => window.open('https://docs.google.com/spreadsheets/d/1XNr_5gjEAt46hYmXASislUwgeZ7yNfsPSsIIJrmDX7E/edit?usp=sharing', '_blank')} endIcon={<LaunchIcon />} >Template</Button>
+                <Button disabled={isConvertPending || validatedData.length === 0 || isDeviceMapPending || isSyncing} variant='filled' onClick={handleSync} >Sync</Button>
+                <Button className='healthy-margin-left' variant='outline' onClick={() => window.open('https://docs.google.com/spreadsheets/d/1XNr_5gjEAt46hYmXASislUwgeZ7yNfsPSsIIJrmDX7E/edit?usp=sharing', '_blank')} rightIcon={<IconExternalLink />} >Template</Button>
                 {isCreationPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Paging Groups" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
                 {isShowingDeviceMapProgress ? <> <Typography>Discovering Devices</Typography> <progress value={deviceMapProgressValue} max={deviceMapProgressMax} /> </> : <></>}

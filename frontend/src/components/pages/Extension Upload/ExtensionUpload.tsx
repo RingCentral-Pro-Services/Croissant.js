@@ -1,4 +1,5 @@
-import { Button, Checkbox, FormControlLabel, Typography } from "@mui/material";
+import { Checkbox, FormControlLabel, Typography } from "@mui/material";
+import { Button } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import { extensionSchema } from "../../../helpers/schemas";
 import useAnalytics from "../../../hooks/useAnalytics";
@@ -177,7 +178,7 @@ const ExtensionUpload = () => {
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} error={tokenError} loading={isTokenPending} setTargetUID={setTargetUID} />
                 <FileSelect enabled={!isSyncing} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
                 <AdaptiveFilter title='Extension Types' placeholder='search' options={supportedExtensionTypes} defaultSelected={supportedExtensionTypes} setSelected={setSelectedExtensionTypes} disabled={isExtensionConverPending || isSyncing} />
-                <Button variant="contained" disabled={filteredExtensions.length === 0 || userDeficit > 0 || leDeficit > 0 || isSyncing} onClick={handleSyncButtonClick}>Sync</Button>
+                <Button variant="filled" disabled={filteredExtensions.length === 0 || userDeficit > 0 || leDeficit > 0 || isSyncing} onClick={handleSyncButtonClick}>Sync</Button>
                 <FormControlLabel className='healthy-margin-left' control={<Checkbox defaultChecked onChange={() => setShouldAlterEmails(!shouldAlterEmails)}/>} label="Add .ps.ringcentral.com" />
                 <Modal open={isShowingModal} setOpen={setIsShowingModal} handleAccept={() => console.log('acceptance')} title='Not enough unassigned extensions' body={deficitLabel} acceptLabel='Okay' />
                 {(isSyncing && currentExtensionIndex === filteredExtensions.length) ? <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button> : <></>}

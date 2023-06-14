@@ -5,7 +5,7 @@ import useGetAccessToken from "../../../rcapi/useGetAccessToken"
 import useMessageQueue from "../../../hooks/useMessageQueue"
 import useFetchNotifications from "../../../rcapi/useFetchNotifications"
 import Header from "../../shared/Header"
-import {Button} from '@mui/material'
+import { Button } from "@mantine/core";
 import FeedbackArea from "../../shared/FeedbackArea"
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage"
 import FileSelect from "../../shared/FileSelect"
@@ -142,10 +142,10 @@ const NotificationAudit = () => {
             <div className="tool-card">
                 <h2>Extension Notifications</h2>
                 <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} error={tokenError} loading={isTokenPending} />
-                <Button disabled={isExtensionListPending || isPending} variant="contained" onClick={handleClick}>Go</Button>
+                <Button disabled={isExtensionListPending || isPending} variant="filled" onClick={handleClick}>Go</Button>
                 {isNotificationListPending ? <></> : <FileSelect isPending={false} enabled={true} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} accept='.xlsx' defaultSheet='Notifications' handleSubmit={handleFileSubmit}/>}
-                {isEmailSwapPending ? <></> : <Button variant='contained' onClick={handleSyncButtonClick} >Sync</Button>}
-                {isNotificationListPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
+                {isEmailSwapPending ? <></> : <Button variant='filled' onClick={handleSyncButtonClick} >Sync</Button>}
+                {isNotificationListPending ? <></> : <Button variant='subtle' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 <br/>
                 <div className="mega-margin-top">
                     {sites.length > 0 ? <AdaptiveFilter options={prettyExtensionTypes} defaultSelected={prettyExtensionTypes} title='Extension Types' placeholder='Search...' setSelected={setSelectedExtensionTypes} /> : <></>}

@@ -1,4 +1,5 @@
-import { Button, Checkbox, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, TextField } from "@mui/material";
+import { Checkbox, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, TextField } from "@mui/material";
+import { Button } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import ExtensionIsolator from "../../../../helpers/ExtensionIsolator";
 import useLogin from "../../../../hooks/useLogin";
@@ -344,7 +345,7 @@ const MigrateUsers = () => {
                 <AdaptiveFilter options={supportedExtensionTypes} title='Extension Types' placeholder='Search' setSelected={setSelectedExtensionTypes} />
                 {shouldShowSiteFilter ? <AdaptiveFilter options={siteNames} title='Sites' placeholder='Search' setSelected={setSelectedSiteNames} /> : <></>}
                 <FormControlLabel control={<Checkbox defaultChecked value={shouldMigrateSites} onChange={(e) => setShouldMigrateSites(e.target.checked)} />} label="Migrate Sites" />
-                <Button variant='contained' onClick={handleDisoverButtonClick} disabled={isPullingData} >Discover</Button>
+                <Button variant='filled' onClick={handleDisoverButtonClick} disabled={isPullingData} >Discover</Button>
                 <div className="healthy-margin-top">
                     <FormControl>
                         <FormLabel id="demo-row-radio-buttons-group-label">Pull numbers from</FormLabel>
@@ -374,7 +375,7 @@ const MigrateUsers = () => {
                 <h2>Target Account</h2>
                 <p>Enter the UID that you are migrating <em>to</em></p>
                 <UIDInputField disabled={hasTargetAccountToken} disabledText={targetCompanyName} setTargetUID={setTargetUID} loading={isTargetAccountTokenPending} error={targetAccountTokenError} />
-                <Button variant='contained' onClick={handleMigrateButtonClick} disabled={!hasTargetAccountToken || isERLListPending || isTargetERLListPending || isMigrating} >Migrate</Button>
+                <Button variant='filled' onClick={handleMigrateButtonClick} disabled={!hasTargetAccountToken || isERLListPending || isTargetERLListPending || isMigrating} >Migrate</Button>
                 <ProgressBar label='ERLs' value={erlProgress} max={maxERLProgress} />
                 <ProgressBar label='Custom Roles' value={customRoleProgress} max={maxCustomRoleProgress} />
                 <ProgressBar label='Create Users' value={createUsersProgress} max={maxCreateUsersProgress} />

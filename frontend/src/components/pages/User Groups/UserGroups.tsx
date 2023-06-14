@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import { Button } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import useLogin from "../../../hooks/useLogin";
 import useMessageQueue from "../../../hooks/useMessageQueue";
@@ -93,8 +93,8 @@ const UserGroups = () => {
                 <h2>User Groups</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                 <FileSelect enabled={!isSyncing || !isExtensionListPending} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
-                <Button className='healthy-margin-right' variant='contained' onClick={() => setIsSyncing(true)} disabled={!hasCustomerToken || isSyncing || isAuditing || isExtensionListPending || groups.length === 0}>Sync</Button>
-                <Button variant='contained' onClick={handleAuditButtonClick} disabled={!hasCustomerToken || isAuditing || isSyncing || isExtensionListPending}>Audit</Button>
+                <Button className='healthy-margin-right' variant='filled' onClick={() => setIsSyncing(true)} disabled={!hasCustomerToken || isSyncing || isAuditing || isExtensionListPending || groups.length === 0}>Sync</Button>
+                <Button variant='filled' onClick={handleAuditButtonClick} disabled={!hasCustomerToken || isAuditing || isSyncing || isExtensionListPending}>Audit</Button>
                 {isAuditing ? <progress value={completedUserGroups.length} max={userGroups.length} /> : <></>}
                 {isSyncing ? <progress value={currentExtensionIndex} max={groups.length} /> : <></>}
                 <FeedbackArea gridData={groups} messages={messages} timedMessages={timedMessages} errors={errors} />

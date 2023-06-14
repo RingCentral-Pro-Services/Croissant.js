@@ -3,7 +3,7 @@ import useLogin from '../../../hooks/useLogin'
 import useMessageQueue from '../../../hooks/useMessageQueue'
 import useGetAccessToken from '../../../rcapi/useGetAccessToken'
 import Header from '../../shared/Header'
-import {Button, Paper, Typography} from '@mui/material'
+import { Button } from "@mantine/core";
 import FeedbackArea from '../../shared/FeedbackArea'
 import usePostTimedMessage from '../../../hooks/usePostTimedMessage'
 import useAnalytics from '../../../hooks/useAnalytics'
@@ -67,7 +67,7 @@ const ExtensionAudit = () => {
                 <h2>Account Dump</h2>
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Account Dump" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
                 <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} loading={isTokenPending} error={tokenError} />
-                <Button className='healthy-margin-right' disabled={!hasCustomerToken} variant='contained' onClick={handleClick}>Go</Button>
+                <Button className='healthy-margin-right' disabled={!hasCustomerToken} variant='filled' onClick={handleClick}>Go</Button>
                 {isExtensionListPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 {extensionsList.length > 0 ? <FeedbackArea gridData={extensionsList} additiveFilter={true} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
             </div>

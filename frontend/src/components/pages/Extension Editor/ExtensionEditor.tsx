@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import { Button } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import useAnalytics from "../../../hooks/useAnalytics";
 import useExtensionEditing from "../../../hooks/useExtensionEditing";
@@ -67,7 +67,7 @@ const ExtensionEditor = () => {
                 <h2>Edit Extensions</h2>
                 <div className="mega-mergin-top">
                     <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
-                    <Button disabled={isExtensionListPending} variant="contained" onClick={handleSyncbuttonClick}>Sync</Button>
+                    <Button disabled={isExtensionListPending} variant="filled" onClick={handleSyncbuttonClick}>Sync</Button>
                     {isExtensionUpdatePending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 </div>
                 <SimpleReplacement leftTitle="If first name contains" rightTitle="Replace with" setLeftValue={setOldFirstName} setRightValue={setNewFirstName} />

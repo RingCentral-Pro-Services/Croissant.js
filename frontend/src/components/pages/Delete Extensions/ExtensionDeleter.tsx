@@ -7,7 +7,7 @@ import useMessageQueue from "../../../hooks/useMessageQueue"
 import AdditiveFilter from "../../shared/AdditiveFilter"
 import FeedbackArea from "../../shared/FeedbackArea"
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage"
-import { Button } from "@mui/material"
+import { Button } from "@mantine/core";
 import {FileDownload} from '@mui/icons-material'
 import useDeleteExtensions from "../../../rcapi/useDeleteExtensions"
 import Modal from "../../shared/Modal"
@@ -240,8 +240,8 @@ const ExtensionDeleter = () => {
                     <AdditiveFilter options={sites} title='Sites' placeholder='Sites' setSelected={setSelectedSites} />
                     {/* <Button className="vertical-middle" sx={{top: 9}} variant="contained" onClick={() => deleteExtensions(filteredExtensions)}>Delete</Button> */}
                     {/* <FileSelect enabled={true} handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={false} setSelectedSheet={setSelectedSheet} defaultSheet={"Delete Extensions"} accept={".xlsx"} /> */}
-                    <Button disabled={isPending || selectedExtensions.length === 0} className="vertical-middle" sx={{top: 9}} variant="contained" onClick={handleDeleteButtonClick}>Delete</Button>
-                    <Button disabled={filteredExtensions.length === 0} className="vertical-middle healthy-margin-left" sx={{top: 9}} variant="outlined" startIcon={ <FileDownload/>} onClick={handleDownloadButtonClick} >Download</Button>
+                    <Button disabled={isPending || selectedExtensions.length === 0} className="vertical-middle" sx={{top: 9}} variant="filled" onClick={handleDeleteButtonClick}>Delete</Button>
+                    <Button disabled={filteredExtensions.length === 0} className="vertical-middle healthy-margin-left" sx={{top: 9}} variant="outlined" leftIcon={ <FileDownload/>} onClick={handleDownloadButtonClick} >Download</Button>
                     <Modal open={isShowingModal} setOpen={setIsShowingModal} handleAccept={handleModalAcceptance} title='Are you sure about that?' body={`You're about to delete ${selectedExtensions.length} extensions. Be sure that you understand the implications of this.`} acceptLabel={`Yes, delete ${selectedExtensions.length} extensions`} rejectLabel='Go back' />
                     <Modal open={isShowingUnassignedModal} setOpen={setIsShowingUnassignedModal} handleAccept={handleUnassignedModalAcceptance} title='Unassigned Extensions' body={`Deleting unassigned extensions will not delete licenses from the account. However the phone number associated with the unassigned extension will be removed from the account.`} acceptLabel={`I understand`} rejectLabel='Go back' />
                     {filteredExtensions.length > 0 ? <progress className='healthy-margin-top' id='sync_progress' value={progressValue} max={maxProgressValue} /> : <></>}

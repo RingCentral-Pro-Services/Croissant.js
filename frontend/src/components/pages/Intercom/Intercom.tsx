@@ -1,4 +1,5 @@
-import { Button, FormControl, FormControlLabel, Radio, RadioGroup, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
+import { Button } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import useAnalytics from "../../../hooks/useAnalytics";
 import useLogin from "../../../hooks/useLogin";
@@ -165,16 +166,16 @@ const Intercom = () => {
     return (
         <>
             <Header title='Intercom' body='Enable, disable, and audit intercom' documentationURL="https://dqgriffin.com/blog/oss6kFK8brP8o8gCWflc">
-                <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
+                <Button variant='subtle' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <div className="tool-card">
                 <h2>Intercom</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} loading={isTokenPending} error={tokenError} setTargetUID={setTargetUID} />
                 {siteNames.length > 0 ? <AdaptiveFilter options={siteNames} showAllOption={true} defaultSelected={siteNames} title='Sites' placeholder='Search' disabled={false} setSelected={handleSiteSelection} /> : <></>}
-                <Button variant="contained" disabled={selectedExtensions.length === 0 || isAuditing} onClick={handleDownloadButtonClick} >Download</Button>
+                <Button variant="filled" disabled={selectedExtensions.length === 0 || isAuditing} onClick={handleDownloadButtonClick} >Download</Button>
                 <FileSelect enabled={true} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
-                <Button variant='contained' disabled={isConvertPending || isSyncing} onClick={handleSyncButtonClick} >Sync</Button>
-                {isIntercomPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
+                <Button variant='filled' disabled={isConvertPending || isSyncing} onClick={handleSyncButtonClick} >Sync</Button>
+                {isIntercomPending ? <></> : <Button variant='subtle' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Intercom" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
                 {isFetchingDevices ? <> <Typography>Discovering devices</Typography> <progress value={deviceFetchProgress} max={deviceFetchMax} /> </> : <></>}
                 {isSyncing ? <> <Typography>Setting intercom</Typography> <progress value={enablementProgress} max={enablementMax} /> </> : <></>}

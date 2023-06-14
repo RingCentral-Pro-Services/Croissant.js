@@ -1,4 +1,5 @@
-import { Button, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
+import { Button } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import useAnalytics from "../../../hooks/useAnalytics";
 import useLogin from "../../../hooks/useLogin";
@@ -137,7 +138,7 @@ const Deskphones = () => {
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                 {siteNames.length === 0 ? <></> : <AdaptiveFilter title='Sites' placeholder="Sites" options={siteNames} defaultSelected={siteNames} disabled={false} showAllOption={true} setSelected={setSelectedSites} />}
                 {siteNames.length === 0 ? <></> : <SimpleSelection options={ringTimes} onSelect={setSelectedRingTime} defaultSelected='4 Rings / 20 Seconds' label='' placeholder='' /> }
-                {isExtensionListPending ? <></> : <Button disabled={selectedExtensions.length === 0 || isSyncing} variant="contained" onClick={handleSyncButtonClicked}>Sync</Button>}
+                {isExtensionListPending ? <></> : <Button disabled={selectedExtensions.length === 0 || isSyncing} variant="filled" onClick={handleSyncButtonClicked}>Sync</Button>}
                 {isCallHandlingSettingsPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 {isSyncing ? <> <Typography>Fetching Call Handling</Typography> <progress value={callForwardingProgressValue} max={callForwardingProgressMax} /> </> : <></>}
                 {isSyncing ? <> <Typography>Updating Call Handling</Typography> <progress value={callforwardingUpdateProgress} max={callForwardingUpdateProgressMax} /> </> : <></>}

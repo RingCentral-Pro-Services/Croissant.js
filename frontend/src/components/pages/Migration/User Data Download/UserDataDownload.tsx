@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import { Button } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import useLogin from "../../../../hooks/useLogin";
 import useMessageQueue from "../../../../hooks/useMessageQueue";
@@ -145,7 +145,7 @@ const UserDataDownload = () => {
                 <h2>User Data Export</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                 {shouldShowSiteFilter ? <AdaptiveFilter options={sites} defaultSelected={sites} title='Sites' placeholder='Search' setSelected={setSelectedSites} /> : <></>}
-                <Button variant='contained' onClick={handleButtonClick} disabled={isUserGroupsListPending || isSyncing}>Go</Button>
+                <Button variant='filled' onClick={handleButtonClick} disabled={isUserGroupsListPending || isSyncing}>Go</Button>
                 {isSyncing ? <progress className="healthy-margin-top" value={currentExtensionIndex} max={userDataBundles.length} /> : <></>}
                 <FeedbackArea gridData={[]} defaultTab={1} messages={messages} timedMessages={timedMessages} errors={errors} />
             </ToolCard>

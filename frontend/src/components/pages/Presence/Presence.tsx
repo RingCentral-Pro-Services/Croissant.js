@@ -1,4 +1,4 @@
-import { Button } from '@mui/material'
+import { Button } from "@mantine/core";
 import React, { useEffect, useState } from 'react'
 import { sanitize } from '../../../helpers/Sanatize'
 import useAnalytics from '../../../hooks/useAnalytics'
@@ -94,7 +94,7 @@ const Presence = () => {
                 <h2>Presence</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                 {!isSiteListPending && isMultiSiteEnabled ? <AdaptiveFilter title="Site" placeholder="Search" verticalAlign='middle' options={siteNames} defaultSelected={siteNames} setSelected={setSelectedSiteNames} /> : <></>}
-                <Button variant='contained'onClick={handleSync} disabled={ isExtensionListPending || isSyncing || selectedExtensions.length === 0} >Audit</Button>
+                <Button variant='filled'onClick={handleSync} disabled={ isExtensionListPending || isSyncing || selectedExtensions.length === 0} >Audit</Button>
                 {isSyncing ? <progress value={currentExtensionIndex} max={selectedExtensions.length} /> : <></>}
                 {isExtensionListPending ? <></> : <FeedbackArea gridData={selectedExtensions} messages={messages} timedMessages={timedMessages} errors={errors} />}
             </div>

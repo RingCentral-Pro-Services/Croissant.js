@@ -1,4 +1,4 @@
-import { Button, Typography } from "@mui/material";
+import { Button } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import { callMonitoringSchema } from "../../../helpers/schemas";
 import useAnalytics from "../../../hooks/useAnalytics";
@@ -17,9 +17,9 @@ import Header from "../../shared/Header";
 import UIDInputField from "../../shared/UIDInputField";
 import useCreateGroups from "./hooks/useCreateGroups";
 import useExcelToMonitoringGroups from "./hooks/useExcelToMonitoringGroups";
-import LaunchIcon from '@mui/icons-material/Launch';
 import useCallMonitoringList from "./hooks/useCallMonitoringList";
 import useWriteExcelFile from "../../../hooks/useWriteExcelFile";
+import { IconExternalLink } from "@tabler/icons-react";
 
 const CallMonitoring = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -96,8 +96,8 @@ const CallMonitoring = () => {
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} loading={isTokenPending} error={tokenError} setTargetUID={setTargetUID} />
                 <FileSelect enabled={!isSyncing} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
                 <Button variant='contained' disabled={monitoringGroups.length === 0 || isConvertPending || isSyncing} onClick={handleSync}>Sync</Button>
-                <Button className='healthy-margin-left' variant='contained' disabled={!hasCustomerToken || isAuditPending} onClick={() => setIsAuditPending(true)}>Audit</Button>
-                <Button className='healthy-margin-left' variant='outlined' onClick={() => window.open('https://docs.google.com/spreadsheets/d/11EuhgwFaaFNXj4tt99mhHIFzpsvSUNs2Y-oqLditq24/edit?usp=sharing', '_blank')} endIcon={<LaunchIcon />} >Template</Button>
+                <Button className='healthy-margin-left' variant='filled' disabled={!hasCustomerToken || isAuditPending} onClick={() => setIsAuditPending(true)}>Audit</Button>
+                <Button className='healthy-margin-left' variant='outline' onClick={() => window.open('https://docs.google.com/spreadsheets/d/11EuhgwFaaFNXj4tt99mhHIFzpsvSUNs2Y-oqLditq24/edit?usp=sharing', '_blank')} rightIcon={<IconExternalLink />} >Template</Button>
                 {isGroupCreationPending || isGroupAdjustmentPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Create Call Monitoring Groups" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
                 {isSyncing ? <progress value={progressValue} max={progressMax} /> : <></>}

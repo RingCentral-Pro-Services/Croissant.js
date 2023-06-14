@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import { Button } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import { sanitize } from "../../../helpers/Sanatize";
 import useLogin from "../../../hooks/useLogin";
@@ -124,8 +124,8 @@ const PushToTalk = () => {
                 <h2>Push to Talk</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                 <FileSelect enabled={!isSyncing} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
-                <Button className="healthy-margin-right" variant='contained' onClick={handleSyncButtonClick} disabled={isExtensionListPending || isSyncing}>Sync</Button>
-                <Button variant='contained' onClick={handleExportButtonClick} disabled={isExtensionListPending || isAuditing}>Export</Button>
+                <Button className="healthy-margin-right" variant='filled' onClick={handleSyncButtonClick} disabled={isExtensionListPending || isSyncing}>Sync</Button>
+                <Button variant='filled' onClick={handleExportButtonClick} disabled={isExtensionListPending || isAuditing}>Export</Button>
                 {isAuditing ? <progress value={currentExtensionIndex} max={fetchedChannels.length} /> : <></>}
                 {isSyncing ? <progress value={currentExtensionIndex} max={channels.length} /> : <></>}
                 {isDoneProcessing ? <FeedbackArea gridData={isDataValidationPending ? auditedChannels : channels} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
