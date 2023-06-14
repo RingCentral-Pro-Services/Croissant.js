@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import { Button } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import useLogin from "../../../hooks/useLogin";
 import useMessageQueue from "../../../hooks/useMessageQueue";
@@ -92,8 +92,8 @@ const CustomRulesBuilder = () => {
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Build Custom Rules" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                 <FileSelect enabled={hasCustomerToken} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelection} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
-                <Button variant='contained' onClick={handleSyncButtonClick} disabled={isRuleReadPending || isSyncing} >Sync</Button>
-                <Button className='healthy-margin-left' variant='outlined' onClick={handleTemplateButtonClick}>Template</Button>
+                <Button variant='filled' onClick={handleSyncButtonClick} disabled={isRuleReadPending || isSyncing} >Sync</Button>
+                <Button className='healthy-margin-left' variant='outline' onClick={handleTemplateButtonClick}>Template</Button>
                 {isSyncing && currentExtensionIndex === customRules.length ? <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button> : <></>}
                 {isSyncing ? <progress value={currentExtensionIndex} max={customRules.length} /> : <></>}
                 {isRuleReadPending ? <></> : <FeedbackArea gridData={customRules} messages={messages} timedMessages={timedMessages} errors={errors} />}

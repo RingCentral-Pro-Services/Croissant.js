@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import { Button } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import { sanitize } from "../../../helpers/Sanatize";
 import useLogin from "../../../hooks/useLogin";
@@ -125,7 +125,7 @@ const CustomRulesExport = () => {
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                 {isFilterReady && isMultiSiteEnabled ? <AdaptiveFilter options={siteNames} defaultSelected={siteNames} title='Sites' placeholder='Search...' setSelected={setSelectedSiteNames} />  : <></>}
                 {isFilterReady ? <AdaptiveFilter options={supportedExtensionTypes} defaultSelected={supportedExtensionTypes} title='Extension types' placeholder='Search...' setSelected={setSelectedExtensionTypes} />  : <></>}
-                <Button variant='contained' onClick={handleButtonClick} disabled={isExtensionListPending || isAuditingCompanyRules || isAuditing}>Go</Button>
+                <Button variant='filled' onClick={handleButtonClick} disabled={isExtensionListPending || isAuditingCompanyRules || isAuditing}>Go</Button>
                 {isAuditingCompanyRules ? <> <p>Main Site Rules</p> <progress value={companyRuleProgress} max={maxCompanyRuleProgress} /> </> : <></>}
                 {isAuditing && selectedExtensions.length != 0 ? <> <p>Extension Rules</p> <progress value={currentExtensionIndex} max={selectedExtensions.length} /> </> : <></>}
                 {isExtensionListPending ? <></> : <FeedbackArea gridData={selectedExtensions} messages={messages} errors={errors} timedMessages={timedMessages} />}

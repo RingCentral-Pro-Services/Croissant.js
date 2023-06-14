@@ -1,4 +1,5 @@
-import { Button, Step, StepContent, StepLabel, Stepper, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import { Step, StepContent, StepLabel, Stepper, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import {Button} from '@mantine/core'
 import React, { useEffect, useState } from "react";
 import useAnalytics from "../../../hooks/useAnalytics";
 import useLogin from "../../../hooks/useLogin";
@@ -148,8 +149,8 @@ const CustomRules = () => {
                                 <Typography>What extension do you want to copy from?</Typography>
                                 <TextField size="small" placeholder="Extension number" onBlur={(e) => handleExtensionInput(e.target.value)}></TextField>
                                 <div className='healthy-margin-top'>
-                                    <Button className='healthy-margin-right' variant='contained' disabled={true} >Back</Button>
-                                    <Button variant='contained' disabled={isCustomRulesListPending} onClick={() => setActiveStep((prev) => prev + 1)} >Next</Button>
+                                    <Button className='healthy-margin-right' variant='filled' disabled={true} >Back</Button>
+                                    <Button variant='filled' disabled={isCustomRulesListPending} onClick={() => setActiveStep((prev) => prev + 1)} >Next</Button>
                                 </div>
                             </StepContent>
                         </Step>
@@ -158,8 +159,8 @@ const CustomRules = () => {
                             <StepContent>
                                 <AdaptiveFilter title="Rules" placeholder="Search" options={customRules.map((rule) => rule.name)} defaultSelected={[]} setSelected={handleRuleSelection} />
                                 <div className='healthy-margin-top'>
-                                    <Button className='healthy-margin-right' variant='contained' onClick={() => setActiveStep((prev) => prev - 1)} >Back</Button>
-                                    <Button variant='contained' disabled={selectedRules.length === 0} onClick={() => setActiveStep(isRuleRoutingToVoicemail() ? 2 : 3)} >Next</Button>
+                                    <Button className='healthy-margin-right' variant='filled' onClick={() => setActiveStep((prev) => prev - 1)} >Back</Button>
+                                    <Button variant='filled' disabled={selectedRules.length === 0} onClick={() => setActiveStep(isRuleRoutingToVoicemail() ? 2 : 3)} >Next</Button>
                                 </div>
                             </StepContent>
                         </Step>
@@ -172,8 +173,8 @@ const CustomRules = () => {
                                     <ToggleButton size='small' value='overrideDestination'>Target Extension</ToggleButton>
                                 </ToggleButtonGroup>
                                 <div className='healthy-margin-top'>
-                                    <Button className='healthy-margin-right' variant='contained' onClick={() => setActiveStep((prev) => prev - 1)} >Back</Button>
-                                    <Button variant='contained' disabled={selectedRules.length === 0} onClick={() => setActiveStep((prev) => prev + 1)} >Next</Button>
+                                    <Button className='healthy-margin-right' variant='filled' onClick={() => setActiveStep((prev) => prev - 1)} >Back</Button>
+                                    <Button variant='filled' disabled={selectedRules.length === 0} onClick={() => setActiveStep((prev) => prev + 1)} >Next</Button>
                                 </div>
                             </StepContent>
                         </Step>
@@ -183,8 +184,8 @@ const CustomRules = () => {
                                 <AdditiveFilter title="Extension Type" placeholder="Select" options={extensionTypes} setSelected={setSelectedExtensionTypes} />
                                 {isMultiSiteEnabled ? <AdaptiveFilter title="Site" placeholder="Search" verticalAlign='bottom' options={siteNames} defaultSelected={[]} setSelected={setSelectedSiteNames} /> : <></>}
                                 <div className='healthy-margin-top'>
-                                    <Button className='healthy-margin-right' variant='contained' onClick={() => setActiveStep((prev) => prev - 1)} >Back</Button>
-                                    <Button variant='contained' disabled={filteredExtensions.length === 0 || isSyncing} onClick={handleSyncButtonClick} >Sync</Button>
+                                    <Button className='healthy-margin-right' variant='filled' onClick={() => setActiveStep((prev) => prev - 1)} >Back</Button>
+                                    <Button variant='filled' disabled={filteredExtensions.length === 0 || isSyncing} onClick={handleSyncButtonClick} >Sync</Button>
                                 </div>
                             </StepContent>
                         </Step>

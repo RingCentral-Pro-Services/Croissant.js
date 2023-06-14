@@ -1,4 +1,5 @@
-import { Button, Step, StepContent, StepLabel, Stepper, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import { Step, StepContent, StepLabel, Stepper, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import { Button } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import useAnalytics from "../../../hooks/useAnalytics";
 import useLogin from "../../../hooks/useLogin";
@@ -126,8 +127,8 @@ const ManipulateCustomRules = () => {
                             <StepContent>
                                 <TextField size="small" placeholder="" onBlur={(e) => setTargetRuleName(e.target.value)}></TextField>
                                 <div className='healthy-margin-top'>
-                                    <Button className='healthy-margin-right' variant='contained' disabled={true} >Back</Button>
-                                    <Button variant='contained' disabled={targetRuleName === ''} onClick={() => setActiveStep((prev) => prev + 1)} >Next</Button>
+                                    <Button className='healthy-margin-right' variant='filled' disabled={true} >Back</Button>
+                                    <Button variant='filled' disabled={targetRuleName === ''} onClick={() => setActiveStep((prev) => prev + 1)} >Next</Button>
                                 </div>
                             </StepContent>
                         </Step>
@@ -140,8 +141,8 @@ const ManipulateCustomRules = () => {
                                     <ToggleButton size='small' value='delete'>Delete</ToggleButton>
                                 </ToggleButtonGroup>
                                 <div className='healthy-margin-top'>
-                                    <Button className='healthy-margin-right' variant='contained' onClick={() => setActiveStep((prev) => prev - 1)} >Back</Button>
-                                    <Button variant='contained' disabled={ruleAction === ''} onClick={() => setActiveStep((prev) => prev + 1)} >Next</Button>
+                                    <Button className='healthy-margin-right' variant='filled' onClick={() => setActiveStep((prev) => prev - 1)} >Back</Button>
+                                    <Button variant='filled' disabled={ruleAction === ''} onClick={() => setActiveStep((prev) => prev + 1)} >Next</Button>
                                 </div>
                             </StepContent>
                         </Step>
@@ -151,8 +152,8 @@ const ManipulateCustomRules = () => {
                                 <AdditiveFilter title="Extension Type" placeholder="Select" options={extensionTypes} setSelected={setSelectedExtensionTypes} />
                                 {isMultiSiteEnabled ? <AdaptiveFilter title="Site" placeholder="Search" verticalAlign='bottom' options={siteNames} defaultSelected={[]} setSelected={setSelectedSiteNames} /> : <></>}
                                 <div className='healthy-margin-top'>
-                                    <Button className='healthy-margin-right' variant='contained' onClick={() => setActiveStep((prev) => prev - 1)} >Back</Button>
-                                    <Button variant='contained' disabled={filteredExtensions.length === 0 || isSyncing} onClick={handleSync} >Sync</Button>
+                                    <Button className='healthy-margin-right' variant='filled' onClick={() => setActiveStep((prev) => prev - 1)} >Back</Button>
+                                    <Button variant='filled' disabled={filteredExtensions.length === 0 || isSyncing} onClick={handleSync} >Sync</Button>
                                 </div>
                             </StepContent>
                         </Step>
