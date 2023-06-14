@@ -23,14 +23,17 @@ const useCreateIVRs = (postMessage: (message: Message) => void, postTimedMessage
 
         for (let i = 0; i < bundles.length; i++) {
             let bundle = bundles[i]
-            const site = targetExtensions.find((ext) => ext.prettyType() === 'Site' && ext.data.name === bundle.extension.data.site?.name)
 
-            if (!site) {
-                postMessage(new Message(`${bundle.extension.data.name} can't be migrated because the site it's assigned to (${bundle.extension.data.site?.name}) does not exist`, 'error'))
-                continue
+            if (bundle.extension.data.site && bundle.extension.data.site.name !== 'Main Site') {
+                const site = targetExtensions.find((ext) => ext.prettyType() === 'Site' && ext.data.name === bundle.extension.data.site?.name)
+                if (!site) {
+                    postMessage(new Message(`${bundle.extension.data.name} can't be migrated because the site it's assigned to (${bundle.extension.data.site?.name}) does not exist`, 'error'))
+                    continue
+                }
+
+                bundle.extension.data.site!.id = `${site!.data.id}`
             }
 
-            bundle.extension.data.site!.id = `${site!.data.id}`
             if (bundle.extension.data.contact.email) {
                 bundle.extension.data.contact.email = `${bundle.extension.data.contact.email}.ps.ringcentral.com`
             }
