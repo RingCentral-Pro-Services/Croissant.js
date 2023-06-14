@@ -1,4 +1,5 @@
-import { Button, Checkbox, FormControlLabel, Typography } from "@mui/material";
+import { FormControlLabel, Typography } from "@mui/material";
+import { Button, Checkbox } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import { createSiteSchema } from "../../../helpers/schemas";
 import useLogin from "../../../hooks/useLogin";
@@ -92,8 +93,9 @@ const Sites = () => {
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Create Sites" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} error={tokenError} loading={isTokenPending} />
                 <FileSelect enabled={!isSyncing} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
-                <Button variant='contained' disabled={!hasCustomerToken || sites.length === 0 || isSyncing} onClick={handleSync} >Sync</Button>
-                <FormControlLabel className='healthy-margin-left' control={<Checkbox defaultChecked onChange={() => setShouldBuildERLs(!shouldBuildERLs)}/>} label="Create ERLs" />
+                <Button variant='filled' disabled={!hasCustomerToken || sites.length === 0 || isSyncing} onClick={handleSync} >Sync</Button>
+                {/* <FormControlLabel className='healthy-margin-left' control={<Checkbox defaultChecked onChange={() => setShouldBuildERLs(!shouldBuildERLs)}/>} label="Create ERLs" /> */}
+                <Checkbox className="healthy-margin-left" sx={{display: 'inline-block'}} checked={shouldBuildERLs} onChange={(event) => setShouldBuildERLs(event.currentTarget.checked)} label='Create ERLs' />
                 {(shouldBuildERLs ? isERLCreationPending : isCreatePending) ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 {isSyncing ? <> <Typography>Creating Sites</Typography> <progress value={progressValue} max={progressMax} /> </> : <></>}
                 {isSyncing && shouldBuildERLs ? <> <Typography>Creating ERLs</Typography> <progress value={erlProgressValue} max={erlProgressMax} /> </> : <></>}

@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import { Button } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import { siteSchema } from "../../../helpers/schemas";
 import useAnalytics from "../../../hooks/useAnalytics";
@@ -109,15 +109,15 @@ const EditSites = () => {
     return (
         <>
             <Header title='Edit Sites' body='Edit site names and extension numbers in bulk' documentationURL="https://dqgriffin.com/blog/so8Z5rWf9Z4lWXRXqxK4">
-                <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
+                <Button variant='subtle' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Edit Sites" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
             <div className="tool-card">
                 <h2>Edit Sites</h2>
                 <UIDInputField disabledText={companyName} disabled={hasCustomerToken} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
-                <Button disabled={isExtensionListPending} variant='contained' onClick={handleDownloadButtonClick}>Download</Button>
+                <Button disabled={isExtensionListPending} variant='outline' onClick={handleDownloadButtonClick}>Download</Button>
                 <FileSelect enabled={!isExtensionListPending} handleSubmit={handleFileSubmit} setSelectedFile={setSelectedFile} isPending={false} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
-                <Button variant='contained' disabled={isDataValidationPending || isSyncing} onClick={handleSyncButtonClick}>Sync</Button>
+                <Button variant='filled' disabled={isDataValidationPending || isSyncing} onClick={handleSyncButtonClick}>Sync</Button>
                 {isSiteUpdatePending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 {isDataValidationPending ? <></> : <progress max={maxProgressValue} value={progressValue} />}
                 {isDataValidationPending ? <></> : <FeedbackArea gridData={validatedSites} additiveFilter={true} messages={messages} timedMessages={timedMessages} errors={errors} />}
