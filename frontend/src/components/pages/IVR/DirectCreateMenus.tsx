@@ -10,9 +10,7 @@ import useCreateIVRs from "../../../rcapi/useCreateIVRs";
 import useReadLucidchart from "../../../hooks/useReadLucidchart";
 import { IVRMenu } from "../../../models/IVRMenu";
 import useFilterServices from "../../../hooks/useFilterServices";
-import PageFilter from "../../shared/PageFilter";
-import LucidchartFilterPage from "../../../models/LucidchartFilterPage";
-import {TextField, Button} from '@mui/material'
+import { Button } from '@mantine/core'
 import FeedbackArea from "../../shared/FeedbackArea";
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
 import useGetAudioPrompts from "../../../rcapi/useGetAudioPrompts";
@@ -22,6 +20,7 @@ import { ivrSchema } from "../../../helpers/schemas";
 import UIDInputField from "../../shared/UIDInputField";
 import AdaptiveFilter from "../../shared/AdaptiveFilter";
 import LaunchIcon from '@mui/icons-material/Launch';
+import { IconExternalLink } from "@tabler/icons-react";
 
 const DirectCreateMenus = () => {
     useLogin('create-ivr')
@@ -150,8 +149,8 @@ const DirectCreateMenus = () => {
             <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} loading={isTokenPending} error={tokenError} />
             <FileSelect enabled={hasCustomerToken} accept=".xlsx, .csv" handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={isPending} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
             {isDisplayingFilterBox ? <AdaptiveFilter title='Pages' placeholder='Search...' setSelected={setSelectedSites} options={pages.map((page) => page.label)} defaultSelected={pages.map((page) => page.label)} /> : <></>}
-            <Button disabled={!hasCustomerToken || menus.length === 0 || isSyncing} variant="contained" className="inline" onClick={handleSyncButtonClick}>Sync</Button>
-            <Button className='healthy-margin-left' variant='outlined' onClick={() => window.open('https://docs.google.com/spreadsheets/d/1jcXdr5mc-HpmbkjRq4V-2_G_pftrSOHqFYSyo5wLs2k/edit?usp=sharing', '_blank')} endIcon={<LaunchIcon />} >Template</Button>
+            <Button disabled={!hasCustomerToken || menus.length === 0 || isSyncing} variant="filled" className="inline" onClick={handleSyncButtonClick}>Sync</Button>
+            <Button className='healthy-margin-left' variant='outline' onClick={() => window.open('https://docs.google.com/spreadsheets/d/1jcXdr5mc-HpmbkjRq4V-2_G_pftrSOHqFYSyo5wLs2k/edit?usp=sharing', '_blank')} rightIcon={<IconExternalLink />} >Template</Button>
             {!(menus.length > 0) ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
             {timedMessages.map((timedMessage) => (
                 <p>{timedMessage.body}</p>

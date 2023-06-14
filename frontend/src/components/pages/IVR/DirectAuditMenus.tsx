@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import UIDInputField from "../../shared/UIDInputField";
 import useGetAccessToken from "../../../rcapi/useGetAccessToken";
-import {Button, CircularProgress, IconButton} from '@mui/material'
+import { Button } from '@mantine/core'
 import useExtensionList from "../../../rcapi/useExtensionList";
 import useMessageQueue from "../../../hooks/useMessageQueue";
 import useFetchIVRs from "../../../rcapi/useFetchIVRs";
 import FeedbackArea from "../../shared/FeedbackArea";
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
-import useWriteExcelFile from "../../../hooks/useWriteExcelFile";
 import useBeautifyIVRs from "../../../rcapi/useBeautifyIVRs";
 import useGetAudioPrompts from "../../../rcapi/useGetAudioPrompts";
 import useAnalytics from "../../../hooks/useAnalytics";
@@ -18,8 +17,6 @@ import usePhoneNumberMap from "../../../rcapi/usePhoneNumberMap";
 import { IVRMenu } from "../../../models/IVRMenu";
 import RCExtension from "../../../models/RCExtension";
 import AdaptiveFilter from "../../shared/AdaptiveFilter";
-import StopCircleIcon from '@mui/icons-material/StopCircle';
-import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import { sanitize } from "../../../helpers/Sanatize";
 
 const DirectAuditMenus = () => {
@@ -41,7 +38,6 @@ const DirectAuditMenus = () => {
     const {getPhoneNumberMap, phoneNumberMap, isPhoneNumberMapPending} = usePhoneNumberMap()
     const {fetchAudioPrompts, audioPromptList, isAudioPromptListPending} = useGetAudioPrompts(postMessage, postTimedMessage)
     const {fetchIVRs, ivrsList, isIVRsListPending} = useFetchIVRs(setProgressValue, setMaxProgressValue, postMessage, postTimedMessage, postError, isPaused)
-    const {writeExcel} = useWriteExcelFile()
     const {writePrettyExcel} = useWritePrettyExcel()
     const {prettyIVRs, isIVRBeautificationPending} = useBeautifyIVRs(isIVRsListPending, ivrsList, extensionsList, audioPromptList)
 
@@ -110,12 +106,7 @@ const DirectAuditMenus = () => {
         <div className="main-content">
             <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
             {!isPhoneNumberMapPending && isMultiSiteEnabled ? <AdaptiveFilter options={siteNames} defaultSelected={siteNames} title='Sites' placeholder='Search...' setSelected={setSelectedSiteNames} />  : <></>}
-            <Button className='healthy-margin-right' disabled={!hasCustomerToken || isPhoneNumberMapPending || isPending} variant="contained" onClick={handleClick}>Go</Button>
-            {isPending ? 
-                <IconButton color="primary" aria-label="upload picture" component="label" onClick={() => setIsPaused(!isPaused)}>
-                    {isPaused ? <PlayCircleIcon/> : <StopCircleIcon />}
-                </IconButton>
-            : <></>}
+            <Button className='healthy-margin-right' disabled={!hasCustomerToken || isPhoneNumberMapPending || isPending} variant="filled" onClick={handleClick}>Go</Button>
             {isPending ? <progress className='healthy-margin-top' value={progressValue} max={maxProgressValue} /> : <></>}
             {timedMessages.length > 0 ? <MessagesArea messages={timedMessages} /> : <></>}
             {isIVRBeautificationPending ? <></> : <FeedbackArea gridData={prettyIVRs} messages={messages} timedMessages={timedMessages} errors={errors} />}
