@@ -1,5 +1,5 @@
-import { Typography } from "@mui/material";
 import React from "react";
+import {Progress} from '@mantine/core'
 
 interface ProgressBarProps {
     value: number
@@ -8,10 +8,12 @@ interface ProgressBarProps {
 }
 
 const ProgressBar: React.FC<ProgressBarProps> = ({value, max, label}) => {
+    const normalise = (value: number) => ((value) * 100) / (max);
+
     return (
         <>
-            <Typography>{label}</Typography>
-            <progress value={value} max={max} />
+            <p style={{display: 'contents'}}>{label}</p>
+            <Progress className="healthy-margin-bottom" size='lg' value={normalise(value)} />
         </>
     )
 }
