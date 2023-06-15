@@ -158,6 +158,7 @@ const useCreateIVRs = (setProgressValue: (value: (any)) => void, postMessage: (m
                     "Authorization": `Bearer ${accessToken}`
                 },
                 data: {
+                    name: menu.data.name,
                     prompt: menu.data.prompt,
                     actions: menu.data.actions
                 },

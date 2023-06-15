@@ -77,7 +77,7 @@ export class UserDataRow implements ExcelFormattable {
             this.blockedCallSettings?.payPhones ?? '',
             this.prettyForwardAllCalls(),
             this.businessHoursCallHandling?.forwarding.ringingMode ?? '',
-            this.prettyRingTime(this.businessHoursCallHandling?.forwarding.softPhonesRingCount),
+            this.businessHoursCallHandling?.forwarding.softPhonesAlwaysRing ? 'Always Ring' : this.prettyRingTime(this.businessHoursCallHandling?.forwarding.softPhonesRingCount),
             this.prettyDeviceRingTime(),
             this.prettyVoicemailAction(),
             this.greeting('Voicemail'),
@@ -209,6 +209,7 @@ export class UserDataRow implements ExcelFormattable {
 
     prettyRingTime(rawRingCount: number | undefined) {
         if (!rawRingCount) return ''
+        if (rawRingCount === 1) return 'Always ring'
         return `${rawRingCount} Rings / ${rawRingCount * 5} Seconds`
     }
 
