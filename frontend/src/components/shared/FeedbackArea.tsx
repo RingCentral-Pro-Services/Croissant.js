@@ -13,6 +13,7 @@ import { SyncError } from "../../models/SyncError";
 import useWriteExcelFile from "../../hooks/useWriteExcelFile";
 import { DataGridFormattable } from "../../models/DataGridFormattable";
 import FilterArea from "./FilterArea";
+import { NotificationItem } from "../../models/NotificationItem";
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -24,6 +25,7 @@ interface TabPanelProps {
     messages: Message[]
     timedMessages: Message[]
     errors: SyncError[]
+    notifications?: NotificationItem[]
     gridData?: DataGridFormattable[]
     onFilterSelection?: (selected: DataGridFormattable[]) => void
     showSiteFilter?: boolean
@@ -31,7 +33,7 @@ interface TabPanelProps {
     defaultTab?: number
   }
 
-const FeedbackArea: React.FC<FeedbackAreaProps> = ({messages, timedMessages, errors, gridData = [], onFilterSelection, showSiteFilter = false, additiveFilter = false, defaultTab = 0}) => {
+const FeedbackArea: React.FC<FeedbackAreaProps> = ({messages, timedMessages, errors, notifications, gridData = [], onFilterSelection, showSiteFilter = false, additiveFilter = false, defaultTab = 0}) => {
     const [value, setValue] = React.useState(defaultTab);
     const {writeExcel} = useWriteExcelFile()
 
@@ -58,7 +60,7 @@ const FeedbackArea: React.FC<FeedbackAreaProps> = ({messages, timedMessages, err
             <TabPanel value={value} index={1}>
                 {errors.length > 0 ? <IconButton onClick={handleDownloadButtonClick}><FileDownload /></IconButton> : <></>}
                 <MessagesArea messages={timedMessages} />
-                <MessagesArea messages={messages} />
+                <MessagesArea messages={messages} notifications={notifications} />
             </TabPanel>
         </>
     )

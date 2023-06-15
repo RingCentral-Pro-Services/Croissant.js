@@ -86,7 +86,7 @@ const MigrateUsers = () => {
     useSidebar('Auto-Migrate')
     const {fetchToken: fetchOriginalAccountToken, companyName: originalCompanyName, hasCustomerToken: hasOriginalAccountToken, error: originalAccountTokenError, isTokenPending: isOriginalAccountTokenPending, userName: originalUserName} = useGetAccessToken()
     const {fetchToken: fetchTargetAccountToken, companyName: targetCompanyName, hasCustomerToken: hasTargetAccountToken, error: targetAccountTokenError, isTokenPending: isTargetAccountTokenPending, userName: targetUserName} = useGetAccessToken()
-    const {postMessage, messages, errors, postError} = useMessageQueue()
+    const {postMessage, postNotification, postError, messages, errors, notifications} = useMessageQueue()
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
     const {fetchSites, isFetchingSites} = useSiteList(postMessage, postTimedMessage, postError, handleSiteFetchCompletion)
     const {extensionsList: originalExtensionList, fetchExtensions: fetchOriginalExtensions, isExtensionListPending: isOriginalExtensionListPending, isMultiSiteEnabled} = useExtensions(postMessage)
@@ -247,7 +247,6 @@ const MigrateUsers = () => {
             postMessage(new Message(`Discovered ${availablePhoneNumbers.length} numbers in number inventory`, 'info'))
         }
         else if (numberSourceSelection === 'Auto-Receptionist') {
-            // do this
             availablePhoneNumbers = phoneNumbers.filter((number) => number.usageType === 'CompanyNumber')
             postMessage(new Message(`Discovered ${availablePhoneNumbers.length} numbers on auto-receptionist`, 'info'))
         }
@@ -386,7 +385,7 @@ const MigrateUsers = () => {
                 <ProgressBar label='Configure Users' value={configureUsersProgress} max={maxConfigureUsersProgress} />
                 <ProgressBar label='Configure Queues' value={configureQueuesProgress} max={maxConfigureQueuesProgress} />
                 <ProgressBar label='Configure IVRs' value={configureIVRsProgress} max={maxConfigureIVRsProgress} />
-                <FeedbackArea messages={messages} timedMessages={timedMessages} errors={errors} />
+                <FeedbackArea messages={messages} timedMessages={timedMessages} errors={errors} notifications={notifications} />
             </ToolCard>
         </>
     )

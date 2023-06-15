@@ -11,10 +11,10 @@ const ProgressBar: React.FC<ProgressBarProps> = ({value, max, label}) => {
     const normalise = (value: number) => ((value) * 100) / (max);
 
     return (
-        <>
+        <div style={{display: 'block'}}>
             <p style={{display: 'contents'}}>{label}</p>
             <Progress className="healthy-margin-bottom" size='lg' value={normalise(value)} />
-        </>
+        </div>
     )
 }
 
