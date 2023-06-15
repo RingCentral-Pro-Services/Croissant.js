@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import FeedIcon from '@mui/icons-material/Feed';
+import { Avatar } from "@mantine/core";
+
+// -----------------------------------------------------------------------------
 
 interface HeaderProps {
     title: string
@@ -19,7 +22,7 @@ const Header = (props: HeaderProps) => {
                 {documentationURL ? <FeedIcon /> : <></>}
                 {documentationURL ? <a href={documentationURL} target="_blank">Documentation</a>: <></>}
             </div>
-            <p>{body}</p>
+            {/* <p>{body}</p> */}
         </div>
     )
 }
