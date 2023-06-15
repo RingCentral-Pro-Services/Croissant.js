@@ -5,6 +5,8 @@ const sign = require('jwt-encode');
 
 export class RestCentral {
 
+    static TOKEN_REFRESH_THRESHOLD = 300000 // 300K miliseconds or 5 minutes
+
     static get = async (url: string, headers: any) => {
         if (this.isCustomerTokenAboutToExpire()) {
             console.log('Customer token is about to expire. Fetching new token.')
@@ -228,7 +230,7 @@ export class RestCentral {
         let expirationTime = new Date(parseInt(tokenExpiration))
         let currentTime = new Date()
         let timeToExpire = expirationTime.getTime() - currentTime.getTime()
-        if (timeToExpire <= 300) return true
+        if (timeToExpire <= this.TOKEN_REFRESH_THRESHOLD) return true
     }
 
     static isRCTokenAboutToExpire = () => {
@@ -239,7 +241,7 @@ export class RestCentral {
         let expirationTime = new Date(parseInt(tokenExpiration))
         let currentTime = new Date()
         let timeToExpire = expirationTime.getTime() - currentTime.getTime()
-        if (timeToExpire <= 300) return true
+        if (timeToExpire <= this.TOKEN_REFRESH_THRESHOLD) return true
     }
 }
 
