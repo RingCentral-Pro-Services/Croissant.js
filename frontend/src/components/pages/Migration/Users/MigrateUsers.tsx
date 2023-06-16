@@ -59,6 +59,9 @@ import useCreateParkLocations from "./hooks/useCreateParkLocations";
 import useFetchUserGroups from "./hooks/userFetchUserGroups";
 import { UserGroupDataBundle } from "./models/UserGroupDataBundle";
 import useCreateUserGroups from "./hooks/useCreateUserGroups";
+import useFetchSites from "./hooks/useFetchSites";
+import { SiteDataBundle } from "./models/SiteDataBundle";
+import useConfigureSites from "./hooks/useConfigureSites";
 
 const MigrateUsers = () => {
     const [originalUID, setOriginalUID] = useState('')
@@ -88,6 +91,7 @@ const MigrateUsers = () => {
     const [callMonitoringBundles, setCallMonitoringBundles] = useState<CallMonitoringDataBundle[]>([])
     const [parkLocationBundles, setParkLocationBundles] = useState<ParkLocationDataBundle[]>([])
     const [userGroupBundles, setUserGroupBundles] = useState<UserGroupDataBundle[]>([])
+    const [siteBundles, setSiteBundles] = useState<SiteDataBundle[]>([])
 
     const handleSiteFetchCompletion = (sites: SiteData[]) => {
         setSites(sites)
@@ -120,6 +124,7 @@ const MigrateUsers = () => {
     const {fetchCallMonitoringGroups, progressValue: fetchCallMonitoringProgess, maxProgress: maxFetchCallMonitoringProgress} = useFetchCallMonitoringGroups(postMessage, postMessage, postError)
     const {fetchParkLocations, progressValue: fetchParkLocationsProgress, maxProgress: maxFetchParkLocationsProgress} = useFetchParkLocations(postMessage, postTimedMessage, postError)
     const {fetchUserGroups, progressValue: fetchUserGroupsProgess, maxProgress: maxFetchUserGroupsProgress} = useFetchUserGroups(postMessage, postTimedMessage, postError)
+    const {fetchSites: fetchSiteData, progressValue: fetchSitesProgress, maxProgress: maxFetchSitesProgress} = useFetchSites(postMessage, postTimedMessage, postError)
 
     const {migrateSites, maxProgress: maxSiteProgress, progressValue: siteMigrationProgress} = useMigrateSites(postMessage, postTimedMessage, postError)
     const {migrateCustomRoles, progressValue: customRoleProgress, maxProgress: maxCustomRoleProgress} = useMigrateCustomRoles(postMessage, postTimedMessage, postError)
@@ -137,6 +142,7 @@ const MigrateUsers = () => {
     const {createMonitoringGroups, progressValue: createMonitoringGroupsProgess, maxProgress: maxCreateMonitoringGroupsProgress} = useCreateCallMonitoringGroups(postMessage, postTimedMessage, postError)
     const {createParkLocations, progressValue: createParkLocationsProgress, maxProgress: maxCreateParkLocationsProgress} = useCreateParkLocations(postMessage, postTimedMessage, postError)
     const {createUserGroups, progressValue: createUserGroupsProgress, maxProgress: maxCreateUserGroupsProgress} = useCreateUserGroups(postMessage, postTimedMessage, postError)
+    const {configureSites} = useConfigureSites(postMessage, postTimedMessage, postError)
     
     useEffect(() => {
         if (originalUID.length < 5) return
@@ -184,7 +190,6 @@ const MigrateUsers = () => {
         if (isOriginalExtensionListPending) return
 
         if (!isMultiSiteEnabled) {
-            // setFilteredExtensions(originalExtensionList)
             setShouldMigrateSites(false)
             return
         }
@@ -213,6 +218,13 @@ const MigrateUsers = () => {
 
     const handleDisoverButtonClick = async () => {
         setIsPullingData(true)
+
+        // Sites
+        const selectedSites = sites.filter((site) => selectedSiteNames.includes(`${site.name}`))
+        const siteDataBundles = await fetchSiteData(selectedSites)
+        console.log('Sites')
+        console.log(siteDataBundles)
+
         const roles = await fetchCustomRoles()
         const userDataBundles = await fetchUsers(selectedExtensions.filter((ext) => ext.prettyType() === 'User'), originalExtensionList)
         
@@ -270,6 +282,7 @@ const MigrateUsers = () => {
             setUserGroupBundles(userGroupsDataBundles)
         }
 
+        setSiteBundles(siteDataBundles)
         setUserDataBundles(userDataBundles)
         setCustomRoles(roles)
         setMessageOnlyBundles(messageOnlyDataBundles)
@@ -315,7 +328,7 @@ const MigrateUsers = () => {
         // Migrate sites
         if (shouldMigrateSites) {
             const selectedSites = sites.filter((site) => selectedSiteNames.includes(`${site.name}`))
-            const siteExtensions = await migrateSites(selectedSites)
+            const siteExtensions = await migrateSites(siteBundles)
             targetExts = [...targetExts, ...siteExtensions]
         }
 
@@ -386,6 +399,7 @@ const MigrateUsers = () => {
         await configureMOs(messageOnlyBundles, originalExtensionList, targetExts)
         await configureQueues(callQueueBundles, originalExtensionList, targetExts)
         await configureIVRs(ivrBundles, originalExtensionList, targetExts, originalAccountPrompts, prompts)
+        await configureSites(siteBundles, originalExtensionList, targetExts)
         postMessage(new Message('Finished migrating', 'info'))
     }
 
@@ -420,6 +434,7 @@ const MigrateUsers = () => {
                     </FormControl>
                     {numberSourceSelection === 'Specific Extension' ? <TextField className='vertical-bottom' size='small' id="outlined-basic" label="Specific Extension" variant="outlined" value={specificExtension} onChange={(e) => setSpecificExtension(e.target.value)} /> : <></>}
                 </div>
+                <ProgressBar value={fetchSitesProgress} max={maxFetchSitesProgress} label='Sites' />
                 <ProgressBar value={userFetchProgress} max={maxUserFetchProgress} label='Users' />
                 <ProgressBar value={messageOnlyFetchProgress} max={maxMessageOnlyFetchProgress} label='Message-Only Extensions & Announcement-Only Extensions' />
                 <ProgressBar value={callQueueFetchProgress} max={maxCallQueueFetchProgress} label='Call Queues' />

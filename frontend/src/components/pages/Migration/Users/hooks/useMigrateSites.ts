@@ -3,14 +3,16 @@ import { Extension } from "../../../../../models/Extension"
 import { Message } from "../../../../../models/Message"
 import { SyncError } from "../../../../../models/SyncError"
 import { RestCentral } from "../../../../../rcapi/RestCentral"
+import { SiteDataBundle } from "../models/SiteDataBundle"
 
 const useMigrateSites = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
     const baseURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/sites'
+    const baseExtensionURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension'
     const baseWaitingPeriod = 250
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgress, setMaxProgress] = useState(2)
 
-    const migrateSites = async (sites: SiteData[]) => {
+    const migrateSites = async (sites: SiteDataBundle[]) => {
         const accessToken = localStorage.getItem('cs_access_token')
         if (!accessToken) {
             throw new Error('No access token')
@@ -20,8 +22,8 @@ const useMigrateSites = (postMessage: (message: Message) => void, postTimedMessa
 
         setMaxProgress(sites.length)
         for (const site of sites) {
-            await makeSite(site, accessToken)
-            siteExtensions.push(convertToExtension(site))
+            await makeSite(site.extension, accessToken)
+            siteExtensions.push(convertToExtension(site.extension))
             setProgressValue((prev) => prev + 1)
         }
         return siteExtensions
@@ -43,6 +45,7 @@ const useMigrateSites = (postMessage: (message: Message) => void, postTimedMessa
             else {
                 site.email = `noreply-${site.extensionNumber}@ps.ringcentral.com`
             }
+            delete site.id
             const response = await RestCentral.post(baseURL, headers, site)
             site.id = response.data.id
 

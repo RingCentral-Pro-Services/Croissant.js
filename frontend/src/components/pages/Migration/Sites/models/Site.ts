@@ -18,5 +18,6 @@ interface SiteData {
         extensionNumber: string
         name?: string 
     },
+    regionalSettings: {}
     code?: string
 }

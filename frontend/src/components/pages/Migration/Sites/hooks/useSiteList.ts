@@ -35,7 +35,7 @@ const useSiteList = (postMessage: (message: Message) => void, postTimedMessage: 
                 if (site.id === 'main-site') {
                     continue
                 }
-                delete site.id
+                // delete site.id
                 delete site.uri
                 sites.push(site)
             }
