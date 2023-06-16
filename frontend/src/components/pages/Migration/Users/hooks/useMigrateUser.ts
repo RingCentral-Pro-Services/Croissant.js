@@ -19,7 +19,7 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
 
         if (!extensionIDs) {
             // This is a virtual user
-            createUnlicensedUser(dataBundle, accessToken)
+            await createUnlicensedUser(dataBundle, accessToken)
         }
         
         else {
@@ -145,7 +145,7 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
                     id: bundle.extension.data.id
                 }
             }
-            const response = await RestCentral.put(baseNumberAssignURL.replace('phoneNumberId', phoneNumberID), headers, body)
+            const response = await RestCentral.patch(baseNumberAssignURL.replace('phoneNumberId', phoneNumberID), headers, body)
             
 
             if (response.rateLimitInterval > 0) {

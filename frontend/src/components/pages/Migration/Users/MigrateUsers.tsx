@@ -184,7 +184,8 @@ const MigrateUsers = () => {
         if (isOriginalExtensionListPending) return
 
         if (!isMultiSiteEnabled) {
-            setFilteredExtensions(originalExtensionList)
+            // setFilteredExtensions(originalExtensionList)
+            setShouldMigrateSites(false)
             return
         }
 
@@ -194,8 +195,14 @@ const MigrateUsers = () => {
     }, [isOriginalExtensionListPending])
 
     useEffect(() => {
-        const selected = originalExtensionList.filter((ext) => ext.data.status !== 'Unassigned' && selectedExtensionTypes.includes(ext.prettyType()) && selectedSiteNames.includes(ext.data.site?.name ?? ''))
-        setFilteredExtensions(selected)
+        if (isMultiSiteEnabled) {
+            const selected = originalExtensionList.filter((ext) => ext.data.status !== 'Unassigned' && selectedExtensionTypes.includes(ext.prettyType()) && selectedSiteNames.includes(ext.data.site?.name ?? ''))
+            setFilteredExtensions(selected)
+        }
+        else {
+            const selected = originalExtensionList.filter((ext) => ext.data.status !== 'Unassigned' && selectedExtensionTypes.includes(ext.prettyType()))
+            setFilteredExtensions(selected)
+        }
     }, [selectedExtensionTypes, selectedSiteNames])
 
     const handleFilterSelection = (selected: DataGridFormattable[]) => {
@@ -364,7 +371,7 @@ const MigrateUsers = () => {
 
         console.log(`Migrating ${userDataBundles.length} users`)
         console.log(userDataBundles)
-        await migrateUsers(phoneNumbers, userDataBundles, unassignedExtensions, targetExts)
+        await migrateUsers(availablePhoneNumbers, userDataBundles, unassignedExtensions, targetExts)
 
         const migratedUsers = userDataBundles.map((bundle) => bundle.extension)
         targetExts = [...targetExts, ...migratedUsers]
@@ -394,7 +401,7 @@ const MigrateUsers = () => {
                 <h2>Make Selections</h2>
                 <AdaptiveFilter options={supportedExtensionTypes} title='Extension Types' placeholder='Search' setSelected={setSelectedExtensionTypes} />
                 {shouldShowSiteFilter ? <AdaptiveFilter options={siteNames} title='Sites' placeholder='Search' setSelected={setSelectedSiteNames} /> : <></>}
-                <FormControlLabel control={<Checkbox defaultChecked value={shouldMigrateSites} onChange={(e) => setShouldMigrateSites(e.target.checked)} />} label="Migrate Sites" />
+                {isMultiSiteEnabled ? <FormControlLabel control={<Checkbox defaultChecked value={shouldMigrateSites} onChange={(e) => setShouldMigrateSites(e.target.checked)} />} label="Migrate Sites" /> : <></>}
                 <Button variant='filled' onClick={handleDisoverButtonClick} disabled={isPullingData} >Discover</Button>
                 <div className="healthy-margin-top">
                     <FormControl>

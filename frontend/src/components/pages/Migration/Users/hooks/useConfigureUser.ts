@@ -897,7 +897,7 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
 
         // Adjust call forwarding
         // Need to swap out phone numbers and IDs to that of the newly created extension
-        if (originalCallHandling.forwarding) {
+        if (originalCallHandling.forwarding && originalCallHandling.forwarding.rules) {
             let originalRules = originalCallHandling.forwarding.rules
             const currentRules = result.forwarding.rules
             if (!currentRules || !originalRules) return

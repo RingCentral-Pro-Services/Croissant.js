@@ -47,7 +47,7 @@ const usePhoneNumberList = () => {
                 const newPhoneNumbers = [...phoneNumbers, ...numbers]
                 setPhoneNumbers(newPhoneNumbers)
 
-                if (response.data.navigation.nextPage) {
+                if (response.data.navigation && response.data.navigation.nextPage) {
                     setPage(page + 1)
                 }
                 else {
@@ -59,6 +59,7 @@ const usePhoneNumberList = () => {
             }
             catch (e: any) {
                 console.log(`Failed to fetch phone numbers. Page: ${page}`)
+                console.log(e)
             }
         }, rateLimitInterval)
     }, [shouldFetch, page, rateLimitInterval, baseURL])
