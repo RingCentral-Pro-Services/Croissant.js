@@ -53,6 +53,9 @@ import { Role } from "./models/Role";
 import useFetchCallMonitoringGroups from "./hooks/useFetchCallMonitoringGrous";
 import { CallMonitoringDataBundle } from "./models/CallMonitoringDataBundle";
 import useCreateCallMonitoringGroups from "./hooks/useCreateCallMonitoringGroups";
+import useFetchParkLocations from "./hooks/useFetchParkLocations";
+import { ParkLocationDataBundle } from "./models/ParkLocationDataBundle";
+import useCreateParkLocations from "./hooks/useCreateParkLocations";
 
 const MigrateUsers = () => {
     const [originalUID, setOriginalUID] = useState('')
@@ -69,7 +72,7 @@ const MigrateUsers = () => {
     const [isPullingData, setIsPullingData] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
     const [isPending, setIsPending] = useState(false)
-    const supportedExtensionTypes = ['ERLs', 'Custom Roles', 'User', 'Limited Extension', 'Call Queue', 'IVR Menu', 'Prompt Library', 'Message-Only', 'Announcement-Only', 'Call Monitoring Groups']
+    const supportedExtensionTypes = ['ERLs', 'Custom Roles', 'User', 'Limited Extension', 'Call Queue', 'IVR Menu', 'Prompt Library', 'Message-Only', 'Announcement-Only', 'Call Monitoring Groups', 'Park Location']
     const [sites, setSites] = useState<SiteData[]>([])
     const [customRoles, setCustomRoles] = useState<Role[]>([])
     const [numberSourceSelection, setNumberSourceSelection] = useState('Inventory')
@@ -80,6 +83,7 @@ const MigrateUsers = () => {
     const [leBundles, setLEBundles] = useState<LimitedExtensionDataBundle[]>([])
     const [originalAccountPrompts, setOriginalAccountPrompts] = useState<IVRAudioPrompt[]>([])
     const [callMonitoringBundles, setCallMonitoringBundles] = useState<CallMonitoringDataBundle[]>([])
+    const [parkLocationBundles, setParkLocationBundles] = useState<ParkLocationDataBundle[]>([])
 
     const handleSiteFetchCompletion = (sites: SiteData[]) => {
         setSites(sites)
@@ -110,6 +114,7 @@ const MigrateUsers = () => {
     const {fetchAudioPrompts, progressValue: fetchAudioPromtProgress, maxProgress: maxFetchAudioPromptProgress} = useFetchAudioPrompts(postMessage, postTimedMessage, postError)
     const {fetchLEs, progressValue: fetchLEsProgress, maxProgress: maxFetchLEsProgress} = useFetchLEs(postMessage, postTimedMessage, postError)
     const {fetchCallMonitoringGroups, progressValue: fetchCallMonitoringProgess, maxProgress: maxFetchCallMonitoringProgress} = useFetchCallMonitoringGroups(postMessage, postMessage, postError)
+    const {fetchParkLocations, progressValue: fetchParkLocationsProgress, maxProgress: maxFetchParkLocationsProgress} = useFetchParkLocations(postMessage, postTimedMessage, postError)
 
     const {migrateSites, maxProgress: maxSiteProgress, progressValue: siteMigrationProgress} = useMigrateSites(postMessage, postTimedMessage, postError)
     const {migrateCustomRoles, progressValue: customRoleProgress, maxProgress: maxCustomRoleProgress} = useMigrateCustomRoles(postMessage, postTimedMessage, postError)
@@ -125,6 +130,7 @@ const MigrateUsers = () => {
     const {uploadPrompts, progressValue: uploadPromptsProgress, maxProgress: maxUploadPromptsProgress} = useUploadPromopts(postMessage, postTimedMessage, postError)
     const {createLEs, progressValue: createLEsProgress, maxProgress: maxCreateLEsProgress} = useCreateLEs(postMessage, postTimedMessage, postError)
     const {createMonitoringGroups, progressValue: createMonitoringGroupsProgess, maxProgress: maxCreateMonitoringGroupsProgress} = useCreateCallMonitoringGroups(postMessage, postTimedMessage, postError)
+    const {createParkLocations, progressValue: createParkLocationsProgress, maxProgress: maxCreateParkLocationsProgress} = useCreateParkLocations(postMessage, postTimedMessage, postError)
     
     useEffect(() => {
         if (originalUID.length < 5) return
@@ -236,6 +242,14 @@ const MigrateUsers = () => {
             setCallMonitoringBundles(callMonitoringGroups)
         }
 
+        if (selectedExtensionTypes.includes('Park Location')) {
+            const selectedParkLocations = selectedExtensions.filter((ext) => ext.prettyType() === 'Park Location')
+            const parkLocationDataBundles = await fetchParkLocations(selectedParkLocations)
+            console.log('Park Locations')
+            console.log(parkLocationDataBundles)
+            setParkLocationBundles(parkLocationDataBundles)
+        }
+
         setUserDataBundles(userDataBundles)
         setCustomRoles(roles)
         setMessageOnlyBundles(messageOnlyDataBundles)
@@ -302,6 +316,7 @@ const MigrateUsers = () => {
         const createdLEs = await createLEs(leBundles, unassignedLEExtensions, targetERLs, targetExts, availablePhoneNumbers)
         targetExts = [...targetExts, ...createdLEs]
 
+        // Fetch prompts
         const existingPrompts = await fetchTargetAccountPrompts()
         prompts = [...prompts, ...existingPrompts]
 
@@ -340,6 +355,10 @@ const MigrateUsers = () => {
 
         const migratedUsers = userDataBundles.map((bundle) => bundle.extension)
         targetExts = [...targetExts, ...migratedUsers]
+
+        // Create Park Locations
+        const createdParkLocations = await createParkLocations(parkLocationBundles, originalExtensionList, targetExts)
+        targetExts = [...targetExts, ...createdParkLocations]
 
         await configureUsers(userDataBundles, targetERLs, originalExtensionList, targetExts, roles)
         await configureMOs(messageOnlyBundles, originalExtensionList, targetExts)
@@ -386,6 +405,7 @@ const MigrateUsers = () => {
                 <ProgressBar value={ivrFetchProgress} max={maxIVRFetchProgress} label='IVR Menus' />
                 <ProgressBar value={fetchLEsProgress} max={maxFetchLEsProgress} label='Limited Extensions' />
                 <ProgressBar value={fetchCallMonitoringProgess} max={maxFetchCallMonitoringProgress} label='Call Monitoring Groups' />
+                <ProgressBar value={fetchParkLocationsProgress} max={maxFetchParkLocationsProgress} label='Call Monitoring Groups' />
                 <FeedbackArea gridData={filteredExtensions} onFilterSelection={handleFilterSelection} messages={[]} errors={[]} timedMessages={[]} />
             </ToolCard>
             <ToolCard>
@@ -400,6 +420,7 @@ const MigrateUsers = () => {
                 <ProgressBar label='Create IVRs' value={createIVRsProgress} max={maxCreateIVRsProgress} />
                 <ProgressBar label='Create LEs' value={createLEsProgress} max={maxCreateLEsProgress} />
                 <ProgressBar label='Create Call Monitoring Groups' value={createMonitoringGroupsProgess} max={maxCreateMonitoringGroupsProgress} />
+                <ProgressBar label='Park Locations' value={createParkLocationsProgress} max={maxCreateParkLocationsProgress} />
                 <ProgressBar label='Prompt Library' value={uploadPromptsProgress} max={maxUploadPromptsProgress} />
                 <ProgressBar label='Configure Users' value={configureUsersProgress} max={maxConfigureUsersProgress} />
                 <ProgressBar label='Configure Queues' value={configureQueuesProgress} max={maxConfigureQueuesProgress} />

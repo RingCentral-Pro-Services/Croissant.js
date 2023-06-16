@@ -41,10 +41,10 @@ const useCreateMO = (postMessage: (message: Message) => void, postTimedMessage: 
             if (e.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
-            console.log(`Failed to create user`)
+            console.log(`Failed to create message only`)
             console.log(e)
-            postMessage(new Message(`Failed to create user ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError('', 0, ['Failed to create user', bundle.extension.data.name], e.error ?? ''))
+            postMessage(new Message(`Failed to create extension ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError('', 0, ['Failed to create extension', bundle.extension.data.name], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
