@@ -10,6 +10,7 @@ const useMessageQueue = () => {
     
     const postMessage = (message: Message) => {
         setMessages(prev => [...prev, message])
+        // postNotification({body: message.body, type: message.type})
     }
 
     const postError = (error: SyncError) => {

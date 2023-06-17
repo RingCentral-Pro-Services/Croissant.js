@@ -391,7 +391,10 @@ export interface ForwardAllCalls {
         extensionNumber: string
         id: string
     }
-    externalNumber: {
+    phoneNumber?: {
+        phoneNumber: string
+    }
+    externalNumber?: {
         phoneNumber: string
     }
 }

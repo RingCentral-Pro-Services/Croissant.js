@@ -399,7 +399,9 @@ const MigrateUsers = () => {
         await configureMOs(messageOnlyBundles, originalExtensionList, targetExts)
         await configureQueues(callQueueBundles, originalExtensionList, targetExts)
         await configureIVRs(ivrBundles, originalExtensionList, targetExts, originalAccountPrompts, prompts)
-        await configureSites(siteBundles, originalExtensionList, targetExts)
+        if (shouldMigrateSites) {
+            await configureSites(siteBundles, originalExtensionList, targetExts)
+        }
         postMessage(new Message('Finished migrating', 'info'))
     }
 

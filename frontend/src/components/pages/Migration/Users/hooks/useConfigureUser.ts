@@ -678,6 +678,13 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
                 forwardAllCalls.extension.id = `${newExtension.data.id}`
             }
 
+            if (forwardAllCalls.externalNumber) {
+                forwardAllCalls.phoneNumber = {
+                    phoneNumber: forwardAllCalls.externalNumber.phoneNumber
+                }
+                delete forwardAllCalls.externalNumber
+            }
+
             const response = await RestCentral.patch(baseForwardAllCallsURL.replace('extensionId', `${bundle.extension.data.id}`), headers, forwardAllCalls)
 
             if (response.rateLimitInterval > 0) {

@@ -385,7 +385,7 @@ export class UserDataRow implements ExcelFormattable {
 
         // UnconditionalForwarding, TransferToExtension, TakeMessagesOnly, PlayAnnouncementOnly
         if (this.forwardAllCalls.callHandlingAction === 'UnconditionalForwarding') {
-            return `Forward to ${this.forwardAllCalls.externalNumber.phoneNumber}`
+            return `Forward to ${this.forwardAllCalls.externalNumber?.phoneNumber}`
         }
         else if (this.forwardAllCalls.callHandlingAction === 'TransferToExtension') {
             return `Forward to ${this.forwardAllCalls.extension?.name}`

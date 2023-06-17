@@ -36,11 +36,28 @@ const NotificationsArea = (props: {notifications: NotificationItem[]}) => {
         }
     }
 
+    const getBackgroundColor = (notification: NotificationItem) => {
+        switch(notification.type) {
+            case 'error':
+                return 'lavenderblush'
+            case 'info':
+                return 'blue'
+            case 'success':
+                return 'green'
+            case 'warning':
+                return 'yellow'
+            case 'failure':
+                return 'red'
+            default:
+                return 'blue'
+        }
+    }
+
     return (
         <>
-            {notifications.map((notification) => (
+            {notifications.slice().reverse().map((notification) => (
                 <div style={{marginBottom: 10}}>
-                    <Notification sx={{backgroundColor: 'ghostwhite'}} title={notification.title} color={getColor(notification)}>
+                    <Notification sx={{backgroundColor: 'ghostwhite', boxShadow: 'none'}} title={notification.title} color={getColor(notification)}>
                         {notification.body}
                     </Notification>
                 </div>
