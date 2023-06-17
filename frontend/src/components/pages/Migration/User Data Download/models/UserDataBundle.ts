@@ -58,6 +58,7 @@ export interface ExtendedUserData {
     directNumbers?: PhoneNumber[]
     forwardAllCalls?: ForwardAllCalls
     defaultBridge?: DefaultBridge
+    customRules?: CallHandling[]
 }
 
 export interface Device {
@@ -179,6 +180,43 @@ export interface CallHandling {
             }
         }
     }
+}
+
+export interface CustomRule {
+    uri?: string
+    id?: string
+    type: string
+    name: string
+    enabled: string
+    calledNumbers?: CalledNumber[]
+    callHandlingAction: string
+    forwarding?: {
+        rules?: ForwardingRule[]
+    }
+    unconditionalForwarding?: UnconditionalForwardingPayload[]
+    transfer?: TransferPayload
+    voicemail?: {
+        enabled: boolean
+        recipient: {
+            uri?: string
+            id: string
+        }
+    }
+    greetings?: Greeting[]
+}
+
+export interface ForwardingRule {
+    rules?: ForwardingRule[]
+}
+
+export interface ForwardingNumber {
+    uri?: string
+    id: string
+    phoneNumber: string
+}
+
+export interface CalledNumber {
+    phoneNumber: string
 }
 
 export interface Notifications {
