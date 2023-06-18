@@ -7,8 +7,8 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
     const baseUpdateURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId'
     const baseVirtualUserURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension'
     const basePhoneNumbersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/phone-number'
-    // const baseNumberAssignURL = 'https://platform.ringcentral.com/restapi/v2/accounts/~/phone-numbers/phoneNumberId'
     const baseNumberAssignURL = 'https://platform.ringcentral.com/restapi/v2/accounts/~/phone-numbers/phoneNumberId'
+    const basePhoneNumberURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/phone-number/phoneNumberId'
     const baseWaitingPeriod = 250
 
     const migrateUser = async (dataBundle: UserDataBundle, phoneNumbers: PhoneNumber[], extensionIDs?: string[]) => {
@@ -94,12 +94,13 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
     }
 
     const addDigitalLine = async (bundle: UserDataBundle, extensionID: string, token: string) => {
-        const id = await getPhoneNumberID(extensionID, token)
-        if (!id) {
+        const phoneNumber = await getPhoneNumberID(extensionID, token)
+        if (!phoneNumber) {
             // do something
             return
         }
-        await assignPhoneNumber(bundle, id, token)
+        
+        await assignDL(bundle, phoneNumber.id, token)
     }
 
     const getPhoneNumberID = async (extensionID: string, token: string) => {
@@ -111,7 +112,7 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
                 "Authorization": `Bearer ${token}`
             }
             const response = await RestCentral.get(basePhoneNumbersURL.replace('extensionId', extensionID), headers)
-            const id = response.data.records.find((record: any) => record.usageType === 'DirectNumber' && !record.extension).id
+            const id = response.data.records.find((record: any) => record.usageType === 'DirectNumber' && !record.extension) as PhoneNumber
 
             if (response.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
@@ -146,6 +147,40 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
                 }
             }
             const response = await RestCentral.patch(baseNumberAssignURL.replace('phoneNumberId', phoneNumberID), headers, body)
+            
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to assign additional number`)
+            console.log(e)
+            postMessage(new Message(`Failed to get phone number ID ${e.error ?? ''}`, 'error'))
+            postError(new SyncError('', 0, ['Failed to get phone number ID', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const assignDL = async (bundle: UserDataBundle, phoneNumberID: string, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const body = {
+                usageType: 'DirectNumber',
+                extension: {
+                    id: bundle.extension.data.id
+                }
+            }
+            const response = await RestCentral.put(basePhoneNumberURL.replace('phoneNumberId', phoneNumberID), headers, body)
             
 
             if (response.rateLimitInterval > 0) {

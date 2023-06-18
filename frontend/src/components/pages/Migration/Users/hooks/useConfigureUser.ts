@@ -32,7 +32,7 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
     const basePresenceSettingsURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/presence'
     const baseNotificationsSettingsURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/notification-settings'
     const baseIntercomURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/intercom'
-    const baseCallHandlingURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/answering-rule/ruleId'
+    const baseCallHandlingURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/answering-rule/ruleId?showInactiveNumbers=true'
     const baseBlockedCallsURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/caller-blocking'
     const baseBlockedPnoneNumbersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/caller-blocking/phone-numbers'
     const baseForwardingNumbersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/forwarding-number'
@@ -51,8 +51,6 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
         await setSchedule(bundle, accessToken)
         const deviceIDs = await getDeviceIDs(bundle, accessToken)
         const deviceData = await setDeviceModels(bundle, deviceIDs, accessToken)
-        console.log('PERLS')
-        console.log(bundle.extendedData?.pERLs)
         for (let i = 0; i < bundle.extendedData!.pERLs!.length; i++) {
             await addPERL(bundle, bundle.extendedData!.pERLs![i], accessToken)
             console.log('Adding pERL')

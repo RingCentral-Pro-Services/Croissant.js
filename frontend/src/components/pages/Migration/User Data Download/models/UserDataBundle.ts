@@ -9,7 +9,7 @@ export class UserDataBundle {
 
     public userGroups = ''
 
-    constructor(public extension: Extension, public extendedData: ExtendedUserData | undefined) {}
+    constructor(public extension: Extension, public extendedData: ExtendedUserData | undefined, public phoneNumberMap?: Map<string, string>) {}
 
     toRows(): UserDataRow[] {
         const rows: UserDataRow[] = []
@@ -408,13 +408,21 @@ export interface BusinessHours {
 }
 
 export interface PhoneNumber {
+    uri: string
     id: string
     phoneNumber: string
     usageType: string
-    extension?: {
+    extension: {
+        uri: string
         id: string
+        name: string
         extensionNumber: string
     }
+    label: string
+    location: string
+    type: string
+    contactCenterProvider: string
+    vanityPattern: string
 }
 
 export interface ForwardAllCalls {

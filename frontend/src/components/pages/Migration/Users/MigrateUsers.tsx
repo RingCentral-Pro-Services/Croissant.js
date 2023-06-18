@@ -113,7 +113,8 @@ const MigrateUsers = () => {
     const {fetchUsers, progressValue: userFetchProgress, maxProgress: maxUserFetchProgress} = useFetchUsers(postMessage, postTimedMessage, postError)
     const {fetchCustomRoles} = useCustomRoleList(postMessage, postTimedMessage, postError)
     const {fetchPredefinedRoles} = usePredefinedRoleList(postMessage, postTimedMessage, postError)
-    const {getPhoneNumberMap, phoneNumbers, isPhoneNumberMapPending} = usePhoneNumberList()
+    const {getPhoneNumberMap, phoneNumbers, phoneNumberMap, isPhoneNumberMapPending} = usePhoneNumberList()
+    const {getPhoneNumberMap: getOriginalPhoneNumbers, phoneNumberMap: originalPhoneNumberMap, isPhoneNumberMapPending: isOriginalPhoneNumberListPending} = usePhoneNumberList()
     const {fetchMOs, progressValue: messageOnlyFetchProgress , maxProgress: maxMessageOnlyFetchProgress} = useFetchMOs(postMessage, postTimedMessage, postError)
     const {fetchCallQueues, progressValue: callQueueFetchProgress, maxProgress: maxCallQueueFetchProgress} = useFetchCallQueues(postMessage, postTimedMessage, postError)
     const {fetchIVRs, progressValue: ivrFetchProgress, maxProgress: maxIVRFetchProgress} = useFetchIVRs(postMessage, postTimedMessage, postError)
@@ -197,6 +198,7 @@ const MigrateUsers = () => {
         const siteNames = originalExtensionList.filter((ext) => ext.prettyType() === 'Site').map((site) => site.data.name)
         setSiteNames(['Main Site', ...siteNames])
         setShouldShowSiteFilter(true)
+        getOriginalPhoneNumbers()
     }, [isOriginalExtensionListPending])
 
     useEffect(() => {
@@ -371,6 +373,12 @@ const MigrateUsers = () => {
         }
 
         let unassignedExtensions = targetExtensionList.filter((ext) => ext.data.status === 'Unassigned' && ext.prettyType() === 'User')
+        // Add phone numbers to unassigned extensions
+        for (let index = 0; index < unassignedExtensions.length; index++) {
+            unassignedExtensions[index].data.phoneNumbers = phoneNumberMap.get(`${unassignedExtensions[index].data.id}`) || []
+        }
+
+        unassignedExtensions = unassignedExtensions.filter((extension) => extension.data.phoneNumbers && extension.data.phoneNumbers.length !== 0)
 
         // Migrate ERLs
         if (selectedExtensionTypes.includes('ERLs')) {
@@ -402,6 +410,8 @@ const MigrateUsers = () => {
         if (shouldMigrateSites) {
             await configureSites(siteBundles, originalExtensionList, targetExts)
         }
+        console.log('User bundles post config')
+        console.log(userDataBundles)
         postMessage(new Message('Finished migrating', 'info'))
     }
 

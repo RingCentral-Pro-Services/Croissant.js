@@ -33,11 +33,15 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
             bundle.extension.data.status = 'NotActivated'
 
             const phoneNumberBundle: PhoneNumber[] = []
+            bundle.phoneNumberMap = new Map<string, string>()
 
             if (bundle.extendedData?.directNumbers) {
                 for (let i = 0; i < bundle.extendedData!.directNumbers!.length; i++) {
                     if (phoneNumbers.length !== 0) {
-                        phoneNumberBundle.push(phoneNumbers.pop()!)
+                        const tempNumber = phoneNumbers.pop()!
+                        const originalNumber = bundle.extendedData.directNumbers[i]
+                        bundle.phoneNumberMap.set(originalNumber.phoneNumber, tempNumber.phoneNumber)
+                        phoneNumberBundle.push(tempNumber)
                     }
                 }
             }
@@ -50,7 +54,9 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
                         postMessage(new Message('Ran out of unassigned extensions', 'error'))
                         continue
                     }
-                    unassignedIDs.push(`${unassignedExtensions.pop()?.data.id}`)
+                    const unassignedExt = unassignedExtensions.pop()!
+                    bundle.phoneNumberMap.set(bundle.extendedData!.devices[i].phoneLines[0].phoneInfo.phoneNumber, unassignedExt.data!.phoneNumbers![0].phoneNumber)
+                    unassignedIDs.push(`${unassignedExt.data.id}`)
                 }
 
                 await migrateUser(bundle, phoneNumberBundle, unassignedIDs)
@@ -60,7 +66,7 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
             }
             setProgressValue((prev) => prev + 1)
         }
-        await wait(3000)
+        await wait(10000)
     }
 
     const wait = (ms: number) => {
