@@ -62,6 +62,7 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
                 await addForwardingDevice(bundle, data.newDeviceID, accessToken)
             }
         }
+
         await setPresenseLines(bundle, originalExtensions, targetExtensions, accessToken)
         await setPresenseStatus(bundle, accessToken)
         await setNotifications(bundle, accessToken)
@@ -738,6 +739,41 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
         }
     }
 
+    const addForwardingNumber = async (bundle: UserDataBundle, deviceID: string, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+
+            const body = {
+                type: "PhoneLine",
+                device: {
+                    id: deviceID
+                }
+            }
+
+            const response = await RestCentral.post(baseForwardingNumbersURL.replace('extensionId', `${bundle.extension.data.id}`), headers, body)
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to add forwarding device`)
+            console.log(e)
+            // postMessage(new Message(`Failed to add forwarding device to ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            // postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to add forwarding device', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
     const getBusinessHoursCallHandling = async (bundle: UserDataBundle, token: string) => {
         try {
             const headers = {
@@ -915,7 +951,10 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
     
                     for (let j = 0; j < rule.forwardingNumbers.length; j++) {
                         let forwardingNumber = rule.forwardingNumbers[j]
-                        if (forwardingNumber.type !== 'PhoneLine') continue
+                        if (forwardingNumber.type !== 'PhoneLine') {
+                            // Do something here
+                            continue
+                        }
     
                         const matchingForwardingNumber = currentForwardingNumbers.find((number) => number.label === forwardingNumber.label)
                         if (!matchingForwardingNumber) {

@@ -62,6 +62,9 @@ import useCreateUserGroups from "./hooks/useCreateUserGroups";
 import useFetchSites from "./hooks/useFetchSites";
 import { SiteDataBundle } from "./models/SiteDataBundle";
 import useConfigureSites from "./hooks/useConfigureSites";
+import { PhoneNumberMapRow } from "./models/PhoneNumberMapRow";
+import { IconDownload } from "@tabler/icons-react";
+
 
 const MigrateUsers = () => {
     const [originalUID, setOriginalUID] = useState('')
@@ -144,6 +147,7 @@ const MigrateUsers = () => {
     const {createParkLocations, progressValue: createParkLocationsProgress, maxProgress: maxCreateParkLocationsProgress} = useCreateParkLocations(postMessage, postTimedMessage, postError)
     const {createUserGroups, progressValue: createUserGroupsProgress, maxProgress: maxCreateUserGroupsProgress} = useCreateUserGroups(postMessage, postTimedMessage, postError)
     const {configureSites} = useConfigureSites(postMessage, postTimedMessage, postError)
+    const {writeExcel} = useWriteExcelFile()
     
     useEffect(() => {
         if (originalUID.length < 5) return
@@ -353,7 +357,7 @@ const MigrateUsers = () => {
         for (let index = 0; index < unassignedLEExtensions.length; index++) {
             unassignedLEExtensions[index].data.phoneNumbers = phoneNumberMap.get(`${unassignedLEExtensions[index].data.id}`) || []
         }
-        
+
         const createdLEs = await createLEs(leBundles, unassignedLEExtensions, targetERLs, targetExts, availablePhoneNumbers)
         targetExts = [...targetExts, ...createdLEs]
 
@@ -430,6 +434,57 @@ const MigrateUsers = () => {
         postMessage(new Message('Finished migrating', 'info'))
     }
 
+    const handleDownloadNumberMapClick = () => {
+        const numberMapRows: PhoneNumberMapRow[] = []
+
+        for (const bundle of userDataBundles) {
+            const map = bundle.phoneNumberMap
+            if (!map) continue
+
+            for (const [key, value] of map?.entries()) {
+                numberMapRows.push(new PhoneNumberMapRow(key, value, bundle.extension.data.name, bundle.extension.data.extensionNumber, bundle.extension.prettyType(), bundle.extension.data.site?.name ?? ''))
+            }
+        }
+
+        for (const bundle of leBundles) {
+            const map = bundle.phoneNumberMap
+            if (!map) continue
+
+            for (const [key, value] of map?.entries()) {
+                numberMapRows.push(new PhoneNumberMapRow(key, value, bundle.extension.data.name, bundle.extension.data.extensionNumber, bundle.extension.prettyType(), bundle.extension.data.site?.name ?? ''))
+            }
+        }
+
+        for (const bundle of callQueueBundles) {
+            const map = bundle.phoneNumberMap
+            if (!map) continue
+
+            for (const [key, value] of map?.entries()) {
+                numberMapRows.push(new PhoneNumberMapRow(key, value, bundle.extension.data.name, bundle.extension.data.extensionNumber, bundle.extension.prettyType(), bundle.extension.data.site?.name ?? ''))
+            }
+        }
+
+        for (const bundle of messageOnlyBundles) {
+            const map = bundle.phoneNumberMap
+            if (!map) continue
+
+            for (const [key, value] of map?.entries()) {
+                numberMapRows.push(new PhoneNumberMapRow(key, value, bundle.extension.data.name, bundle.extension.data.extensionNumber, bundle.extension.prettyType(), bundle.extension.data.site?.name ?? ''))
+            }
+        }
+
+        for (const bundle of ivrBundles) {
+            const map = bundle.phoneNumberMap
+            if (!map) continue
+
+            for (const [key, value] of map?.entries()) {
+                numberMapRows.push(new PhoneNumberMapRow(key, value, bundle.extension.data.name, bundle.extension.data.extensionNumber, bundle.extension.prettyType(), bundle.extension.data.site?.name ?? ''))
+            }
+        }
+
+        writeExcel(['Original Number', 'Temp Number', 'Extension Type', 'Extension Name', 'Extension Number', 'Site'], numberMapRows, 'Number Map', 'number-map.xlsx')
+    }
+
     return (
         <>
             <Header title='Migration' body='Migrate from one account to another' />
@@ -478,6 +533,7 @@ const MigrateUsers = () => {
                 <p>Enter the UID that you are migrating <em>to</em></p>
                 <UIDInputField disabled={hasTargetAccountToken} disabledText={targetCompanyName} setTargetUID={setTargetUID} loading={isTargetAccountTokenPending} error={targetAccountTokenError} />
                 <Button variant='filled' onClick={handleMigrateButtonClick} disabled={!hasTargetAccountToken || isERLListPending || isTargetERLListPending || isMigrating} >Migrate</Button>
+                <Button className='healthy-margin-left' sx={{top: 7}} variant='subtle' color='dark' leftIcon={<IconDownload />} onClick={handleDownloadNumberMapClick} >Number Map</Button>
                 <ProgressBar label='ERLs' value={erlProgress} max={maxERLProgress} />
                 <ProgressBar label='Custom Roles' value={customRoleProgress} max={maxCustomRoleProgress} />
                 <ProgressBar label='Create Users' value={createUsersProgress} max={maxCreateUsersProgress} />
