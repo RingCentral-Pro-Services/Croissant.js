@@ -2,7 +2,7 @@ import { Extension } from "../../../../../models/Extension";
 import { PhoneNumber } from "../../User Data Download/models/UserDataBundle";
 
 export class IVRDataBundle {
-    constructor(public extension: Extension, public extendedData?: IVRExtendedData) {}
+    constructor(public extension: Extension, public extendedData?: IVRExtendedData, public phoneNumberMap?: Map<string, string>) {}
 
     payload() {
         return {

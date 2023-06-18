@@ -2,7 +2,7 @@ import { Extension } from "../../../../../models/Extension";
 import { BusinessHours, CallHandling, Notifications, PhoneNumber } from "../../User Data Download/models/UserDataBundle";
 
 export class CallQueueDataBundle {
-    constructor(public extension: Extension, public extendedData?: ExtendedQueueData) {}
+    constructor(public extension: Extension, public extendedData?: ExtendedQueueData, public phoneNumberMap?: Map<string, string>) {}
 }
 
 export interface ExtendedQueueData {

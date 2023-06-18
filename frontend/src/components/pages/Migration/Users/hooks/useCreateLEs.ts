@@ -29,6 +29,7 @@ const useCreateLEs = (postMessage: (message: Message) => void, postTimedMessage:
 
         for (let i = 0; i < bundles.length; i++) {
             let bundle = bundles[i]
+            bundle.phoneNumberMap = new Map<string, string>()
             
             if (bundle.extension.data.site && bundle.extension.data.site.name !== 'Main Site') {
                 const site = targetExtensions.find((ext) => ext.prettyType() === 'Site' && ext.data.name === bundle.extension.data.site?.name)
@@ -46,11 +47,16 @@ const useCreateLEs = (postMessage: (message: Message) => void, postTimedMessage:
             const numbers: PhoneNumber[] = []
             for (const number of bundle.extendedData!.directNumbers!) {
                 if (availablePhoneNumbers.length > 0) {
-                    numbers.push(availablePhoneNumbers.pop()!)
+                    const tempNumber = availablePhoneNumbers.pop()!
+                    bundle.phoneNumberMap.set(number.phoneNumber, tempNumber.phoneNumber)
+                    numbers.push(tempNumber)
                 }
             }
 
-            await createLE(bundle, erls, unassignedExtensions.pop()!, numbers)
+            const unassignedExt = unassignedExtensions.pop()!
+            bundle.phoneNumberMap.set(bundle.extendedData!.devices![0].phoneLines[0].phoneInfo.phoneNumber, unassignedExt.data.phoneNumbers![0].phoneNumber)
+
+            await createLE(bundle, erls, unassignedExt, numbers)
             createdLEs.push(bundle.extension)
             setProgressValue((prev) => prev + 1)
         }

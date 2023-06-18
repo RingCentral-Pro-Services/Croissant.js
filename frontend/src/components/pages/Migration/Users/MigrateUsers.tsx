@@ -348,6 +348,12 @@ const MigrateUsers = () => {
 
         // Create LEs
         let unassignedLEExtensions = targetExtensionList.filter((ext) => ext.data.status === 'Unassigned' && ext.prettyType() === 'Limited Extension')
+
+        // Add phone numbers to unassigned extensions
+        for (let index = 0; index < unassignedLEExtensions.length; index++) {
+            unassignedLEExtensions[index].data.phoneNumbers = phoneNumberMap.get(`${unassignedLEExtensions[index].data.id}`) || []
+        }
+        
         const createdLEs = await createLEs(leBundles, unassignedLEExtensions, targetERLs, targetExts, availablePhoneNumbers)
         targetExts = [...targetExts, ...createdLEs]
 
@@ -410,8 +416,17 @@ const MigrateUsers = () => {
         if (shouldMigrateSites) {
             await configureSites(siteBundles, originalExtensionList, targetExts)
         }
-        console.log('User bundles post config')
+        console.log('Post config bundles')
+        console.log('users')
         console.log(userDataBundles)
+        console.log('ivrs')
+        console.log(ivrBundles)
+        console.log('queues')
+        console.log(callQueueBundles)
+        console.log('MOs / AOs')
+        console.log(messageOnlyBundles)
+        console.log('Limited Extensions')
+        console.log(leBundles)
         postMessage(new Message('Finished migrating', 'info'))
     }
 
