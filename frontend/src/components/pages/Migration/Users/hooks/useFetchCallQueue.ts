@@ -17,6 +17,7 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
     const basePickupMemberURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId/pickup-members'
     const baseCustomGreetingURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/greeting/greetingId'
     const baseManagersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId/permissions?managersOnly=true'
+    const baseCustomRulesURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/answering-rule?perPage=1000&type=Custom&view=Detailed'
     const baseWaitingPeriod = 250
 
     const fetchCallQueue = async (bundle: CallQueueDataBundle) => {
@@ -36,6 +37,7 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
         await fetchOtherSettings(bundle, accessToken)
         await fetchMemberPresense(bundle, accessToken)
         await fetchPickupMembers(bundle, accessToken)
+        await fetchCustomRules(bundle, accessToken)
 
         for (let i = 0; i < bundle.extendedData!.businessHoursCallHandling!.greetings.length; i++) {
             if (bundle.extendedData?.businessHoursCallHandling?.greetings[i].custom) {
@@ -444,6 +446,34 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
             console.log(e)
             postMessage(new Message(`Failed to get custom greeting URL for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to get custom greeting URL', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const fetchCustomRules = async (userDataBundle: CallQueueDataBundle, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const response = await RestCentral.get(baseCustomRulesURL.replace('extensionId', `${userDataBundle.extension.data.id}`), headers)
+            userDataBundle.extendedData!.customRules = response.data.records
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to get custom rules`)
+            console.log(e)
+            postMessage(new Message(`Failed to get custom rules for ${userDataBundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(userDataBundle.extension.data.name, parseInt(userDataBundle.extension.data.extensionNumber), ['Failed to fetch custom rules', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }

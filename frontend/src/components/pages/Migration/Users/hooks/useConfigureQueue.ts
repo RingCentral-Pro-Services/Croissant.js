@@ -4,7 +4,7 @@ import { Greeting } from "../../../../../models/Greetings"
 import { Message } from "../../../../../models/Message"
 import { SyncError } from "../../../../../models/SyncError"
 import { RestCentral } from "../../../../../rcapi/RestCentral"
-import { CallHandling } from "../../User Data Download/models/UserDataBundle"
+import { CalledNumber, CallHandling, CustomRule } from "../../User Data Download/models/UserDataBundle"
 import { CallQueueDataBundle, MemberPresenseStatus, QueueManager } from "../models/CallQueueDataBundle"
 
 interface PickupMemberPayload {
@@ -22,6 +22,7 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
     const baseOtherSettingsURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId'
     const basePickupMemberURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId/pickup-members'
     const baseMemberStatusURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId/presence'
+    const baseCustomRuleURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/answering-rule'
     const baseWaitingPeriod = 250
 
     const configureQueue = async (bundle: CallQueueDataBundle, originalExtensions: Extension[], targetExtensions: Extension[]) => {
@@ -37,6 +38,13 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
         await setOtherSettings(bundle, accessToken)
         await setPickupMembers(bundle, originalExtensions, targetExtensions, accessToken)
         await setMemberPresenseStatus(bundle, originalExtensions, targetExtensions, accessToken)
+
+        for (let customRule of bundle.extendedData!.customRules!) {
+            let adjsutedRule = adjustCustomRule(bundle, customRule, originalExtensions, targetExtensions)
+            console.log('Adjusted custom rule')
+            console.log(adjsutedRule)
+            await addCustomRule(bundle, customRule, accessToken)
+        }
 
         const customBusinessHoursGreetings = await setDuringHoursGreetings(bundle, accessToken)
         const customAfterHoursGreetings = await setAfterHoursGreetings(bundle, accessToken)
@@ -661,6 +669,129 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
         }
 
         return callHandling
+    }
+
+    const addCustomRule = async (bundle: CallQueueDataBundle, customRule: CustomRule, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+
+            const response = await RestCentral.post(baseCustomRuleURL.replace('extensionId', `${bundle.extension.data.id}`), headers, customRule)
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to add custom rule`)
+            console.log(e)
+            postMessage(new Message(`Failed to add custom rule for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to add custom rule', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const adjustCustomRule = (bundle: CallQueueDataBundle, customRule: CustomRule, originalExtensions: Extension[], targetExtensions: Extension[]) => {
+        try {
+            delete customRule.id
+            delete customRule.uri
+
+            if (customRule.calledNumbers && customRule.calledNumbers.length !== 0) {
+                const goodNumbers: CalledNumber[] = []
+                for (const number of customRule.calledNumbers) {
+                    const tempNumber = bundle.phoneNumberMap?.get(number.phoneNumber)
+                    if (!tempNumber) {
+                        postMessage(new Message(`Failed to find temp number for called number ${number.phoneNumber} on custom rule ${customRule.name} on user ${bundle.extension.data.name}`, 'warning'))
+                        postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to find temp number for custom rule', number.phoneNumber]))
+                        continue
+                    }
+
+                    goodNumbers.push({phoneNumber: tempNumber})
+                }
+                customRule.calledNumbers = goodNumbers
+            }
+
+            if (customRule.callHandlingAction === 'TakeMessagesOnly') {
+
+                const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === customRule.voicemail?.recipient.id)
+                if (!originalExtension) {
+                    postMessage(new Message(`Failed to adjust voicemail recipient for custom rule ${customRule.name} on user ${bundle.extension.data.name}`, 'error'))
+                    postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to adjust custom rule', customRule.name]))
+                    return customRule
+                }
+
+                const newExtension = targetExtensions.find((ext) => ext.data.name === originalExtension.data.name && ext.prettyType() === originalExtension.prettyType())
+                if (!newExtension) {
+                    postMessage(new Message(`Failed to adjust voicemail recipient for custom rule ${customRule.name} on user ${bundle.extension.data.name}`, 'error'))
+                    postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to adjust custom rule', customRule.name]))
+                    return customRule
+                }
+
+                customRule.voicemail!.recipient.id = `${newExtension.data.id}`
+                delete customRule.forwarding
+                delete customRule.greetings
+                delete customRule.unconditionalForwarding
+                delete customRule.uri
+                delete customRule.transfer
+
+                return customRule
+            }
+            else if (customRule.callHandlingAction === 'TransferToExtension' || customRule.callHandlingAction === 'Bypass') {
+
+                const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === `${customRule.transfer?.extension.id}`)
+                if (!originalExtension) {
+                    postMessage(new Message(`Failed to adjust transfer extension for custom rule ${customRule.name} on user ${bundle.extension.data.name}`, 'error'))
+                    postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to adjust custom rule', customRule.name]))
+                    return customRule
+                }
+
+                const newExtension = targetExtensions.find((ext) => ext.data.name === originalExtension.data.name && ext.prettyType() === originalExtension.prettyType())
+                if (!newExtension) {
+                    postMessage(new Message(`Failed to adjust transfer extension for custom rule ${customRule.name} on user ${bundle.extension.data.name}`, 'error'))
+                    postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to adjust custom rule', customRule.name]))
+                    return customRule
+                }
+
+                customRule.transfer!.extension.id = `${newExtension.data.id}`
+                delete customRule.forwarding
+                delete customRule.greetings
+                delete customRule.unconditionalForwarding
+                delete customRule.uri
+                delete customRule.voicemail
+
+                return customRule
+            }
+
+            else if (customRule.callHandlingAction === 'PlayAnnouncementOnly') {
+                delete customRule.forwarding
+                delete customRule.greetings
+                delete customRule.unconditionalForwarding
+                delete customRule.uri
+                delete customRule.voicemail
+
+                return customRule
+            }
+            else if (customRule.callHandlingAction === 'UnconditionalForwarding') {
+                delete customRule.forwarding
+                delete customRule.greetings
+                delete customRule.uri
+                delete customRule.voicemail
+                delete customRule.transfer
+
+                return customRule
+            }
+        } 
+        catch (e) {
+            postMessage(new Message(`Failed to adjust custom rule ${customRule.name} on user ${bundle.extension.data.name}`, 'error'))
+        }
     }
 
     const wait = (ms: number) => {

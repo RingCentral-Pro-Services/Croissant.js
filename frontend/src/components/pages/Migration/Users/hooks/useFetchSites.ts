@@ -12,6 +12,7 @@ const useFetchSites = (postMessage: (message: Message) => void, postTimedMessage
     const baseBusinessHoursURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/business-hours'
     const baseCallHandlingURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/answering-rule/ruleId'
     const basePhoneNumbersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/phone-number?usageType=DirectNumber&perPage=1000'
+    const baseCustomRulesURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/answering-rule?perPage=1000&type=Custom&view=Detailed'
     const baseWaitingPeriod = 250
 
     const fetchSites = async (sites: SiteData[]) => {
@@ -32,6 +33,7 @@ const useFetchSites = (postMessage: (message: Message) => void, postTimedMessage
             await fetchBusinessHoursCallHandling(bundles[i], accessToken)
             await fetchAfterHoursCallHandling(bundles[i], accessToken)
             await fetchDirectNumbers(bundles[i], accessToken)
+            await fetchCustomRules(bundles[i], accessToken)
             setProgressValue((prev) => prev + 1)
         }
 
@@ -155,6 +157,34 @@ const useFetchSites = (postMessage: (message: Message) => void, postTimedMessage
             console.log(e)
             postMessage(new Message(`Failed to get direct numbers for ${bundle.extension.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(bundle.extension.name, parseInt(bundle.extension.extensionNumber), ['Failed to fetch direct numbers', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const fetchCustomRules = async (userDataBundle: SiteDataBundle, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const response = await RestCentral.get(baseCustomRulesURL.replace('extensionId', `${userDataBundle.extension.id}`), headers)
+            userDataBundle.extendedData!.customRules = response.data.records
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to get custom rules`)
+            console.log(e)
+            postMessage(new Message(`Failed to get custom rules for ${userDataBundle.extension.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(userDataBundle.extension.name, parseInt(userDataBundle.extension.extensionNumber), ['Failed to fetch custom rules', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }

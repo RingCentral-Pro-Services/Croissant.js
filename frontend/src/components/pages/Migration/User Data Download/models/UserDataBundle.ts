@@ -58,7 +58,7 @@ export interface ExtendedUserData {
     directNumbers?: PhoneNumber[]
     forwardAllCalls?: ForwardAllCalls
     defaultBridge?: DefaultBridge
-    customRules?: CallHandling[]
+    customRules?: CustomRule[]
 }
 
 export interface Device {
