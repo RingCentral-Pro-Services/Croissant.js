@@ -120,7 +120,7 @@ export interface CallHandling {
                 enabled: boolean
                 forwardingNumbers: [
                     {
-                        id?: string
+                        id: string
                         phoneNumber: string
                         label: string
                         type: string
@@ -213,6 +213,8 @@ export interface ForwardingNumber {
     uri?: string
     id: string
     phoneNumber: string
+    type: string
+    label: string
 }
 
 export interface CalledNumber {

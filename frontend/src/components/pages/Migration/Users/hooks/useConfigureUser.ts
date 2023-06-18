@@ -5,7 +5,7 @@ import { Message } from "../../../../../models/Message";
 import { SyncError } from "../../../../../models/SyncError";
 import { RestCentral } from "../../../../../rcapi/RestCentral";
 import { ERL } from "../../../Automatic Location Updates/models/ERL";
-import { BlockedPhoneNumber, CallHandling, Device, PERL, PresenseLine, UserDataBundle } from "../../User Data Download/models/UserDataBundle";
+import { BlockedPhoneNumber, CallHandling, Device, ForwardingNumber, PERL, PresenseLine, UserDataBundle } from "../../User Data Download/models/UserDataBundle";
 import { Role } from "../models/Role";
 
 interface DeviceModelPayload {
@@ -60,6 +60,16 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
                 await setDeviceName(bundle, data, accessToken)
                 await setDeviceERL(bundle, data, companyERLs, bundle.extendedData!.pERLs!, accessToken)
                 await addForwardingDevice(bundle, data.newDeviceID, accessToken)
+            }
+        }
+
+        const forwardingNumbers = bundle.extendedData?.businessHoursCallHandling?.forwarding.rules.flatMap((rule) => rule.forwardingNumbers).filter((forwardingNumber) => forwardingNumber.type !== 'PhoneLine')
+        console.log('Forwarding Numbers')
+        console.log(forwardingNumbers)
+
+        if (forwardingNumbers) {
+            for (const number of forwardingNumbers) {
+                await addForwardingNumber(bundle, number, accessToken)
             }
         }
 
@@ -739,7 +749,7 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
         }
     }
 
-    const addForwardingNumber = async (bundle: UserDataBundle, deviceID: string, token: string) => {
+    const addForwardingNumber = async (bundle: UserDataBundle, forwardingNumber: ForwardingNumber, token: string) => {
         try {
             const headers = {
                 "Accept": "application/json",
@@ -748,10 +758,9 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
             }
 
             const body = {
-                type: "PhoneLine",
-                device: {
-                    id: deviceID
-                }
+                type: forwardingNumber.type,
+                label: forwardingNumber.label,
+                phoneNumber: forwardingNumber.phoneNumber
             }
 
             const response = await RestCentral.post(baseForwardingNumbersURL.replace('extensionId', `${bundle.extension.data.id}`), headers, body)
@@ -766,10 +775,10 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
             if (e.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
-            console.log(`Failed to add forwarding device`)
+            console.log(`Failed to add forwarding number`)
             console.log(e)
-            // postMessage(new Message(`Failed to add forwarding device to ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
-            // postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to add forwarding device', ''], e.error ?? ''))
+            postMessage(new Message(`Failed to add forwarding number to ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to add forwarding number', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
@@ -943,7 +952,6 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
             const currentRules = result.forwarding.rules
             if (!currentRules || !originalRules) return
             const currentForwardingNumbers = currentRules.flatMap((rule) => rule.forwardingNumbers)
-            let newRules = []
 
             if (currentRules && originalRules) {
                 for (let i = 0; i < originalRules.length; i++) {
@@ -951,10 +959,6 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
     
                     for (let j = 0; j < rule.forwardingNumbers.length; j++) {
                         let forwardingNumber = rule.forwardingNumbers[j]
-                        if (forwardingNumber.type !== 'PhoneLine') {
-                            // Do something here
-                            continue
-                        }
     
                         const matchingForwardingNumber = currentForwardingNumbers.find((number) => number.label === forwardingNumber.label)
                         if (!matchingForwardingNumber) {
