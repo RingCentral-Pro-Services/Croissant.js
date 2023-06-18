@@ -3,6 +3,7 @@ import { wait } from "../../../../../helpers/rcapi";
 import { Message } from "../../../../../models/Message";
 import { SyncError } from "../../../../../models/SyncError";
 import { RestCentral } from "../../../../../rcapi/RestCentral";
+import { PhoneNumber } from "../../User Data Download/models/UserDataBundle";
 import { SiteDataBundle } from "../models/SiteDataBundle";
 
 const useFetchSites = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
@@ -10,6 +11,7 @@ const useFetchSites = (postMessage: (message: Message) => void, postTimedMessage
     const [maxProgress, setMaxProgress] = useState(2)
     const baseBusinessHoursURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/business-hours'
     const baseCallHandlingURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/answering-rule/ruleId'
+    const basePhoneNumbersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/phone-number?usageType=DirectNumber&perPage=1000'
     const baseWaitingPeriod = 250
 
     const fetchSites = async (sites: SiteData[]) => {
@@ -29,6 +31,7 @@ const useFetchSites = (postMessage: (message: Message) => void, postTimedMessage
             await fetchBusinessHours(bundles[i], accessToken)
             await fetchBusinessHoursCallHandling(bundles[i], accessToken)
             await fetchAfterHoursCallHandling(bundles[i], accessToken)
+            await fetchDirectNumbers(bundles[i], accessToken)
             setProgressValue((prev) => prev + 1)
         }
 
@@ -120,6 +123,38 @@ const useFetchSites = (postMessage: (message: Message) => void, postTimedMessage
             console.log(e)
             postMessage(new Message(`Failed to get after hours call handling for ${bundle.extension.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(bundle.extension.name, parseInt(bundle.extension.extensionNumber), ['Failed to fetch after hours call handling', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const fetchDirectNumbers = async (bundle: SiteDataBundle, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const response = await RestCentral.get(basePhoneNumbersURL.replace('extensionId', `${bundle.extension.id}`), headers)
+            const numbers = response.data.records as PhoneNumber[]
+            const directNumbers = numbers.filter((number) => !number.extension)
+
+            bundle.extendedData!.directNumbers = directNumbers
+            
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to get direct numbers`)
+            console.log(e)
+            postMessage(new Message(`Failed to get direct numbers for ${bundle.extension.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.name, parseInt(bundle.extension.extensionNumber), ['Failed to fetch direct numbers', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }

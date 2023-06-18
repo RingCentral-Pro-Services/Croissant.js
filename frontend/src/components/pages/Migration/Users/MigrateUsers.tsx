@@ -334,7 +334,7 @@ const MigrateUsers = () => {
         // Migrate sites
         if (shouldMigrateSites) {
             const selectedSites = sites.filter((site) => selectedSiteNames.includes(`${site.name}`))
-            const siteExtensions = await migrateSites(siteBundles)
+            const siteExtensions = await migrateSites(siteBundles, availablePhoneNumbers)
             targetExts = [...targetExts, ...siteExtensions]
         }
 
@@ -431,11 +431,22 @@ const MigrateUsers = () => {
         console.log(messageOnlyBundles)
         console.log('Limited Extensions')
         console.log(leBundles)
+        console.log('Sites')
+        console.log(siteBundles)
         postMessage(new Message('Finished migrating', 'info'))
     }
 
     const handleDownloadNumberMapClick = () => {
         const numberMapRows: PhoneNumberMapRow[] = []
+
+        for (const bundle of siteBundles) {
+            const map = bundle.phoneNumberMap
+            if (!map) continue
+
+            for (const [key, value] of map?.entries()) {
+                numberMapRows.push(new PhoneNumberMapRow(key, value, bundle.extension.name, bundle.extension.extensionNumber, 'Site', bundle.extension.name))
+            }
+        }
 
         for (const bundle of userDataBundles) {
             const map = bundle.phoneNumberMap
