@@ -693,8 +693,8 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
             }
             console.log(`Failed to add custom rule`)
             console.log(e)
-            postMessage(new Message(`Failed to add custom rule for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to add custom rule', ''], e.error ?? ''))
+            postMessage(new Message(`Failed to add custom rule ${customRule.name} on ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to add custom rule', customRule.name], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
@@ -709,7 +709,7 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
                 for (const number of customRule.calledNumbers) {
                     const tempNumber = bundle.phoneNumberMap?.get(number.phoneNumber)
                     if (!tempNumber) {
-                        postMessage(new Message(`Failed to find temp number for called number ${number.phoneNumber} on custom rule ${customRule.name} on user ${bundle.extension.data.name}`, 'warning'))
+                        postMessage(new Message(`Failed to find temp number for called number ${number.phoneNumber} on custom rule ${customRule.name} on queue ${bundle.extension.data.name}`, 'warning'))
                         postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to find temp number for custom rule', number.phoneNumber]))
                         continue
                     }
@@ -723,14 +723,14 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
 
                 const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === customRule.voicemail?.recipient.id)
                 if (!originalExtension) {
-                    postMessage(new Message(`Failed to adjust voicemail recipient for custom rule ${customRule.name} on user ${bundle.extension.data.name}`, 'error'))
+                    postMessage(new Message(`Failed to adjust voicemail recipient for custom rule ${customRule.name} on queue ${bundle.extension.data.name}`, 'error'))
                     postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to adjust custom rule', customRule.name]))
                     return customRule
                 }
 
                 const newExtension = targetExtensions.find((ext) => ext.data.name === originalExtension.data.name && ext.prettyType() === originalExtension.prettyType())
                 if (!newExtension) {
-                    postMessage(new Message(`Failed to adjust voicemail recipient for custom rule ${customRule.name} on user ${bundle.extension.data.name}`, 'error'))
+                    postMessage(new Message(`Failed to adjust voicemail recipient for custom rule ${customRule.name} on queue ${bundle.extension.data.name}`, 'error'))
                     postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to adjust custom rule', customRule.name]))
                     return customRule
                 }
@@ -748,14 +748,14 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
 
                 const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === `${customRule.transfer?.extension.id}`)
                 if (!originalExtension) {
-                    postMessage(new Message(`Failed to adjust transfer extension for custom rule ${customRule.name} on user ${bundle.extension.data.name}`, 'error'))
+                    postMessage(new Message(`Failed to adjust transfer extension for custom rule ${customRule.name} on queue ${bundle.extension.data.name}`, 'error'))
                     postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to adjust custom rule', customRule.name]))
                     return customRule
                 }
 
                 const newExtension = targetExtensions.find((ext) => ext.data.name === originalExtension.data.name && ext.prettyType() === originalExtension.prettyType())
                 if (!newExtension) {
-                    postMessage(new Message(`Failed to adjust transfer extension for custom rule ${customRule.name} on user ${bundle.extension.data.name}`, 'error'))
+                    postMessage(new Message(`Failed to adjust transfer extension for custom rule ${customRule.name} on queue ${bundle.extension.data.name}`, 'error'))
                     postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to adjust custom rule', customRule.name]))
                     return customRule
                 }
@@ -790,7 +790,7 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
             }
         } 
         catch (e) {
-            postMessage(new Message(`Failed to adjust custom rule ${customRule.name} on user ${bundle.extension.data.name}`, 'error'))
+            postMessage(new Message(`Failed to adjust custom rule ${customRule.name} on queue ${bundle.extension.data.name}`, 'error'))
         }
     }
 

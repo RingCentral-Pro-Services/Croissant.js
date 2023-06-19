@@ -1259,8 +1259,8 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
             }
             console.log(`Failed to add custom rule`)
             console.log(e)
-            postMessage(new Message(`Failed to add custom rule for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to add custom rule', ''], e.error ?? ''))
+            postMessage(new Message(`Failed to add custom rule ${customRule.name} on ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to add custom rule', customRule.name], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
