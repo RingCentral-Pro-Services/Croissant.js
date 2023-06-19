@@ -67,6 +67,9 @@ import { IconDownload } from "@tabler/icons-react";
 import useFetchCostCenters from "./hooks/useFetchCostCenters";
 import { CostCenterDataBundle } from "./models/CostCenterDataBundle";
 import useCreateCostCenters from "./hooks/useCreateCostCenters";
+import useFetchCallRecordingSettings from "./hooks/useFetchCallRecordingSettings";
+import { CallRecordingDataBundle } from "./models/CallRecordingDataBundle";
+import useSetCallRecordingSettings from "./hooks/useSetCallRecordingSettings";
 
 
 const MigrateUsers = () => {
@@ -84,7 +87,7 @@ const MigrateUsers = () => {
     const [isPullingData, setIsPullingData] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
     const [isPending, setIsPending] = useState(false)
-    const supportedExtensionTypes = ['ERLs', 'Custom Roles', 'Cost Centers', 'User', 'Limited Extension', 'Call Queue', 'IVR Menu', 'Prompt Library', 'Message-Only', 'Announcement-Only', 'Call Monitoring Groups', 'Park Location', 'User Group']
+    const supportedExtensionTypes = ['ERLs', 'Custom Roles', 'Call Recording Settings', 'Cost Centers', 'User', 'Limited Extension', 'Call Queue', 'IVR Menu', 'Prompt Library', 'Message-Only', 'Announcement-Only', 'Call Monitoring Groups', 'Park Location', 'User Group']
     const [sites, setSites] = useState<SiteData[]>([])
     const [customRoles, setCustomRoles] = useState<Role[]>([])
     const [numberSourceSelection, setNumberSourceSelection] = useState('Inventory')
@@ -99,6 +102,7 @@ const MigrateUsers = () => {
     const [userGroupBundles, setUserGroupBundles] = useState<UserGroupDataBundle[]>([])
     const [siteBundles, setSiteBundles] = useState<SiteDataBundle[]>([])
     const [costCenterBundles, setCostCenterBundles] = useState<CostCenterDataBundle[]>([])
+    const [callRecordingSettings, setCallRecordingSettings] = useState<CallRecordingDataBundle>()
 
     const handleSiteFetchCompletion = (sites: SiteData[]) => {
         setSites(sites)
@@ -134,6 +138,7 @@ const MigrateUsers = () => {
     const {fetchUserGroups, progressValue: fetchUserGroupsProgess, maxProgress: maxFetchUserGroupsProgress} = useFetchUserGroups(postMessage, postTimedMessage, postError)
     const {fetchSites: fetchSiteData, progressValue: fetchSitesProgress, maxProgress: maxFetchSitesProgress} = useFetchSites(postMessage, postTimedMessage, postError)
     const {fetchCostCenters} = useFetchCostCenters(postMessage, postTimedMessage, postError)
+    const {fetchCallRecordingSettings} = useFetchCallRecordingSettings(postMessage, postTimedMessage, postError)
 
     const {migrateSites, maxProgress: maxSiteProgress, progressValue: siteMigrationProgress} = useMigrateSites(postMessage, postTimedMessage, postError)
     const {migrateCustomRoles, progressValue: customRoleProgress, maxProgress: maxCustomRoleProgress} = useMigrateCustomRoles(postMessage, postTimedMessage, postError)
@@ -153,6 +158,7 @@ const MigrateUsers = () => {
     const {createUserGroups, progressValue: createUserGroupsProgress, maxProgress: maxCreateUserGroupsProgress} = useCreateUserGroups(postMessage, postTimedMessage, postError)
     const {configureSites} = useConfigureSites(postMessage, postTimedMessage, postError)
     const {createCostCenters, progressValue: createCostCentersProgress, maxProgress: maxCreateCostCentersProgress} = useCreateCostCenters(postMessage, postTimedMessage, postError)
+    const {setCallRecordingSettings: setRecordingSettings} = useSetCallRecordingSettings(postMessage, postTimedMessage, postError)
     const {writeExcel} = useWriteExcelFile()
     
     useEffect(() => {
@@ -243,6 +249,16 @@ const MigrateUsers = () => {
             console.log('Cost centers')
             console.log(costCenters)
             setCostCenterBundles(costCenters)
+        }
+
+        // Call recording settings
+        if (selectedExtensionTypes.includes('Call Recording Settings')) {
+            const recordingSettings = await fetchCallRecordingSettings()
+            console.log('Call Recording Settings')
+            console.log(recordingSettings)
+            if (recordingSettings) {
+                setCallRecordingSettings(recordingSettings)
+            }
         }
 
         const roles = await fetchCustomRoles()
@@ -433,6 +449,10 @@ const MigrateUsers = () => {
         targetExts = [...targetExts, ...createdParkLocations]
 
         await createUserGroups(userGroupBundles, originalExtensionList, targetExts)
+
+        if (callRecordingSettings) {
+            await setRecordingSettings(callRecordingSettings, originalExtensionList, targetExts)
+        }
 
         await configureUsers(userDataBundles, targetERLs, originalExtensionList, targetExts, roles)
         await configureMOs(messageOnlyBundles, originalExtensionList, targetExts)
