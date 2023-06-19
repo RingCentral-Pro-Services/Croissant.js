@@ -156,7 +156,7 @@ const MigrateUsers = () => {
     const {createMonitoringGroups, progressValue: createMonitoringGroupsProgess, maxProgress: maxCreateMonitoringGroupsProgress} = useCreateCallMonitoringGroups(postMessage, postTimedMessage, postError)
     const {createParkLocations, progressValue: createParkLocationsProgress, maxProgress: maxCreateParkLocationsProgress} = useCreateParkLocations(postMessage, postTimedMessage, postError)
     const {createUserGroups, progressValue: createUserGroupsProgress, maxProgress: maxCreateUserGroupsProgress} = useCreateUserGroups(postMessage, postTimedMessage, postError)
-    const {configureSites} = useConfigureSites(postMessage, postTimedMessage, postError)
+    const {configureSites, progressValue: configureSitesProgress, maxProgress: maxConfigureSitesProgress} = useConfigureSites(postMessage, postTimedMessage, postError)
     const {createCostCenters, progressValue: createCostCentersProgress, maxProgress: maxCreateCostCentersProgress} = useCreateCostCenters(postMessage, postTimedMessage, postError)
     const {setCallRecordingSettings: setRecordingSettings} = useSetCallRecordingSettings(postMessage, postTimedMessage, postError)
     const {writeExcel} = useWriteExcelFile()
@@ -586,6 +586,7 @@ const MigrateUsers = () => {
                 <UIDInputField disabled={hasTargetAccountToken} disabledText={targetCompanyName} setTargetUID={setTargetUID} loading={isTargetAccountTokenPending} error={targetAccountTokenError} />
                 <Button variant='filled' onClick={handleMigrateButtonClick} disabled={!hasTargetAccountToken || isERLListPending || isTargetERLListPending || isMigrating} >Migrate</Button>
                 <Button className='healthy-margin-left' sx={{top: 7}} variant='subtle' color='dark' leftIcon={<IconDownload />} onClick={handleDownloadNumberMapClick} >Number Map</Button>
+                <ProgressBar label='Create Sites' value={siteMigrationProgress} max={maxSiteProgress} />
                 <ProgressBar label='Cost Centers' value={createCostCentersProgress} max={maxCreateCostCentersProgress} />
                 <ProgressBar label='ERLs' value={erlProgress} max={maxERLProgress} />
                 <ProgressBar label='Custom Roles' value={customRoleProgress} max={maxCustomRoleProgress} />
@@ -599,7 +600,7 @@ const MigrateUsers = () => {
                 <ProgressBar label='User Groups' value={createUserGroupsProgress} max={maxCreateUserGroupsProgress} />
                 <ProgressBar label='Configure Users' value={configureUsersProgress} max={maxConfigureUsersProgress} />
                 <ProgressBar label='Configure Queues' value={configureQueuesProgress} max={maxConfigureQueuesProgress} />
-                <ProgressBar label='Configure IVRs' value={configureIVRsProgress} max={maxConfigureIVRsProgress} />
+                <ProgressBar label='Configure Sites' value={configureSitesProgress} max={maxConfigureSitesProgress} />
                 <FeedbackArea messages={messages} timedMessages={timedMessages} errors={errors} notifications={notifications} />
             </ToolCard>
         </>
