@@ -64,6 +64,9 @@ import { SiteDataBundle } from "./models/SiteDataBundle";
 import useConfigureSites from "./hooks/useConfigureSites";
 import { PhoneNumberMapRow } from "./models/PhoneNumberMapRow";
 import { IconDownload } from "@tabler/icons-react";
+import useFetchCostCenters from "./hooks/useFetchCostCenters";
+import { CostCenterDataBundle } from "./models/CostCenterDataBundle";
+import useCreateCostCenters from "./hooks/useCreateCostCenters";
 
 
 const MigrateUsers = () => {
@@ -81,7 +84,7 @@ const MigrateUsers = () => {
     const [isPullingData, setIsPullingData] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
     const [isPending, setIsPending] = useState(false)
-    const supportedExtensionTypes = ['ERLs', 'Custom Roles', 'User', 'Limited Extension', 'Call Queue', 'IVR Menu', 'Prompt Library', 'Message-Only', 'Announcement-Only', 'Call Monitoring Groups', 'Park Location', 'User Group']
+    const supportedExtensionTypes = ['ERLs', 'Custom Roles', 'Cost Centers', 'User', 'Limited Extension', 'Call Queue', 'IVR Menu', 'Prompt Library', 'Message-Only', 'Announcement-Only', 'Call Monitoring Groups', 'Park Location', 'User Group']
     const [sites, setSites] = useState<SiteData[]>([])
     const [customRoles, setCustomRoles] = useState<Role[]>([])
     const [numberSourceSelection, setNumberSourceSelection] = useState('Inventory')
@@ -95,6 +98,7 @@ const MigrateUsers = () => {
     const [parkLocationBundles, setParkLocationBundles] = useState<ParkLocationDataBundle[]>([])
     const [userGroupBundles, setUserGroupBundles] = useState<UserGroupDataBundle[]>([])
     const [siteBundles, setSiteBundles] = useState<SiteDataBundle[]>([])
+    const [costCenterBundles, setCostCenterBundles] = useState<CostCenterDataBundle[]>([])
 
     const handleSiteFetchCompletion = (sites: SiteData[]) => {
         setSites(sites)
@@ -129,6 +133,7 @@ const MigrateUsers = () => {
     const {fetchParkLocations, progressValue: fetchParkLocationsProgress, maxProgress: maxFetchParkLocationsProgress} = useFetchParkLocations(postMessage, postTimedMessage, postError)
     const {fetchUserGroups, progressValue: fetchUserGroupsProgess, maxProgress: maxFetchUserGroupsProgress} = useFetchUserGroups(postMessage, postTimedMessage, postError)
     const {fetchSites: fetchSiteData, progressValue: fetchSitesProgress, maxProgress: maxFetchSitesProgress} = useFetchSites(postMessage, postTimedMessage, postError)
+    const {fetchCostCenters} = useFetchCostCenters(postMessage, postTimedMessage, postError)
 
     const {migrateSites, maxProgress: maxSiteProgress, progressValue: siteMigrationProgress} = useMigrateSites(postMessage, postTimedMessage, postError)
     const {migrateCustomRoles, progressValue: customRoleProgress, maxProgress: maxCustomRoleProgress} = useMigrateCustomRoles(postMessage, postTimedMessage, postError)
@@ -147,6 +152,7 @@ const MigrateUsers = () => {
     const {createParkLocations, progressValue: createParkLocationsProgress, maxProgress: maxCreateParkLocationsProgress} = useCreateParkLocations(postMessage, postTimedMessage, postError)
     const {createUserGroups, progressValue: createUserGroupsProgress, maxProgress: maxCreateUserGroupsProgress} = useCreateUserGroups(postMessage, postTimedMessage, postError)
     const {configureSites} = useConfigureSites(postMessage, postTimedMessage, postError)
+    const {createCostCenters, progressValue: createCostCentersProgress, maxProgress: maxCreateCostCentersProgress} = useCreateCostCenters(postMessage, postTimedMessage, postError)
     const {writeExcel} = useWriteExcelFile()
     
     useEffect(() => {
@@ -230,6 +236,14 @@ const MigrateUsers = () => {
         const siteDataBundles = await fetchSiteData(selectedSites)
         console.log('Sites')
         console.log(siteDataBundles)
+
+        // Cost centers
+        if (selectedExtensionTypes.includes('Cost Centers')) {
+            const costCenters = await fetchCostCenters()
+            console.log('Cost centers')
+            console.log(costCenters)
+            setCostCenterBundles(costCenters)
+        }
 
         const roles = await fetchCustomRoles()
         const userDataBundles = await fetchUsers(selectedExtensions.filter((ext) => ext.prettyType() === 'User'), originalExtensionList)
@@ -336,6 +350,13 @@ const MigrateUsers = () => {
             const selectedSites = sites.filter((site) => selectedSiteNames.includes(`${site.name}`))
             const siteExtensions = await migrateSites(siteBundles, availablePhoneNumbers)
             targetExts = [...targetExts, ...siteExtensions]
+        }
+
+        // Cost centers
+        const targetAccountCostCenters = await fetchCostCenters()
+        const topLevelCostCenter = targetAccountCostCenters.find((costCenter) => !costCenter.parentId)
+        if (topLevelCostCenter) {
+            await createCostCenters(costCenterBundles, topLevelCostCenter)
         }
 
         // Message only extensions
@@ -545,6 +566,7 @@ const MigrateUsers = () => {
                 <UIDInputField disabled={hasTargetAccountToken} disabledText={targetCompanyName} setTargetUID={setTargetUID} loading={isTargetAccountTokenPending} error={targetAccountTokenError} />
                 <Button variant='filled' onClick={handleMigrateButtonClick} disabled={!hasTargetAccountToken || isERLListPending || isTargetERLListPending || isMigrating} >Migrate</Button>
                 <Button className='healthy-margin-left' sx={{top: 7}} variant='subtle' color='dark' leftIcon={<IconDownload />} onClick={handleDownloadNumberMapClick} >Number Map</Button>
+                <ProgressBar label='Cost Centers' value={createCostCentersProgress} max={maxCreateCostCentersProgress} />
                 <ProgressBar label='ERLs' value={erlProgress} max={maxERLProgress} />
                 <ProgressBar label='Custom Roles' value={customRoleProgress} max={maxCustomRoleProgress} />
                 <ProgressBar label='Create Users' value={createUsersProgress} max={maxCreateUsersProgress} />
