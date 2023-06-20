@@ -32,6 +32,9 @@ const useCreateIVR = (postMessage: (message: Message) => void, postTimedMessage:
                 "Authorization": `Bearer ${token}`
             }
 
+            // The API doesn't let you set hidden field and will emit an error if you try
+            delete bundle.extension.data.hidden
+
             const response = await RestCentral.post(baseVirtualUserURL, headers, bundle.payload())
             bundle.extension.data.id = response.data.id
 

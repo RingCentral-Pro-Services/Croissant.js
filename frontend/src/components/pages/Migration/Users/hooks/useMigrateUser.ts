@@ -17,6 +17,9 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
             throw new Error('No access token')
         }
 
+        // The API doesn't let you set hidden field and will emit an error if you try
+        delete dataBundle.extension.data.hidden
+
         if (!extensionIDs) {
             // This is a virtual user
             await createUnlicensedUser(dataBundle, accessToken)

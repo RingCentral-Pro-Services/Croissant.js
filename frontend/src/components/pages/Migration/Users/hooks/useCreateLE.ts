@@ -77,6 +77,10 @@ const useCreateLE = (postMessage: (message: Message) => void, postTimedMessage: 
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             }
+
+            // The API doesn't let you set hidden field and will emit an error if you try
+            delete bundle.extension.data.hidden
+
             const response = await RestCentral.put(baseVirtualUserURL.replace('extensionId', extensionID), headers, bundle.extension.payload(true))
             bundle.extension.data.id = response.data.id
 
