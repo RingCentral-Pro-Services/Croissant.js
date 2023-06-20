@@ -540,6 +540,10 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
                 foundMembers.push(foundMember)
             }
 
+            // Member presence is not enabled for every account. Check to see if members have acceptCurrentQueueCalls propery.
+            // If not, skip this step
+            if (foundMembers.filter((member) => member.acceptCurrentQueueCalls !== undefined).length === 0) return
+
             const body = {
                 records: foundMembers
             }
