@@ -386,6 +386,7 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
 
             if (!bundle.extendedData || !bundle.extendedData.presenseLines) return
             const goodPresenseLines: PresenseLine[] = []
+            const badPresenseLines: PresenseLine[] = []
 
             for (let i = 0; i < bundle.extendedData!.presenseLines!.length; i++) {
                 let presenseLine = bundle.extendedData.presenseLines[i]
@@ -395,8 +396,7 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
 
                 // If the original extension couldn't be found, post error and skip
                 if (!originalExtension) {
-                    postMessage(new Message(`Failed to find old ID for presense line ${presenseLine.id} for user ${bundle.extension.data.name}`, 'error'))
-                    postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to set presense', `Line ${presenseLine.id}`], '', presenseLine))
+                    badPresenseLines.push(presenseLine)
                     continue
                 }
 
@@ -404,8 +404,7 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
                 const newExtension = targetExtensions.find((ext) => ext.data.name === originalExtension.data.name && ext.prettyType() === originalExtension.prettyType())
 
                 if (!newExtension) {
-                    postMessage(new Message(`Failed to find new ID for presense line ${presenseLine.id} for user ${bundle.extension.data.name}`, 'error'))
-                    postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to set presense', `Line ${presenseLine.id}`], '', presenseLine))
+                    badPresenseLines.push(presenseLine)
                     continue
                 }
 
@@ -417,6 +416,11 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
                 delete presenseLine.extension.uri
                 presenseLine.extension.id = `${newExtension.data.id}`
                 goodPresenseLines.push(presenseLine)
+            }
+
+            if (badPresenseLines.length !== 0) {
+                postMessage(new Message(`${badPresenseLines.length} extensions were removed from ${bundle.extension.data.name}'s presence because they could not be found`, 'warning'))
+                postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Extensions removed from presence', badPresenseLines.map((line) => line.id).join(', ')]))
             }
 
             const response = await RestCentral.put(basePresenseLineURL.replace('extensionId', `${bundle.extension.data.id}`), headers, goodPresenseLines)

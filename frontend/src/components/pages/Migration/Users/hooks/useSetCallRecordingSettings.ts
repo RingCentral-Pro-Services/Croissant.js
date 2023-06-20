@@ -86,7 +86,7 @@ const useSetCallRecordingSettings = (postMessage: (message: Message) => void, po
 
             if (badExtensions.length !== 0) {
                 postMessage(new Message(`Automatic call recording could not be enabled for ${badExtensions.length} extensions.`, 'warning'))
-                postError(new SyncError('', '', ['Could not enable automatic call recording', badExtensions.map((ext) => ext.name).join(', ')]))
+                postError(new SyncError('', '', ['Could not enable automatic call recording', badExtensions.map((ext) => ext.extensionNumber).join(', ')]))
             }
 
             const body = {
