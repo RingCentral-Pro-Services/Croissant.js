@@ -145,7 +145,7 @@ const MigrateUsers = () => {
     const {migrateERLs, progressValue: erlProgress, maxProgress: maxERLProgress} = useMigrateERLs(postMessage, postTimedMessage, postError)
     const {migrateUsers, progressValue: createUsersProgress, maxProgress: maxCreateUsersProgress} = useMigrateUsers(postMessage, postTimedMessage, postError)
     const {configureUsers, progressValue: configureUsersProgress, maxProgress: maxConfigureUsersProgress} = useConfigureUsers(postMessage, postTimedMessage, postError)
-    const {createMOs} = useCreateMOs(postMessage, postTimedMessage, postError)
+    const {createMOs, progressValue: createMOsProgress, maxProgress: maxCreateMOsProgress} = useCreateMOs(postMessage, postTimedMessage, postError)
     const {configureMOs} = useConfigureMOs(postMessage, postTimedMessage, postError)
     const {createQueues, progressValue: createQueuesProgress, maxProgress: maxCreateQueueProgess} = useCreateQueues(postMessage, postTimedMessage, postError)
     const {configureQueues, progressValue: configureQueuesProgress, maxProgress: maxConfigureQueuesProgress} = useConfigureQueues(postMessage, postTimedMessage, postError)
@@ -375,6 +375,13 @@ const MigrateUsers = () => {
             await createCostCenters(costCenterBundles, topLevelCostCenter)
         }
 
+        // Migrate ERLs
+        if (selectedExtensionTypes.includes('ERLs')) {
+            const selectedERLs = erls.filter((erl) => selectedSiteNames.includes(erl.site.name))
+            const migratedERLs = await migrateERLs(selectedERLs, targetExts)
+            targetERLs = [...targetERLs, ...migratedERLs]
+        }
+
         // Message only extensions
         const createdMOs = await createMOs(messageOnlyBundles, targetExts, availablePhoneNumbers)
         targetExts = [...targetExts, ...createdMOs]
@@ -427,13 +434,6 @@ const MigrateUsers = () => {
 
         unassignedExtensions = unassignedExtensions.filter((extension) => extension.data.phoneNumbers && extension.data.phoneNumbers.length !== 0)
 
-        // Migrate ERLs
-        if (selectedExtensionTypes.includes('ERLs')) {
-            const selectedERLs = erls.filter((erl) => selectedSiteNames.includes(erl.site.name))
-            const migratedERLs = await migrateERLs(selectedERLs, targetExts)
-            targetERLs = [...targetERLs, ...migratedERLs]
-        }
-
         // Call monitoring groups
         await createMonitoringGroups(callMonitoringBundles, originalExtensionList, targetExts)
 
@@ -454,9 +454,9 @@ const MigrateUsers = () => {
             await setRecordingSettings(callRecordingSettings, originalExtensionList, targetExts)
         }
 
+        await configureQueues(callQueueBundles, originalExtensionList, targetExts)
         await configureUsers(userDataBundles, targetERLs, originalExtensionList, targetExts, roles)
         await configureMOs(messageOnlyBundles, originalExtensionList, targetExts)
-        await configureQueues(callQueueBundles, originalExtensionList, targetExts)
         await configureIVRs(ivrBundles, originalExtensionList, targetExts, originalAccountPrompts, prompts)
         if (shouldMigrateSites) {
             await configureSites(siteBundles, originalExtensionList, targetExts)
@@ -592,6 +592,7 @@ const MigrateUsers = () => {
                 <ProgressBar label='Custom Roles' value={customRoleProgress} max={maxCustomRoleProgress} />
                 <ProgressBar label='Create Users' value={createUsersProgress} max={maxCreateUsersProgress} />
                 <ProgressBar label='Create Queues' value={createQueuesProgress} max={maxCreateQueueProgess} />
+                <ProgressBar label='Message Only / Announcement Only' value={createMOsProgress} max={maxCreateMOsProgress} />
                 <ProgressBar label='Create IVRs' value={createIVRsProgress} max={maxCreateIVRsProgress} />
                 <ProgressBar label='Create LEs' value={createLEsProgress} max={maxCreateLEsProgress} />
                 <ProgressBar label='Create Call Monitoring Groups' value={createMonitoringGroupsProgess} max={maxCreateMonitoringGroupsProgress} />

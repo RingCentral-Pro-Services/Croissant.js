@@ -14,7 +14,7 @@ export class Extension implements ExcelFormattable, DataGridFormattable {
             // Set the pin to a random 6-digit number
             this.data.ivrPin = Math.floor(100000 + Math.random() * 900000).toString()
 
-            this.data.password = `Ring${this.data.ivrPin}Central!`
+            this.data.password = `Ring$Central1!`
         }
     }
 

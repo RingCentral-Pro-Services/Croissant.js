@@ -703,6 +703,7 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
         try {
             delete customRule.id
             delete customRule.uri
+            delete customRule.queue
 
             if (customRule.calledNumbers && customRule.calledNumbers.length !== 0) {
                 const goodNumbers: CalledNumber[] = []

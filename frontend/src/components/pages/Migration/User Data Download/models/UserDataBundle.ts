@@ -203,6 +203,7 @@ export interface CustomRule {
         }
     }
     greetings?: Greeting[]
+    queue?: {}
 }
 
 export interface ForwardingRule {

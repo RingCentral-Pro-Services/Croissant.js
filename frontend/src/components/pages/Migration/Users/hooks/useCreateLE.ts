@@ -48,13 +48,15 @@ const useCreateLE = (postMessage: (message: Message) => void, postTimedMessage: 
 
         const originalDevice = bundle.extendedData!.devices![0]
         const deviceIDs = await getDeviceIDs(bundle, accessToken)
-        if (originalDevice.type === 'HardPhone') {
-            await setDeviceSerial(bundle, deviceIDs[0], originalDevice, accessToken)
+        if (deviceIDs && deviceIDs.length !== 0) {
+            if (originalDevice.type === 'HardPhone') {
+                await setDeviceSerial(bundle, deviceIDs[0], originalDevice, accessToken)
+            }
+            if (originalDevice.emergency && originalDevice.emergency.location) {
+                await setDeviceERL(bundle, deviceIDs[0], originalDevice, erls, bundle.extendedData!.pERLs!, accessToken)
+            }
+            await setDeviceName(bundle, deviceIDs[0], originalDevice.name, accessToken)
         }
-        if (originalDevice.emergency && originalDevice.emergency.location) {
-            await setDeviceERL(bundle, deviceIDs[0], originalDevice, erls, bundle.extendedData!.pERLs!, accessToken)
-        }
-        await setDeviceName(bundle, deviceIDs[0], originalDevice.name, accessToken)
         
         const customGreetings = await setDuringHoursGreetings(bundle, accessToken)
         if (customGreetings) {

@@ -5,12 +5,15 @@ export class IVRDataBundle {
     constructor(public extension: Extension, public extendedData?: IVRExtendedData, public phoneNumberMap?: Map<string, string>) {}
 
     payload() {
+        console.log('IVR payload generation')
+        console.log(this)
         return {
             name: this.extension.data.name,
             extensionNumber: this.extension.data.extensionNumber,
-            site: {
-                id: this.extension.data.site?.id
-            }
+            ...((this.extension.data.site?.name !== 'Main Site') && {site: {id: this.extension.data.site?.id}})
+            // site: {
+            //     id: this.extension.data.site?.id
+            // }
         }
     }
 }

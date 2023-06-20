@@ -31,6 +31,7 @@ const useCreateIVR = (postMessage: (message: Message) => void, postTimedMessage:
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             }
+
             const response = await RestCentral.post(baseVirtualUserURL, headers, bundle.payload())
             bundle.extension.data.id = response.data.id
 
