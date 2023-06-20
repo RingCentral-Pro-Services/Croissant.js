@@ -12,10 +12,27 @@ export class Extension implements ExcelFormattable, DataGridFormattable {
         }
         if (this.data.type === 'Limited') {
             // Set the pin to a random 6-digit number
-            this.data.ivrPin = Math.floor(100000 + Math.random() * 900000).toString()
+            this.data.ivrPin = this.generatePIN()
 
             this.data.password = `Ring$Central1!`
         }
+    }
+
+    generatePIN() {
+        const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+        const result = [];
+
+        while (result.length < 6) {
+            const index = Math.floor(Math.random() * digits.length);
+            const digit = digits[index];
+
+            if (result.length === 0 || Math.abs(result[result.length - 1] - digit) > 1) {
+                result.push(digit);
+                digits.splice(index, 1);
+            }
+        }
+
+        return result.join('');
     }
 
     prettyType() {
