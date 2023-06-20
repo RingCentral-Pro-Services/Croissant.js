@@ -70,6 +70,7 @@ import useCreateCostCenters from "./hooks/useCreateCostCenters";
 import useFetchCallRecordingSettings from "./hooks/useFetchCallRecordingSettings";
 import { CallRecordingDataBundle } from "./models/CallRecordingDataBundle";
 import useSetCallRecordingSettings from "./hooks/useSetCallRecordingSettings";
+import { UserDataRow } from "../User Data Download/models/UserDataRow";
 
 
 const MigrateUsers = () => {
@@ -477,6 +478,34 @@ const MigrateUsers = () => {
         postMessage(new Message('Finished migrating', 'info'))
     }
 
+    const handleDownloadUsersClick = () => {
+        const header = ['Initial Upon Completion of number/device swap', 'User Type', 'Extension', 'PHASE 2 - Temporary Extension (If Federated Accounts or Extension already in use)', 'First Name',
+                            'Last Name', 'Email Address', 'Department', 'Job Title', 'User Groups', 'Contact Phone', 'Mobile Phone', 'Regional Settings',
+                            'Regional Format', 'User Language', 'Time Format', 'User Hours', 'User Role', 'Include User in Company Directory', 'Receive RC Communication',
+                            'Send an email when a phone is added', 'Site', 'Phone Number', 'Temp Number (new account) Complete during Phase 2', 'Phone Model', 'Phone S/N',
+                            'Phone Nickname', 'Default Area Code', 'E911 Customer Name', 'E911  Street Address - Line 1', 'E911  Street Address - Line 2', 'E911  Town/City/Locality/Municipality',
+                            'E911  State/Province/County', 'Postal Code', 'E911  Country', 'Is Device Locked?', 'Is WMI Enabled?', 'Appearance', 'Appearance: Ring my phone when any user I am monitoring rings',
+                            'Appearance: Enable me to pick up a monitored line on hold', 'Permission: Allow other users to see my Presence status', 'Permission: Permitted to answer call',
+                            'Intercom', 'Delegates', 'Personal Meeting ID & Host Key', 'User Greeting', 'Screening', 'Connecting Message', 'Audio While Connecting', 'Hold Music',
+                            'User Greeting', 'Screening', 'Connecting Message', 'Audio While Connecting', 'Hold Music', 'Block option', 'Blocked Numbers', 'Robocalls', 'Trusted numbers',
+                            'Block calls with no caller ID', 'Block calls from pay phones Block option', 'Foward All Calls', 'Ring Type', 'Softphone Ring Time (My desktop & mobile apps)',
+                            'Device/Number Forward and Ring Time', 'Missed Calls', 'Voicemail Greeting', 'Voicemail Recipient', 'Ring Type', 'Softphone Ring Time (My desktop & mobile apps)',
+                            'Device/Number Forward and Ring Time', 'Missed Calls', 'Voicemail Greeting', 'Voicemail Recipient', 'Custom rules (Create a separate Google Sheet and link here if Ext has multiple rules)',
+                            'Incoming Call Information: Display Number & Play Announcement', 'Voicemail to Text', 'Personal ERL', 'Notification Email', 'Voicemail Notifications', 'Fax Notifications',
+                            'Missed Call Notifications', 'Fax Transmission Results', 'Text Message Notifications', 'Device Caller ID(s)', 'Fax Number Caller ID', 'Call Flip Caller ID', 'Ring Out Caller ID',
+                            'Ring Me Caller ID', 'AdditionalSoftphone Caller ID', 'Alternate Caller ID', 'Common Phone Caller ID', 'Mobile App Caller ID', 'Delegated Caller ID', 'Cost Center']
+
+        const rows: UserDataRow[] = []
+
+        for (const bundle of userDataBundles) {
+            for (const row of bundle.toRows()) {
+                rows.push(row)
+            }
+        }
+
+        writeExcel(header, rows, 'User Data', 'User Data.xlsx')
+    }
+
     const handleDownloadNumberMapClick = () => {
         const numberMapRows: PhoneNumberMapRow[] = []
 
@@ -551,6 +580,7 @@ const MigrateUsers = () => {
                 {shouldShowSiteFilter ? <AdaptiveFilter options={siteNames} title='Sites' placeholder='Search' setSelected={setSelectedSiteNames} /> : <></>}
                 {isMultiSiteEnabled ? <FormControlLabel control={<Checkbox defaultChecked value={shouldMigrateSites} onChange={(e) => setShouldMigrateSites(e.target.checked)} />} label="Migrate Sites" /> : <></>}
                 <Button variant='filled' onClick={handleDisoverButtonClick} disabled={isPullingData} >Discover</Button>
+                <Button className='healthy-margin-left' sx={{top: 7}} variant='subtle' color='dark' leftIcon={<IconDownload />} onClick={handleDownloadUsersClick} >User Data</Button>
                 <div className="healthy-margin-top">
                     <FormControl>
                         <FormLabel id="demo-row-radio-buttons-group-label">Pull numbers from</FormLabel>
