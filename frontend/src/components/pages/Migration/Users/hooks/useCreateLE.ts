@@ -39,6 +39,9 @@ const useCreateLE = (postMessage: (message: Message) => void, postTimedMessage: 
         }
 
         await createExtension(bundle, `${unassignedExtension.data.id}`, accessToken)
+
+        if (bundle.hasEncounteredFatalError) return
+        
         for (const phoneNumber of availablePhoneNumbers) {
             await assignPhoneNumber(bundle, phoneNumber.id, accessToken)
         }
@@ -87,6 +90,7 @@ const useCreateLE = (postMessage: (message: Message) => void, postTimedMessage: 
             if (e.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
+            bundle.hasEncounteredFatalError = true
             console.log(`Failed to create LE`)
             console.log(e)
             postMessage(new Message(`Failed to create limited extension ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))

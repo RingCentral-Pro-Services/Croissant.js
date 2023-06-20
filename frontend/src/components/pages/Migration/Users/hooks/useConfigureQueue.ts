@@ -26,6 +26,9 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
     const baseWaitingPeriod = 250
 
     const configureQueue = async (bundle: CallQueueDataBundle, originalExtensions: Extension[], targetExtensions: Extension[]) => {
+        // Don't bother trying to configure the queue if it wasn't created
+        if (bundle.hasEncounteredFatalError) return
+
         const accessToken = localStorage.getItem('cs_access_token')
         if (!accessToken) {
             throw new Error('No access token')

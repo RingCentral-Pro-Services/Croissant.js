@@ -2,6 +2,8 @@ import { Extension } from "../../../../../models/Extension";
 import { BusinessHours, CallHandling, CustomRule, Notifications, PhoneNumber } from "../../User Data Download/models/UserDataBundle";
 
 export class CallQueueDataBundle {
+    public hasEncounteredFatalError = false
+    
     constructor(public extension: Extension, public extendedData?: ExtendedQueueData, public phoneNumberMap?: Map<string, string>) {}
 }
 

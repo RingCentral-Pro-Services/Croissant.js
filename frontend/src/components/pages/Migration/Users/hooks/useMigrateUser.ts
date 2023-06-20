@@ -56,6 +56,7 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
             if (e.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
+            bundle.hasEncounteredFatalError = true
             console.log(`Failed to create user`)
             console.log(e)
             postMessage(new Message(`Failed to create user ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
@@ -85,6 +86,7 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
             if (e.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
+            bundle.hasEncounteredFatalError = true
             console.log(`Failed to create user`)
             console.log(e)
             postMessage(new Message(`Failed to create user ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
@@ -96,7 +98,6 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
     const addDigitalLine = async (bundle: UserDataBundle, extensionID: string, token: string) => {
         const phoneNumber = await getPhoneNumberID(extensionID, token)
         if (!phoneNumber) {
-            // do something
             return
         }
         
@@ -161,8 +162,8 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
             }
             console.log(`Failed to assign additional number`)
             console.log(e)
-            postMessage(new Message(`Failed to get phone number ID ${e.error ?? ''}`, 'error'))
-            postError(new SyncError('', 0, ['Failed to get phone number ID', ''], e.error ?? ''))
+            postMessage(new Message(`Failed to assign additional number ${e.error ?? ''}`, 'error'))
+            postError(new SyncError('', 0, ['Failed to assign additional number', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
@@ -193,10 +194,10 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
             if (e.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
-            console.log(`Failed to assign additional number`)
+            console.log(`Failed to assign additional DL`)
             console.log(e)
-            postMessage(new Message(`Failed to get phone number ID ${e.error ?? ''}`, 'error'))
-            postError(new SyncError('', 0, ['Failed to get phone number ID', ''], e.error ?? ''))
+            postMessage(new Message(`Failed to assign additional DL ${e.error ?? ''}`, 'error'))
+            postError(new SyncError('', 0, ['Failed to assign additional DL', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }

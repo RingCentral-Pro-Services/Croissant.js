@@ -43,6 +43,10 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
     const baseWaitingPeriod = 250
 
     const configureUser = async (bundle: UserDataBundle, companyERLs: ERL[], originalExtensions: Extension[], targetExtensions: Extension[], roles: Role[]) => {
+        
+        // Don't bother trying to configure the user if they weren't created
+        if (bundle.hasEncounteredFatalError) return
+
         const accessToken = localStorage.getItem('cs_access_token')
         if (!accessToken) {
             throw new Error('No access token')

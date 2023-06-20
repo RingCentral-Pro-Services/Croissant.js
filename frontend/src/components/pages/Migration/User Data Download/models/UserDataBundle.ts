@@ -8,6 +8,7 @@ import { UserDataRow } from "./UserDataRow";
 export class UserDataBundle {
 
     public userGroups = ''
+    public hasEncounteredFatalError = false
 
     constructor(public extension: Extension, public extendedData: ExtendedUserData | undefined, public phoneNumberMap?: Map<string, string>) {}
 

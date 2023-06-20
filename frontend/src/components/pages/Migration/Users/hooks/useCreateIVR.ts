@@ -45,6 +45,7 @@ const useCreateIVR = (postMessage: (message: Message) => void, postTimedMessage:
             if (e.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
+            bundle.hasEncounteredFatalError = true
             console.log(`Failed to create IVR`)
             console.log(e)
             postMessage(new Message(`Failed to create IVR ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
@@ -54,6 +55,8 @@ const useCreateIVR = (postMessage: (message: Message) => void, postTimedMessage:
     }
 
     const setLanguage = async (bundle: IVRDataBundle, token: string) => {
+        if (bundle.hasEncounteredFatalError) return
+
         try {
             const headers = {
                 "Accept": "application/json",
@@ -85,7 +88,9 @@ const useCreateIVR = (postMessage: (message: Message) => void, postTimedMessage:
         }
     }
 
-    const assignPhoneNumber = async (bundle: MessageOnlyDataBundle, phoneNumberID: string, token: string) => {
+    const assignPhoneNumber = async (bundle: IVRDataBundle, phoneNumberID: string, token: string) => {
+        if (bundle.hasEncounteredFatalError) return
+
         try {
             const headers = {
                 "Accept": "application/json",

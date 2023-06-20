@@ -12,6 +12,8 @@ const useConfigureMO = (postMessage: (message: Message) => void, postTimedMessag
     const baseWaitingPeriod = 250
 
     const configureMO = async (bundle: MessageOnlyDataBundle, originalExtensions: Extension[], targetExtensions: Extension[]) => {
+        if (bundle.hasEncounteredFatalError) return
+        
         const accessToken = localStorage.getItem('cs_access_token')
         if (!accessToken) {
             throw new Error('No access token')

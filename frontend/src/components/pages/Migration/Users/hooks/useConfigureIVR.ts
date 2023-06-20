@@ -10,6 +10,8 @@ const useConfigureIVR = (postMessage: (message: Message) => void, postTimedMessa
     const baseWaitingPeriod = 250
 
     const configureIVR = async (bundle: IVRDataBundle, originalExtensions: Extension[], targetExtensions: Extension[], originalPrompts: IVRAudioPrompt[], targetPrompts: IVRAudioPrompt[]) => {
+        if (bundle.hasEncounteredFatalError) return
+        
         const accessToken = localStorage.getItem('cs_access_token')
         if (!accessToken) {
             throw new Error('No access token')

@@ -41,6 +41,7 @@ const useCreateQueue = (postMessage: (message: Message) => void, postTimedMessag
             if (e.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
+            bundle.hasEncounteredFatalError = true
             console.log(`Failed to create call queue`)
             console.log(e)
             postMessage(new Message(`Failed to create call queue ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
