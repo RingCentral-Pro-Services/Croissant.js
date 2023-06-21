@@ -1,11 +1,10 @@
-import { Bundle } from "typescript";
 import { Extension } from "../../../../../models/Extension";
 import { Greeting } from "../../../../../models/Greetings";
 import { Message } from "../../../../../models/Message";
 import { SyncError } from "../../../../../models/SyncError";
 import { RestCentral } from "../../../../../rcapi/RestCentral";
 import { ERL } from "../../../Automatic Location Updates/models/ERL";
-import { BlockedPhoneNumber, CalledNumber, CallHandling, CallHandlingForwardingNumber, CallHandlingForwardingRule, CustomRule, Device, ForwardingNumber, PERL, PresenseLine, UserDataBundle } from "../../User Data Download/models/UserDataBundle";
+import { BlockedPhoneNumber, CalledNumber, CallHandling, CallHandlingForwardingNumber, CustomRule, Device, ForwardingNumber, PERL, PresenseLine, UserDataBundle } from "../../User Data Download/models/UserDataBundle";
 import { Role } from "../models/Role";
 
 interface DeviceModelPayload {
@@ -345,6 +344,7 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
             const perl = personalERLs.find((erl) => erl.name === deviceData.device.emergency.location?.name)
             if (!erl && !perl) {
                 postMessage(new Message(`ERL for ${bundle.extension.data.name} was not found. ERL not set`, 'error'))
+                postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to set ERL', deviceData.device.emergency.location?.name ?? '']))
                 return
             }
 
