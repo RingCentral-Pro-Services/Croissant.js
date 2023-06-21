@@ -397,17 +397,13 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
                 // If the original extension couldn't be found, post error and skip
                 if (!originalExtension) {
                     badPresenseLines.push(presenseLine)
-                    console.log('Presense line not found. Should be skipping.')
                     continue
                 }
 
                 // Search for the new extension
-                console.log('Found original presense line extension')
-                console.log(originalExtension)
                 const newExtension = targetExtensions.find((ext) => ext.data.name === originalExtension.data.name && ext.prettyType() === originalExtension.prettyType())
                 if (!newExtension) {
                     badPresenseLines.push(presenseLine)
-                    console.log('Did not find new presense line extension. should be skipping.')
                     continue
                 }
 
