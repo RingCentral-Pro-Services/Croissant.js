@@ -50,7 +50,7 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
                 const deviceCount = bundle.extendedData!.devices.length
                 let unassignedIDs: string[] = []
                 for (let i = 0; i < deviceCount; i++) {
-                    if (bundle.extendedData?.devices[i].type === 'SoftPhone' || unassignedExtensions.length === 0) {
+                    if (unassignedExtensions.length === 0) {
                         postMessage(new Message('Ran out of unassigned extensions', 'error'))
                         continue
                     }

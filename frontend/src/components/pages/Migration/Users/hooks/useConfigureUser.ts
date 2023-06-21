@@ -5,7 +5,7 @@ import { Message } from "../../../../../models/Message";
 import { SyncError } from "../../../../../models/SyncError";
 import { RestCentral } from "../../../../../rcapi/RestCentral";
 import { ERL } from "../../../Automatic Location Updates/models/ERL";
-import { BlockedPhoneNumber, CalledNumber, CallHandling, CustomRule, Device, ForwardingNumber, PERL, PresenseLine, UserDataBundle } from "../../User Data Download/models/UserDataBundle";
+import { BlockedPhoneNumber, CalledNumber, CallHandling, CallHandlingForwardingNumber, CallHandlingForwardingRule, CustomRule, Device, ForwardingNumber, PERL, PresenseLine, UserDataBundle } from "../../User Data Download/models/UserDataBundle";
 import { Role } from "../models/Role";
 
 interface DeviceModelPayload {
@@ -965,27 +965,48 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
         // Need to swap out phone numbers and IDs to that of the newly created extension
         if (originalCallHandling.forwarding && originalCallHandling.forwarding.rules) {
             let originalRules = originalCallHandling.forwarding.rules
-            const currentRules = result.forwarding.rules
+            const currentRules = result.forwarding?.rules
             if (!currentRules || !originalRules) return
             const currentForwardingNumbers = currentRules.flatMap((rule) => rule.forwardingNumbers)
 
             if (currentRules && originalRules) {
                 for (let i = 0; i < originalRules.length; i++) {
                     let rule = originalRules[i]
+                    const goodForwardingNumbers: CallHandlingForwardingNumber[] = []
+                    const badForwardingNumbers: CallHandlingForwardingNumber[] = []
     
                     for (let j = 0; j < rule.forwardingNumbers.length; j++) {
                         let forwardingNumber = rule.forwardingNumbers[j]
     
                         const matchingForwardingNumber = currentForwardingNumbers.find((number) => number.label === forwardingNumber.label)
                         if (!matchingForwardingNumber) {
-                            postMessage(new Message(`Failed to find matching forwarding rule for ${forwardingNumber.label} on ${bundle.extension.data.name}`, 'error'))
+                            badForwardingNumbers.push(forwardingNumber)
                             continue
                         }
-    
-                        forwardingNumber.id = matchingForwardingNumber.id
-                        forwardingNumber.phoneNumber = matchingForwardingNumber.phoneNumber
+                        
+                        const goodNumber: CallHandlingForwardingNumber = {
+                            id: matchingForwardingNumber.id,
+                            phoneNumber: matchingForwardingNumber.phoneNumber,
+                            label: matchingForwardingNumber.label,
+                            type: matchingForwardingNumber.type
+                        }
+                        goodForwardingNumbers.push(goodNumber)
+                    }
+
+                    rule.forwardingNumbers = goodForwardingNumbers
+                    if (badForwardingNumbers.length !== 0) {
+                        postMessage(new Message(`${badForwardingNumbers.length} forwarding numbers were removed from ${bundle.extension.data.name}'s business hours call handling because they were not found`, 'warning'))
+                        postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Forwarding numbers removed', badForwardingNumbers.map((number) => number.label).join(', ')]))
                     }
                 }
+
+                const goodRules = originalRules.filter((rule) => rule.forwardingNumbers.length !== 0)
+
+                for (let i = 0; i < goodRules.length; i++) {
+                    goodRules[i].index = i + 1
+                }
+
+                originalCallHandling.forwarding.rules = goodRules
             }
         }
 
@@ -1039,31 +1060,55 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
 
             // Adjust call forwarding
             // Need to swap out phone numbers and IDs to that of the newly created extension
-            if (originalCallHandling.forwarding) {
+            if (originalCallHandling.callHandlingAction === 'ForwardCalls' && originalCallHandling.forwarding && originalCallHandling.forwarding.rules) {
                 let originalRules = originalCallHandling.forwarding.rules
-                const currentRules = result.forwarding.rules
+                const currentRules = result.forwarding?.rules
                 if (!currentRules || !originalRules) return
                 const currentForwardingNumbers = currentRules.flatMap((rule) => rule.forwardingNumbers)
-                let newRules = []
-
-                for (let i = 0; i < originalRules.length; i++) {
-                    let rule = originalRules[i]
-
-                    for (let j = 0; j < rule.forwardingNumbers.length; j++) {
-                        let forwardingNumber = rule.forwardingNumbers[j]
-                        if (forwardingNumber.type !== 'PhoneLine') continue
-
-                        const matchingForwardingNumber = currentForwardingNumbers.find((number) => number.label === forwardingNumber.label)
-                        if (!matchingForwardingNumber) {
-                            postMessage(new Message(`Failed to find matching forwarding rule for ${forwardingNumber.label} on ${bundle.extension.data.name}`, 'error'))
-                            continue
+    
+                if (currentRules && originalRules) {
+                    for (let i = 0; i < originalRules.length; i++) {
+                        let rule = originalRules[i]
+                        const goodForwardingNumbers: CallHandlingForwardingNumber[] = []
+                        const badForwardingNumbers: CallHandlingForwardingNumber[] = []
+        
+                        for (let j = 0; j < rule.forwardingNumbers.length; j++) {
+                            let forwardingNumber = rule.forwardingNumbers[j]
+        
+                            const matchingForwardingNumber = currentForwardingNumbers.find((number) => number.label === forwardingNumber.label)
+                            if (!matchingForwardingNumber) {
+                                // postMessage(new Message(`Failed to find matching forwarding rule for ${forwardingNumber.label} on ${bundle.extension.data.name}`, 'error'))
+                                badForwardingNumbers.push(forwardingNumber)
+                                continue
+                            }
+                            
+                            const goodNumber: CallHandlingForwardingNumber = {
+                                id: matchingForwardingNumber.id,
+                                phoneNumber: matchingForwardingNumber.phoneNumber,
+                                label: matchingForwardingNumber.label,
+                                type: matchingForwardingNumber.type
+                            }
+                            goodForwardingNumbers.push(goodNumber)
+                            // forwardingNumber.id = matchingForwardingNumber.id
+                            // forwardingNumber.phoneNumber = matchingForwardingNumber.phoneNumber
                         }
-
-                        forwardingNumber.id = matchingForwardingNumber.id
-                        forwardingNumber.phoneNumber = matchingForwardingNumber.phoneNumber
+    
+                        rule.forwardingNumbers = goodForwardingNumbers
+                        if (badForwardingNumbers.length !== 0) {
+                            postMessage(new Message(`${badForwardingNumbers.length} forwarding numbers were removed from ${bundle.extension.data.name}'s after hours call handling because they were not found`, 'warning'))
+                        }
                     }
-                    
+    
+                    const goodRules = originalRules.filter((rule) => rule.forwardingNumbers.length !== 0)
+    
+                    for (let i = 0; i < goodRules.length; i++) {
+                        goodRules[i].index = i + 1
+                    }
+    
+                    originalCallHandling.forwarding.rules = goodRules
                 }
+            } else {
+                delete originalCallHandling.forwarding
             }
 
             // Adjust voicemail recipient

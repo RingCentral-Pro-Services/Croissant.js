@@ -103,33 +103,33 @@ export interface Device {
     }]
 }
 
+export interface CallHandlingForwardingRule {
+    index: number
+    ringCount: number
+    enabled: boolean
+    forwardingNumbers: CallHandlingForwardingNumber[]
+}
+
+export interface CallHandlingForwardingNumber {
+    id: string
+    phoneNumber: string
+    label: string
+    type: string
+    uri?: string
+}
+
 export interface CallHandling {
     greetings: Greeting[]
     screening: string
     callHandlingAction: string
-    forwarding: {
+    forwarding?: {
         notifyMySoftPhones: boolean
         notifyAdminSoftPhones: boolean
         softPhonesRingCount: number
         softPhonesAlwaysRing: boolean
         ringingMode: string
         softPhonesPositionTop: boolean
-        rules: [
-            {
-                index: number
-                ringCount: number
-                enabled: boolean
-                forwardingNumbers: [
-                    {
-                        id: string
-                        phoneNumber: string
-                        label: string
-                        type: string
-                        uri?: string
-                    }
-                ]
-            }
-        ]
+        rules: CallHandlingForwardingRule[]
     }
     missedCall: {
         actionType: string

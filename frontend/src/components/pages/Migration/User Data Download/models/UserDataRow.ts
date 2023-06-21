@@ -76,14 +76,14 @@ export class UserDataRow implements ExcelFormattable {
             this.blockedCallSettings?.noCallerId ?? '',
             this.blockedCallSettings?.payPhones ?? '',
             this.prettyForwardAllCalls(),
-            this.businessHoursCallHandling?.forwarding.ringingMode ?? '',
-            this.businessHoursCallHandling?.forwarding.softPhonesAlwaysRing ? 'Always Ring' : this.prettyRingTime(this.businessHoursCallHandling?.forwarding.softPhonesRingCount),
+            this.businessHoursCallHandling?.forwarding?.ringingMode ?? '',
+            this.businessHoursCallHandling?.forwarding?.softPhonesAlwaysRing ? 'Always Ring' : this.prettyRingTime(this.businessHoursCallHandling?.forwarding?.softPhonesRingCount),
             this.prettyDeviceRingTime(),
             this.prettyVoicemailAction(),
             this.greeting('Voicemail'),
             this.businessHoursCallHandling?.voicemail.recipient.displayName ?? '',
-            this.afterHoursCallHandling?.callHandlingAction === 'ForwardCalls' ? this.afterHoursCallHandling?.forwarding.ringingMode ?? '' : '',
-            this.afterHoursCallHandling?.callHandlingAction === 'ForwardCalls' ? this.prettyRingTime(this.afterHoursCallHandling?.forwarding.softPhonesRingCount) : '',
+            this.afterHoursCallHandling?.callHandlingAction === 'ForwardCalls' ? this.afterHoursCallHandling?.forwarding?.ringingMode ?? '' : '',
+            this.afterHoursCallHandling?.callHandlingAction === 'ForwardCalls' ? this.prettyRingTime(this.afterHoursCallHandling?.forwarding?.softPhonesRingCount) : '',
             this.prettyAfterHoursDeviceRingTime(),
             this.prettyAfterHoursVoicemailAction(),
             this.afterHoursGreeting('Voicemail'),
@@ -216,10 +216,10 @@ export class UserDataRow implements ExcelFormattable {
     prettyDeviceRingTime() {
         let result = ''
 
-        if (!this.businessHoursCallHandling || !this.businessHoursCallHandling.forwarding.rules) return result
+        if (!this.businessHoursCallHandling || !this.businessHoursCallHandling.forwarding?.rules) return result
 
-        for (let i = 0; i < this.businessHoursCallHandling?.forwarding.rules.length; i++) {
-            const rule = this.businessHoursCallHandling.forwarding.rules[i]
+        for (let i = 0; i < this.businessHoursCallHandling?.forwarding?.rules.length; i++) {
+            const rule = this.businessHoursCallHandling.forwarding?.rules[i]
             result += `${rule.index} -- ${this.prettyRingTime(rule.ringCount)}\n`
             for (const endpoint of rule.forwardingNumbers) {
                 result += `${endpoint.label} ${endpoint.phoneNumber}\n`
@@ -233,10 +233,10 @@ export class UserDataRow implements ExcelFormattable {
     prettyAfterHoursDeviceRingTime() {
         let result = ''
 
-        if (!this.afterHoursCallHandling || !this.afterHoursCallHandling.forwarding.rules || this.afterHoursCallHandling.callHandlingAction !== 'ForwardCalls') return result
+        if (!this.afterHoursCallHandling || !this.afterHoursCallHandling.forwarding?.rules || this.afterHoursCallHandling.callHandlingAction !== 'ForwardCalls') return result
 
-        for (let i = 0; i < this.afterHoursCallHandling?.forwarding.rules.length; i++) {
-            const rule = this.afterHoursCallHandling.forwarding.rules[i]
+        for (let i = 0; i < this.afterHoursCallHandling?.forwarding?.rules.length; i++) {
+            const rule = this.afterHoursCallHandling.forwarding?.rules[i]
             result += `${rule.index} -- ${this.prettyRingTime(rule.ringCount)}\n`
             for (const endpoint of rule.forwardingNumbers) {
                 result += `${endpoint.label} ${endpoint.phoneNumber}\n`
