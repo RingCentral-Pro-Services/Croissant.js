@@ -57,22 +57,26 @@ const useCreateCallMonitoringGroup = (postMessage: (message: Message) => void, p
             }
 
             const goodMembers: CallMonitoringMember[] = []
+            const badMembers: CallMonitoringMember[] = []
             for (const member of group.data.members) {
                 const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === `${member.id}`)
                 if (!originalExtension) {
-                    postMessage(new Message(`Failed to add ext ${member.extensionNumber} to call monitoring group ${group.data.name}. Old ID not found`, 'warning'))
-                    postError(new SyncError(group.data.name, '', ['Failed to add call monitoring member. Old ID not found', `${member.extensionNumber}`]))
+                    badMembers.push(member)
                     continue
                 }
 
                 const newExtension = targetExtensions.find((ext) => ext.data.name === originalExtension.data.name && ext.prettyType() === originalExtension.prettyType())
                 if (!newExtension) {
-                    postMessage(new Message(`Failed to add ext ${member.extensionNumber} to call monitoring group ${group.data.name}. New ID not found`, 'warning'))
-                    postError(new SyncError(group.data.name, '', ['Failed to add call monitoring member. New ID not found', `${member.extensionNumber}`]))
+                    badMembers.push(member)
                     continue
                 }
 
                 goodMembers.push({id: `${newExtension.data.id}`, permissions: member.permissions})
+            }
+
+            if (badMembers.length !== 0) {
+                postMessage(new Message(`${badMembers.length} members were removed from call monitoring group ${group.data.name} because they could not be found`, 'warning'))
+                postError(new SyncError(group.data.name, '', ['Call monitoring members removed', badMembers.map((member) => member.extensionNumber).join(', ')]))
             }
 
             if (goodMembers.length === 0) return
@@ -92,7 +96,7 @@ const useCreateCallMonitoringGroup = (postMessage: (message: Message) => void, p
             console.log(`Failed to add group members`)
             console.log(e)
             postMessage(new Message(`Failed to add members to call monitoring group ${group.data.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(group.data.name, '', ['Failed to add call monitoring members', ''], e.error ?? ''))
+            postError(new SyncError(group.data.name, '', ['Failed to add call monitoring members', ''], e.error ?? '', group))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
