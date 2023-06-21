@@ -21,7 +21,7 @@ const useFetchUsers = (postMessage: (message: Message) => void, postTimedMessage
         }
 
         for (const bundle of dataBundles) {
-            await fetchUserData(bundle, extensions)
+            await fetchUserData(bundle, extensions, false)
             setProgressValue((prev) => prev + 1)
         }
 

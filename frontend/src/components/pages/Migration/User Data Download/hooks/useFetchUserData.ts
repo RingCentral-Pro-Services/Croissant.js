@@ -29,7 +29,7 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
     const baseCustomRulesURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/answering-rule?perPage=1000&type=Custom&view=Detailed'
     const baseWaitingPeriod = 250
 
-    const fetchUserData = async (userDataBundle: UserDataBundle, extensions: Extension[]) => {
+    const fetchUserData = async (userDataBundle: UserDataBundle, extensions: Extension[], shouldFetchDelegates: boolean = true) => {
         const accessToken = localStorage.getItem('cs_access_token')
         if (!accessToken) {
             throw new Error('No access token')
@@ -48,7 +48,9 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
         await fetchPresenseSettings(userDataBundle, accessToken)
         await fetchPresenseAllowedUsers(userDataBundle, extensions, accessToken)
         await fetchIntercomStatus(userDataBundle, accessToken)
-        await fetchDelegates(userDataBundle, accessToken)
+        if (shouldFetchDelegates) {
+            await fetchDelegates(userDataBundle, accessToken)
+        }
         await fetchPERLs(userDataBundle, accessToken)
         await fetchRoles(userDataBundle, accessToken)
         await fetchIncommingCallInfo(userDataBundle, accessToken)
