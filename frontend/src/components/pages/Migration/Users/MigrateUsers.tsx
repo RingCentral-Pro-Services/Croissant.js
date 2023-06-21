@@ -443,15 +443,15 @@ const MigrateUsers = () => {
 
         unassignedExtensions = unassignedExtensions.filter((extension) => extension.data.phoneNumbers && extension.data.phoneNumbers.length !== 0)
 
-        // Call monitoring groups
-        await createMonitoringGroups(callMonitoringBundles, originalExtensionList, targetExts)
-
         console.log(`Migrating ${userDataBundles.length} users`)
         console.log(userDataBundles)
         await migrateUsers(availablePhoneNumbers, userDataBundles, unassignedExtensions, targetExts)
 
         const migratedUsers = userDataBundles.map((bundle) => bundle.extension)
         targetExts = [...targetExts, ...migratedUsers]
+
+        // Call monitoring groups
+        await createMonitoringGroups(callMonitoringBundles, originalExtensionList, targetExts)
 
         // Create Park Locations
         const existingParkLocations = targetExtensionList.filter((ext) => ext.prettyType() === 'Park Location')
