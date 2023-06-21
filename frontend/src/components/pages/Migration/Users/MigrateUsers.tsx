@@ -71,6 +71,7 @@ import useFetchCallRecordingSettings from "./hooks/useFetchCallRecordingSettings
 import { CallRecordingDataBundle } from "./models/CallRecordingDataBundle";
 import useSetCallRecordingSettings from "./hooks/useSetCallRecordingSettings";
 import { UserDataRow } from "../User Data Download/models/UserDataRow";
+import { ERL } from "../../Automatic Location Updates/models/ERL";
 
 
 const MigrateUsers = () => {
@@ -209,6 +210,7 @@ const MigrateUsers = () => {
 
         if (!isMultiSiteEnabled) {
             setShouldMigrateSites(false)
+            setSelectedSiteNames(['Main Site'])
             return
         }
 
@@ -378,7 +380,13 @@ const MigrateUsers = () => {
 
         // Migrate ERLs
         if (selectedExtensionTypes.includes('ERLs')) {
-            const selectedERLs = erls.filter((erl) => selectedSiteNames.includes(erl.site.name))
+            let selectedERLs: ERL[] = [] 
+            
+            if (isMultiSiteEnabled) {
+                selectedERLs = erls.filter((erl) => selectedSiteNames.includes(erl.site.name))
+            } else {
+                selectedERLs = erls
+            }
             const migratedERLs = await migrateERLs(selectedERLs, targetExts)
             targetERLs = [...targetERLs, ...migratedERLs]
         }
@@ -446,8 +454,9 @@ const MigrateUsers = () => {
         targetExts = [...targetExts, ...migratedUsers]
 
         // Create Park Locations
-        const createdParkLocations = await createParkLocations(parkLocationBundles, originalExtensionList, targetExts)
-        targetExts = [...targetExts, ...createdParkLocations]
+        const existingParkLocations = targetExtensionList.filter((ext) => ext.prettyType() === 'Park Location')
+        const createdParkLocations = await createParkLocations(structuredClone(parkLocationBundles), originalExtensionList, targetExts)
+        targetExts = [...targetExts, ...createdParkLocations, ...existingParkLocations]
 
         await createUserGroups(userGroupBundles, originalExtensionList, targetExts)
 
