@@ -456,6 +456,13 @@ const MigrateUsers = () => {
         // Create Park Locations
         const existingParkLocations = targetExtensionList.filter((ext) => ext.prettyType() === 'Park Location')
         const createdParkLocations = await createParkLocations(structuredClone(parkLocationBundles), originalExtensionList, targetExts)
+
+        // We have to do this because structuredClone doesn't clone functions and configureUsers() relies on the .prettyType() function
+        for (let i = 0; i < createdParkLocations.length; i++) {
+            createdParkLocations[i].prettyType = () => {
+                return 'Park Location'
+            }
+        }
         targetExts = [...targetExts, ...createdParkLocations, ...existingParkLocations]
 
         await createUserGroups(userGroupBundles, originalExtensionList, targetExts)
