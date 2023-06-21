@@ -397,14 +397,17 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
                 // If the original extension couldn't be found, post error and skip
                 if (!originalExtension) {
                     badPresenseLines.push(presenseLine)
+                    console.log('Presense line not found. Should be skipping.')
                     continue
                 }
 
                 // Search for the new extension
+                console.log('Found original presense line extension')
+                console.log(originalExtension)
                 const newExtension = targetExtensions.find((ext) => ext.data.name === originalExtension.data.name && ext.prettyType() === originalExtension.prettyType())
-
                 if (!newExtension) {
                     badPresenseLines.push(presenseLine)
+                    console.log('Did not find new presense line extension. should be skipping.')
                     continue
                 }
 
@@ -478,6 +481,41 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             }
+
+            for (let i = 0; i < bundle.extendedData!.notifications!.emailAddresses.length; i++) {
+                bundle.extendedData!.notifications!.emailAddresses[i] = `${bundle.extendedData?.notifications?.emailAddresses[i]}.ps.ringcentral.com`
+            }
+
+            if (bundle.extendedData?.notifications?.voicemails.advancedEmailAddresses) {
+                for (let i = 0; i < bundle.extendedData!.notifications!.voicemails.advancedEmailAddresses.length; i++) {
+                    bundle.extendedData!.notifications!.voicemails.advancedEmailAddresses[i] = `${bundle.extendedData?.notifications?.voicemails.advancedEmailAddresses[i]}.ps.ringcentral.com`
+                }
+            }
+
+            if (bundle.extendedData?.notifications?.inboundFaxes.advancedEmailAddresses) {
+                for (let i = 0; i < bundle.extendedData!.notifications!.inboundFaxes.advancedEmailAddresses.length; i++) {
+                    bundle.extendedData!.notifications!.inboundFaxes.advancedEmailAddresses[i] = `${bundle.extendedData?.notifications?.inboundFaxes.advancedEmailAddresses[i]}.ps.ringcentral.com`
+                }
+            }
+
+            if (bundle.extendedData?.notifications?.missedCalls.advancedEmailAddresses) {
+                for (let i = 0; i < bundle.extendedData!.notifications!.missedCalls.advancedEmailAddresses.length; i++) {
+                    bundle.extendedData!.notifications!.missedCalls.advancedEmailAddresses[i] = `${bundle.extendedData?.notifications?.missedCalls.advancedEmailAddresses[i]}.ps.ringcentral.com`
+                }
+            }
+
+            if (bundle.extendedData?.notifications?.inboundTexts.advancedEmailAddresses) {
+                for (let i = 0; i < bundle.extendedData!.notifications!.inboundTexts.advancedEmailAddresses.length; i++) {
+                    bundle.extendedData!.notifications!.inboundTexts.advancedEmailAddresses[i] = `${bundle.extendedData?.notifications?.inboundTexts.advancedEmailAddresses[i]}.ps.ringcentral.com`
+                }
+            }
+
+            if (bundle.extendedData?.notifications?.outboundFaxes.advancedEmailAddresses) {
+                for (let i = 0; i < bundle.extendedData!.notifications!.outboundFaxes.advancedEmailAddresses.length; i++) {
+                    bundle.extendedData!.notifications!.outboundFaxes.advancedEmailAddresses[i] = `${bundle.extendedData?.notifications?.outboundFaxes.advancedEmailAddresses[i]}.ps.ringcentral.com`
+                }
+            }
+
             const response = await RestCentral.put(baseNotificationsSettingsURL.replace('extensionId', `${bundle.extension.data.id}`), headers, bundle.extendedData?.notifications)
 
             if (response.rateLimitInterval > 0) {

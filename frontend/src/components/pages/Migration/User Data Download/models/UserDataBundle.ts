@@ -242,20 +242,25 @@ export interface Notifications {
         notifyByEmail: boolean
         includeAttachment: boolean
         markAsRead: boolean
+        advancedEmailAddresses?: string[]
     }
     inboundFaxes: {
         notifyByEmail: boolean
         includeAttachment: boolean
         markAsRead: boolean
+        advancedEmailAddresses?: string[]
     }
     missedCalls: {
         notifyByEmail: boolean
+        advancedEmailAddresses?: string[]
     }
     inboundTexts: {
         notifyByEmail: boolean
+        advancedEmailAddresses?: string[]
     }
     outboundFaxes: {
         notifyByEmail: boolean
+        advancedEmailAddresses?: string[]
     }
 }
 
