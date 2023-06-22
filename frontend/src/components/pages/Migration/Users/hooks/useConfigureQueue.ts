@@ -182,8 +182,10 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
                 delete bundle.extendedData.notifications.emailRecipients
             }
 
-            for (let i = 0; i < bundle.extendedData!.notifications!.emailAddresses.length; i++) {
-                bundle.extendedData!.notifications!.emailAddresses[i] = `${bundle.extendedData?.notifications?.emailAddresses[i]}.ps.ringcentral.com`
+            if (bundle.extendedData?.notifications?.emailAddresses) {
+                for (let i = 0; i < bundle.extendedData!.notifications!.emailAddresses.length; i++) {
+                    bundle.extendedData!.notifications!.emailAddresses[i] = `${bundle.extendedData?.notifications?.emailAddresses[i]}.ps.ringcentral.com`
+                }
             }
 
             if (bundle.extendedData?.notifications?.voicemails.advancedEmailAddresses) {

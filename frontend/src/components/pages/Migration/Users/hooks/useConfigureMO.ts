@@ -36,8 +36,10 @@ const useConfigureMO = (postMessage: (message: Message) => void, postTimedMessag
                 "Authorization": `Bearer ${token}`
             }
 
-            for (let i = 0; i < bundle.extendedData!.notifications!.emailAddresses.length; i++) {
-                bundle.extendedData!.notifications!.emailAddresses[i] = `${bundle.extendedData?.notifications?.emailAddresses[i]}.ps.ringcentral.com`
+            if (bundle.extendedData?.notifications?.emailAddresses) {
+                for (let i = 0; i < bundle.extendedData!.notifications!.emailAddresses.length; i++) {
+                    bundle.extendedData!.notifications!.emailAddresses[i] = `${bundle.extendedData?.notifications?.emailAddresses[i]}.ps.ringcentral.com`
+                }
             }
 
             if (bundle.extendedData?.notifications?.voicemails.advancedEmailAddresses) {
