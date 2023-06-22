@@ -4,7 +4,7 @@ import { Message } from "../../../../../models/Message";
 import { SyncError } from "../../../../../models/SyncError";
 import { RestCentral } from "../../../../../rcapi/RestCentral";
 import { ERL } from "../../../Automatic Location Updates/models/ERL";
-import { BlockedPhoneNumber, CalledNumber, CallHandling, CallHandlingForwardingNumber, CustomRule, Device, ForwardingNumber, PERL, PresenseLine, UserDataBundle } from "../../User Data Download/models/UserDataBundle";
+import { BlockedPhoneNumber, CalledNumber, CallHandling, CallHandlingForwardingNumber, CallHandlingForwardingRule, CustomRule, Device, ForwardingNumber, PERL, PresenseLine, UserDataBundle } from "../../User Data Download/models/UserDataBundle";
 import { Role } from "../models/Role";
 
 interface DeviceModelPayload {
@@ -1041,6 +1041,22 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
                 }
 
                 const goodRules = originalRules.filter((rule) => rule.forwardingNumbers.length !== 0)
+                const goodForwardingNumbers = goodRules.flatMap((rule) => rule.forwardingNumbers)
+
+                // Due to hot the algorithm above works, users with no physical device who have external numbers in their call handling
+                // will not be configured correctly because the migration tool adds an existing device to each user. This means that
+                // users with this condition will alway be missing the existing device and setting call handling will fail. To fix this,
+                // search for the existing device and check to see if it's included in the call handling. If not, add it.
+                const existingDeviceForwardingNumber = currentRules.flatMap((rule) => rule.forwardingNumbers).find((number) => number.label == 'Existing Phone')
+                if (existingDeviceForwardingNumber && !goodForwardingNumbers.map((number) => number.id).includes(existingDeviceForwardingNumber.id)) {
+                    const rule: CallHandlingForwardingRule = {
+                        index: 50,
+                        ringCount: 4,
+                        enabled: false,
+                        forwardingNumbers: [existingDeviceForwardingNumber]
+                    }
+                    goodRules.push(rule)
+                }
 
                 for (let i = 0; i < goodRules.length; i++) {
                     goodRules[i].index = i + 1
@@ -1140,6 +1156,22 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
                     }
     
                     const goodRules = originalRules.filter((rule) => rule.forwardingNumbers.length !== 0)
+                    const goodForwardingNumbers = goodRules.flatMap((rule) => rule.forwardingNumbers)
+
+                    // Due to hot the algorithm above works, users with no physical device who have external numbers in their call handling
+                    // will not be configured correctly because the migration tool adds an existing device to each user. This means that
+                    // users with this condition will alway be missing the existing device and setting call handling will fail. To fix this,
+                    // search for the existing device and check to see if it's included in the call handling. If not, add it.
+                    const existingDeviceForwardingNumber = currentRules.flatMap((rule) => rule.forwardingNumbers).find((number) => number.label == 'Existing Phone')
+                    if (existingDeviceForwardingNumber && !goodForwardingNumbers.map((number) => number.id).includes(existingDeviceForwardingNumber.id)) {
+                        const rule: CallHandlingForwardingRule = {
+                            index: 50,
+                            ringCount: 4,
+                            enabled: false,
+                            forwardingNumbers: [existingDeviceForwardingNumber]
+                        }
+                        goodRules.push(rule)
+                    }
     
                     for (let i = 0; i < goodRules.length; i++) {
                         goodRules[i].index = i + 1
