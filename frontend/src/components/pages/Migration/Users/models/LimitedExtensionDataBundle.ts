@@ -4,7 +4,7 @@ import { CallHandling, Device, PERL, PhoneNumber } from "../../User Data Downloa
 export class LimitedExtensionDataBundle {
     public hasEncounteredFatalError = false
     
-    constructor(public extension: Extension, public extendedData?: LEExtendedData, public phoneNumberMap?: Map<string, string>) {}
+    constructor(public extension: Extension, public extendedData?: LEExtendedData, public phoneNumberMap?: Map<string, PhoneNumber>) {}
 }
 
 export interface LEExtendedData {

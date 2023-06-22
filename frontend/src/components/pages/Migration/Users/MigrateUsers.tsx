@@ -530,7 +530,7 @@ const MigrateUsers = () => {
             if (!map) continue
 
             for (const [key, value] of map?.entries()) {
-                numberMapRows.push(new PhoneNumberMapRow(key, value, bundle.extension.name, bundle.extension.extensionNumber, 'Site', bundle.extension.name))
+                numberMapRows.push(new PhoneNumberMapRow(key, value.phoneNumber, bundle.extension.name, bundle.extension.extensionNumber, 'Site', bundle.extension.name))
             }
         }
 
@@ -539,7 +539,7 @@ const MigrateUsers = () => {
             if (!map) continue
 
             for (const [key, value] of map?.entries()) {
-                numberMapRows.push(new PhoneNumberMapRow(key, value, bundle.extension.data.name, bundle.extension.data.extensionNumber, bundle.extension.prettyType(), bundle.extension.data.site?.name ?? ''))
+                numberMapRows.push(new PhoneNumberMapRow(key, value.phoneNumber, bundle.extension.data.name, bundle.extension.data.extensionNumber, bundle.extension.prettyType(), bundle.extension.data.site?.name ?? ''))
             }
         }
 
@@ -548,7 +548,7 @@ const MigrateUsers = () => {
             if (!map) continue
 
             for (const [key, value] of map?.entries()) {
-                numberMapRows.push(new PhoneNumberMapRow(key, value, bundle.extension.data.name, bundle.extension.data.extensionNumber, bundle.extension.prettyType(), bundle.extension.data.site?.name ?? ''))
+                numberMapRows.push(new PhoneNumberMapRow(key, value.phoneNumber, bundle.extension.data.name, bundle.extension.data.extensionNumber, bundle.extension.prettyType(), bundle.extension.data.site?.name ?? ''))
             }
         }
 
@@ -557,7 +557,7 @@ const MigrateUsers = () => {
             if (!map) continue
 
             for (const [key, value] of map?.entries()) {
-                numberMapRows.push(new PhoneNumberMapRow(key, value, bundle.extension.data.name, bundle.extension.data.extensionNumber, bundle.extension.prettyType(), bundle.extension.data.site?.name ?? ''))
+                numberMapRows.push(new PhoneNumberMapRow(key, value.phoneNumber, bundle.extension.data.name, bundle.extension.data.extensionNumber, bundle.extension.prettyType(), bundle.extension.data.site?.name ?? ''))
             }
         }
 
@@ -566,7 +566,7 @@ const MigrateUsers = () => {
             if (!map) continue
 
             for (const [key, value] of map?.entries()) {
-                numberMapRows.push(new PhoneNumberMapRow(key, value, bundle.extension.data.name, bundle.extension.data.extensionNumber, bundle.extension.prettyType(), bundle.extension.data.site?.name ?? ''))
+                numberMapRows.push(new PhoneNumberMapRow(key, value.phoneNumber, bundle.extension.data.name, bundle.extension.data.extensionNumber, bundle.extension.prettyType(), bundle.extension.data.site?.name ?? ''))
             }
         }
 
@@ -575,7 +575,7 @@ const MigrateUsers = () => {
             if (!map) continue
 
             for (const [key, value] of map?.entries()) {
-                numberMapRows.push(new PhoneNumberMapRow(key, value, bundle.extension.data.name, bundle.extension.data.extensionNumber, bundle.extension.prettyType(), bundle.extension.data.site?.name ?? ''))
+                numberMapRows.push(new PhoneNumberMapRow(key, value.phoneNumber, bundle.extension.data.name, bundle.extension.data.extensionNumber, bundle.extension.prettyType(), bundle.extension.data.site?.name ?? ''))
             }
         }
 

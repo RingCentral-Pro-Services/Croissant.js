@@ -33,14 +33,14 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
             bundle.extension.data.status = 'NotActivated'
 
             const phoneNumberBundle: PhoneNumber[] = []
-            bundle.phoneNumberMap = new Map<string, string>()
+            bundle.phoneNumberMap = new Map<string, PhoneNumber>()
 
             if (bundle.extendedData?.directNumbers) {
                 for (let i = 0; i < bundle.extendedData!.directNumbers!.length; i++) {
                     if (phoneNumbers.length !== 0) {
                         const tempNumber = phoneNumbers.pop()!
                         const originalNumber = bundle.extendedData.directNumbers[i]
-                        bundle.phoneNumberMap.set(originalNumber.phoneNumber, tempNumber.phoneNumber)
+                        bundle.phoneNumberMap.set(originalNumber.phoneNumber, tempNumber)
                         phoneNumberBundle.push(tempNumber)
                     }
                 }
@@ -55,7 +55,7 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
                         continue
                     }
                     const unassignedExt = unassignedExtensions.pop()!
-                    bundle.phoneNumberMap.set(bundle.extendedData!.devices[i].phoneLines[0].phoneInfo.phoneNumber, unassignedExt.data!.phoneNumbers![0].phoneNumber)
+                    bundle.phoneNumberMap.set(bundle.extendedData!.devices[i].phoneLines[0].phoneInfo.phoneNumber, unassignedExt.data!.phoneNumbers![0])
                     unassignedIDs.push(`${unassignedExt.data.id}`)
                 }
 

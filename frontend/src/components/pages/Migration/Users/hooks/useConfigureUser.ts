@@ -1244,7 +1244,7 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
                         continue
                     }
 
-                    goodNumbers.push({phoneNumber: tempNumber})
+                    goodNumbers.push({phoneNumber: tempNumber.phoneNumber})
                 }
                 customRule.calledNumbers = goodNumbers
             }

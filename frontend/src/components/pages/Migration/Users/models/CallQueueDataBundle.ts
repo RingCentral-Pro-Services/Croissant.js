@@ -4,7 +4,7 @@ import { BusinessHours, CallHandling, CustomRule, Notifications, PhoneNumber } f
 export class CallQueueDataBundle {
     public hasEncounteredFatalError = false
     
-    constructor(public extension: Extension, public extendedData?: ExtendedQueueData, public phoneNumberMap?: Map<string, string>) {}
+    constructor(public extension: Extension, public extendedData?: ExtendedQueueData, public phoneNumberMap?: Map<string, PhoneNumber>) {}
 }
 
 export interface ExtendedQueueData {

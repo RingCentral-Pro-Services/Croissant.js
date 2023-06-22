@@ -26,7 +26,7 @@ const useMigrateSites = (postMessage: (message: Message) => void, postTimedMessa
         for (const site of sites) {
             await makeSite(site.extension, accessToken)
 
-            site.phoneNumberMap = new Map<string, string>()
+            site.phoneNumberMap = new Map<string, PhoneNumber>()
 
             for (const number of site.extendedData!.directNumbers!) {
                 if (availablePhoneNumbers.length === 0) {
@@ -35,7 +35,7 @@ const useMigrateSites = (postMessage: (message: Message) => void, postTimedMessa
                 }
 
                 const tempNumber = availablePhoneNumbers.pop()!
-                site.phoneNumberMap.set(number.phoneNumber, tempNumber.phoneNumber)
+                site.phoneNumberMap.set(number.phoneNumber, tempNumber)
 
                 await assignPhoneNumber(site, tempNumber.id, accessToken)
             }

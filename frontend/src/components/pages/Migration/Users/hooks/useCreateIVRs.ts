@@ -23,7 +23,7 @@ const useCreateIVRs = (postMessage: (message: Message) => void, postTimedMessage
 
         for (let i = 0; i < bundles.length; i++) {
             let bundle = bundles[i]
-            bundle.phoneNumberMap = new Map<string, string>()
+            bundle.phoneNumberMap = new Map<string, PhoneNumber>()
 
             if (bundle.extension.data.site && bundle.extension.data.site.name !== 'Main Site') {
                 const site = targetExtensions.find((ext) => ext.prettyType() === 'Site' && ext.data.name === bundle.extension.data.site?.name)
@@ -47,7 +47,7 @@ const useCreateIVRs = (postMessage: (message: Message) => void, postTimedMessage
             for (const number of bundle.extendedData!.directNumbers!) {
                 if (availablePhoneNumbers.length > 0) {
                     const tempNumber = availablePhoneNumbers.pop()!
-                    bundle.phoneNumberMap.set(number.phoneNumber, tempNumber.phoneNumber)
+                    bundle.phoneNumberMap.set(number.phoneNumber, tempNumber)
                     numbers.push(tempNumber)
                 }
             }

@@ -2,7 +2,7 @@ import { Extension } from "../../../../../models/Extension";
 import { BusinessHours, CallHandling, CustomRule, PhoneNumber } from "../../User Data Download/models/UserDataBundle";
 
 export class SiteDataBundle {    
-    constructor(public extension: SiteData, public extendedData?: ExtendedSiteData, public phoneNumberMap?: Map<string, string>) {}
+    constructor(public extension: SiteData, public extendedData?: ExtendedSiteData, public phoneNumberMap?: Map<string, PhoneNumber>) {}
 }
 
 export interface ExtendedSiteData {

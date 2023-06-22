@@ -10,7 +10,7 @@ export class UserDataBundle {
     public userGroups = ''
     public hasEncounteredFatalError = false
 
-    constructor(public extension: Extension, public extendedData: ExtendedUserData | undefined, public phoneNumberMap?: Map<string, string>) {}
+    constructor(public extension: Extension, public extendedData: ExtendedUserData | undefined, public phoneNumberMap?: Map<string, PhoneNumber>) {}
 
     toRows(): UserDataRow[] {
         const rows: UserDataRow[] = []

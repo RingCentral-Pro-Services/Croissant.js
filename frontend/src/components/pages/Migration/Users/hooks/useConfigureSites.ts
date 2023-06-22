@@ -219,7 +219,7 @@ const useConfigureSites = (postMessage: (message: Message) => void, postTimedMes
                         continue
                     }
 
-                    goodNumbers.push({phoneNumber: tempNumber})
+                    goodNumbers.push({phoneNumber: tempNumber.phoneNumber})
                 }
                 customRule.calledNumbers = goodNumbers
             }

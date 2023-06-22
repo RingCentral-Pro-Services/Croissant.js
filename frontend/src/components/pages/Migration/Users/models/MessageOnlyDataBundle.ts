@@ -5,7 +5,7 @@ import { Notifications, PhoneNumber } from "../../User Data Download/models/User
 export class MessageOnlyDataBundle {
     public hasEncounteredFatalError = false
     
-    constructor(public extension: Extension, public extendedData?: ExtendedMOData, public phoneNumberMap?: Map<string, string>) {}
+    constructor(public extension: Extension, public extendedData?: ExtendedMOData, public phoneNumberMap?: Map<string, PhoneNumber>) {}
 }
 
 interface ExtendedMOData {
