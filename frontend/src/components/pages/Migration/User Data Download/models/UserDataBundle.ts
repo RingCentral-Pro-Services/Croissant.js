@@ -154,7 +154,7 @@ export interface CallHandling {
             }
         }
     }
-    voicemail: {
+    voicemail?: {
         enabled: boolean
         recipient: {
             id: string

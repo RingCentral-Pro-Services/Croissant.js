@@ -1050,7 +1050,7 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
 
         // Adjust voicemail recipient
         if (originalCallHandling.voicemail) {
-            const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === `${originalCallHandling?.voicemail.recipient.id}`)
+            const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === `${originalCallHandling?.voicemail?.recipient.id}`)
             if (!originalExtension) {
                 postMessage(new Message(`Failed to find original ID for voicemail recipient on ${bundle.extension.data.name}. Original ID: ${originalCallHandling.voicemail.recipient.id}`, 'error'))
                 postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to set voicemail recipient', 'Original ID not found']))
@@ -1153,7 +1153,7 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
             if (originalCallHandling.voicemail && originalCallHandling.voicemail.enabled) {
                 console.log('original call handling')
                 console.log(originalCallHandling.voicemail.recipient)
-                const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === `${originalCallHandling?.voicemail.recipient.id}`)
+                const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === `${originalCallHandling?.voicemail?.recipient.id}`)
                 if (!originalExtension) {
                     postMessage(new Message(`Failed to find original ID for after hours voicemail recipient on ${bundle.extension.data.name}. Original ID: ${originalCallHandling.voicemail.recipient.id}`, 'error'))
                     postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to set voicemail recipient', 'Original ID not found']))

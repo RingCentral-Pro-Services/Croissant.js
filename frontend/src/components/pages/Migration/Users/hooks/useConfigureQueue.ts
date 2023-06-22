@@ -605,6 +605,8 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
     // This should probably be split into multiple functions
     const adjustCallHandling = (bundle: CallQueueDataBundle, callHandling: CallHandling, originalExtensions: Extension[], targetExtensions: Extension[]) => {
 
+        if (callHandling.callHandlingAction === 'TransferToExtension' || callHandling.callHandlingAction === 'PlayAnnouncementOnly' || callHandling.callHandlingAction === 'UnconditionalForwarding') delete callHandling.voicemail
+
         // Adjust transfer extension
         if (callHandling.transfer) {
             const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === `${callHandling.transfer.extension.id}`)
@@ -626,7 +628,7 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
 
         // Adjust voicemail recipient
         if (callHandling.voicemail && callHandling.voicemail.enabled) {
-            const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === `${callHandling.voicemail.recipient.id}`)
+            const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === `${callHandling.voicemail?.recipient.id}`)
             if (!originalExtension) {
                 postMessage(new Message(`Could not set call handling for ${bundle.extension.data.name} because the original voicemail recipient wasn't found`, 'error'))
                 return
