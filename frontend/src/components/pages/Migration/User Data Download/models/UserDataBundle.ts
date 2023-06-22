@@ -86,7 +86,6 @@ export interface Device {
         stateName: string
         country: string
         countryName: string
-
     }
     emergency: {
         location?: {
@@ -94,6 +93,17 @@ export interface Device {
             name: string
         }
         visibility: string
+        address?: {
+            street: string
+            street2: string
+            city: string
+            zip: string
+            customerName: string
+            state: string
+            stateName: string
+            country: string
+            countryName: string
+        }
     }
     phoneLines: [{
         lineType: string

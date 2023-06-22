@@ -342,7 +342,11 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
 
             const erl = companyERLs.find((erl) => erl.name === deviceData.device.emergency.location?.name && erl.visibility === deviceData.device.emergency.visibility)
             const perl = personalERLs.find((erl) => erl.name === deviceData.device.emergency.location?.name)
-            if (!erl && !perl) {
+
+            // If we couldn't find the ERL by name, try searching for one with the same address. This is necessary because some user in some accounts
+            // aren't using an ERL location due to setting their ERL before locations were introduced.
+            const fallbackERL = companyERLs.find((erl) => erl.address.street === deviceData.device.emergency.address?.street && erl.address.city === deviceData.device.emergency.address.city && erl.address.state === deviceData.device.emergency.address.state && deviceData.device.emergency.address.country)
+            if (!erl && !perl && !fallbackERL) {
                 postMessage(new Message(`ERL for ${bundle.extension.data.name} was not found. ERL not set`, 'error'))
                 postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to set ERL', deviceData.device.emergency.location?.name ?? '']))
                 return
@@ -351,7 +355,7 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
             const body = {
                 emergency: {
                     location: {
-                        id: erl?.id ?? perl?.id
+                        id: erl?.id ?? perl?.id ?? fallbackERL?.id
                     }
                 }
             }
