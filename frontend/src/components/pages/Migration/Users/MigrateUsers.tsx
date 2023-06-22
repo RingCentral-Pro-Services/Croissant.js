@@ -232,7 +232,7 @@ const MigrateUsers = () => {
     }, [selectedExtensionTypes, selectedSiteNames])
 
     const handleFilterSelection = (selected: DataGridFormattable[]) => {
-        if (isPending) return
+        if (isPending || isPullingData || isMigrating) return
         const extensions = selected as Extension[]
         setSelectedExtensions(extensions)
     }
