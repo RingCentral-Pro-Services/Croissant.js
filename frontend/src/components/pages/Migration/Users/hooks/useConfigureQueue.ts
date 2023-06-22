@@ -645,6 +645,7 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
             callHandling.voicemail.recipient.id = `${newExtension.data.id}`
             delete callHandling.voicemail.recipient.displayName
             delete callHandling.voicemail.recipient.uri
+            if (`${callHandling.voicemail.recipient.id}` === `${bundle.extension.data.id}`) delete callHandling.voicemail
         }
 
         // Adjust missed call destination
