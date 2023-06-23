@@ -126,6 +126,7 @@ const useConfigureSites = (postMessage: (message: Message) => void, postTimedMes
             }
 
             const body = {
+                callHandlingAction: 'TransferToExtension',
                 transfer: {
                     extension: {
                         id: transferID
