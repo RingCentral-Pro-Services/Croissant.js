@@ -4,7 +4,7 @@ import { Message } from "../../../../../models/Message";
 import { SyncError } from "../../../../../models/SyncError";
 import { RestCentral } from "../../../../../rcapi/RestCentral";
 import { ERL } from "../../../Automatic Location Updates/models/ERL";
-import { BlockedPhoneNumber, CalledNumber, CallHandling, CallHandlingForwardingNumber, CallHandlingForwardingRule, CustomRule, Device, ForwardingNumber, PERL, PresenseLine, UserDataBundle } from "../../User Data Download/models/UserDataBundle";
+import { BlockedPhoneNumber, CalledNumber, CallerIDDevice, CallerIDFeature, CallHandling, CallHandlingForwardingNumber, CallHandlingForwardingRule, CustomRule, Device, ForwardingNumber, PERL, PhoneNumber, PresenseLine, UserDataBundle } from "../../User Data Download/models/UserDataBundle";
 import { Role } from "../models/Role";
 
 interface DeviceModelPayload {
@@ -39,9 +39,10 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
     const basePERLURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/emergency-locations'
     const baseCustomGreetingURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/greeting'
     const baseCustomRuleURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/answering-rule'
+    const baseCallerIdURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/caller-id'
     const baseWaitingPeriod = 250
 
-    const configureUser = async (bundle: UserDataBundle, companyERLs: ERL[], originalExtensions: Extension[], targetExtensions: Extension[], roles: Role[]) => {
+    const configureUser = async (bundle: UserDataBundle, companyERLs: ERL[], originalExtensions: Extension[], targetExtensions: Extension[], roles: Role[], globalSiteNumberMap: Map<string, PhoneNumber>) => {
         
         // Don't bother trying to configure the user if they weren't created
         if (bundle.hasEncounteredFatalError) return
@@ -126,6 +127,8 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
                 }
             }    
         }
+
+        await setCallerID(bundle, globalSiteNumberMap, deviceData, accessToken)
 
         // for (const erl of bundle.extendedData!.pERLs!) {
         //     await addPERL(bundle, erl, accessToken)
@@ -1386,6 +1389,120 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
             console.log(e)
             postMessage(new Message(`Failed to add custom rule ${customRule.name} on ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to add custom rule', customRule.name], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const setCallerID = async (bundle: UserDataBundle, globalSiteNumberMap: Map<string, PhoneNumber>, devices: DeviceData[] | undefined, token: string) => {
+        if (!bundle.extendedData?.callerID) return
+
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+
+            const resultingCallerID = structuredClone(bundle.extendedData.callerID)
+
+            const goodDevices: CallerIDDevice[] = []
+            const badDevices: CallerIDDevice[] = []
+            if (devices) {
+                // Swap out caller ID by device
+                for (let i = 0; i < resultingCallerID.byDevice.length; i++) {
+                    const deviceName = resultingCallerID.byDevice[i].device.name
+                    const originalPhoneNumber = resultingCallerID.byFeature[i].callerId?.phoneInfo?.phoneNumber
+
+                    if (!originalPhoneNumber) {
+                        badDevices.push(resultingCallerID.byDevice[i])
+                        continue
+                    }
+
+                    const targetDevice = devices.find((device) => device.device.name === deviceName)
+                    if (!targetDevice) {
+                        badDevices.push(resultingCallerID.byDevice[i])
+                        continue
+                    }
+
+                    const tempDirectNumber = bundle.phoneNumberMap?.get(originalPhoneNumber)
+                    const tempSiteNumber = globalSiteNumberMap.get(originalPhoneNumber)
+
+                    if (!tempDirectNumber && !tempSiteNumber) {
+                        badDevices.push(resultingCallerID.byDevice[i])
+                        continue
+                    }
+
+                    const deviceCallerID: CallerIDDevice = {
+                        device: {
+                            id: targetDevice.newDeviceID,
+                            name: targetDevice.device.name
+                        },
+                        callerId: {
+                            type: resultingCallerID.byDevice[i].callerId.type,
+                            phoneInfo: {
+                                phoneNumber: "",
+                                id: tempDirectNumber?.id ?? tempSiteNumber?.id,
+                            }
+                        }
+                    }
+
+                    goodDevices.push(deviceCallerID)
+                }
+            }
+
+            resultingCallerID.byDevice = goodDevices
+
+            // Swap out caller ID by feature
+            const goodFeatures: CallerIDFeature[] = []
+            const badFeatures: CallerIDFeature[] = []
+            for (let i = 0; i < resultingCallerID.byFeature.length; i++) {
+                const originalPhoneNumber = resultingCallerID.byFeature[i].callerId?.phoneInfo?.phoneNumber
+                if (!originalPhoneNumber) continue
+                const tempDirectNumber = bundle.phoneNumberMap?.get(originalPhoneNumber)
+                const tempSiteNumber = globalSiteNumberMap.get(originalPhoneNumber)
+
+                if (!tempDirectNumber && !tempSiteNumber) {
+                    badFeatures.push(resultingCallerID.byFeature[i])
+                    continue
+                }
+
+                const feature: CallerIDFeature = {
+                    feature: resultingCallerID.byFeature[i].feature,
+                    callerId: {
+                        type: resultingCallerID.byFeature[i].callerId.type,
+                        phoneInfo: {
+                            phoneNumber: "",
+                            id: tempDirectNumber?.id ?? tempSiteNumber?.id
+                        }
+                    }
+                }
+                goodFeatures.push(feature)
+            }
+
+            resultingCallerID.byFeature = goodFeatures
+
+            const body = {
+                byDevice: resultingCallerID.byDevice,
+                byFeature: resultingCallerID.byFeature,
+            }
+
+
+            const response = await RestCentral.put(baseCallerIdURL.replace('extensionId', `${bundle.extension.data.id}`), headers, body)
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to set caller ID`)
+            console.log(e)
+            postMessage(new Message(`Failed to set caller ID for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to set caller ID', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }

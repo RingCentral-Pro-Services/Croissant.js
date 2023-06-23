@@ -276,31 +276,35 @@ export interface Notifications {
 
 export interface CallerID {
     uri: string
-    byDevice: [
-        {
-            device: {
-                id: string
-                name: string
-            }
+    byDevice: CallerIDDevice[]
+    byFeature: CallerIDFeature[]
+}
+
+export interface CallerIDDevice {
+    device: {
+        id: string
+        name: string
+    }
+    callerId: {
+        type: string
+        phoneInfo: {
+            phoneNumber: string
+            id?: string
+            uri?: string
+        }
+    }
+}
+
+export interface CallerIDFeature {
+    feature: string
             callerId: {
                 type: string
                 phoneInfo: {
                     phoneNumber: string
+                    id?: string
+                    uri?: string
                 }
             }
-        }
-    ]
-    byFeature: [
-        {
-            feature: string
-            callerId: {
-                type: string
-                phoneInfo: {
-                    phoneNumber: string
-                }
-            }
-        }
-    ]
 }
 
 export interface BlockedCallSettings {

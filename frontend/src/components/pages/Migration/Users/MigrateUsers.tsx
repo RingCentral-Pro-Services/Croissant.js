@@ -471,8 +471,27 @@ const MigrateUsers = () => {
             await setRecordingSettings(callRecordingSettings, originalExtensionList, targetExts)
         }
 
+        const globalSiteNumberMap: Map<string, PhoneNumber> = new Map()
+        for (const bundle of siteBundles) {
+            const map = bundle.phoneNumberMap
+            if (!map) continue
+
+            for (const [key, value] of map.entries()) {
+                globalSiteNumberMap.set(key, value)
+            }
+        }
+
+        for (const bundle of callQueueBundles) {
+            const map = bundle.phoneNumberMap
+            if (!map) continue
+
+            for (const [key, value] of map.entries()) {
+                globalSiteNumberMap.set(key, value)
+            }
+        }
+
         await configureQueues(callQueueBundles, originalExtensionList, targetExts)
-        await configureUsers(userDataBundles, targetERLs, originalExtensionList, targetExts, roles)
+        await configureUsers(userDataBundles, targetERLs, originalExtensionList, targetExts, roles, globalSiteNumberMap)
         await configureMOs(messageOnlyBundles, originalExtensionList, targetExts)
         await configureIVRs(ivrBundles, originalExtensionList, targetExts, originalAccountPrompts, prompts)
         if (shouldMigrateSites) {

@@ -3,7 +3,7 @@ import { Extension } from "../../../../../models/Extension";
 import { Message } from "../../../../../models/Message";
 import { SyncError } from "../../../../../models/SyncError";
 import { ERL } from "../../../Automatic Location Updates/models/ERL";
-import { UserDataBundle } from "../../User Data Download/models/UserDataBundle";
+import { PhoneNumber, UserDataBundle } from "../../User Data Download/models/UserDataBundle";
 import { Role } from "../models/Role";
 import useConfigureUser from "./useConfigureUser";
 
@@ -12,7 +12,7 @@ const useConfigureUsers = (postMessage: (message: Message) => void, postTimedMes
     const [maxProgress, setMaxProgress] = useState(2)
     const {configureUser} = useConfigureUser(postMessage, postTimedMessage, postError)
 
-    const configureUsers = async (bundles: UserDataBundle[], companyERLs: ERL[], originalExtensions: Extension[], targetExtensions: Extension[], roles: Role[]) => {
+    const configureUsers = async (bundles: UserDataBundle[], companyERLs: ERL[], originalExtensions: Extension[], targetExtensions: Extension[], roles: Role[], globalSiteNumberMap: Map<string, PhoneNumber>) => {
         const accessToken = localStorage.getItem('cs_access_token')
         if (!accessToken) {
             throw new Error('No access token')
@@ -20,7 +20,7 @@ const useConfigureUsers = (postMessage: (message: Message) => void, postTimedMes
 
         setMaxProgress(bundles.length)
         for (const bundle of bundles) {
-            await configureUser(bundle, companyERLs, originalExtensions, targetExtensions, roles)
+            await configureUser(bundle, companyERLs, originalExtensions, targetExtensions, roles, globalSiteNumberMap)
             setProgressValue((prev) => prev + 1)
         }
     }
