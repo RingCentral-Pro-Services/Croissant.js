@@ -46,6 +46,10 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
                 "Authorization": `Bearer ${token}`
             }
             bundle.extension.data.subType = 'VirtualUser'
+            if (bundle.extension.data.extensionNumber === '0') {
+                postMessage(new Message(`Next available extension used for ${bundle.extension.data.name} because zero cannot be used`, 'warning'))
+                postError(new SyncError(bundle.extension.data.name, '0', ['Extension number changed', '']))
+            }
             const response = await RestCentral.post(baseVirtualUserURL, headers, bundle.extension.payload(true))
             bundle.extension.data.id = response.data.id
 

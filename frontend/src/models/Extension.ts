@@ -147,7 +147,8 @@ export class Extension implements ExcelFormattable, DataGridFormattable {
                 ...(this.data.contact.jobTitle && {jobTitle: this.data.contact.jobTitle}),
                 ... (this.data.type === 'Limited' && {lastName: ''})
             },
-            extensionNumber: this.data.extensionNumber,
+            ...(this.data.extensionNumber !== '0' && {extensionNumber: this.data.extensionNumber}),
+            // extensionNumber: this.data.extensionNumber,
             type: this.data.type === 'VirtualUser' ? 'User' : this.data.type,
             status: this.status(),
             ...(this.data.type === 'VirtualUser' && {subType: 'VideoPro'}),
