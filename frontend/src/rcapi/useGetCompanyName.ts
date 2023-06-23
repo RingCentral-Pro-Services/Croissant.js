@@ -21,7 +21,7 @@ const useGetCompanyName = () => {
                     "Authorization": `Bearer ${accessToken}`
                 }
                 let res = await RestCentral.get(url, headers)
-                setCompantName(res.data.company)
+                setCompantName(res.data.company ?? '')
                 setIsCompanyNamePending(false)
             }
             catch (e) {
