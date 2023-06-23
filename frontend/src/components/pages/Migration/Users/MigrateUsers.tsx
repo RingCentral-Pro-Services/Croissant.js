@@ -72,6 +72,9 @@ import { CallRecordingDataBundle } from "./models/CallRecordingDataBundle";
 import useSetCallRecordingSettings from "./hooks/useSetCallRecordingSettings";
 import { UserDataRow } from "../User Data Download/models/UserDataRow";
 import { ERL } from "../../Automatic Location Updates/models/ERL";
+import useFetchMainSite from "./hooks/useFetchMainSite";
+import useConfigureMainSite from "./hooks/useConfigureMainSite";
+import useAssignMainSiteNumbers from "./hooks/useAssignMainSiteNumbers";
 
 
 const MigrateUsers = () => {
@@ -105,6 +108,7 @@ const MigrateUsers = () => {
     const [siteBundles, setSiteBundles] = useState<SiteDataBundle[]>([])
     const [costCenterBundles, setCostCenterBundles] = useState<CostCenterDataBundle[]>([])
     const [callRecordingSettings, setCallRecordingSettings] = useState<CallRecordingDataBundle>()
+    const [mainSiteBundle, setMainSiteBundle] = useState<SiteDataBundle>()
 
     const handleSiteFetchCompletion = (sites: SiteData[]) => {
         setSites(sites)
@@ -127,7 +131,7 @@ const MigrateUsers = () => {
     const {fetchCustomRoles} = useCustomRoleList(postMessage, postTimedMessage, postError)
     const {fetchPredefinedRoles} = usePredefinedRoleList(postMessage, postTimedMessage, postError)
     const {getPhoneNumberMap, phoneNumbers, phoneNumberMap, isPhoneNumberMapPending} = usePhoneNumberList()
-    const {getPhoneNumberMap: getOriginalPhoneNumbers, phoneNumberMap: originalPhoneNumberMap, isPhoneNumberMapPending: isOriginalPhoneNumberListPending} = usePhoneNumberList()
+    const {getPhoneNumberMap: getOriginalPhoneNumbers, phoneNumberMap: originalPhoneNumberMap, phoneNumbers: originalPhoneNumbers, isPhoneNumberMapPending: isOriginalPhoneNumberListPending} = usePhoneNumberList()
     const {fetchMOs, progressValue: messageOnlyFetchProgress , maxProgress: maxMessageOnlyFetchProgress} = useFetchMOs(postMessage, postTimedMessage, postError)
     const {fetchCallQueues, progressValue: callQueueFetchProgress, maxProgress: maxCallQueueFetchProgress} = useFetchCallQueues(postMessage, postTimedMessage, postError)
     const {fetchIVRs, progressValue: ivrFetchProgress, maxProgress: maxIVRFetchProgress} = useFetchIVRs(postMessage, postTimedMessage, postError)
@@ -139,9 +143,11 @@ const MigrateUsers = () => {
     const {fetchParkLocations, progressValue: fetchParkLocationsProgress, maxProgress: maxFetchParkLocationsProgress} = useFetchParkLocations(postMessage, postTimedMessage, postError)
     const {fetchUserGroups, progressValue: fetchUserGroupsProgess, maxProgress: maxFetchUserGroupsProgress} = useFetchUserGroups(postMessage, postTimedMessage, postError)
     const {fetchSites: fetchSiteData, progressValue: fetchSitesProgress, maxProgress: maxFetchSitesProgress} = useFetchSites(postMessage, postTimedMessage, postError)
+    const {fetchMainSite, progressValue: fetchMainSiteProgess, maxProgress: maxFetchMainSiteProgress} = useFetchMainSite(postMessage, postTimedMessage, postError)
     const {fetchCostCenters} = useFetchCostCenters(postMessage, postTimedMessage, postError)
     const {fetchCallRecordingSettings} = useFetchCallRecordingSettings(postMessage, postTimedMessage, postError)
 
+    const {assignMainSiteNumbers, progressValue: assignMainSiteNumbersProgress, maxProgress: maxAssignMainSiteNumbersProgress} = useAssignMainSiteNumbers(postMessage, postTimedMessage, postError)
     const {migrateSites, maxProgress: maxSiteProgress, progressValue: siteMigrationProgress} = useMigrateSites(postMessage, postTimedMessage, postError)
     const {migrateCustomRoles, progressValue: customRoleProgress, maxProgress: maxCustomRoleProgress} = useMigrateCustomRoles(postMessage, postTimedMessage, postError)
     const {migrateERLs, progressValue: erlProgress, maxProgress: maxERLProgress} = useMigrateERLs(postMessage, postTimedMessage, postError)
@@ -158,6 +164,7 @@ const MigrateUsers = () => {
     const {createMonitoringGroups, progressValue: createMonitoringGroupsProgess, maxProgress: maxCreateMonitoringGroupsProgress} = useCreateCallMonitoringGroups(postMessage, postTimedMessage, postError)
     const {createParkLocations, progressValue: createParkLocationsProgress, maxProgress: maxCreateParkLocationsProgress} = useCreateParkLocations(postMessage, postTimedMessage, postError)
     const {createUserGroups, progressValue: createUserGroupsProgress, maxProgress: maxCreateUserGroupsProgress} = useCreateUserGroups(postMessage, postTimedMessage, postError)
+    const {configureMainSite, progressValue: configureMainSiteProgress, maxProgress: maxConfigureMainSiteProgress} = useConfigureMainSite(postMessage, postTimedMessage, postError)
     const {configureSites, progressValue: configureSitesProgress, maxProgress: maxConfigureSitesProgress} = useConfigureSites(postMessage, postTimedMessage, postError)
     const {createCostCenters, progressValue: createCostCentersProgress, maxProgress: maxCreateCostCentersProgress} = useCreateCostCenters(postMessage, postTimedMessage, postError)
     const {setCallRecordingSettings: setRecordingSettings} = useSetCallRecordingSettings(postMessage, postTimedMessage, postError)
@@ -239,6 +246,16 @@ const MigrateUsers = () => {
 
     const handleDisoverButtonClick = async () => {
         setIsPullingData(true)
+
+        // Main site
+        if (shouldMigrateSites && selectedSiteNames.includes('Main Site')) {
+            const mainSiteData = await fetchMainSite()
+            const autoReceptionistNumbers = originalPhoneNumbers.filter((number) => !number.extension && number.usageType === 'CompanyNumber')
+            mainSiteData.extendedData!.directNumbers = autoReceptionistNumbers
+            console.log('Main site')
+            console.log(mainSiteData)
+            setMainSiteBundle(mainSiteData)
+        }
 
         // Sites
         const selectedSites = sites.filter((site) => selectedSiteNames.includes(`${site.name}`))
@@ -362,6 +379,10 @@ const MigrateUsers = () => {
             }
             availablePhoneNumbers = phoneNumbers.filter((number) => number.extension && `${number.extension.id}` === `${extension.data.id}`)
             postMessage(new Message(`Discovered ${availablePhoneNumbers.length} numbers on extension ${specificExtension}`, 'info'))
+        }
+
+        if (shouldMigrateSites && mainSiteBundle) {
+            await assignMainSiteNumbers(mainSiteBundle, availablePhoneNumbers)
         }
 
         // Migrate sites
@@ -490,11 +511,21 @@ const MigrateUsers = () => {
             }
         }
 
+        const mainSiteMap = mainSiteBundle?.phoneNumberMap
+        if (mainSiteMap) {
+            for (const [key, value] of mainSiteMap?.entries()) {
+                globalSiteNumberMap.set(key, value)
+            }
+        }
+
         await configureQueues(callQueueBundles, originalExtensionList, targetExts)
         await configureUsers(userDataBundles, targetERLs, originalExtensionList, targetExts, roles, globalSiteNumberMap)
         await configureMOs(messageOnlyBundles, originalExtensionList, targetExts)
         await configureIVRs(ivrBundles, originalExtensionList, targetExts, originalAccountPrompts, prompts)
         if (shouldMigrateSites) {
+            if (mainSiteBundle) {
+                await configureMainSite(mainSiteBundle, originalExtensionList, targetExts)
+            }
             await configureSites(siteBundles, originalExtensionList, targetExts)
         }
         console.log('Post config bundles')
@@ -543,6 +574,14 @@ const MigrateUsers = () => {
 
     const handleDownloadNumberMapClick = () => {
         const numberMapRows: PhoneNumberMapRow[] = []
+
+        // Main site
+        const mainSiteMap = mainSiteBundle?.phoneNumberMap
+        if (mainSiteMap) {
+            for (const [key, value] of mainSiteMap?.entries()) {
+                numberMapRows.push(new PhoneNumberMapRow(key, value.phoneNumber, 'Main Site', '', 'Main Site', 'Main Site'))
+            }
+        }
 
         for (const bundle of siteBundles) {
             const map = bundle.phoneNumberMap
@@ -633,6 +672,7 @@ const MigrateUsers = () => {
                     </FormControl>
                     {numberSourceSelection === 'Specific Extension' ? <TextField className='vertical-bottom' size='small' id="outlined-basic" label="Specific Extension" variant="outlined" value={specificExtension} onChange={(e) => setSpecificExtension(e.target.value)} /> : <></>}
                 </div>
+                <ProgressBar value={fetchMainSiteProgess} max={maxFetchMainSiteProgress} label='Main Site' />
                 <ProgressBar value={fetchSitesProgress} max={maxFetchSitesProgress} label='Sites' />
                 <ProgressBar value={userFetchProgress} max={maxUserFetchProgress} label='Users' />
                 <ProgressBar value={messageOnlyFetchProgress} max={maxMessageOnlyFetchProgress} label='Message-Only Extensions & Announcement-Only Extensions' />
@@ -651,6 +691,7 @@ const MigrateUsers = () => {
                 <UIDInputField disabled={hasTargetAccountToken} disabledText={targetCompanyName} setTargetUID={setTargetUID} loading={isTargetAccountTokenPending} error={targetAccountTokenError} />
                 <Button variant='filled' onClick={handleMigrateButtonClick} disabled={!hasTargetAccountToken || isERLListPending || isTargetERLListPending || isMigrating} >Migrate</Button>
                 <Button className='healthy-margin-left' sx={{top: 7}} variant='subtle' color='dark' leftIcon={<IconDownload />} onClick={handleDownloadNumberMapClick} >Number Map</Button>
+                <ProgressBar label='Main Site' value={assignMainSiteNumbersProgress} max={maxAssignMainSiteNumbersProgress} />
                 <ProgressBar label='Create Sites' value={siteMigrationProgress} max={maxSiteProgress} />
                 <ProgressBar label='Cost Centers' value={createCostCentersProgress} max={maxCreateCostCentersProgress} />
                 <ProgressBar label='ERLs' value={erlProgress} max={maxERLProgress} />
@@ -666,6 +707,7 @@ const MigrateUsers = () => {
                 <ProgressBar label='User Groups' value={createUserGroupsProgress} max={maxCreateUserGroupsProgress} />
                 <ProgressBar label='Configure Users' value={configureUsersProgress} max={maxConfigureUsersProgress} />
                 <ProgressBar label='Configure Queues' value={configureQueuesProgress} max={maxConfigureQueuesProgress} />
+                <ProgressBar label='Configure Main Site' value={configureMainSiteProgress} max={maxConfigureMainSiteProgress} />
                 <ProgressBar label='Configure Sites' value={configureSitesProgress} max={maxConfigureSitesProgress} />
                 <FeedbackArea messages={messages} timedMessages={timedMessages} errors={errors} notifications={notifications} />
             </ToolCard>

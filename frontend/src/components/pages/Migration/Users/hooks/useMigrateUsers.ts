@@ -66,7 +66,9 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
             }
             setProgressValue((prev) => prev + 1)
         }
-        await wait(10000)
+        if (dataBundles.length !== 0) {
+            await wait(10000)
+        }
     }
 
     const wait = (ms: number) => {

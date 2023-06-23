@@ -191,6 +191,9 @@ export interface CallHandling {
             }
         }
     }
+    extension?: {
+        id: string
+    }
 }
 
 export interface CustomRule {
@@ -215,6 +218,9 @@ export interface CustomRule {
     }
     greetings?: Greeting[]
     queue?: {}
+    extension?: {
+        id: string
+    }
 }
 
 export interface ForwardingRule {
