@@ -809,6 +809,8 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
     }
 
     const addForwardingNumber = async (bundle: UserDataBundle, forwardingNumber: ForwardingNumber, token: string) => {
+        if (forwardingNumber.type === 'ExtensionApps') return
+        
         try {
             const headers = {
                 "Accept": "application/json",
