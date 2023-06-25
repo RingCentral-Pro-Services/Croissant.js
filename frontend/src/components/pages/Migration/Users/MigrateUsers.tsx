@@ -1,5 +1,5 @@
 import { Checkbox, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, TextField } from "@mui/material";
-import { Button } from "@mantine/core";
+import { Accordion, Button, Input, Text } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import ExtensionIsolator from "../../../../helpers/ExtensionIsolator";
 import useLogin from "../../../../hooks/useLogin";
@@ -75,6 +75,7 @@ import { ERL } from "../../Automatic Location Updates/models/ERL";
 import useFetchMainSite from "./hooks/useFetchMainSite";
 import useConfigureMainSite from "./hooks/useConfigureMainSite";
 import useAssignMainSiteNumbers from "./hooks/useAssignMainSiteNumbers";
+import SettingToggle from "../../../shared/Settings Components/SettingToggle";
 
 
 const MigrateUsers = () => {
@@ -88,15 +89,12 @@ const MigrateUsers = () => {
     const [userDataBundles, setUserDataBundles] = useState<UserDataBundle[]>([])
     const [shouldShowSiteFilter, setShouldShowSiteFilter] = useState(false)
     const [isDoneFetchingSites, setIsDoneFetchingSites] = useState(false)
-    const [shouldMigrateSites, setShouldMigrateSites] = useState(true)
     const [isPullingData, setIsPullingData] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
     const [isPending, setIsPending] = useState(false)
     const supportedExtensionTypes = ['ERLs', 'Custom Roles', 'Call Recording Settings', 'Cost Centers', 'User', 'Limited Extension', 'Call Queue', 'IVR Menu', 'Prompt Library', 'Message-Only', 'Announcement-Only', 'Call Monitoring Groups', 'Park Location', 'User Group']
     const [sites, setSites] = useState<SiteData[]>([])
     const [customRoles, setCustomRoles] = useState<Role[]>([])
-    const [numberSourceSelection, setNumberSourceSelection] = useState('Inventory')
-    const [specificExtension, setSpecificExtension] = useState('')
     const [messageOnlyBundles, setMessageOnlyBundles] = useState<MessageOnlyDataBundle[]>([])
     const [callQueueBundles, setCallQueueBundles] = useState<CallQueueDataBundle[]>([])
     const [ivrBundles, setIVRBundles] = useState<IVRDataBundle[]>([])
@@ -109,6 +107,14 @@ const MigrateUsers = () => {
     const [costCenterBundles, setCostCenterBundles] = useState<CostCenterDataBundle[]>([])
     const [callRecordingSettings, setCallRecordingSettings] = useState<CallRecordingDataBundle>()
     const [mainSiteBundle, setMainSiteBundle] = useState<SiteDataBundle>()
+    const [settings, setSettings] = useState({
+        shouldOverrideSites: false,
+        shouldRemoveSites: false,
+        shouldMigrateSites: true,
+        numberSourceSelection: 'Inventory',
+        specificExtension: '',
+        targetSiteName: ''
+    })
 
     const handleSiteFetchCompletion = (sites: SiteData[]) => {
         setSites(sites)
@@ -169,6 +175,13 @@ const MigrateUsers = () => {
     const {createCostCenters, progressValue: createCostCentersProgress, maxProgress: maxCreateCostCentersProgress} = useCreateCostCenters(postMessage, postTimedMessage, postError)
     const {setCallRecordingSettings: setRecordingSettings} = useSetCallRecordingSettings(postMessage, postTimedMessage, postError)
     const {writeExcel} = useWriteExcelFile()
+
+    // ---------------------- Testing -----------------------
+    useEffect(() => {
+        console.log('Settings')
+        console.log(settings)
+    }, [settings])
+    // ---------------------- Testing -----------------------
     
     useEffect(() => {
         if (originalUID.length < 5) return
@@ -216,7 +229,8 @@ const MigrateUsers = () => {
         if (isOriginalExtensionListPending) return
 
         if (!isMultiSiteEnabled) {
-            setShouldMigrateSites(false)
+            setSettings({...settings, shouldMigrateSites: false})
+            // setShouldMigrateSites(false)
             setSelectedSiteNames(['Main Site'])
             return
         }
@@ -244,11 +258,97 @@ const MigrateUsers = () => {
         setSelectedExtensions(extensions)
     }
 
+    const removeSitesFromExtensions = () => {
+        // Users
+        const updatedUsers = [...userDataBundles]
+        for (let i = 0; i < updatedUsers.length; i++) {
+            delete updatedUsers[i].extension.data.site
+        }
+        setUserDataBundles(updatedUsers)
+
+        // Message only / announcement only
+        const updatedMOs = [...messageOnlyBundles]
+        for (let i = 0; i < updatedMOs.length; i++) {
+            delete updatedMOs[i].extension.data.site
+        }
+        setMessageOnlyBundles(updatedMOs)
+
+        // Call queues
+        const updatedCallQueues = [...callQueueBundles]
+        for (let i = 0; i < updatedCallQueues.length; i++) {
+            delete updatedCallQueues[i].extension.data.site
+        }
+        setCallQueueBundles(updatedCallQueues)
+
+        // IVRs
+        const updatedIVRs = [...ivrBundles]
+        for (let i = 0; i < updatedIVRs.length; i++) {
+            if (updatedIVRs[i].extension.data.site) {
+                updatedIVRs[i].extension.data.site!.name = 'Main Site'
+            }
+        }
+        setIVRBundles(updatedIVRs)
+
+        // Limited extensions
+        const updatedLEs = [...leBundles]
+        for (let i = 0; i < updatedLEs.length; i++) {
+            delete updatedLEs[i].extension.data.site
+        }
+        setLEBundles(updatedLEs)
+    }
+
+    const overrideExtensionsites = () => {
+        // Users
+        const updatedUsers = [...userDataBundles]
+        for (let i = 0; i < updatedUsers.length; i++) {
+            if (updatedUsers[i].extension.data.site) {
+                updatedUsers[i].extension.data.site!.name = settings.targetSiteName
+            }
+        }
+        setUserDataBundles(updatedUsers)
+
+        // Message only / announcement only
+        const updatedMOs = [...messageOnlyBundles]
+        for (let i = 0; i < updatedMOs.length; i++) {
+            if (updatedMOs[i].extension.data.site) {
+                updatedMOs[i].extension.data.site!.name = settings.targetSiteName
+            }
+        }
+        setMessageOnlyBundles(updatedMOs)
+
+        // Call queues
+        const updatedCallQueues = [...callQueueBundles]
+        for (let i = 0; i < updatedCallQueues.length; i++) {
+            if (updatedCallQueues[i].extension.data.site) {
+                updatedCallQueues[i].extension.data.site!.name = settings.targetSiteName
+            }
+        }
+        setCallQueueBundles(updatedCallQueues)
+
+        // IVRs
+        const updatedIVRs = [...ivrBundles]
+        for (let i = 0; i < updatedIVRs.length; i++) {
+            if (updatedIVRs[i].extension.data.site) {
+                updatedIVRs[i].extension.data.site!.name = settings.targetSiteName
+            }
+        }
+        setIVRBundles(updatedIVRs)
+
+        // Limited extensions
+        const updatedLEs = [...leBundles]
+        for (let i = 0; i < updatedLEs.length; i++) {
+            if (updatedLEs[i].extension.data.site) {
+                updatedLEs[i].extension.data.site!.name = settings.targetSiteName
+            }
+        }
+        setLEBundles(updatedLEs)
+    }
+
     const handleDisoverButtonClick = async () => {
         setIsPullingData(true)
 
         // Main site
-        if (shouldMigrateSites && selectedSiteNames.includes('Main Site')) {
+        if (settings.shouldMigrateSites && selectedSiteNames.includes('Main Site')) {
             const mainSiteData = await fetchMainSite()
             const autoReceptionistNumbers = originalPhoneNumbers.filter((number) => !number.extension && number.usageType === 'CompanyNumber')
             mainSiteData.extendedData!.directNumbers = autoReceptionistNumbers
@@ -359,34 +459,42 @@ const MigrateUsers = () => {
         let availablePhoneNumbers: PhoneNumber[] = []
         let prompts: IVRAudioPrompt[] = []
 
-        if (numberSourceSelection === 'Inventory') {
+        if (settings.shouldRemoveSites) {
+            removeSitesFromExtensions()
+        }
+
+        if (settings.shouldOverrideSites) {
+            overrideExtensionsites()
+        }
+
+        if (settings.numberSourceSelection === 'Inventory') {
             availablePhoneNumbers = phoneNumbers.filter((number) => number.usageType === 'Inventory')
             postMessage(new Message(`Discovered ${availablePhoneNumbers.length} numbers in number inventory`, 'info'))
         }
-        else if (numberSourceSelection === 'Auto-Receptionist') {
+        else if (settings.numberSourceSelection === 'Auto-Receptionist') {
             availablePhoneNumbers = phoneNumbers.filter((number) => number.usageType === 'CompanyNumber')
             postMessage(new Message(`Discovered ${availablePhoneNumbers.length} numbers on auto-receptionist`, 'info'))
         }
         else {
             // specific extension
             const isolator = new ExtensionIsolator()
-            const targetExtension = isolator.isolateExtension(specificExtension)
+            const targetExtension = isolator.isolateExtension(settings.specificExtension)
             const extension = targetExtensionList.find((ext) => ext.data.extensionNumber === targetExtension)
             if (!extension) {
-                postMessage(new Message(`Cannot pull numbers from extension ${specificExtension} because the extension was not found`, 'error'))
+                postMessage(new Message(`Cannot pull numbers from extension ${settings.specificExtension} because the extension was not found`, 'error'))
                 setIsMigrating(false)
                 return
             }
             availablePhoneNumbers = phoneNumbers.filter((number) => number.extension && `${number.extension.id}` === `${extension.data.id}`)
-            postMessage(new Message(`Discovered ${availablePhoneNumbers.length} numbers on extension ${specificExtension}`, 'info'))
+            postMessage(new Message(`Discovered ${availablePhoneNumbers.length} numbers on extension ${settings.specificExtension}`, 'info'))
         }
 
-        if (shouldMigrateSites && mainSiteBundle) {
+        if (settings.shouldMigrateSites && mainSiteBundle) {
             await assignMainSiteNumbers(mainSiteBundle, availablePhoneNumbers)
         }
 
         // Migrate sites
-        if (shouldMigrateSites) {
+        if (settings.shouldMigrateSites) {
             const selectedSites = sites.filter((site) => selectedSiteNames.includes(`${site.name}`))
             const siteExtensions = await migrateSites(siteBundles, availablePhoneNumbers)
             targetExts = [...targetExts, ...siteExtensions]
@@ -522,7 +630,7 @@ const MigrateUsers = () => {
         await configureUsers(userDataBundles, targetERLs, originalExtensionList, targetExts, roles, globalSiteNumberMap)
         await configureMOs(messageOnlyBundles, originalExtensionList, targetExts)
         await configureIVRs(ivrBundles, originalExtensionList, targetExts, originalAccountPrompts, prompts)
-        if (shouldMigrateSites) {
+        if (settings.shouldMigrateSites) {
             if (mainSiteBundle) {
                 await configureMainSite(mainSiteBundle, originalExtensionList, targetExts)
             }
@@ -649,10 +757,34 @@ const MigrateUsers = () => {
                 <UIDInputField disabled={hasOriginalAccountToken} disabledText={originalCompanyName} setTargetUID={setOriginalUID} loading={isOriginalAccountTokenPending} error={originalAccountTokenError} />
             </ToolCard>
             <ToolCard>
+                <Accordion defaultValue="">
+                    <Accordion.Item value="customization">
+                        <Accordion.Control>Settings</Accordion.Control>
+                        <Accordion.Panel>
+                            <SettingToggle
+                                title="Override Sites"
+                                description="Assign all extensions to a particular site. The site will be created if it does not exist."
+                                checked={settings.shouldOverrideSites}
+                                onChange={(value) => setSettings({...settings, shouldOverrideSites: value})}
+                            >
+                                <Input disabled={!settings.shouldOverrideSites} sx={{width: 250}} placeholder='Site name' value={settings.targetSiteName} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSettings({...settings, targetSiteName: e.target.value.trim()})} />
+                            </SettingToggle>
+
+                            <SettingToggle
+                                title="Force Main Site"
+                                description="Assign all extensions to the main site, regardless of what site they were previously assigned to"
+                                checked={settings.shouldRemoveSites}
+                                onChange={(value) => setSettings({...settings, shouldRemoveSites: value})}
+                            />
+                        </Accordion.Panel>
+                    </Accordion.Item>
+                </Accordion>
+            </ToolCard>
+            <ToolCard>
                 <h2>Make Selections</h2>
                 <AdaptiveFilter options={supportedExtensionTypes} title='Extension Types' placeholder='Search' setSelected={setSelectedExtensionTypes} />
                 {shouldShowSiteFilter ? <AdaptiveFilter options={siteNames} title='Sites' placeholder='Search' setSelected={setSelectedSiteNames} /> : <></>}
-                {isMultiSiteEnabled ? <FormControlLabel control={<Checkbox defaultChecked value={shouldMigrateSites} onChange={(e) => setShouldMigrateSites(e.target.checked)} />} label="Migrate Sites" /> : <></>}
+                {isMultiSiteEnabled ? <FormControlLabel control={<Checkbox defaultChecked value={settings.shouldMigrateSites} onChange={(e) => setSettings({...settings, shouldMigrateSites: e.target.checked})} />} label="Migrate Sites" /> : <></>}
                 <Button variant='filled' onClick={handleDisoverButtonClick} disabled={isPullingData} >Discover</Button>
                 <Button className='healthy-margin-left' sx={{top: 7}} variant='subtle' color='dark' leftIcon={<IconDownload />} onClick={handleDownloadUsersClick} >User Data</Button>
                 <div className="healthy-margin-top">
@@ -662,15 +794,15 @@ const MigrateUsers = () => {
                             row
                             aria-labelledby="number-selection-controll"
                             name="row-radio-buttons-group"
-                            value={numberSourceSelection}
-                            onChange={(e, value) => setNumberSourceSelection(value)}
+                            value={settings.numberSourceSelection}
+                            onChange={(e, value) => setSettings({...settings, numberSourceSelection: value})}
                         >
                             <FormControlLabel value="Inventory" control={<Radio />} label="Inventory" />
                             <FormControlLabel value="Auto-Receptionist" control={<Radio />} label="Auto-Receptionist" />
                             <FormControlLabel value="Specific Extension" control={<Radio />} label="Specific Extension" />
                         </RadioGroup>
                     </FormControl>
-                    {numberSourceSelection === 'Specific Extension' ? <TextField className='vertical-bottom' size='small' id="outlined-basic" label="Specific Extension" variant="outlined" value={specificExtension} onChange={(e) => setSpecificExtension(e.target.value)} /> : <></>}
+                    {settings.numberSourceSelection === 'Specific Extension' ? <TextField className='vertical-bottom' size='small' id="outlined-basic" label="Specific Extension" variant="outlined" value={settings.specificExtension} onChange={(e) => setSettings({...settings, specificExtension: e.target.value})} /> : <></>}
                 </div>
                 <ProgressBar value={fetchMainSiteProgess} max={maxFetchMainSiteProgress} label='Main Site' />
                 <ProgressBar value={fetchSitesProgress} max={maxFetchSitesProgress} label='Sites' />
