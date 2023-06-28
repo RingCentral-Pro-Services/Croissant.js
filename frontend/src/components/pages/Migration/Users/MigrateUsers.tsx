@@ -76,6 +76,8 @@ import useFetchMainSite from "./hooks/useFetchMainSite";
 import useConfigureMainSite from "./hooks/useConfigureMainSite";
 import useAssignMainSiteNumbers from "./hooks/useAssignMainSiteNumbers";
 import SettingToggle from "../../../shared/Settings Components/SettingToggle";
+import { SyncError } from "../../../../models/SyncError";
+import { flushSync } from "react-dom";
 
 
 const MigrateUsers = () => {
@@ -93,6 +95,7 @@ const MigrateUsers = () => {
     const [isMigrating, setIsMigrating] = useState(false)
     const [isPending, setIsPending] = useState(false)
     const supportedExtensionTypes = ['ERLs', 'Custom Roles', 'Call Recording Settings', 'Cost Centers', 'User', 'Limited Extension', 'Call Queue', 'IVR Menu', 'Prompt Library', 'Message-Only', 'Announcement-Only', 'Call Monitoring Groups', 'Park Location', 'User Group']
+
     const [sites, setSites] = useState<SiteData[]>([])
     const [customRoles, setCustomRoles] = useState<Role[]>([])
     const [messageOnlyBundles, setMessageOnlyBundles] = useState<MessageOnlyDataBundle[]>([])
@@ -107,6 +110,7 @@ const MigrateUsers = () => {
     const [costCenterBundles, setCostCenterBundles] = useState<CostCenterDataBundle[]>([])
     const [callRecordingSettings, setCallRecordingSettings] = useState<CallRecordingDataBundle>()
     const [mainSiteBundle, setMainSiteBundle] = useState<SiteDataBundle>()
+    const [overridenSiteBundle, setOverridenSiteBundle] = useState<SiteDataBundle>()
     const [settings, setSettings] = useState({
         shouldOverrideSites: false,
         shouldRemoveSites: false,
@@ -175,13 +179,6 @@ const MigrateUsers = () => {
     const {createCostCenters, progressValue: createCostCentersProgress, maxProgress: maxCreateCostCentersProgress} = useCreateCostCenters(postMessage, postTimedMessage, postError)
     const {setCallRecordingSettings: setRecordingSettings} = useSetCallRecordingSettings(postMessage, postTimedMessage, postError)
     const {writeExcel} = useWriteExcelFile()
-
-    // ---------------------- Testing -----------------------
-    useEffect(() => {
-        console.log('Settings')
-        console.log(settings)
-    }, [settings])
-    // ---------------------- Testing -----------------------
     
     useEffect(() => {
         if (originalUID.length < 5) return
@@ -230,7 +227,6 @@ const MigrateUsers = () => {
 
         if (!isMultiSiteEnabled) {
             setSettings({...settings, shouldMigrateSites: false})
-            // setShouldMigrateSites(false)
             setSelectedSiteNames(['Main Site'])
             return
         }
@@ -342,6 +338,75 @@ const MigrateUsers = () => {
             }
         }
         setLEBundles(updatedLEs)
+
+        const updatedERLs = [...erls]
+        for (let i = 0; i < updatedERLs.length; i++) {
+            if (updatedERLs[i].site) {
+                updatedERLs[i].site.name = settings.targetSiteName
+            }
+        }
+    }
+
+    const getTargetSiteBundle = () => {
+        if (!settings.shouldOverrideSites || (!mainSiteBundle && siteBundles.length === 0)) return
+
+        const targetSite = targetExtensionList.find((ext) => ext.prettyType() === 'Site' && ext.data.name === settings.targetSiteName)
+        if (!targetSite) {
+            postMessage(new Message(`Could not find site ${settings.targetSiteName}`, 'error'))
+            postError(new SyncError(settings.targetSiteName, '', ['Could not find target site', settings.targetSiteName]))
+            return
+        }
+
+        const targetSiteData: SiteData = {
+            name: targetSite.data.name,
+            id: `${targetSite.data.id}`,
+            extensionNumber: targetSite.data.extensionNumber,
+            callerIdName: "",
+            email: "",
+            businessAddress: {
+                country: "",
+                state: "",
+                city: "",
+                street: "",
+                zip: ""
+            },
+            operator: {
+                extensionNumber: "",
+            },
+            regionalSettings: {}
+        }
+
+        const targetSiteBundle = new SiteDataBundle(targetSiteData)
+        targetSiteBundle.extendedData = {
+            businessHours: {
+                schedule: {
+                    weeklyRanges: {
+                        monday: [{
+                            from: '08:00',
+                            to: '17:00'
+                        }]
+                    }
+                }
+            }
+        }
+
+        const otherSiteRules = siteBundles.flatMap((site) => site.extendedData!.customRules!)
+        const otherSiteDirectNumbers = siteBundles.flatMap((site) => site.extendedData!.directNumbers!)
+
+        const mainSiteRules = mainSiteBundle?.extendedData?.customRules
+        const mainSiteDirectNumbers = mainSiteBundle?.extendedData?.directNumbers
+
+        targetSiteBundle.extendedData!.customRules = otherSiteRules
+        targetSiteBundle.extendedData!.directNumbers = otherSiteDirectNumbers
+
+        if (mainSiteRules) {
+            targetSiteBundle.extendedData.customRules = [...targetSiteBundle.extendedData.customRules, ...mainSiteRules]
+        }
+        if (mainSiteDirectNumbers) {
+            targetSiteBundle.extendedData.directNumbers = [...targetSiteBundle.extendedData.directNumbers, ...mainSiteDirectNumbers]
+        }
+
+        return targetSiteBundle
     }
 
     const handleDisoverButtonClick = async () => {
@@ -458,6 +523,7 @@ const MigrateUsers = () => {
         let roles: Role[] = []
         let availablePhoneNumbers: PhoneNumber[] = []
         let prompts: IVRAudioPrompt[] = []
+        let targetSiteBundle = getTargetSiteBundle()
 
         if (settings.shouldRemoveSites) {
             removeSitesFromExtensions()
@@ -489,15 +555,45 @@ const MigrateUsers = () => {
             postMessage(new Message(`Discovered ${availablePhoneNumbers.length} numbers on extension ${settings.specificExtension}`, 'info'))
         }
 
-        if (settings.shouldMigrateSites && mainSiteBundle) {
+        if (settings.shouldMigrateSites && !settings.shouldOverrideSites && mainSiteBundle) {
+
+            // If sites are being removed, add direct numbers and custom rules of other sites to the main site
+            if (settings.shouldRemoveSites) {
+
+                const otherSiteRules = siteBundles.flatMap((site) => site.extendedData!.customRules!)
+                if (otherSiteRules) {
+                    const existingRules = mainSiteBundle.extendedData!.customRules!
+                    mainSiteBundle.extendedData!.customRules = [...existingRules, ...otherSiteRules]
+                }
+
+                const otherSiteDirectNumbers = siteBundles.flatMap((site) => site.extendedData!.directNumbers!)
+                if (otherSiteDirectNumbers) {
+                    mainSiteBundle.extendedData!.directNumbers = [...mainSiteBundle.extendedData!.directNumbers!, ...otherSiteDirectNumbers]
+                }
+            }
+
             await assignMainSiteNumbers(mainSiteBundle, availablePhoneNumbers)
         }
 
         // Migrate sites
-        if (settings.shouldMigrateSites) {
-            const selectedSites = sites.filter((site) => selectedSiteNames.includes(`${site.name}`))
-            const siteExtensions = await migrateSites(siteBundles, availablePhoneNumbers)
-            targetExts = [...targetExts, ...siteExtensions]
+        if (settings.shouldMigrateSites && !settings.shouldRemoveSites) {
+            if (settings.shouldOverrideSites) {
+                if (!targetSiteBundle) {
+                    postMessage(new Message(`Something went wrong trying to override sites`, 'error'))
+                    postError(new SyncError('', '', ['Failed to merge sites', '']))
+                    return
+                }
+                
+                const extension = await migrateSites([targetSiteBundle], availablePhoneNumbers, true)
+                setOverridenSiteBundle(targetSiteBundle)
+                targetExts = [...targetExts, ...extension]
+            }
+            else {
+                const selectedSites = sites.filter((site) => selectedSiteNames.includes(`${site.name}`))
+                const siteExtensions = await migrateSites(siteBundles, availablePhoneNumbers)
+    
+                targetExts = [...targetExts, ...siteExtensions]
+            }
         }
 
         // Cost centers
@@ -631,10 +727,15 @@ const MigrateUsers = () => {
         await configureMOs(messageOnlyBundles, originalExtensionList, targetExts)
         await configureIVRs(ivrBundles, originalExtensionList, targetExts, originalAccountPrompts, prompts)
         if (settings.shouldMigrateSites) {
-            if (mainSiteBundle) {
+            if (settings.shouldOverrideSites && targetSiteBundle) {
+                await configureSites([targetSiteBundle], originalExtensionList, targetExts)
+            }
+            if (mainSiteBundle && !settings.shouldOverrideSites) {
                 await configureMainSite(mainSiteBundle, originalExtensionList, targetExts)
             }
-            await configureSites(siteBundles, originalExtensionList, targetExts)
+            if (!settings.shouldRemoveSites && !settings.shouldOverrideSites) {
+                await configureSites(siteBundles, originalExtensionList, targetExts)
+            }
         }
         console.log('Post config bundles')
         console.log('users')
@@ -688,6 +789,14 @@ const MigrateUsers = () => {
         if (mainSiteMap) {
             for (const [key, value] of mainSiteMap?.entries()) {
                 numberMapRows.push(new PhoneNumberMapRow(key, value.phoneNumber, 'Main Site', '', 'Main Site', 'Main Site'))
+            }
+        }
+
+        // Overriden site bundle
+        const map = overridenSiteBundle?.phoneNumberMap
+        if (map) {
+            for (const [key, value] of map?.entries()) {
+                numberMapRows.push(new PhoneNumberMapRow(key, value.phoneNumber, settings.targetSiteName, overridenSiteBundle.extension.extensionNumber, 'Site', settings.targetSiteName))
             }
         }
 
@@ -763,7 +872,7 @@ const MigrateUsers = () => {
                         <Accordion.Panel>
                             <SettingToggle
                                 title="Override Sites"
-                                description="Assign all extensions to a particular site. The site will be created if it does not exist."
+                                description="Assign all extensions to a particular site. The site must already exist."
                                 checked={settings.shouldOverrideSites}
                                 onChange={(value) => setSettings({...settings, shouldOverrideSites: value})}
                             >

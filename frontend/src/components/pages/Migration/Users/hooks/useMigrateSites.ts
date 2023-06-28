@@ -14,7 +14,7 @@ const useMigrateSites = (postMessage: (message: Message) => void, postTimedMessa
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgress, setMaxProgress] = useState(2)
 
-    const migrateSites = async (sites: SiteDataBundle[], availablePhoneNumbers: PhoneNumber[]) => {
+    const migrateSites = async (sites: SiteDataBundle[], availablePhoneNumbers: PhoneNumber[], alreadyExists: boolean = false) => {
         const accessToken = localStorage.getItem('cs_access_token')
         if (!accessToken) {
             throw new Error('No access token')
@@ -24,7 +24,7 @@ const useMigrateSites = (postMessage: (message: Message) => void, postTimedMessa
 
         setMaxProgress(sites.length)
         for (const site of sites) {
-            await makeSite(site.extension, accessToken)
+            if (!alreadyExists) await makeSite(site.extension, accessToken)
 
             site.phoneNumberMap = new Map<string, PhoneNumber>()
 

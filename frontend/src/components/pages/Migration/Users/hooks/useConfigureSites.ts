@@ -21,6 +21,9 @@ const useConfigureSites = (postMessage: (message: Message) => void, postTimedMes
             throw new Error('No access token')
         }
 
+        console.log('Configuring sites')
+        console.log(bundles)
+
         setMaxProgress(bundles.length)
         for (const bundle of bundles) {
             await setSchedule(bundle, accessToken)
@@ -254,19 +257,22 @@ const useConfigureSites = (postMessage: (message: Message) => void, postTimedMes
 
                 const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === `${customRule.transfer?.extension.id}`)
                 if (!originalExtension) {
-                    postMessage(new Message(`Failed to adjust transfer extension for custom rule ${customRule.name} on site ${bundle.extension.name}`, 'error'))
+                    postMessage(new Message(`Failed to adjust transfer extension for custom rule ${customRule.name} on site ${bundle.extension.name}. Old extension not found.`, 'error'))
                     postError(new SyncError(bundle.extension.name, bundle.extension.extensionNumber, ['Failed to adjust custom rule', customRule.name]))
                     return customRule
                 }
 
                 const newExtension = targetExtensions.find((ext) => ext.data.name === originalExtension.data.name && ext.prettyType() === originalExtension.prettyType())
                 if (!newExtension) {
-                    postMessage(new Message(`Failed to adjust transfer extension for custom rule ${customRule.name} on site ${bundle.extension.name}`, 'error'))
+                    postMessage(new Message(`Failed to adjust transfer extension for custom rule ${customRule.name} on site ${bundle.extension.name}. New extensin not found`, 'error'))
                     postError(new SyncError(bundle.extension.name, bundle.extension.extensionNumber, ['Failed to adjust custom rule', customRule.name]))
                     return customRule
                 }
 
                 customRule.transfer!.extension.id = `${newExtension.data.id}`
+
+                // The Bypass action is only allowed on the main site. Set callHandlingAction to TransferToExtension
+                customRule.callHandlingAction = 'TransferToExtension'
                 delete customRule.forwarding
                 delete customRule.greetings
                 delete customRule.unconditionalForwarding
@@ -297,6 +303,7 @@ const useConfigureSites = (postMessage: (message: Message) => void, postTimedMes
         } 
         catch (e) {
             postMessage(new Message(`Failed to adjust custom rule ${customRule.name} on site ${bundle.extension.name}`, 'error'))
+            console.log(e)
         }
     }
 
