@@ -6,6 +6,7 @@ import { RestCentral } from "../../../../rcapi/RestCentral"
 
 const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void, isMultiSiteEnabled: boolean, callback: () => void) => {
     const createURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension'
+    const baseUpdateDataURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId'
     const baseUpdateURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId/bulk-assign'
     const baseCallHandlingURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/answering-rule/business-hours-rule'
     const baseAfterHoursCallHandlingURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/answering-rule/after-hours-rule'
@@ -50,6 +51,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
 
         if (extensionExists(queue.extension.extensionNumber, extensions)) {
             // Update call queue
+            await updateQueue(queue, accessToken)
         }
         else {
             await makeQueue(queue, accessToken)
@@ -89,6 +91,32 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(e)
             postMessage(new Message(`Failed to make queue ${queue.extension.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to create queue', ''], e.error ?? '', queue))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const updateQueue = async (queue: CallQueue, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const response = await RestCentral.put(baseUpdateDataURL.replace('extensionId', `${queue.extension.id}`), headers, queue.createPayload(isMultiSiteEnabled))
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            queue.extension.id = response.data.id
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to make queue ${queue.extension.name}`)
+            console.log(e)
+            postMessage(new Message(`Failed to update queue ${queue.extension.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to update queue', ''], e.error ?? '', queue))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
