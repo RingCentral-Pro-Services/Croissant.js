@@ -78,6 +78,7 @@ import useAssignMainSiteNumbers from "./hooks/useAssignMainSiteNumbers";
 import SettingToggle from "../../../shared/Settings Components/SettingToggle";
 import { SyncError } from "../../../../models/SyncError";
 import { flushSync } from "react-dom";
+import useExportToExcel from "../../../../hooks/useExportToExcel";
 
 
 const MigrateUsers = () => {
@@ -179,6 +180,7 @@ const MigrateUsers = () => {
     const {createCostCenters, progressValue: createCostCentersProgress, maxProgress: maxCreateCostCentersProgress} = useCreateCostCenters(postMessage, postTimedMessage, postError)
     const {setCallRecordingSettings: setRecordingSettings} = useSetCallRecordingSettings(postMessage, postTimedMessage, postError)
     const {writeExcel} = useWriteExcelFile()
+    const {exportToExcel} = useExportToExcel()
     
     useEffect(() => {
         if (originalUID.length < 5) return
@@ -754,7 +756,7 @@ const MigrateUsers = () => {
     }
 
     const handleDownloadUsersClick = () => {
-        const header = ['Initial Upon Completion of number/device swap', 'User Type', 'Extension', 'PHASE 2 - Temporary Extension (If Federated Accounts or Extension already in use)', 'First Name',
+        const userDataHeader = ['Initial Upon Completion of number/device swap', 'User Type', 'Extension', 'PHASE 2 - Temporary Extension (If Federated Accounts or Extension already in use)', 'First Name',
                             'Last Name', 'Email Address', 'Department', 'Job Title', 'User Groups', 'Contact Phone', 'Mobile Phone', 'Regional Settings',
                             'Regional Format', 'User Language', 'Time Format', 'User Hours', 'User Role', 'Include User in Company Directory', 'Receive RC Communication',
                             'Send an email when a phone is added', 'Site', 'Phone Number', 'Temp Number (new account) Complete during Phase 2', 'Phone Model', 'Phone S/N',
@@ -770,6 +772,13 @@ const MigrateUsers = () => {
                             'Missed Call Notifications', 'Fax Transmission Results', 'Text Message Notifications', 'Device Caller ID(s)', 'Fax Number Caller ID', 'Call Flip Caller ID', 'Ring Out Caller ID',
                             'Ring Me Caller ID', 'AdditionalSoftphone Caller ID', 'Alternate Caller ID', 'Common Phone Caller ID', 'Mobile App Caller ID', 'Delegated Caller ID', 'Cost Center']
 
+        const callQueueDataHeader = ['Initial Upon Completion of Number Swap (if applicable)', 'Queue Name', 'Extension', 'PHASE 2 - Temporary Extension (If Federated Accounts or Extension already in use)',
+                                    'Phone Number', 'Temp Number (new account) Complete during Phase 2', 'Site', 'Manager Email', 'Record Username', 'Business Hours', 'Regional Settings', 'Regional Format',
+                                    'User Language', 'Time Format', 'Greeting', 'Connecting Audio', 'Interrupt Audio Frequency', 'Interrupt Audio Prompt', 'Hold Music', 'Ring Type', 'Members',
+                                    'Allow members to change their queue status', 'User Ring Time', 'Max Ring Time', 'Wrap Up Time', 'Max Number waiting', 'Action Exceeds Wait', 'Member Status', 'Queue Status', 'Display Settings', 'Custom Rules',
+                                    'Pickup Members', 'Alert Time', 'After Hours Behavior', 'After Hours Notes (if applicable)', 'VM Greeting', 'VM Recpient', 'VM Greeting', 'VM Recipient', 'VM Email',
+                                    'Voicemail Messages', 'Received Faxes', 'Missed Calls', 'Received Text Messages', 'Cost Center Code', 'Notes']
+
         const rows: UserDataRow[] = []
 
         for (const bundle of userDataBundles) {
@@ -778,7 +787,7 @@ const MigrateUsers = () => {
             }
         }
 
-        writeExcel(header, rows, 'User Data', 'User Data.xlsx')
+        exportToExcel([{sheetName: 'Users', data: rows, headers: userDataHeader}, {sheetName: 'Call Queues', data: callQueueBundles, headers: callQueueDataHeader}], 'Migration Data.xlsx')
     }
 
     const handleDownloadNumberMapClick = () => {
@@ -895,7 +904,7 @@ const MigrateUsers = () => {
                 {shouldShowSiteFilter ? <AdaptiveFilter options={siteNames} title='Sites' placeholder='Search' setSelected={setSelectedSiteNames} /> : <></>}
                 {isMultiSiteEnabled ? <FormControlLabel control={<Checkbox defaultChecked value={settings.shouldMigrateSites} onChange={(e) => setSettings({...settings, shouldMigrateSites: e.target.checked})} />} label="Migrate Sites" /> : <></>}
                 <Button variant='filled' onClick={handleDisoverButtonClick} disabled={isPullingData} >Discover</Button>
-                <Button className='healthy-margin-left' sx={{top: 7}} variant='subtle' color='dark' leftIcon={<IconDownload />} onClick={handleDownloadUsersClick} >User Data</Button>
+                <Button className='healthy-margin-left' sx={{top: 7}} variant='subtle' color='dark' leftIcon={<IconDownload />} onClick={handleDownloadUsersClick} >Migration Template</Button>
                 <div className="healthy-margin-top">
                     <FormControl>
                         <FormLabel id="demo-row-radio-buttons-group-label">Pull numbers from</FormLabel>
