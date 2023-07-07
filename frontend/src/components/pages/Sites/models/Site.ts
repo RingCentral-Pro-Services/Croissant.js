@@ -54,7 +54,7 @@ export class Site implements DataGridFormattable {
             ...(this.data.extensionNumber && { extensionNumber: this.data.extensionNumber }),
             callerIdName: this.data.outboundCnam,
             businessAddress: {
-                street: `${this.data.street1}${this.data.street2 ? ` ${this.data.street2}` : ''}`,
+                street: `${this.data.street1}${this.data.street2 ? `, ${this.data.street2}` : ''}`,
                 city: this.data.city,
                 state: this.data.state,
                 zip: this.data.zip,
