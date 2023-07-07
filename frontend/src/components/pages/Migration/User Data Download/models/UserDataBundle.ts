@@ -458,6 +458,9 @@ export interface PhoneNumber {
     type: string
     contactCenterProvider: string
     vanityPattern: string
+    site?: {
+        name: string
+    }
 }
 
 export interface ForwardAllCalls {

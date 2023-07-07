@@ -35,7 +35,7 @@ export class UserDataRow implements ExcelFormattable {
             '', // Receive RC communications
             '', // Send email when phone added
             this.extension.data.site?.name ?? '',
-            this.device?.phoneLines[0].phoneInfo.phoneNumber ?? this.directNumber ?? '',
+            this.getPhoneNumber(),
             '', // Temp number
             this.device ? this.device?.model?.name ?? 'RingCentral Phone App' : '',
             this.device?.serial ?? '',
@@ -109,6 +109,12 @@ export class UserDataRow implements ExcelFormattable {
             this.callerIDNumber('Delegated'),
             this.extension.data.costCenter?.name ?? ''
         ]
+    }
+
+    getPhoneNumber() {
+        if (this.directNumber) return this.directNumber
+        if (this.device && this.device.phoneLines && this.device.phoneLines.length !== 0 && this.device.phoneLines[0].phoneInfo) return this.device.phoneLines[0].phoneInfo.phoneNumber
+        return ''
     }
 
     greeting(name: string) {

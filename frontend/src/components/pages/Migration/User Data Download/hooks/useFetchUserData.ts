@@ -625,7 +625,7 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
             }
             const response = await RestCentral.get(basePhoneNumbersURL.replace('extensionId', `${userDataBundle.extension.data.id}`), headers)
             const numbers = response.data.records as PhoneNumber[]
-            const deviceNumbers = userDataBundle.extendedData!.devices.map((device) => device.phoneLines[0].phoneInfo.phoneNumber)
+            const deviceNumbers = userDataBundle.extendedData!.devices.map((device) => device.phoneLines && device.phoneLines.length !== 0 && device.phoneLines[0].phoneInfo.phoneNumber)
             const nonDeviceNumbers = numbers.filter((number) => !deviceNumbers.includes(number.phoneNumber))
             const directNumbers = nonDeviceNumbers.filter((number) => !number.extension)
 

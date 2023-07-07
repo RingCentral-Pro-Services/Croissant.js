@@ -83,6 +83,8 @@ import useAccountDevices from "./hooks/useAccountDevices";
 import { HotDeskingDevice } from "./models/HotDeskingDevice";
 import { UnassignedDeviceRow } from "./models/UnassignedDevice";
 import { ERLRow } from "./models/ERLRow";
+import useCompanyNumbers from "./hooks/useCompanyNumbers";
+import { CompanyNumberRow } from "./models/CompanyNumberRow";
 
 
 const MigrateUsers = () => {
@@ -117,6 +119,7 @@ const MigrateUsers = () => {
     const [mainSiteBundle, setMainSiteBundle] = useState<SiteDataBundle>()
     const [overridenSiteBundle, setOverridenSiteBundle] = useState<SiteDataBundle>()
     const [originalAccountDevices, setOriginalAccountDevices] = useState<Device[]>([])
+    const [originalAccountNumbers, setOriginalAccountNumbers] = useState<PhoneNumber[]>([])
     const [settings, setSettings] = useState({
         shouldOverrideSites: false,
         shouldRemoveSites: false,
@@ -141,6 +144,7 @@ const MigrateUsers = () => {
     const {extensionsList: originalExtensionList, fetchExtensions: fetchOriginalExtensions, isExtensionListPending: isOriginalExtensionListPending, isMultiSiteEnabled} = useExtensions(postMessage)
     const {extensionsList: targetExtensionList, fetchExtensions: fetchTargetExtensions, isExtensionListPending: isTargetExtensionListPending, isMultiSiteEnabled: targetAccountHasMultisite} = useExtensions(postMessage)
 
+    const {fetchCompanyNumbers} = useCompanyNumbers(postMessage, postTimedMessage, postError)
     const {fetchERLs, erls, isERLListPending} = useFetchERLs()
     const {fetchAccountDevices} = useAccountDevices(postMessage, postTimedMessage, postError)
     const {fetchERLs: fetchTargetERLs, erls: targetERLList, isERLListPending: isTargetERLListPending} = useFetchERLs()
@@ -426,6 +430,10 @@ const MigrateUsers = () => {
         console.log('Devices')
         console.log(devices)
         setOriginalAccountDevices(devices)
+
+        // Company numbers
+        const numbers = await fetchCompanyNumbers()
+        setOriginalAccountNumbers(numbers)
 
         // Main site
         if (settings.shouldMigrateSites && selectedSiteNames.includes('Main Site')) {
@@ -789,7 +797,7 @@ const MigrateUsers = () => {
         }
 
         for (let siteBundle of siteBundles) {
-            const businessHoursID = siteBundle.extendedData?.businessHoursCallHandling?.extension?.id ?? siteBundle.extendedData?.businessHoursCallHandling?.transfer.extension.id
+            const businessHoursID = siteBundle.extendedData?.businessHoursCallHandling?.extension?.id ?? siteBundle.extendedData?.businessHoursCallHandling?.transfer?.extension?.id
             if (businessHoursID) {
                 const extension = originalExtensionList.find((ext) => `${ext.data.id}` === businessHoursID)
                 if (extension) {
@@ -797,7 +805,7 @@ const MigrateUsers = () => {
                 }
             }
 
-            const afterHoursID = siteBundle.extendedData?.afterHoursCallHandling?.extension?.id ?? siteBundle.extendedData?.afterHoursCallHandling?.transfer.extension.id
+            const afterHoursID = siteBundle.extendedData?.afterHoursCallHandling?.extension?.id ?? siteBundle.extendedData?.afterHoursCallHandling?.transfer?.extension?.id
             if (afterHoursID) {
                 const extension = originalExtensionList.find((ext) => `${ext.data.id}` === afterHoursID)
                 if (extension) {
@@ -826,6 +834,34 @@ const MigrateUsers = () => {
             erlRows.push(new ERLRow(erl))
         }
 
+        // Company numbers
+        const companyNumberRows: CompanyNumberRow[] = []
+        for (let number of originalAccountNumbers) {
+            if (!number.extension && number.usageType === 'CompanyNumber') {
+                number.site = {
+                    name: 'Main Site'
+                }
+                companyNumberRows.push(new CompanyNumberRow(number))
+                continue
+            }
+            if (!number.extension) continue
+            const originalExtension = originalExtensionList.find((ext) => `${ext.data.id}` === `${number.extension.id}`)
+            if (!originalExtension) continue
+
+            if (originalExtension.prettyType() === 'Site') {
+                number.site = {
+                    name: originalExtension.data.name
+                }
+                companyNumberRows.push(new CompanyNumberRow(number))
+            }
+        }
+        companyNumberRows.sort((a: CompanyNumberRow, b: CompanyNumberRow) => {
+            if (a.data.site!.name < b.data.site!.name) {
+                return -1
+            }
+            return 1
+        })
+
         exportPrettyExcel([
             {sheetName: 'Users', data: rows, startingRow: 6},
             {sheetName: 'Call Queues', data: callQueueBundles, startingRow: 5},
@@ -839,7 +875,8 @@ const MigrateUsers = () => {
             {sheetName: 'Sites', data: siteBundles, startingRow: 3},
             {sheetName: 'Hot Desk Phones', data: hotDeskingDeviceRows, startingRow: 3},
             {sheetName: 'Unassigned Devices', data: unassignedDeviceRows, startingRow: 4},
-            {sheetName: 'Emergency Response Locations', data: erlRows, startingRow: 3}
+            {sheetName: 'Emergency Response Locations', data: erlRows, startingRow: 3},
+            {sheetName: 'Company Numbers', data: companyNumberRows, startingRow: 3}
         ], 'Migration Template.xlsx', '/migration-template.xlsx')
     }
 
