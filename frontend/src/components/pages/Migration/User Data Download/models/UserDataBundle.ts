@@ -106,12 +106,17 @@ export interface Device {
             countryName: string
         }
     }
-    phoneLines: [{
+    phoneLines: {
         lineType: string
         phoneInfo: {
             phoneNumber: string
         }
-    }]
+    }[]
+    site?: {
+        name: string
+        id: string
+    }
+    extension?: {}
 }
 
 export interface CallHandlingForwardingRule {

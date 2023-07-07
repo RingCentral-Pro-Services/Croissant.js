@@ -20,7 +20,7 @@ import ToolCard from "../../../shared/ToolCard";
 import UIDInputField from "../../../shared/UIDInputField";
 import useFetchERLs from "../../Automatic Location Updates/hooks/useFetchERLs";
 import useSiteList from "../Sites/hooks/useSiteList";
-import { PhoneNumber, UserDataBundle } from "../User Data Download/models/UserDataBundle";
+import { Device, PhoneNumber, UserDataBundle } from "../User Data Download/models/UserDataBundle";
 import useConfigureIVRs from "./hooks/useConfigureIVRs";
 import useConfigureMOs from "./hooks/useConfigureMOs";
 import useConfigureQueues from "./hooks/useConfigureQueues";
@@ -79,6 +79,10 @@ import SettingToggle from "../../../shared/Settings Components/SettingToggle";
 import { SyncError } from "../../../../models/SyncError";
 import useExportToExcel from "../../../../hooks/useExportToExcel";
 import useExportPrettyExcel from "../../../../hooks/useExportPrettyExcel";
+import useAccountDevices from "./hooks/useAccountDevices";
+import { HotDeskingDevice } from "./models/HotDeskingDevice";
+import { UnassignedDeviceRow } from "./models/UnassignedDevice";
+import { ERLRow } from "./models/ERLRow";
 
 
 const MigrateUsers = () => {
@@ -112,6 +116,7 @@ const MigrateUsers = () => {
     const [callRecordingSettings, setCallRecordingSettings] = useState<CallRecordingDataBundle>()
     const [mainSiteBundle, setMainSiteBundle] = useState<SiteDataBundle>()
     const [overridenSiteBundle, setOverridenSiteBundle] = useState<SiteDataBundle>()
+    const [originalAccountDevices, setOriginalAccountDevices] = useState<Device[]>([])
     const [settings, setSettings] = useState({
         shouldOverrideSites: false,
         shouldRemoveSites: false,
@@ -137,6 +142,7 @@ const MigrateUsers = () => {
     const {extensionsList: targetExtensionList, fetchExtensions: fetchTargetExtensions, isExtensionListPending: isTargetExtensionListPending, isMultiSiteEnabled: targetAccountHasMultisite} = useExtensions(postMessage)
 
     const {fetchERLs, erls, isERLListPending} = useFetchERLs()
+    const {fetchAccountDevices} = useAccountDevices(postMessage, postTimedMessage, postError)
     const {fetchERLs: fetchTargetERLs, erls: targetERLList, isERLListPending: isTargetERLListPending} = useFetchERLs()
     const {fetchUsers, progressValue: userFetchProgress, maxProgress: maxUserFetchProgress} = useFetchUsers(postMessage, postTimedMessage, postError)
     const {fetchCustomRoles} = useCustomRoleList(postMessage, postTimedMessage, postError)
@@ -414,6 +420,12 @@ const MigrateUsers = () => {
 
     const handleDisoverButtonClick = async () => {
         setIsPullingData(true)
+
+        // Devices
+        const devices = await fetchAccountDevices()
+        console.log('Devices')
+        console.log(devices)
+        setOriginalAccountDevices(devices)
 
         // Main site
         if (settings.shouldMigrateSites && selectedSiteNames.includes('Main Site')) {
@@ -794,6 +806,26 @@ const MigrateUsers = () => {
             }
         }
 
+        // Hot desking devices
+        const hotDeskingDevices = originalAccountDevices.filter((device) => device.useAsCommonPhone)
+        const hotDeskingDeviceRows: HotDeskingDevice[] = []
+        for (const device of hotDeskingDevices) {
+            hotDeskingDeviceRows.push(new HotDeskingDevice(device))
+        }
+
+        // Unassigned devices
+        const unassignedDevices = originalAccountDevices.filter((device) => !device.extension)
+        const unassignedDeviceRows: UnassignedDeviceRow[] = []
+        for (const device of unassignedDevices) {
+            unassignedDeviceRows.push(new UnassignedDeviceRow(device))
+        }
+
+        // ERLs
+        const erlRows: ERLRow[] = []
+        for (const erl of erls) {
+            erlRows.push(new ERLRow(erl))
+        }
+
         exportPrettyExcel([
             {sheetName: 'Users', data: rows, startingRow: 6},
             {sheetName: 'Call Queues', data: callQueueBundles, startingRow: 5},
@@ -804,7 +836,10 @@ const MigrateUsers = () => {
             {sheetName: 'Call Monitoring', data: callMonitoringBundles, startingRow: 4},
             {sheetName: 'Park Locations', data: parkLocationBundles, startingRow: 3},
             {sheetName: 'Call Recording', data: callRecordingRows, startingRow: 16},
-            {sheetName: 'Sites', data: siteBundles, startingRow: 3}
+            {sheetName: 'Sites', data: siteBundles, startingRow: 3},
+            {sheetName: 'Hot Desk Phones', data: hotDeskingDeviceRows, startingRow: 3},
+            {sheetName: 'Unassigned Devices', data: unassignedDeviceRows, startingRow: 4},
+            {sheetName: 'Emergency Response Locations', data: erlRows, startingRow: 3}
         ], 'Migration Template.xlsx', '/migration-template.xlsx')
     }
 
