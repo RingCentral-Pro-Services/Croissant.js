@@ -12,6 +12,7 @@ const useFetchLE = (postMessage: (message: Message) => void, postTimedMessage: (
     const baseCallHandlingURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/answering-rule/ruleId'
     const baseCustomGreetingURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/greeting/greetingId'
     const basePERLURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/emergency-locations?perPage=1000'
+    const baseCallerIDURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/caller-id'
     const baseWaitingPeriod = 250
 
     const fetchLE = async (extension: Extension) => {
@@ -32,6 +33,7 @@ const useFetchLE = (postMessage: (message: Message) => void, postTimedMessage: (
         await fetchDirectNumbers(bundle, accessToken)
         await fetchBusinessHoursCallHandling(bundle, accessToken)
         await fetchPERLs(bundle, accessToken)
+        await fetchCallerID(bundle, accessToken)
 
         for (let i = 0; i < bundle.extendedData!.businessHoursCallHandling!.greetings.length; i++) {
             if (bundle.extendedData?.businessHoursCallHandling?.greetings[i].custom) {
@@ -251,6 +253,34 @@ const useFetchLE = (postMessage: (message: Message) => void, postTimedMessage: (
             console.log(e)
             postMessage(new Message(`Failed to get custom greeting URL for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to get custom greeting URL', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const fetchCallerID = async (bundle: LimitedExtensionDataBundle, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const response = await RestCentral.get(baseCallerIDURL.replace('extensionId', `${bundle.extension.data.id}`), headers)
+            bundle.extendedData!.callerID = response.data
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to get caller id settings`)
+            console.log(e)
+            postMessage(new Message(`Failed to get Caller ID settings for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to fetch Caller ID settings', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }

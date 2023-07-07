@@ -1,3 +1,17 @@
+import ExcelFormattable from "../../../../../models/ExcelFormattable"
+
+export class CallRecordingExcelRow implements ExcelFormattable {
+    constructor(public member: CallRecordingExtension) {}
+
+    toExcelRow(): string[] {
+        return [
+            this.member.name ?? '',
+            this.member.extensionNumber ?? '',
+            this.member.callDirection
+        ]
+    }
+}
+
 export interface CallRecordingDataBundle {
     onDemand: {
         enabled: boolean

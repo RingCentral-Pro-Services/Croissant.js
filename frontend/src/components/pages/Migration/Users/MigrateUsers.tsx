@@ -68,7 +68,7 @@ import useFetchCostCenters from "./hooks/useFetchCostCenters";
 import { CostCenterDataBundle } from "./models/CostCenterDataBundle";
 import useCreateCostCenters from "./hooks/useCreateCostCenters";
 import useFetchCallRecordingSettings from "./hooks/useFetchCallRecordingSettings";
-import { CallRecordingDataBundle } from "./models/CallRecordingDataBundle";
+import { CallRecordingDataBundle, CallRecordingExcelRow } from "./models/CallRecordingDataBundle";
 import useSetCallRecordingSettings from "./hooks/useSetCallRecordingSettings";
 import { UserDataRow } from "../User Data Download/models/UserDataRow";
 import { ERL } from "../../Automatic Location Updates/models/ERL";
@@ -77,8 +77,8 @@ import useConfigureMainSite from "./hooks/useConfigureMainSite";
 import useAssignMainSiteNumbers from "./hooks/useAssignMainSiteNumbers";
 import SettingToggle from "../../../shared/Settings Components/SettingToggle";
 import { SyncError } from "../../../../models/SyncError";
-import { flushSync } from "react-dom";
 import useExportToExcel from "../../../../hooks/useExportToExcel";
+import useExportPrettyExcel from "../../../../hooks/useExportPrettyExcel";
 
 
 const MigrateUsers = () => {
@@ -181,6 +181,7 @@ const MigrateUsers = () => {
     const {setCallRecordingSettings: setRecordingSettings} = useSetCallRecordingSettings(postMessage, postTimedMessage, postError)
     const {writeExcel} = useWriteExcelFile()
     const {exportToExcel} = useExportToExcel()
+    const {exportPrettyExcel} = useExportPrettyExcel()
     
     useEffect(() => {
         if (originalUID.length < 5) return
@@ -756,28 +757,6 @@ const MigrateUsers = () => {
     }
 
     const handleDownloadUsersClick = () => {
-        const userDataHeader = ['Initial Upon Completion of number/device swap', 'User Type', 'Extension', 'PHASE 2 - Temporary Extension (If Federated Accounts or Extension already in use)', 'First Name',
-                            'Last Name', 'Email Address', 'Department', 'Job Title', 'User Groups', 'Contact Phone', 'Mobile Phone', 'Regional Settings',
-                            'Regional Format', 'User Language', 'Time Format', 'User Hours', 'User Role', 'Include User in Company Directory', 'Receive RC Communication',
-                            'Send an email when a phone is added', 'Site', 'Phone Number', 'Temp Number (new account) Complete during Phase 2', 'Phone Model', 'Phone S/N',
-                            'Phone Nickname', 'Default Area Code', 'E911 Customer Name', 'E911  Street Address - Line 1', 'E911  Street Address - Line 2', 'E911  Town/City/Locality/Municipality',
-                            'E911  State/Province/County', 'Postal Code', 'E911  Country', 'Is Device Locked?', 'Is WMI Enabled?', 'Appearance', 'Appearance: Ring my phone when any user I am monitoring rings',
-                            'Appearance: Enable me to pick up a monitored line on hold', 'Permission: Allow other users to see my Presence status', 'Permission: Permitted to answer call',
-                            'Intercom', 'Delegates', 'Personal Meeting ID & Host Key', 'User Greeting', 'Screening', 'Connecting Message', 'Audio While Connecting', 'Hold Music',
-                            'User Greeting', 'Screening', 'Connecting Message', 'Audio While Connecting', 'Hold Music', 'Block option', 'Blocked Numbers', 'Robocalls', 'Trusted numbers',
-                            'Block calls with no caller ID', 'Block calls from pay phones Block option', 'Foward All Calls', 'Ring Type', 'Softphone Ring Time (My desktop & mobile apps)',
-                            'Device/Number Forward and Ring Time', 'Missed Calls', 'Voicemail Greeting', 'Voicemail Recipient', 'Ring Type', 'Softphone Ring Time (My desktop & mobile apps)',
-                            'Device/Number Forward and Ring Time', 'Missed Calls', 'Voicemail Greeting', 'Voicemail Recipient', 'Custom rules (Create a separate Google Sheet and link here if Ext has multiple rules)',
-                            'Incoming Call Information: Display Number & Play Announcement', 'Voicemail to Text', 'Personal ERL', 'Notification Email', 'Voicemail Notifications', 'Fax Notifications',
-                            'Missed Call Notifications', 'Fax Transmission Results', 'Text Message Notifications', 'Device Caller ID(s)', 'Fax Number Caller ID', 'Call Flip Caller ID', 'Ring Out Caller ID',
-                            'Ring Me Caller ID', 'AdditionalSoftphone Caller ID', 'Alternate Caller ID', 'Common Phone Caller ID', 'Mobile App Caller ID', 'Delegated Caller ID', 'Cost Center']
-
-        const callQueueDataHeader = ['Initial Upon Completion of Number Swap (if applicable)', 'Queue Name', 'Extension', 'PHASE 2 - Temporary Extension (If Federated Accounts or Extension already in use)',
-                                    'Phone Number', 'Temp Number (new account) Complete during Phase 2', 'Site', 'Manager Email', 'Record Username', 'Business Hours', 'Regional Settings', 'Regional Format',
-                                    'User Language', 'Time Format', 'Greeting', 'Connecting Audio', 'Interrupt Audio Frequency', 'Interrupt Audio Prompt', 'Hold Music', 'Ring Type', 'Members',
-                                    'Allow members to change their queue status', 'User Ring Time', 'Max Ring Time', 'Wrap Up Time', 'Max Number waiting', 'Action Exceeds Wait', 'Member Status', 'Queue Status', 'Display Settings', 'Custom Rules',
-                                    'Pickup Members', 'Alert Time', 'After Hours Behavior', 'After Hours Notes (if applicable)', 'VM Greeting', 'VM Recpient', 'VM Greeting', 'VM Recipient', 'VM Email',
-                                    'Voicemail Messages', 'Received Faxes', 'Missed Calls', 'Received Text Messages', 'Cost Center Code', 'Notes']
 
         const rows: UserDataRow[] = []
 
@@ -787,7 +766,46 @@ const MigrateUsers = () => {
             }
         }
 
-        exportToExcel([{sheetName: 'Users', data: rows, headers: userDataHeader}, {sheetName: 'Call Queues', data: callQueueBundles, headers: callQueueDataHeader}], 'Migration Data.xlsx')
+        const callRecordingRows: CallRecordingExcelRow[] = []
+        if (callRecordingSettings && callRecordingSettings.members) {
+            for (let member of callRecordingSettings.members) {
+                const extension = originalExtensionList.find((ext) => `${ext.data.id}` === `${member.id}`)
+                if (!extension) continue
+                member.name = extension.data.name
+                callRecordingRows.push(new CallRecordingExcelRow(member))
+            }
+        }
+
+        for (let siteBundle of siteBundles) {
+            const businessHoursID = siteBundle.extendedData?.businessHoursCallHandling?.extension?.id ?? siteBundle.extendedData?.businessHoursCallHandling?.transfer.extension.id
+            if (businessHoursID) {
+                const extension = originalExtensionList.find((ext) => `${ext.data.id}` === businessHoursID)
+                if (extension) {
+                    siteBundle.businessHoursRecpient = `${extension.data.name} - Ext. ${extension.data.extensionNumber}`
+                }
+            }
+
+            const afterHoursID = siteBundle.extendedData?.afterHoursCallHandling?.extension?.id ?? siteBundle.extendedData?.afterHoursCallHandling?.transfer.extension.id
+            if (afterHoursID) {
+                const extension = originalExtensionList.find((ext) => `${ext.data.id}` === afterHoursID)
+                if (extension) {
+                    siteBundle.afterHoursRecipient = `${extension.data.name} - Ext. ${extension.data.extensionNumber}`
+                }
+            }
+        }
+
+        exportPrettyExcel([
+            {sheetName: 'Users', data: rows, startingRow: 6},
+            {sheetName: 'Call Queues', data: callQueueBundles, startingRow: 5},
+            {sheetName: 'IVRs', data: ivrBundles, startingRow: 4},
+            {sheetName: 'MessageAnnouncement Extensions', data: messageOnlyBundles, startingRow: 5},
+            {sheetName: 'Limited Extensions', data: leBundles, startingRow: 5},
+            {sheetName: 'User Groups', data: userGroupBundles, startingRow: 3},
+            {sheetName: 'Call Monitoring', data: callMonitoringBundles, startingRow: 4},
+            {sheetName: 'Park Locations', data: parkLocationBundles, startingRow: 3},
+            {sheetName: 'Call Recording', data: callRecordingRows, startingRow: 16},
+            {sheetName: 'Sites', data: siteBundles, startingRow: 3}
+        ], 'Migration Template.xlsx', '/migration-template.xlsx')
     }
 
     const handleDownloadNumberMapClick = () => {

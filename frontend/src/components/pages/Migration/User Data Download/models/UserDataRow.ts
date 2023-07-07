@@ -12,7 +12,6 @@ export class UserDataRow implements ExcelFormattable {
                 public defaultBridge?: DefaultBridge, public userGroups?: string) {}
 
     toExcelRow(): string[] {
-        console.log(this)
         return [
             '', // Initial upon completion
             this.type,

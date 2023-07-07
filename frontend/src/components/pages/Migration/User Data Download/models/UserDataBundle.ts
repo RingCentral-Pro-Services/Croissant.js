@@ -71,6 +71,7 @@ export interface Device {
     serial: string
     status: string
     computerName: string
+    useAsCommonPhone?: boolean
     model: {
         id: string
         name: string
