@@ -120,6 +120,7 @@ const MigrateUsers = () => {
     const [overridenSiteBundle, setOverridenSiteBundle] = useState<SiteDataBundle>()
     const [originalAccountDevices, setOriginalAccountDevices] = useState<Device[]>([])
     const [originalAccountNumbers, setOriginalAccountNumbers] = useState<PhoneNumber[]>([])
+    // const [originalAccountPrompts, setOriginalAccountPrompts] = useState<IVRAudioPrompt[]>([])
     const [settings, setSettings] = useState({
         shouldOverrideSites: false,
         shouldRemoveSites: false,
@@ -776,7 +777,7 @@ const MigrateUsers = () => {
         postMessage(new Message('Finished migrating', 'info'))
     }
 
-    const handleDownloadUsersClick = () => {
+    const handleDownloadUsersClick = async () => {
 
         const rows: UserDataRow[] = []
 
@@ -811,6 +812,15 @@ const MigrateUsers = () => {
                 if (extension) {
                     siteBundle.afterHoursRecipient = `${extension.data.name} - Ext. ${extension.data.extensionNumber}`
                 }
+            }
+        }
+
+        // IVRs
+        for (let ivr of ivrBundles) {
+            if (ivr.extendedData?.ivrData?.prompt && ivr.extendedData.ivrData.prompt.mode === 'Audio' && ivr.extendedData.ivrData.prompt.audio) {
+                const originalPrompt = originalAccountPrompts.find((prompt) => prompt.id === ivr.extendedData?.ivrData?.prompt?.audio?.id)
+                if (!originalPrompt) continue
+                ivr.extendedData.ivrData.prompt.audio.displayName = originalPrompt.filename
             }
         }
 
@@ -862,7 +872,7 @@ const MigrateUsers = () => {
             return 1
         })
 
-        exportPrettyExcel([
+        await exportPrettyExcel([
             {sheetName: 'Users', data: rows, startingRow: 6},
             {sheetName: 'Call Queues', data: callQueueBundles, startingRow: 5},
             {sheetName: 'IVRs', data: ivrBundles, startingRow: 4},
@@ -878,6 +888,12 @@ const MigrateUsers = () => {
             {sheetName: 'Emergency Response Locations', data: erlRows, startingRow: 3},
             {sheetName: 'Company Numbers', data: companyNumberRows, startingRow: 3}
         ], 'Migration Template.xlsx', '/migration-template.xlsx')
+
+        for (let ivr of ivrBundles) {
+            if (ivr.extendedData?.ivrData?.prompt && ivr.extendedData.ivrData.prompt.mode === 'Audio' && ivr.extendedData.ivrData.prompt.audio) {
+                delete ivr.extendedData.ivrData.prompt.audio.displayName
+            }
+        }
     }
 
     const handleDownloadNumberMapClick = () => {

@@ -23,7 +23,12 @@ const useExportPrettyExcel = () => {
             const excelData: string[][] = []
 
             for (const item of sheet.data) {
-                excelData.push(item.toExcelRow())
+                try {
+                    excelData.push(item.toExcelRow())
+                }
+                catch (e) {
+                    console.log('Failed to write excel row')
+                }
             }
 
             worksheet.insertRows(sheet.startingRow, excelData, 'i+')

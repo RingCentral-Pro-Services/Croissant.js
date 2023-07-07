@@ -17,9 +17,15 @@ export class IVRDataBundle implements ExcelFormattable {
             '', // Temp number. Ignored
             this.extension.data.regionalSettings?.language.name ?? '',
             this.extendedData?.ivrData?.prompt ? this.extendedData.ivrData.prompt.mode : 'No Prompt',
-            this.extendedData?.ivrData?.prompt ? this.extendedData.ivrData.prompt?.text ?? '' : 'No Prompt',
+            this.extendedData?.ivrData?.prompt ? this.prettyPrompt() ?? '' : 'No Prompt',
             ...this.excelActionsToRow()
         ]
+    }
+
+    prettyPrompt() {
+        if (this.extendedData?.ivrData?.prompt?.mode === 'TextToSpeech') return this.extendedData.ivrData.prompt.text
+        if (this.extendedData?.ivrData?.prompt?.audio) return this.extendedData.ivrData.prompt.audio.displayName
+        return 'No Prompt'
     }
 
     excelActionsToRow () {
@@ -177,6 +183,7 @@ export interface IVRPrompt {
     audio?: {
         uri?: string
         id: string
+        displayName?: string
     }
     text?: string
     language?: {
