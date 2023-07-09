@@ -14,12 +14,26 @@ export class IVRDataBundle implements ExcelFormattable {
             this.extension.data.extensionNumber,
             this.extension.data.site?.name ?? '',
             this.extendedData?.directNumbers?.map((number) => number.phoneNumber).join(', ') ?? '',
-            '', // Temp number. Ignored
+            this.getTempNumbers(),
             this.extension.data.regionalSettings?.language.name ?? '',
             this.extendedData?.ivrData?.prompt ? this.extendedData.ivrData.prompt.mode : 'No Prompt',
             this.extendedData?.ivrData?.prompt ? this.prettyPrompt() ?? '' : 'No Prompt',
             ...this.excelActionsToRow()
         ]
+    }
+
+    getTempNumbers() {
+        if (!this.extendedData?.directNumbers) return ''
+        let result = ''
+
+        for (let i = 0; i < this.extendedData!.directNumbers.length; i++) {
+            const tempNumber = this.phoneNumberMap?.get(this.extendedData!.directNumbers[i].phoneNumber)?.phoneNumber
+            if (!tempNumber) continue
+            result += `${tempNumber}`
+            if (i !== this.extendedData!.directNumbers.length - 1) result += '\n'
+        }
+
+        return result
     }
 
     prettyPrompt() {

@@ -15,7 +15,7 @@ export class MessageOnlyDataBundle implements ExcelFormattable {
             this.extension.data.name,
             this.extension.data.extensionNumber,
             this.extendedData?.directNumbers?.map((number) => number.phoneNumber).join(', ') ?? '',
-            '', // Temp number. Ignored.
+            this.getTempNumbers(), // Temp number. Ignored.
             this.extension.data.site?.name ?? '',
             this.extension.data.contact.email,
             this.extension.data.contact.pronouncedName?.text ?? '',
@@ -31,6 +31,20 @@ export class MessageOnlyDataBundle implements ExcelFormattable {
             this.prettyFaxNotificationSettings(),
             this.extendedData!.notifications?.inboundTexts.notifyByEmail ? 'Notify' : 'Do not notify',
         ]
+    }
+
+    getTempNumbers() {
+        if (!this.extendedData?.directNumbers) return ''
+        let result = ''
+
+        for (let i = 0; i < this.extendedData!.directNumbers.length; i++) {
+            const tempNumber = this.phoneNumberMap?.get(this.extendedData!.directNumbers[i].phoneNumber)?.phoneNumber
+            if (!tempNumber) continue
+            result += `${tempNumber}`
+            if (i !== this.extendedData!.directNumbers.length - 1) result += '\n'
+        }
+
+        return result
     }
 
     prettyVoicemailNotificationSettings() {

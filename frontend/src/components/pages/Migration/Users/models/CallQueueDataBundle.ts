@@ -14,7 +14,7 @@ export class CallQueueDataBundle implements ExcelFormattable {
             this.extension.data.extensionNumber,
             '', // Temp extension number. Ignored
             this.extendedData?.directNumbers?.map((number) => number.phoneNumber).join(', ') ?? '',
-            '', // Temp number. Ignored
+            this.getTempNumbers(),
             this.extension.data.site?.name ?? '',
             this.extension.data.contact.email ?? '',
             this.extension.data.contact.pronouncedName?.text ?? '',
@@ -56,6 +56,20 @@ export class CallQueueDataBundle implements ExcelFormattable {
             this.extension.data.costCenter?.name ?? '',
             '', // Notes. Ignored
         ]
+    }
+
+    getTempNumbers() {
+        if (!this.extendedData?.directNumbers) return ''
+        let result = ''
+
+        for (let i = 0; i < this.extendedData!.directNumbers.length; i++) {
+            const tempNumber = this.phoneNumberMap?.get(this.extendedData!.directNumbers[i].phoneNumber)?.phoneNumber
+            if (!tempNumber) continue
+            result += `${tempNumber}`
+            if (i !== this.extendedData!.directNumbers.length - 1) result += '\n'
+        }
+
+        return result
     }
 
     greeting(name: string) {

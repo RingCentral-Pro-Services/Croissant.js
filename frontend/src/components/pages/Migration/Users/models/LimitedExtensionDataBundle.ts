@@ -17,9 +17,9 @@ export class LimitedExtensionDataBundle implements ExcelFormattable {
             this.extension.data.contact.email,
             this.extension.data.site?.name ?? '',
             this.extendedData?.devices![0].phoneLines[0].phoneInfo.phoneNumber ?? '',
-            '', // Tenporary number. Ignored
+            this.getTempPhoneNumber(), // Tenporary number. Ignored
             this.extendedData!.directNumbers!.map((number) => number.phoneNumber).join(', ') ?? '',
-            '', // Additional temp DIDs
+            this.getTempNumbers(),
             this.prettyDeviceType(),
             this.extendedData!.devices![0].model ? this.extendedData!.devices![0].model.name : '',
             this.extendedData!.devices![0].serial ?? '',
@@ -46,6 +46,29 @@ export class LimitedExtensionDataBundle implements ExcelFormattable {
             this.prettyCommonAreaCallerID(), // Common phone caller ID
             this.extension.data.costCenter?.name ?? ''
         ]
+    }
+
+    getTempPhoneNumber() {
+        if (this.extendedData?.devices && this.extendedData.devices[0].phoneLines && this.extendedData.devices[0].phoneLines.length !== 0 && this.extendedData.devices[0].phoneLines[0].phoneInfo) {
+            const tempNumber = this.phoneNumberMap?.get(this.extendedData.devices[0].phoneLines[0].phoneInfo.phoneNumber)
+            if (!tempNumber) return ''
+            return tempNumber.phoneNumber
+        }
+        return ''
+    }
+
+    getTempNumbers() {
+        if (!this.extendedData?.directNumbers) return ''
+        let result = ''
+
+        for (let i = 0; i < this.extendedData!.directNumbers.length; i++) {
+            const tempNumber = this.phoneNumberMap?.get(this.extendedData!.directNumbers[i].phoneNumber)?.phoneNumber
+            if (!tempNumber) continue
+            result += `${tempNumber}`
+            if (i !== this.extendedData!.directNumbers.length - 1) result += '\n'
+        }
+
+        return result
     }
 
     prettyDeviceType() {

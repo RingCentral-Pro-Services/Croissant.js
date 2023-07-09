@@ -1,6 +1,6 @@
 import ExcelFormattable from "../../../../../models/ExcelFormattable";
 import { Extension } from "../../../../../models/Extension";
-import { BlockedCallSettings, BlockedPhoneNumber, BusinessHours, CallerID, CallHandling, DefaultBridge, Delegate, Device, PERL, ForwardAllCalls, IncommingCallInfo, IntercomStatus, Notifications, PresenseAllowedUser, PresenseLine, PresenseSettings, Role } from "./UserDataBundle";
+import { BlockedCallSettings, BlockedPhoneNumber, BusinessHours, CallerID, CallHandling, DefaultBridge, Delegate, Device, PERL, ForwardAllCalls, IncommingCallInfo, IntercomStatus, Notifications, PresenseAllowedUser, PresenseLine, PresenseSettings, Role, PhoneNumber } from "./UserDataBundle";
 
 export class UserDataRow implements ExcelFormattable {
     constructor(public extension: Extension, public type: string, public device?: Device, public directNumber?: string, 
@@ -9,7 +9,7 @@ export class UserDataRow implements ExcelFormattable {
                 public blockedPhoneNumbers?: BlockedPhoneNumber[], public presenseLines?: PresenseLine[], public presenseSettings?: PresenseSettings,
                 public presenseAllowedUsers?: PresenseAllowedUser[], public intercomStatus?: IntercomStatus, public delegates?: Delegate[], public erls?: PERL[],
                 public roles?: Role[], public incommingCallInfo?: IncommingCallInfo, public businessHours?: BusinessHours, public forwardAllCalls?: ForwardAllCalls,
-                public defaultBridge?: DefaultBridge, public userGroups?: string) {}
+                public defaultBridge?: DefaultBridge, public userGroups?: string, public phoneNumberMap?: Map<string, PhoneNumber>) {}
 
     toExcelRow(): string[] {
         return [
@@ -36,7 +36,7 @@ export class UserDataRow implements ExcelFormattable {
             '', // Send email when phone added
             this.extension.data.site?.name ?? '',
             this.getPhoneNumber(),
-            '', // Temp number
+            this.getTempPhoneNumber(),
             this.device ? this.device?.model?.name ?? 'RingCentral Phone App' : '',
             this.device?.serial ?? '',
             this.device?.name ?? '',
@@ -114,6 +114,20 @@ export class UserDataRow implements ExcelFormattable {
     getPhoneNumber() {
         if (this.directNumber) return this.directNumber
         if (this.device && this.device.phoneLines && this.device.phoneLines.length !== 0 && this.device.phoneLines[0].phoneInfo) return this.device.phoneLines[0].phoneInfo.phoneNumber
+        return ''
+    }
+
+    getTempPhoneNumber() {
+        if (this.directNumber) {
+            const tempNumber = this.phoneNumberMap?.get(this.directNumber)
+            if (!tempNumber) return ''
+            return tempNumber.phoneNumber
+        }
+        if (this.device && this.device.phoneLines && this.device.phoneLines.length !== 0 && this.device.phoneLines[0].phoneInfo) {
+            const tempNumber = this.phoneNumberMap?.get(this.device.phoneLines[0].phoneInfo.phoneNumber)
+            if (!tempNumber) return ''
+            return tempNumber.phoneNumber
+        }
         return ''
     }
 
