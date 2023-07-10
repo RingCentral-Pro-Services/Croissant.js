@@ -48,7 +48,7 @@ const useCompanyNumbers = (postMessage: (message: Message) => void, postTimedMes
             const response = await RestCentral.get(baseURL.replace('PAGE', `${page}`), headers)
             const numbers = response.data.records as PhoneNumber[]
             let hasNextPage = false
-            if (response.data.navigation?.nextPage) hasNextPage = true
+            if (page < response.data.paging.totalPages) hasNextPage = true
             const deviceResponse: CompanyNumberResponse = {
                 numbers: numbers,
                 hasNextPage: hasNextPage
