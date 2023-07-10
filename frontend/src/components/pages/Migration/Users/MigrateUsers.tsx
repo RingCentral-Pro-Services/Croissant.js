@@ -822,6 +822,16 @@ const MigrateUsers = () => {
                 if (!originalPrompt) continue
                 ivr.extendedData.ivrData.prompt.audio.displayName = originalPrompt.filename
             }
+
+            if (ivr.extendedData?.ivrData?.actions) {
+                for (let action of ivr.extendedData!.ivrData!.actions) {
+                    if (action.extension) {
+                        const originalExtension = originalExtensionList.find((ext) => `${ext.data.id}` === action.extension?.id)
+                        if (!originalExtension) continue
+                        action.extension.extensionNumber = originalExtension.data.extensionNumber
+                    }
+                }
+            }
         }
 
         // Hot desking devices
@@ -892,6 +902,11 @@ const MigrateUsers = () => {
         for (let ivr of ivrBundles) {
             if (ivr.extendedData?.ivrData?.prompt && ivr.extendedData.ivrData.prompt.mode === 'Audio' && ivr.extendedData.ivrData.prompt.audio) {
                 delete ivr.extendedData.ivrData.prompt.audio.displayName
+            }
+            if (ivr.extendedData?.ivrData?.actions) {
+                for (let action of ivr.extendedData.ivrData.actions) {
+                    if (action.extension) delete action.extension.extensionNumber
+                }
             }
         }
     }
@@ -1061,6 +1076,7 @@ const MigrateUsers = () => {
                 <ProgressBar label='Park Locations' value={createParkLocationsProgress} max={maxCreateParkLocationsProgress} />
                 <ProgressBar label='Prompt Library' value={uploadPromptsProgress} max={maxUploadPromptsProgress} />
                 <ProgressBar label='User Groups' value={createUserGroupsProgress} max={maxCreateUserGroupsProgress} />
+                <ProgressBar label='Configure IVRs' value={configureIVRsProgress} max={maxConfigureIVRsProgress} />
                 <ProgressBar label='Configure Users' value={configureUsersProgress} max={maxConfigureUsersProgress} />
                 <ProgressBar label='Configure Queues' value={configureQueuesProgress} max={maxConfigureQueuesProgress} />
                 <ProgressBar label='Configure Main Site' value={configureMainSiteProgress} max={maxConfigureMainSiteProgress} />

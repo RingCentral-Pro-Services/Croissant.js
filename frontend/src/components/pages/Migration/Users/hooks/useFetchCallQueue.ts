@@ -501,10 +501,10 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
             if (e.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
-            console.log(`Failed to get business hours`)
-            console.log(e)
-            postMessage(new Message(`Failed to get business hours for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to fetch business hours', ''], e.error ?? ''))
+            // console.log(`Failed to get overflow settings`)
+            // console.log(e)
+            // postMessage(new Message(`Failed to get overflow settings for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            // postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to fetch overflow settings', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }

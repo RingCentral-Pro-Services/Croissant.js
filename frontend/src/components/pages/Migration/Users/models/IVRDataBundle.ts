@@ -57,12 +57,12 @@ export class IVRDataBundle implements ExcelFormattable {
                     }
                     else if (this.extendedData.ivrData.actions[actionIndex].action === 'Connect') {
                         result.push(prettyType(this.extendedData.ivrData.actions[actionIndex].action))
-                        result.push(this.extendedData.ivrData.actions[actionIndex].extension!.id)
+                        result.push(this.extendedData.ivrData.actions[actionIndex].extension!.extensionNumber!)
                         found = true
                     }
                     else if (this.extendedData.ivrData.actions[actionIndex].action === 'Voicemail') {
                         result.push(prettyType(this.extendedData.ivrData.actions[actionIndex].action))
-                        result.push(this.extendedData.ivrData.actions[actionIndex].extension!.id)
+                        result.push(this.extendedData.ivrData.actions[actionIndex].extension!.extensionNumber!)
                         found = true
                     }
                     else {
@@ -88,12 +88,12 @@ export class IVRDataBundle implements ExcelFormattable {
                 }
                 else if (this.extendedData.ivrData.actions[actionIndex].action === 'Connect') {
                     result.push(prettyType(this.extendedData.ivrData.actions[actionIndex].action))
-                    result.push(this.extendedData.ivrData.actions[actionIndex].extension!.id)
+                    result.push(this.extendedData.ivrData.actions[actionIndex].extension!.extensionNumber!)
                     zeroKeyFound = true
                 }
                 else if (this.extendedData.ivrData.actions[actionIndex].action === 'Voicemail') {
                     result.push(prettyType(this.extendedData.ivrData.actions[actionIndex].action))
-                    result.push(this.extendedData.ivrData.actions[actionIndex].extension!.id)
+                    result.push(this.extendedData.ivrData.actions[actionIndex].extension!.extensionNumber!)
                     zeroKeyFound = true
                 }
                 else {
@@ -215,6 +215,7 @@ export interface IVRKey {
         uri?: string
         id: string
         name?: string
+        extensionNumber?: string
     }
     phoneNumber: string
 }
