@@ -200,6 +200,9 @@ export interface CallHandling {
     extension?: {
         id: string
     }
+    unconditionalForwarding?: {
+        phoneNumber: string
+    }
 }
 
 export interface CustomRule {

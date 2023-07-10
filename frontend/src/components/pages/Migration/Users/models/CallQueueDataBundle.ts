@@ -35,27 +35,44 @@ export class CallQueueDataBundle implements ExcelFormattable {
             this.prettyTime(this.extendedData?.businessHoursCallHandling?.queue?.holdTime ?? 0),
             this.prettyTime(this.extendedData?.businessHoursCallHandling?.queue?.wrapUpTime ?? 0),
             `${this.extendedData?.businessHoursCallHandling?.queue?.maxCallers}`,
-            this.extendedData?.businessHoursCallHandling?.queue?.noAnswerAction ?? '',
-            '', // Member status. Ignored for now
-            '', // Queue status. Ignored for now
+            this.prettyMaxCallersAction(),
+            this.prettyMaxCallersDestination(),
+            this.prettyWaitTimeAction(),
+            this.prettyWaitTimeDestination(),
+            this.prettyMemberStatus(), // Member status. Ignored for now
+            this.prettyQueueStatus(), // Queue status. Ignored for now
             '', // Display information. Ignored
             this.extendedData?.customRules?.map((rule) => rule.name).join(', ') ?? '',
             this.extendedData?.pickupMembers?.map((member) => member.extensionNumber).join(', ') ?? '',
-            `${this.extendedData?.otherSettings?.alertTimer}`,
-            this.extendedData?.afterHoursCallHandling?.callHandlingAction ?? '',
-            '', // After hours notes. Ignored
+            `${this.extendedData?.otherSettings?.alertTimer ? this.extendedData?.otherSettings?.alertTimer : ''}`,
+            this.prettyAfterHoursAction(),
+            this.prettyAfterHoursDestination(),
             this.greeting('Voicemail'),
             this.extendedData?.businessHoursCallHandling?.voicemail?.recipient?.displayName ?? '',
             this.afterHoursGreeting('Voicemail'),
             this.extendedData?.afterHoursCallHandling?.voicemail?.recipient?.displayName ?? '',
             this.extendedData?.notifications?.emailAddresses?.join(', ') ?? '',
+            this.extendedData?.notifications?.voicemails.advancedEmailAddresses?.join(', ') ?? '',
             this.prettyVoicemailNotificationSettings(),
             this.prettyFaxNotificationSettings(),
             this.extendedData!.notifications?.missedCalls.notifyByEmail ? 'Notify' : 'Do not notify',
             this.extendedData!.notifications?.inboundTexts.notifyByEmail ? 'Notify' : 'Do not notify',
             this.extension.data.costCenter?.name ?? '',
+            this.prettyOverflowSettings(),
             '', // Notes. Ignored
         ]
+    }
+
+    prettyPickupMembers() {
+        if (!this.extendedData?.pickupMembers) return ''
+        let result = ''
+        for (let i = 0; i < this.extendedData.pickupMembers.length; i++) {
+            const member = this.extendedData.pickupMembers[i]
+            result += `${member.name} - Ext. ${member.extensionNumber}`
+
+            if (i != this.extendedData.pickupMembers.length - 1) result += '\n'
+        }
+        return result
     }
 
     getTempNumbers() {
@@ -81,6 +98,154 @@ export class CallQueueDataBundle implements ExcelFormattable {
                 else {
                     return 'Custom'
                 }
+            }
+        }
+        return ''
+    }
+
+    prettyOverflowSettings() {
+        if (!this.extendedData?.overflow || !this.extendedData.overflow.enabled || !this.extendedData.overflow.items) return ''
+        let result = ''
+
+        for (let i = 0; i < this.extendedData.overflow.items.length; i++) {
+            const overflowQueue = this.extendedData.overflow.items[i]
+            result += `${overflowQueue.name} - Ext. ${overflowQueue.extensionNumber}`
+
+            if (i != this.extendedData.overflow.items.length - 1) result += '\n'
+        }
+
+        return result
+    }
+
+    prettyMemberStatus() {
+        if (!this.extendedData?.memberPresense) return ''
+        let result = ''
+
+        for (let i = 0; i < this.extendedData.memberPresense.length; i++) {
+            const member = this.extendedData.memberPresense[i]
+            result += `${member.member.name} - ${member.acceptQueueCalls ? 'ON' : 'OFF'}`
+            if (i != this.extendedData.memberPresense.length - 1) result += '\n'
+        }
+
+        return result
+    }
+
+    prettyQueueStatus() {
+        if (!this.extendedData?.memberPresense) return ''
+        let result = ''
+
+        for (let i = 0; i < this.extendedData.memberPresense.length; i++) {
+            const member = this.extendedData.memberPresense[i]
+            result += `${member.member.name} - ${member.acceptCurrentQueueCalls ? 'ON' : 'OFF'}`
+            if (i != this.extendedData.memberPresense.length - 1) result += '\n'
+        }
+        
+        return result
+    }
+
+    prettyWaitTimeAction() {
+        switch (this.extendedData?.businessHoursCallHandling?.queue?.holdTimeExpirationAction) {
+            case 'TransferToExtension':
+                return 'Extension →'
+            case 'UnconditionalForwarding':
+                return 'External Number →'
+            case 'Voicemail':
+                return 'Voicemail'
+            default:
+                return ''
+        }
+    }
+
+    prettyWaitTimeDestination() {
+        if (this.extendedData?.businessHoursCallHandling?.queue?.holdTimeExpirationAction === 'TransferToExtension') {
+            if (this.extendedData?.businessHoursCallHandling?.queue.transfer) {
+                for (const transfer of this.extendedData?.businessHoursCallHandling?.queue.transfer) {
+                    if (transfer.action === 'HoldTimeExpiration') {
+                        return `${transfer.extension.extensionNumber}`
+                    }
+                }
+            }
+        }
+        else if (this.extendedData?.businessHoursCallHandling?.queue?.holdTimeExpirationAction === 'UnconditionalForwarding') {
+            if (this.extendedData?.businessHoursCallHandling?.queue.unconditionalForwarding) {
+                for (const transfer of this.extendedData?.businessHoursCallHandling?.queue.unconditionalForwarding) {
+                    if (transfer.action === 'HoldTimeExpiration') {
+                        return transfer.phoneNumber
+                    }
+                }
+            }
+        }
+        return ''
+    }
+
+    prettyMaxCallersAction() {
+        if (!this.extendedData?.businessHoursCallHandling?.queue) return ''
+
+        switch (this.extendedData!.businessHoursCallHandling?.queue.maxCallersAction) {
+            case 'TransferToExtension':
+                return 'Extension →'
+            case 'UnconditionalForwarding':
+                return 'External Number →'
+            case 'Voicemail':
+                return 'Send new callers to voicemail'
+            case 'Announcement':
+                return 'Advise callers of heavy call volume and disconnect'
+            default:
+                return ''
+        }
+    }
+
+    prettyMaxCallersDestination() {
+        if (!this.extendedData?.businessHoursCallHandling?.queue) return ''
+
+        if (this.extendedData?.businessHoursCallHandling?.queue?.maxCallersAction === 'TransferToExtension') {
+            if (this.extendedData.businessHoursCallHandling.queue.transfer) {
+                for (const transfer of this.extendedData.businessHoursCallHandling.queue.transfer) {
+                    if (transfer.action === 'MaxCallers') {
+                        return `${transfer.extension.extensionNumber}`
+                    }
+                }
+            }
+        }
+        else if (this.extendedData.businessHoursCallHandling.queue?.maxCallersAction === 'UnconditionalForwarding') {
+            if (this.extendedData.businessHoursCallHandling.queue.unconditionalForwarding) {
+                for (const transfer of this.extendedData.businessHoursCallHandling.queue.unconditionalForwarding) {
+                    if (transfer.action === 'MaxCallers') {
+                        return transfer.phoneNumber
+                    }
+                }
+            }
+        }
+        return ''
+    }
+
+    prettyAfterHoursAction() {
+        switch (this.extendedData?.afterHoursCallHandling?.callHandlingAction) {
+            case 'TransferToExtension':
+                return 'Forward to Extension →'
+            case 'UnconditionalForwarding':
+                return 'Forward to External Number →'
+            case 'TakeMessagesOnly':
+                return 'Send to Voicemail'
+            case 'PlayAnnouncementOnly':
+                return 'Play an Announcement'
+            default:
+                return ''
+        }
+    }
+
+    prettyAfterHoursDestination() {
+        if (!this.extendedData?.afterHoursCallHandling) return ''
+        const callHandling = this.extendedData.afterHoursCallHandling
+
+        if (callHandling.callHandlingAction === 'TransferToExtension') {
+            if (callHandling.transfer) {
+                return `${callHandling.transfer.extension.id}`
+            }
+        }
+        else if (callHandling.callHandlingAction === 'UnconditionalForwarding') {
+            if (this.extendedData.afterHoursCallHandling.unconditionalForwarding) {
+                return callHandling.unconditionalForwarding?.phoneNumber ?? ''
             }
         }
         return ''
@@ -226,6 +391,19 @@ export interface ExtendedQueueData {
     pickupMembers?: PickupMember[]
     managers?: QueueManager[]
     customRules?: CustomRule[]
+    overflow?: OverflowSettings
+}
+
+export interface OverflowSettings {
+    enabled: boolean
+    items: OverflowQueue[]
+}
+
+export interface OverflowQueue {
+    id: string
+    extensionNumber: string
+    name: string
+    status: string
 }
 
 interface CallQueueMember {
