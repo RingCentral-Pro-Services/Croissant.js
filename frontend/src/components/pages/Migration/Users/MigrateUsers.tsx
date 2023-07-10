@@ -1010,7 +1010,6 @@ const MigrateUsers = () => {
                 {shouldShowSiteFilter ? <AdaptiveFilter options={siteNames} title='Sites' placeholder='Search' setSelected={setSelectedSiteNames} /> : <></>}
                 {isMultiSiteEnabled ? <FormControlLabel control={<Checkbox defaultChecked value={settings.shouldMigrateSites} onChange={(e) => setSettings({...settings, shouldMigrateSites: e.target.checked})} />} label="Migrate Sites" /> : <></>}
                 <Button variant='filled' onClick={handleDisoverButtonClick} disabled={isPullingData} >Discover</Button>
-                <Button className='healthy-margin-left' sx={{top: 7}} variant='subtle' color='dark' leftIcon={<IconDownload />} onClick={handleDownloadUsersClick} >Migration Template</Button>
                 <div className="healthy-margin-top">
                     <FormControl>
                         <FormLabel id="demo-row-radio-buttons-group-label">Pull numbers from</FormLabel>
@@ -1046,6 +1045,7 @@ const MigrateUsers = () => {
                 <p>Enter the UID that you are migrating <em>to</em></p>
                 <UIDInputField disabled={hasTargetAccountToken} disabledText={targetCompanyName} setTargetUID={setTargetUID} loading={isTargetAccountTokenPending} error={targetAccountTokenError} />
                 <Button variant='filled' onClick={handleMigrateButtonClick} disabled={!hasTargetAccountToken || isERLListPending || isTargetERLListPending || isMigrating} >Migrate</Button>
+                <Button className='healthy-margin-left' sx={{top: 7}} variant='subtle' color='dark' leftIcon={<IconDownload />} onClick={handleDownloadUsersClick} >Migration Template</Button>
                 <Button className='healthy-margin-left' sx={{top: 7}} variant='subtle' color='dark' leftIcon={<IconDownload />} onClick={handleDownloadNumberMapClick} >Number Map</Button>
                 <ProgressBar label='Main Site' value={assignMainSiteNumbersProgress} max={maxAssignMainSiteNumbersProgress} />
                 <ProgressBar label='Create Sites' value={siteMigrationProgress} max={maxSiteProgress} />
