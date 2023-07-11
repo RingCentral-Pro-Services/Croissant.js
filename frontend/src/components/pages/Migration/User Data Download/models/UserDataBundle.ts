@@ -357,8 +357,8 @@ export interface PresenseSettings {
 
 export interface PresenseAllowedUser {
     id: string
-    extensionNumber: string
-    extensionName: string
+    extensionNumber?: string
+    extensionName?: string
 }
 
 export interface IntercomStatus {

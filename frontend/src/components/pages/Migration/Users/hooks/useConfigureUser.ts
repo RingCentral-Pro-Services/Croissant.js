@@ -4,7 +4,7 @@ import { Message } from "../../../../../models/Message";
 import { SyncError } from "../../../../../models/SyncError";
 import { RestCentral } from "../../../../../rcapi/RestCentral";
 import { ERL } from "../../../Automatic Location Updates/models/ERL";
-import { BlockedPhoneNumber, CalledNumber, CallerIDDevice, CallerIDFeature, CallHandling, CallHandlingForwardingNumber, CallHandlingForwardingRule, CustomRule, Device, ForwardingNumber, PERL, PhoneNumber, PresenseLine, UserDataBundle } from "../../User Data Download/models/UserDataBundle";
+import { BlockedPhoneNumber, CalledNumber, CallerIDDevice, CallerIDFeature, CallHandling, CallHandlingForwardingNumber, CallHandlingForwardingRule, CustomRule, Device, ForwardingNumber, PERL, PhoneNumber, PresenseAllowedUser, PresenseLine, UserDataBundle } from "../../User Data Download/models/UserDataBundle";
 import { Role } from "../models/Role";
 
 interface DeviceModelPayload {
@@ -40,6 +40,7 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
     const baseCustomGreetingURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/greeting'
     const baseCustomRuleURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/answering-rule'
     const baseCallerIdURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/caller-id'
+    const basePresenseAllowedUsersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/presence/permission'
     const baseWaitingPeriod = 250
 
     const configureUser = async (bundle: UserDataBundle, companyERLs: ERL[], originalExtensions: Extension[], targetExtensions: Extension[], roles: Role[], globalSiteNumberMap: Map<string, PhoneNumber>) => {
@@ -78,6 +79,7 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
             }
         }
 
+        await setPresenseAllowedUsers(bundle, originalExtensions, targetExtensions, accessToken)
         await setPresenseLines(bundle, originalExtensions, targetExtensions, accessToken)
         await setPresenseStatus(bundle, accessToken)
         await setNotifications(bundle, accessToken)
@@ -1505,6 +1507,72 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
             console.log(e)
             postMessage(new Message(`Failed to set caller ID for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to set caller ID', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const setPresenseAllowedUsers = async (bundle: UserDataBundle, originalExtensions: Extension[], targetExtensions: Extension[], token: string) => {
+        if (!bundle.extendedData?.presenseAllowedUsers) return
+        
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+
+            const goodUsers: PresenseAllowedUser[] = []
+            const badUsers: PresenseAllowedUser[] = []
+
+            for (const user of bundle.extendedData.presenseAllowedUsers) {
+                const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === `${user.id}`)
+                if (!originalExtension) {
+                    badUsers.push(user)
+                    console.log('Bad allowed user')
+                    continue
+                }
+
+                const targetExtension = targetExtensions.find((ext) => ext.data.name === originalExtension.data.name)
+                if (!targetExtension) {
+                    badUsers.push(user)
+                    console.log('Bad allowed user')
+                    continue
+                }
+
+                if (`${targetExtension.data.id}` !== `${bundle.extension.data.id}`) {
+                    goodUsers.push({
+                        id: `${targetExtension.data.id}`,
+                    })
+                }
+            }
+
+            if (badUsers.length !== 0) {
+                postMessage(new Message(`${badUsers.length} users were removed from users allowed to answer ${bundle.extension.data.name}'s calls`, 'warning'))
+                postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Users removed from allowed to answer calls', badUsers.map((user) => user.extensionNumber).join(', ')]))
+            }
+
+            if (goodUsers.length === 0) return
+
+            const body = {
+                extensions: goodUsers
+            }
+
+            const response = await RestCentral.put(basePresenseAllowedUsersURL.replace('extensionId', `${bundle.extension.data.id}`), headers, body)
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to set users allowed to answer calls`)
+            console.log(e)
+            postMessage(new Message(`Failed to set users allowed to answer calls for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to set users allowed to answer calls', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }

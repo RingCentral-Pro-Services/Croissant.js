@@ -29,7 +29,8 @@ const useFetchMOData = (postMessage: (message: Message) => void, postTimedMessag
         const notifications = await fetchNotificationSettings(newExtension, accessToken)
         const directNumbers = await fetchDirectNumbers(newExtension, accessToken)
         const callHandling = await fetchCallHandling(newExtension, accessToken)
-        const voicemailGreeting = callHandling?.greetings[0]
+        let voicemailGreeting = undefined
+        if (callHandling?.greetings) voicemailGreeting = callHandling?.greetings[0]
         if (voicemailGreeting && voicemailGreeting.custom) {
             // This is a custom greeting
             const greetingData = await getCustomGreetingURL(newExtension, voicemailGreeting.custom.id, accessToken)

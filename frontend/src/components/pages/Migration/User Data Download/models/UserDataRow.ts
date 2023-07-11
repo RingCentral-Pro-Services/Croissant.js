@@ -208,7 +208,7 @@ export class UserDataRow implements ExcelFormattable {
         let result = ''
 
         for (const line of this.presenseLines) {
-            result += `Line ${line.id} - ${line.extension.extensionName}\n`
+            result += `Line ${line.id} - Ext. ${line.extension.extensionNumber}\n`
         }
 
         return result

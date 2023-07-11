@@ -30,7 +30,9 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
                 bundle.extension.data.site!.id = `${site!.data.id}`
             }
             bundle.extension.data.contact.email = `${bundle.extension.data.contact.email}.ps.ringcentral.com`
-            bundle.extension.data.status = 'NotActivated'
+            if (bundle.extension.data.status !== 'Disabled') {
+                bundle.extension.data.status = 'NotActivated'
+            }
 
             const phoneNumberBundle: PhoneNumber[] = []
             bundle.phoneNumberMap = new Map<string, PhoneNumber>()
@@ -52,6 +54,9 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
                 for (let i = 0; i < deviceCount; i++) {
                     if (unassignedExtensions.length === 0) {
                         postMessage(new Message('Ran out of unassigned extensions', 'error'))
+                        continue
+                    }
+                    if (!bundle.extendedData!.devices[i].phoneLines || bundle.extendedData!.devices[i].phoneLines.length === 0) {
                         continue
                     }
                     const unassignedExt = unassignedExtensions.pop()!
