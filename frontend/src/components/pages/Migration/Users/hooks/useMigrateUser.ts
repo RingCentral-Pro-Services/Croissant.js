@@ -63,6 +63,44 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
             if (e.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
+            // bundle.hasEncounteredFatalError = true
+            // console.log(`Failed to create user`)
+            // console.log(e)
+            // postMessage(new Message(`Failed to create user ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            // postError(new SyncError('', 0, ['Failed to create user', bundle.extension.data.name], e.error ?? ''))
+            retryUnlicensedUser(bundle, token)
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const retryUnlicensedUser = async (bundle: UserDataBundle, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            bundle.extension.data.subType = 'VirtualUser'
+            if (bundle.extension.data.extensionNumber === '0') {
+                postMessage(new Message(`Next available extension used for ${bundle.extension.data.name} because zero cannot be used`, 'warning'))
+                postError(new SyncError(bundle.extension.data.name, '0', ['Extension number changed', '']))
+            }
+            const response = await RestCentral.post(baseVirtualUserURL, headers, bundle.extension.payloadWithoutExtension(true))
+            bundle.extension.data.id = response.data.id
+            bundle.tempExtension = response.data.extensionNumber
+
+            postMessage(new Message(`${bundle.extension.data.name} was created with the next available extension number: ${bundle.tempExtension}`, 'warning'))
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
             bundle.hasEncounteredFatalError = true
             console.log(`Failed to create user`)
             console.log(e)
@@ -83,6 +121,37 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
             const response = await RestCentral.put(baseUpdateURL.replace('extensionId', id), headers, bundle.extension.payload(true))
             bundle.extension.data.id = response.data.id
 
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            // postMessage(new Message(`Failed to create user ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            // postError(new SyncError('', 0, ['Failed to create user', bundle.extension.data.name], e.error ?? ''))
+            retryLicensedUser(bundle, id, token)
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const retryLicensedUser = async (bundle: UserDataBundle, id: string, token: string) => {
+        console.log(`Creating user from unassigned ext with ID: ${id}`)
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const response = await RestCentral.put(baseUpdateURL.replace('extensionId', id), headers, bundle.extension.payloadWithoutExtension(true))
+            bundle.extension.data.id = response.data.id
+            bundle.tempExtension = response.data.extensionNumber
+
+            postMessage(new Message(`${bundle.extension.data.name} was created with the next available extension number: ${bundle.tempExtension}`, 'warning'))
+            
             if (response.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }

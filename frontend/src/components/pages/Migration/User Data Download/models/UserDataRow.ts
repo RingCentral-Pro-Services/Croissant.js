@@ -9,14 +9,14 @@ export class UserDataRow implements ExcelFormattable {
                 public blockedPhoneNumbers?: BlockedPhoneNumber[], public presenseLines?: PresenseLine[], public presenseSettings?: PresenseSettings,
                 public presenseAllowedUsers?: PresenseAllowedUser[], public intercomStatus?: IntercomStatus, public delegates?: Delegate[], public erls?: PERL[],
                 public roles?: Role[], public incommingCallInfo?: IncommingCallInfo, public businessHours?: BusinessHours, public forwardAllCalls?: ForwardAllCalls,
-                public defaultBridge?: DefaultBridge, public userGroups?: string, public phoneNumberMap?: Map<string, PhoneNumber>) {}
+                public defaultBridge?: DefaultBridge, public userGroups?: string, public phoneNumberMap?: Map<string, PhoneNumber>, public tempExtension?: string) {}
 
     toExcelRow(): string[] {
         return [
             '', // Initial upon completion
             this.type,
             this.extension.data.extensionNumber,
-            '', // Temporary extension
+            this.tempExtension ?? '', // Temporary extension
             this.extension.data.contact.firstName,
             this.extension.data.contact.lastName ?? '',
             this.extension.data.contact.email,

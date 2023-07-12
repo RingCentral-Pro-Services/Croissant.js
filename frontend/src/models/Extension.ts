@@ -160,6 +160,30 @@ export class Extension implements ExcelFormattable, DataGridFormattable {
         }
     }
 
+    payloadWithoutExtension(isMultiSiteEnable: boolean): any {
+        return {
+            contact: {
+                ...((this.data.type === 'User' || this.data.type == 'VirtualUser') && {firstName: this.data.contact?.firstName}),
+                ... ((this.data.type !== 'User' && this.data.type !== 'VirtualUser') && {firstName: `${this.data.contact.firstName}${this.data.contact.lastName ? ` ${this.data.contact.lastName }`: ''}`}),
+                ...((this.data.type === 'User' || this.data.type == 'VirtualUser') && {lastName: this.data.contact?.lastName}),
+                email: this.data.contact?.email,
+                ...(((this.data.type === 'User' || this.data.type == 'VirtualUser') && (this.data.contact.department && this.data.contact?.department !== '')) && {department: this.data.contact?.department ?? ''}),
+                ...(this.data.contact.businessPhone && {businessPhone: this.data.contact.businessPhone}),
+                ...(this.data.contact.mobilePhone && {mobilePhone: this.data.contact.mobilePhone}),
+                ...(this.data.contact.jobTitle && {jobTitle: this.data.contact.jobTitle}),
+                ... (this.data.type === 'Limited' && {lastName: ''})
+            },
+            type: this.data.type === 'VirtualUser' ? 'User' : this.data.type,
+            status: this.status(),
+            ...(this.data.type === 'VirtualUser' && {subType: 'VideoPro'}),
+            ...((isMultiSiteEnable && this.data.site?.id !== 'main-site') && { site: { id: this.data.site?.id } }),
+            ...((this.data.ivrPin && this.data.ivrPin != '') && {ivrPin: this.data.ivrPin}),
+            ...((this.data.password && this.data.password != '') && {password: this.data.password}),
+            ...(this.data.regionalSettings && {regionalSettings: this.data.regionalSettings}),
+            ...(this.data.hidden !== undefined && {hidden: this.data.hidden})
+        }
+    }
+
     rolePayload(): any {
         if (!this.data.roles) {
             return {}
