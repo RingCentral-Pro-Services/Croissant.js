@@ -149,8 +149,6 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
             const response = await RestCentral.put(baseUpdateURL.replace('extensionId', id), headers, bundle.extension.payloadWithoutExtension(true))
             bundle.extension.data.id = response.data.id
             bundle.tempExtension = response.data.extensionNumber
-
-            postMessage(new Message(`${bundle.extension.data.name} was created with the next available extension number: ${bundle.tempExtension}`, 'warning'))
             
             if (response.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)

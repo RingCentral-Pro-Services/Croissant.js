@@ -4,6 +4,7 @@ import { BusinessHours, CallHandling, CustomRule, Notifications, PhoneNumber } f
 
 export class CallQueueDataBundle implements ExcelFormattable {
     public hasEncounteredFatalError = false
+    public tempExtension = ''
     
     constructor(public extension: Extension, public extendedData?: ExtendedQueueData, public phoneNumberMap?: Map<string, PhoneNumber>) {}
 

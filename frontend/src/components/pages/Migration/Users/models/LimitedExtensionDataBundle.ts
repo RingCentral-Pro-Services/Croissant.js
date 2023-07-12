@@ -4,6 +4,7 @@ import { CallerID, CallHandling, Device, PERL, PhoneNumber } from "../../User Da
 
 export class LimitedExtensionDataBundle implements ExcelFormattable {
     public hasEncounteredFatalError = false
+    public tempExtension = ''
     
     constructor(public extension: Extension, public extendedData?: LEExtendedData, public phoneNumberMap?: Map<string, PhoneNumber>) {}
 
@@ -11,7 +12,7 @@ export class LimitedExtensionDataBundle implements ExcelFormattable {
         return [
             '', // Initial on completion. Ignored.
             this.extension.data.extensionNumber,
-            '', // Temporary extension. Ignored.
+            this.tempExtension ?? '',
             this.extension.data.name,
             '', // Last name. Ignored.
             this.extension.data.contact.email,

@@ -4,6 +4,7 @@ import { PhoneNumber } from "../../User Data Download/models/UserDataBundle";
 
 export class IVRDataBundle implements ExcelFormattable {
     public hasEncounteredFatalError = false
+    public tempExtension = ''
     
     constructor(public extension: Extension, public extendedData?: IVRExtendedData, public phoneNumberMap?: Map<string, PhoneNumber>) {}
 
@@ -139,6 +140,16 @@ export class IVRDataBundle implements ExcelFormattable {
         return {
             name: this.extension.data.name,
             extensionNumber: this.extension.data.extensionNumber,
+            ...((this.extension.data.site?.name !== 'Main Site') && {site: {id: this.extension.data.site?.id}})
+            // site: {
+            //     id: this.extension.data.site?.id
+            // }
+        }
+    }
+
+    payloadWithoutExtension() {
+        return {
+            name: this.extension.data.name,
             ...((this.extension.data.site?.name !== 'Main Site') && {site: {id: this.extension.data.site?.id}})
             // site: {
             //     id: this.extension.data.site?.id
