@@ -64,7 +64,13 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
                     unassignedIDs.push(`${unassignedExt.data.id}`)
                 }
 
-                await migrateUser(bundle, phoneNumberBundle, unassignedIDs)
+                if (unassignedIDs.length !== 0) {
+                    await migrateUser(bundle, phoneNumberBundle, unassignedIDs)
+                }
+                else {
+                    await migrateUser(bundle, phoneNumberBundle)    
+                }
+
             }
             else {
                 await migrateUser(bundle, phoneNumberBundle)
