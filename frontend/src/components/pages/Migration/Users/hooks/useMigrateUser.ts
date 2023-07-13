@@ -68,7 +68,7 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
             // console.log(e)
             // postMessage(new Message(`Failed to create user ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
             // postError(new SyncError('', 0, ['Failed to create user', bundle.extension.data.name], e.error ?? ''))
-            retryUnlicensedUser(bundle, token)
+            await retryUnlicensedUser(bundle, token)
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
@@ -133,7 +133,7 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
             }
             // postMessage(new Message(`Failed to create user ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
             // postError(new SyncError('', 0, ['Failed to create user', bundle.extension.data.name], e.error ?? ''))
-            retryLicensedUser(bundle, id, token)
+            await retryLicensedUser(bundle, id, token)
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }

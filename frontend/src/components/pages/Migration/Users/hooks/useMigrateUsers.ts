@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Extension } from "../../../../../models/Extension";
 import { Message } from "../../../../../models/Message";
 import { SyncError } from "../../../../../models/SyncError";
-import { PhoneNumber, UserDataBundle } from "../../User Data Download/models/UserDataBundle";
+import { Device, PhoneNumber, UserDataBundle } from "../../User Data Download/models/UserDataBundle";
 import useMigrateUser from "./useMigrateUser";
 
 const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
@@ -30,9 +30,8 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
                 bundle.extension.data.site!.id = `${site!.data.id}`
             }
             bundle.extension.data.contact.email = `${bundle.extension.data.contact.email}.ps.ringcentral.com`
-            if (bundle.extension.data.status !== 'Disabled') {
-                bundle.extension.data.status = 'NotActivated'
-            }
+            bundle.extension.data.status = 'NotActivated'
+            
 
             const phoneNumberBundle: PhoneNumber[] = []
             bundle.phoneNumberMap = new Map<string, PhoneNumber>()
@@ -50,13 +49,12 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
 
             if (bundle.extendedData?.devices.length != 0) {
                 const deviceCount = bundle.extendedData!.devices.length
+                let actualDevices: Device[] = []
+                actualDevices = bundle.extendedData!.devices.filter((device) => device.phoneLines && device.phoneLines.length !== 0)
                 let unassignedIDs: string[] = []
-                for (let i = 0; i < deviceCount; i++) {
+                for (let i = 0; i < actualDevices.length; i++) {
                     if (unassignedExtensions.length === 0) {
                         postMessage(new Message('Ran out of unassigned extensions', 'error'))
-                        continue
-                    }
-                    if (!bundle.extendedData!.devices[i].phoneLines || bundle.extendedData!.devices[i].phoneLines.length === 0) {
                         continue
                     }
                     const unassignedExt = unassignedExtensions.pop()!
