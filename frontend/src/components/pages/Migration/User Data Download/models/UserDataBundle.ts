@@ -15,11 +15,18 @@ export class UserDataBundle {
 
     toRows(): UserDataRow[] {
         const rows: UserDataRow[] = []
+        let actualDevices: Device[] = []
         if (!this.extendedData) return []
 
         if (this.extendedData.devices) {
-            for (let i = 0; i < this.extendedData?.devices.length; i++) {
-                const row = new UserDataRow(this.extension, 'Full DL', this.extendedData.devices[i], undefined, this.extendedData.businessHoursCallHandling, this.extendedData.afterHoursCallHandling, this.extendedData.notifications, this.extendedData.callerID, this.extendedData.blockedCallSettings, this.extendedData.blockedPhoneNumbers, this.extendedData.presenseLines, this.extendedData.presenseSettings, this.extendedData.presenseAllowedUsers, this.extendedData.intercomStatus, this.extendedData.delegates, this.extendedData.pERLs, this.extendedData.roles, this.extendedData.incommingCallInfo, this.extendedData.businessHours, this.extendedData.forwardAllCalls, this.extendedData.defaultBridge, this.userGroups, this.phoneNumberMap, this.tempExtension)
+            // Typically, a user must be a fully licenced MVP user to have a device. This is not the case in some accounts.
+            // Some accounts have virtual users that somehow have devices. Though the devices do not have phone lines.
+            // The check below filters out any devices that do not have phone lines so the tool doesn't inaccurately report
+            // virtual users as fully licenced users.
+            actualDevices = this.extendedData.devices.filter((device) => device.phoneLines && device.phoneLines.length !== 0)
+
+            for (let i = 0; i < actualDevices.length; i++) {
+                const row = new UserDataRow(this.extension, 'Full DL', actualDevices[i], undefined, this.extendedData.businessHoursCallHandling, this.extendedData.afterHoursCallHandling, this.extendedData.notifications, this.extendedData.callerID, this.extendedData.blockedCallSettings, this.extendedData.blockedPhoneNumbers, this.extendedData.presenseLines, this.extendedData.presenseSettings, this.extendedData.presenseAllowedUsers, this.extendedData.intercomStatus, this.extendedData.delegates, this.extendedData.pERLs, this.extendedData.roles, this.extendedData.incommingCallInfo, this.extendedData.businessHours, this.extendedData.forwardAllCalls, this.extendedData.defaultBridge, this.userGroups, this.phoneNumberMap, this.tempExtension)
                 rows.push(row)
             }
         }
@@ -31,7 +38,7 @@ export class UserDataBundle {
             }
         }
 
-        if ((!this.extendedData.devices && !this.extendedData.directNumbers) || (this.extendedData.devices.length === 0 && this.extendedData.directNumbers?.length === 0)) {
+        if ((!this.extendedData.devices && !this.extendedData.directNumbers) || (this.extendedData.devices.length === 0 && this.extendedData.directNumbers?.length === 0) || actualDevices.length === 0) {
             const row = new UserDataRow(this.extension, 'Virtual', undefined, undefined, this.extendedData.businessHoursCallHandling, this.extendedData.afterHoursCallHandling, this.extendedData.notifications, this.extendedData.callerID, this.extendedData.blockedCallSettings, this.extendedData.blockedPhoneNumbers, this.extendedData.presenseLines, this.extendedData.presenseSettings, this.extendedData.presenseAllowedUsers, this.extendedData.intercomStatus, this.extendedData.delegates, this.extendedData.pERLs, this.extendedData.roles, this.extendedData.incommingCallInfo, this.extendedData.businessHours, this.extendedData.forwardAllCalls, this.extendedData.defaultBridge, this.userGroups, this.phoneNumberMap, this.tempExtension)
             rows.push(row)
         }
