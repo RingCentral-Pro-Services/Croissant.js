@@ -14,7 +14,7 @@ const SettingToggle = (props: SettingToggleProps) => {
 
     return (
         <div style={{marginBottom: 25}}>
-            <div style={{display: 'inline-block', maxWidth: 385}}>
+            <div style={{display: 'inline-block', width: 385}}>
                 <Text>{title}</Text>
                 <Text size="xs" color="dimmed">{description}</Text>
             </div>

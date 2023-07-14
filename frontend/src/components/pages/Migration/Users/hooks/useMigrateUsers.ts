@@ -10,7 +10,7 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
     const [maxProgress, setMaxProgress] = useState(2)
     const {migrateUser} = useMigrateUser(postMessage, postTimedMessage, postError)
 
-    const migrateUsers = async (phoneNumbers: PhoneNumber[], dataBundles: UserDataBundle[], unassignedExtensions: Extension[], extensions: Extension[]) => {
+    const migrateUsers = async (phoneNumbers: PhoneNumber[], dataBundles: UserDataBundle[], unassignedExtensions: Extension[], extensions: Extension[], emailSuffix: string) => {
         const accessToken = localStorage.getItem('cs_access_token')
         if (!accessToken) {
             throw new Error('No access token')
@@ -29,7 +29,7 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
 
                 bundle.extension.data.site!.id = `${site!.data.id}`
             }
-            bundle.extension.data.contact.email = `${bundle.extension.data.contact.email}.ps.ringcentral.com`
+            bundle.extension.data.contact.email = `${bundle.extension.data.contact.email}${emailSuffix}`
             bundle.extension.data.status = 'NotActivated'
             
 

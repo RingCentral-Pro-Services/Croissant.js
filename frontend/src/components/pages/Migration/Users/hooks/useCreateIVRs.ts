@@ -7,7 +7,7 @@ import { IVRDataBundle } from "../models/IVRDataBundle";
 import { MessageOnlyDataBundle } from "../models/MessageOnlyDataBundle";
 import useCreateIVR from "./useCreateIVR";
 
-const useCreateIVRs = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
+const useCreateIVRs = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void, emailSuffix: string) => {
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgress, setMaxProgress] = useState(2)
     const {createIVR} = useCreateIVR(postMessage, postTimedMessage, postError)
@@ -36,10 +36,10 @@ const useCreateIVRs = (postMessage: (message: Message) => void, postTimedMessage
             }
 
             if (bundle.extension.data.contact.email) {
-                bundle.extension.data.contact.email = `${bundle.extension.data.contact.email}.ps.ringcentral.com`
+                bundle.extension.data.contact.email = `${bundle.extension.data.contact.email}${emailSuffix}`
             }
             else {
-                bundle.extension.data.contact.email = `noreply-${bundle.extension.data.extensionNumber}@ps.ringcentral.com`
+                bundle.extension.data.contact.email = `noreply-${bundle.extension.data.extensionNumber}${emailSuffix}`
             }
             bundle.extension.data.status = 'Enabled'
 

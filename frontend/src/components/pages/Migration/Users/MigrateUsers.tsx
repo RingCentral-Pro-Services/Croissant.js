@@ -127,7 +127,9 @@ const MigrateUsers = () => {
         shouldMigrateSites: true,
         numberSourceSelection: 'Inventory',
         specificExtension: '',
-        targetSiteName: ''
+        targetSiteName: '',
+        shouldAddEmailSuffix: true,
+        emailSuffix: '.ps.ringcentral.com'
     })
 
     const handleSiteFetchCompletion = (sites: SiteData[]) => {
@@ -175,14 +177,14 @@ const MigrateUsers = () => {
     const {migrateERLs, progressValue: erlProgress, maxProgress: maxERLProgress} = useMigrateERLs(postMessage, postTimedMessage, postError)
     const {migrateUsers, progressValue: createUsersProgress, maxProgress: maxCreateUsersProgress} = useMigrateUsers(postMessage, postTimedMessage, postError)
     const {configureUsers, progressValue: configureUsersProgress, maxProgress: maxConfigureUsersProgress} = useConfigureUsers(postMessage, postTimedMessage, postError)
-    const {createMOs, progressValue: createMOsProgress, maxProgress: maxCreateMOsProgress} = useCreateMOs(postMessage, postTimedMessage, postError)
-    const {configureMOs} = useConfigureMOs(postMessage, postTimedMessage, postError)
+    const {createMOs, progressValue: createMOsProgress, maxProgress: maxCreateMOsProgress} = useCreateMOs(postMessage, postTimedMessage, postError, settings.emailSuffix)
+    const {configureMOs} = useConfigureMOs(postMessage, postTimedMessage, postError, settings.emailSuffix)
     const {createQueues, progressValue: createQueuesProgress, maxProgress: maxCreateQueueProgess} = useCreateQueues(postMessage, postTimedMessage, postError)
-    const {configureQueues, progressValue: configureQueuesProgress, maxProgress: maxConfigureQueuesProgress} = useConfigureQueues(postMessage, postTimedMessage, postError)
-    const {createIVRs, progressValue: createIVRsProgress, maxProgress: maxCreateIVRsProgress} = useCreateIVRs(postMessage, postTimedMessage, postError)
+    const {configureQueues, progressValue: configureQueuesProgress, maxProgress: maxConfigureQueuesProgress} = useConfigureQueues(postMessage, postTimedMessage, postError, settings.emailSuffix)
+    const {createIVRs, progressValue: createIVRsProgress, maxProgress: maxCreateIVRsProgress} = useCreateIVRs(postMessage, postTimedMessage, postError, settings.emailSuffix)
     const {configureIVRs, progressValue: configureIVRsProgress, maxProgress: maxConfigureIVRsProgress} = useConfigureIVRs(postMessage, postTimedMessage, postError)
     const {uploadPrompts, progressValue: uploadPromptsProgress, maxProgress: maxUploadPromptsProgress} = useUploadPromopts(postMessage, postTimedMessage, postError)
-    const {createLEs, progressValue: createLEsProgress, maxProgress: maxCreateLEsProgress} = useCreateLEs(postMessage, postTimedMessage, postError)
+    const {createLEs, progressValue: createLEsProgress, maxProgress: maxCreateLEsProgress} = useCreateLEs(postMessage, postTimedMessage, postError, settings.emailSuffix)
     const {createMonitoringGroups, progressValue: createMonitoringGroupsProgess, maxProgress: maxCreateMonitoringGroupsProgress} = useCreateCallMonitoringGroups(postMessage, postTimedMessage, postError)
     const {createParkLocations, progressValue: createParkLocationsProgress, maxProgress: maxCreateParkLocationsProgress} = useCreateParkLocations(postMessage, postTimedMessage, postError)
     const {createUserGroups, progressValue: createUserGroupsProgress, maxProgress: maxCreateUserGroupsProgress} = useCreateUserGroups(postMessage, postTimedMessage, postError)
@@ -261,6 +263,11 @@ const MigrateUsers = () => {
             setFilteredExtensions(selected)
         }
     }, [selectedExtensionTypes, selectedSiteNames])
+
+    useEffect(() => {
+        if (settings.shouldAddEmailSuffix) return
+        setSettings({...settings, emailSuffix: ''})
+    }, [settings.shouldAddEmailSuffix])
 
     const handleFilterSelection = (selected: DataGridFormattable[]) => {
         if (isPending || isPullingData || isMigrating) return
@@ -694,7 +701,7 @@ const MigrateUsers = () => {
 
         console.log(`Migrating ${userDataBundles.length} users`)
         console.log(userDataBundles)
-        await migrateUsers(availablePhoneNumbers, userDataBundles, unassignedExtensions, targetExts)
+        await migrateUsers(availablePhoneNumbers, userDataBundles, unassignedExtensions, targetExts, settings.emailSuffix)
 
         const migratedUsers = userDataBundles.map((bundle) => bundle.extension)
         targetExts = [...targetExts, ...migratedUsers]
@@ -747,7 +754,7 @@ const MigrateUsers = () => {
         }
 
         await configureQueues(callQueueBundles, originalExtensionList, targetExts)
-        await configureUsers(userDataBundles, targetERLs, originalExtensionList, targetExts, roles, globalSiteNumberMap)
+        await configureUsers(userDataBundles, targetERLs, originalExtensionList, targetExts, roles, globalSiteNumberMap, settings.emailSuffix)
         await configureMOs(messageOnlyBundles, originalExtensionList, targetExts)
         await configureIVRs(ivrBundles, originalExtensionList, targetExts, originalAccountPrompts, prompts)
         if (settings.shouldMigrateSites) {
@@ -1015,6 +1022,15 @@ const MigrateUsers = () => {
                                 checked={settings.shouldRemoveSites}
                                 onChange={(value) => setSettings({...settings, shouldRemoveSites: value})}
                             />
+
+                            <SettingToggle
+                                title="Email Suffix"
+                                description="Append this value to the end of email addresses"
+                                checked={settings.shouldAddEmailSuffix}
+                                onChange={(value) => setSettings({...settings, shouldAddEmailSuffix: value})}
+                            >
+                                <Input disabled={!settings.shouldAddEmailSuffix} sx={{width: 250}} placeholder='Email suffix' value={settings.emailSuffix} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSettings({...settings, emailSuffix: e.target.value.trim()})} />
+                            </SettingToggle>
                         </Accordion.Panel>
                     </Accordion.Item>
                 </Accordion>

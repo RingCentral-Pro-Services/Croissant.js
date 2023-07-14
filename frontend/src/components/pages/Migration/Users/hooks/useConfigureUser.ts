@@ -43,7 +43,7 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
     const basePresenseAllowedUsersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/presence/permission'
     const baseWaitingPeriod = 250
 
-    const configureUser = async (bundle: UserDataBundle, companyERLs: ERL[], originalExtensions: Extension[], targetExtensions: Extension[], roles: Role[], globalSiteNumberMap: Map<string, PhoneNumber>) => {
+    const configureUser = async (bundle: UserDataBundle, companyERLs: ERL[], originalExtensions: Extension[], targetExtensions: Extension[], roles: Role[], globalSiteNumberMap: Map<string, PhoneNumber>, emailSuffix: string) => {
         
         // Don't bother trying to configure the user if they weren't created
         if (bundle.hasEncounteredFatalError) return
@@ -82,7 +82,7 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
         await setPresenseAllowedUsers(bundle, originalExtensions, targetExtensions, accessToken)
         await setPresenseLines(bundle, originalExtensions, targetExtensions, accessToken)
         await setPresenseStatus(bundle, accessToken)
-        await setNotifications(bundle, accessToken)
+        await setNotifications(bundle, emailSuffix, accessToken)
         if (deviceIDs && deviceIDs.length > 0) {
             await enableIntercom(bundle, deviceIDs[0], accessToken)
         }
@@ -479,7 +479,7 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
         }
     }
 
-    const setNotifications = async (bundle: UserDataBundle, token: string) => {
+    const setNotifications = async (bundle: UserDataBundle, emailsuffix: string, token: string) => {
         try {
             const headers = {
                 "Accept": "application/json",
@@ -489,37 +489,37 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
 
             if (bundle.extendedData?.notifications?.emailAddresses) {
                 for (let i = 0; i < bundle.extendedData!.notifications!.emailAddresses.length; i++) {
-                    bundle.extendedData!.notifications!.emailAddresses[i] = `${bundle.extendedData?.notifications?.emailAddresses[i]}.ps.ringcentral.com`
+                    bundle.extendedData!.notifications!.emailAddresses[i] = `${bundle.extendedData?.notifications?.emailAddresses[i]}${emailsuffix}`
                 }
             }
 
             if (bundle.extendedData?.notifications?.voicemails.advancedEmailAddresses) {
                 for (let i = 0; i < bundle.extendedData!.notifications!.voicemails.advancedEmailAddresses.length; i++) {
-                    bundle.extendedData!.notifications!.voicemails.advancedEmailAddresses[i] = `${bundle.extendedData?.notifications?.voicemails.advancedEmailAddresses[i]}.ps.ringcentral.com`
+                    bundle.extendedData!.notifications!.voicemails.advancedEmailAddresses[i] = `${bundle.extendedData?.notifications?.voicemails.advancedEmailAddresses[i]}${emailsuffix}`
                 }
             }
 
             if (bundle.extendedData?.notifications?.inboundFaxes.advancedEmailAddresses) {
                 for (let i = 0; i < bundle.extendedData!.notifications!.inboundFaxes.advancedEmailAddresses.length; i++) {
-                    bundle.extendedData!.notifications!.inboundFaxes.advancedEmailAddresses[i] = `${bundle.extendedData?.notifications?.inboundFaxes.advancedEmailAddresses[i]}.ps.ringcentral.com`
+                    bundle.extendedData!.notifications!.inboundFaxes.advancedEmailAddresses[i] = `${bundle.extendedData?.notifications?.inboundFaxes.advancedEmailAddresses[i]}${emailsuffix}`
                 }
             }
 
             if (bundle.extendedData?.notifications?.missedCalls.advancedEmailAddresses) {
                 for (let i = 0; i < bundle.extendedData!.notifications!.missedCalls.advancedEmailAddresses.length; i++) {
-                    bundle.extendedData!.notifications!.missedCalls.advancedEmailAddresses[i] = `${bundle.extendedData?.notifications?.missedCalls.advancedEmailAddresses[i]}.ps.ringcentral.com`
+                    bundle.extendedData!.notifications!.missedCalls.advancedEmailAddresses[i] = `${bundle.extendedData?.notifications?.missedCalls.advancedEmailAddresses[i]}${emailsuffix}`
                 }
             }
 
             if (bundle.extendedData?.notifications?.inboundTexts.advancedEmailAddresses) {
                 for (let i = 0; i < bundle.extendedData!.notifications!.inboundTexts.advancedEmailAddresses.length; i++) {
-                    bundle.extendedData!.notifications!.inboundTexts.advancedEmailAddresses[i] = `${bundle.extendedData?.notifications?.inboundTexts.advancedEmailAddresses[i]}.ps.ringcentral.com`
+                    bundle.extendedData!.notifications!.inboundTexts.advancedEmailAddresses[i] = `${bundle.extendedData?.notifications?.inboundTexts.advancedEmailAddresses[i]}${emailsuffix}`
                 }
             }
 
             if (bundle.extendedData?.notifications?.outboundFaxes.advancedEmailAddresses) {
                 for (let i = 0; i < bundle.extendedData!.notifications!.outboundFaxes.advancedEmailAddresses.length; i++) {
-                    bundle.extendedData!.notifications!.outboundFaxes.advancedEmailAddresses[i] = `${bundle.extendedData?.notifications?.outboundFaxes.advancedEmailAddresses[i]}.ps.ringcentral.com`
+                    bundle.extendedData!.notifications!.outboundFaxes.advancedEmailAddresses[i] = `${bundle.extendedData?.notifications?.outboundFaxes.advancedEmailAddresses[i]}${emailsuffix}`
                 }
             }
 

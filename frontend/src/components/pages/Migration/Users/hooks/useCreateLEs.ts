@@ -8,7 +8,7 @@ import { LimitedExtensionDataBundle } from "../models/LimitedExtensionDataBundle
 import useCreateLE from "./useCreateLE";
 import useCreateMO from "./useCreateMO";
 
-const useCreateLEs = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
+const useCreateLEs = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void, emailSuffix: string) => {
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgress, setMaxProgress] = useState(2)
     const {createLE} = useCreateLE(postMessage, postTimedMessage, postError)
@@ -41,7 +41,7 @@ const useCreateLEs = (postMessage: (message: Message) => void, postTimedMessage:
                 bundle.extension.data.site!.id = `${site!.data.id}`
             }
 
-            bundle.extension.data.contact.email = `${bundle.extension.data.contact.email}.ps.ringcentral.com`
+            bundle.extension.data.contact.email = `${bundle.extension.data.contact.email}${emailSuffix}`
             bundle.extension.data.status = 'Activated'
 
             const numbers: PhoneNumber[] = []

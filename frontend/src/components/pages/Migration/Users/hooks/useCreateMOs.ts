@@ -6,7 +6,7 @@ import { PhoneNumber } from "../../User Data Download/models/UserDataBundle";
 import { MessageOnlyDataBundle } from "../models/MessageOnlyDataBundle";
 import useCreateMO from "./useCreateMO";
 
-const useCreateMOs = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
+const useCreateMOs = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void, emailSuffix: string) => {
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgress, setMaxProgress] = useState(2)
     const {createMO} = useCreateMO(postMessage, postTimedMessage, postError)
@@ -34,7 +34,7 @@ const useCreateMOs = (postMessage: (message: Message) => void, postTimedMessage:
                 bundle.extension.data.site!.id = `${site!.data.id}`
             }
 
-            bundle.extension.data.contact.email = `${bundle.extension.data.contact.email}.ps.ringcentral.com`
+            bundle.extension.data.contact.email = `${bundle.extension.data.contact.email}${emailSuffix}`
             bundle.extension.data.status = 'NotActivated'
 
             const numbers: PhoneNumber[] = []
