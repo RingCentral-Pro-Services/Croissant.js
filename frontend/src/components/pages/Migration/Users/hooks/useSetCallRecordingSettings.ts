@@ -30,7 +30,7 @@ const useSetCallRecordingSettings = (postMessage: (message: Message) => void, po
 
             const body = {
                 onDemand: settings.onDemand,
-                ...(settings.automatic && {automatic: settings.automatic})
+                ...(settings.automatic && settings.automatic.enabled && {automatic: settings.automatic})
             }
 
             const response = await RestCentral.put(baseSettingsURL, headers, body)
