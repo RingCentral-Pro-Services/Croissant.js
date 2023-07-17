@@ -14,6 +14,8 @@ import useSidebar from '../../../hooks/useSidebar'
 import useExtensions from '../../../rcapi/useExtensions'
 import usePhoneNumberMap from '../../../rcapi/usePhoneNumberMap'
 import { Extension } from '../../../models/Extension'
+import { useSetAtom } from 'jotai'
+import { userAtom } from '../../../App'
 
 const ExtensionAudit = () => {
     useLogin('accountdump')
@@ -27,6 +29,7 @@ const ExtensionAudit = () => {
     const {extensionsList, isExtensionListPending, fetchExtensions} = useExtensions(postMessage)
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
     const {writeExcel} = useWriteExcelFile()
+    const setUser = useSetAtom(userAtom)
 
     const handleClick = () => {
         getPhoneNumberMap()
@@ -37,6 +40,10 @@ const ExtensionAudit = () => {
         if (targetUID.length < 5) return
         localStorage.setItem('target_uid', targetUID)
         fetchToken(targetUID)
+        setUser({
+            name: 'Another Name',
+            email: 'another.name@ringcentral.com'
+        })
     },[targetUID])
 
     useEffect(() => {

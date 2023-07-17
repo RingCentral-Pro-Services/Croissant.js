@@ -35,6 +35,8 @@ import MigrateQueues from './components/pages/Migration/Queues/MigrateQueues';
 import UserDataDownload from './components/pages/Migration/User Data Download/UserDataDownload';
 // import MigrateUsers from './components/pages/Migration/Users/MigrateUsers';
 import { MantineProvider } from '@mantine/core';
+import { UserDetailsProvider } from './providers/UserDetailsProvider';
+import { atom, useAtom } from 'jotai'
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -56,14 +58,28 @@ const lightTheme = createTheme({
   },
 });
 
+export const userAtom = atom({
+  name: '',
+  email: ''
+})
+
 function App() {
   const[theme, setTheme] = useState<string>('light')
+  const [user, setUser] = useAtom(userAtom)
 
   useEffect(() => {
     document.title = "Croissant"
     const storedTheme = localStorage.getItem('theme')
+    const storedUser = localStorage.getItem('currentUser')
     if (storedTheme) {
       setcolorTheme(storedTheme)
+    }
+    if (storedUser) {
+      const user = JSON.parse(storedUser)
+      setUser({
+        name: user.name,
+        email: user.email
+      })
     }
   }, [])
 
@@ -75,6 +91,7 @@ function App() {
 
   return (
     <MantineProvider withGlobalStyles withNormalizeCSS>
+      <UserDetailsProvider>
     <ThemeProvider theme={theme === 'light'? lightTheme : darkTheme}>
        <Router>
       <div className="App">
@@ -126,6 +143,7 @@ function App() {
       </div>
     </Router>
     </ThemeProvider>
+    </UserDetailsProvider>
     </MantineProvider>
   );
 }

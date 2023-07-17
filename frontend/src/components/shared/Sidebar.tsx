@@ -24,6 +24,10 @@ import {
   IconSettings2,
 } from '@tabler/icons-react';
 import { LinksGroup } from "./NavBarLinksGroup";
+import { UserButton } from "./UserButton";
+
+import { useAtomValue } from 'jotai'
+import { userAtom } from "../../App";
 
 const mockdata = [
     {
@@ -152,9 +156,10 @@ const mockdata = [
    function Sidebar({setColorTheme} : SidebarProps) {
     const { classes } = useStyles();
     const links = mockdata.map((item) => <LinksGroup {...item} key={item.label} />);
+    const user = useAtomValue(userAtom)
   
     return (
-      <Navbar sx={{position: 'fixed'}} width={{ sm: 230 }} p="md" className={classes.navbar}>
+      <Navbar sx={{position: 'fixed'}} width={{ sm: 250 }} p="md" className={classes.navbar}>
         <Navbar.Section className={classes.header}>
           <Group position="apart">
             {/* <Logo width={rem(120)} /> */}
@@ -167,11 +172,11 @@ const mockdata = [
         </Navbar.Section>
   
         <Navbar.Section className={classes.footer}>
-          {/* <UserButton
+          <UserButton
             image="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=255&q=80"
-            name="Ann Nullpointer"
-            email="anullpointer@yahoo.com"
-          /> */}
+            name={user.name}
+            email={user.email}
+          />
         </Navbar.Section>
       </Navbar>
     );
