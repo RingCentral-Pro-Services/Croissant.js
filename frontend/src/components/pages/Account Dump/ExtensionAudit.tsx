@@ -40,10 +40,6 @@ const ExtensionAudit = () => {
         if (targetUID.length < 5) return
         localStorage.setItem('target_uid', targetUID)
         fetchToken(targetUID)
-        setUser({
-            name: 'Another Name',
-            email: 'another.name@ringcentral.com'
-        })
     },[targetUID])
 
     useEffect(() => {
