@@ -59,7 +59,9 @@ app.get('/oauth2callback', (req: any, res: any) => {
   .then((data: any) => {
     const refreshToken = data["_json"]["refresh_token"]
     const accessToken = data["_json"]["access_token"]
-    res.redirect(`/token?access_token=${accessToken}&state=${state}&refresh_token=${refreshToken}`)
+    res.cookie('auth_token', accessToken)
+    res.cookie('auth_refresh', refreshToken)
+    res.redirect(`/token?state=${state}`)
   })
 })
 

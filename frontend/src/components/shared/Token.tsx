@@ -4,32 +4,41 @@ import { useSetAtom } from 'jotai'
 import { userAtom } from "../../App";
 import useCurrentUser from "../../hooks/useCurrentUser";
 
+const getCookie = (key: string) => {
+    var b = document.cookie.match("(^|;)\\s*" + key + "\\s*=\\s*([^;]+)");
+    return b ? b.pop() : "";
+}
+
+const deleteCookie = (key: string) => {
+    document.cookie = `${key}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
+}
+
 const Token = () => {
     const {getCurrentUser} = useCurrentUser()
     const navigate = useNavigate()
     const location = useLocation()
     const params = new URLSearchParams(location.search);
-    const access_token = params.get("access_token");
-    const refresh_token = params.get("refresh_token");
     let destination = params.get("state");
     const setUser = useSetAtom(userAtom)
+    const accessToken = getCookie('auth_token')
+    const refreshToken = getCookie('auth_refresh')
 
     useEffect(() => {
-        if (!access_token) {
-            return
-        }
+        if (!accessToken || !refreshToken) return
 
         let date = new Date()
         date.setTime(date.getTime() + 1 * 60 * 60 * 1000)
 
-        localStorage.setItem('rc_access_token', access_token)
+        localStorage.setItem('rc_access_token', accessToken)
         localStorage.setItem('rc_token_expiry', `${date.getTime()}`)
-        localStorage.setItem('rc_refresh_token', refresh_token ?? '')
+        localStorage.setItem('rc_refresh_token', refreshToken)
 
+        deleteCookie('auth_token')
+        deleteCookie('auth_refresh')
         setUserDetails()
 
         navigate(`/${destination === 'create-ivr' ? '': destination}`)
-    }, [access_token, navigate])
+    }, [])
 
     const setUserDetails = async () => {
         const currentUser = await getCurrentUser()
@@ -43,11 +52,10 @@ const Token = () => {
             email: currentUser.data.contact.email
         }))
     }
+    
 
     return (
-        <>
-            <p>Access token: {access_token}</p>
-        </>
+        <></>
     )
 }
 
