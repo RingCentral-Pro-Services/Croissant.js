@@ -136,6 +136,7 @@ function App() {
                 <Route path='/migratequeues' element={<MigrateQueues />} />
                 <Route path='/userexport' element={<UserDataDownload />} />
                 <Route path='/migrateusers' element={<MigrateUsers />} />
+                <Route path='/error' element={<FatalError />} />
               </Routes>
             </Suspense>
           </ErrorBoundary>

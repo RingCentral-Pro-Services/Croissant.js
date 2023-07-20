@@ -30,9 +30,13 @@ app.use(express.static(path.resolve(__dirname, '../frontend/build')))
 // })
 
 app.get('/oauth2callback', (req: any, res: any) => {
-  let code = req.query.code
-  let expiration = req.query['expires_in']
   let state = req.query.state
+  const code = req.query.code
+
+  if (!code) {
+    res.redirect(`/error`)
+    return
+  }
 
   const rcsdk = new SDK({
     server: SDK.server.production,
@@ -42,7 +46,7 @@ app.get('/oauth2callback', (req: any, res: any) => {
   })
   var platform = rcsdk.platform()
   var resp = platform.login({
-    code: req.query.code
+    code: code
   })
   .then((data: any) => {
     data.json()
