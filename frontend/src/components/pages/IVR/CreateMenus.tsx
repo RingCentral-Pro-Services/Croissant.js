@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import Header from '../../shared/Header';
-import LegacyCreateMenus from './LegacyCreateMenus';
 import DirectCreateMenus from './DirectCreateMenus';
 import {ToggleButtonGroup, ToggleButton, Button} from '@mui/material'
 import FeedbackForm from '../../shared/FeedbackForm';
@@ -23,19 +22,7 @@ const CreateMenus = () => {
         </Header>
             <div className='tool-card'>
                 <h2>Create Menus</h2>
-                <ToggleButtonGroup
-                    color='primary'
-                    exclusive
-                    value={buildModeSelection}
-                    size='small'
-                    aria-label='Build Mode'
-                    onChange={handleChange}
-                    className='healthy-margin-bottom'
-                >
-                    <ToggleButton value='xml'>XML</ToggleButton>
-                    <ToggleButton value='direct'>Direct</ToggleButton>
-                </ToggleButtonGroup>
-                {buildModeSelection === 'xml' ? <LegacyCreateMenus /> : <DirectCreateMenus />}
+                <DirectCreateMenus />
             </div>
             <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Create IVRs" isUserInitiated={true} />
         </>
