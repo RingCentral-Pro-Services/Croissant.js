@@ -26,20 +26,20 @@ export class UserDataBundle {
             actualDevices = this.extendedData.devices.filter((device) => device.phoneLines && device.phoneLines.length !== 0)
 
             for (let i = 0; i < actualDevices.length; i++) {
-                const row = new UserDataRow(this.extension, 'Full DL', actualDevices[i], undefined, this.extendedData.businessHoursCallHandling, this.extendedData.afterHoursCallHandling, this.extendedData.notifications, this.extendedData.callerID, this.extendedData.blockedCallSettings, this.extendedData.blockedPhoneNumbers, this.extendedData.presenseLines, this.extendedData.presenseSettings, this.extendedData.presenseAllowedUsers, this.extendedData.intercomStatus, this.extendedData.delegates, this.extendedData.pERLs, this.extendedData.roles, this.extendedData.incommingCallInfo, this.extendedData.businessHours, this.extendedData.forwardAllCalls, this.extendedData.defaultBridge, this.userGroups, this.phoneNumberMap, this.tempExtension)
+                const row = new UserDataRow(this.extension, 'Full DL', actualDevices[i], undefined, this.extendedData.businessHoursCallHandling, this.extendedData.afterHoursCallHandling, this.extendedData.notifications, this.extendedData.callerID, this.extendedData.blockedCallSettings, this.extendedData.blockedPhoneNumbers, this.extendedData.presenseLines, this.extendedData.presenseSettings, this.extendedData.presenseAllowedUsers, this.extendedData.intercomStatus, this.extendedData.delegates, this.extendedData.pERLs, this.extendedData.roles, this.extendedData.incommingCallInfo, this.extendedData.businessHours, this.extendedData.forwardAllCalls, this.extendedData.defaultBridge, this.userGroups, this.phoneNumberMap, this.tempExtension, this.extendedData.intercomUsers)
                 rows.push(row)
             }
         }
 
         if (this.extendedData.directNumbers) {
             for (const directNumber of this.extendedData.directNumbers) {
-                const row = new UserDataRow(this.extension, 'Additional DID', undefined, directNumber.phoneNumber, this.extendedData.businessHoursCallHandling, this.extendedData.afterHoursCallHandling, this.extendedData.notifications, this.extendedData.callerID, this.extendedData.blockedCallSettings, this.extendedData.blockedPhoneNumbers, this.extendedData.presenseLines, this.extendedData.presenseSettings, this.extendedData.presenseAllowedUsers, this.extendedData.intercomStatus, this.extendedData.delegates, this.extendedData.pERLs, this.extendedData.roles, this.extendedData.incommingCallInfo, this.extendedData.businessHours, this.extendedData.forwardAllCalls, this.extendedData.defaultBridge, this.userGroups, this.phoneNumberMap, this.tempExtension)
+                const row = new UserDataRow(this.extension, 'Additional DID', undefined, directNumber.phoneNumber, this.extendedData.businessHoursCallHandling, this.extendedData.afterHoursCallHandling, this.extendedData.notifications, this.extendedData.callerID, this.extendedData.blockedCallSettings, this.extendedData.blockedPhoneNumbers, this.extendedData.presenseLines, this.extendedData.presenseSettings, this.extendedData.presenseAllowedUsers, this.extendedData.intercomStatus, this.extendedData.delegates, this.extendedData.pERLs, this.extendedData.roles, this.extendedData.incommingCallInfo, this.extendedData.businessHours, this.extendedData.forwardAllCalls, this.extendedData.defaultBridge, this.userGroups, this.phoneNumberMap, this.tempExtension, this.extendedData.intercomUsers)
                 rows.push(row)
             }
         }
 
         if ((!this.extendedData.devices && !this.extendedData.directNumbers) || (this.extendedData.devices.length === 0 && this.extendedData.directNumbers?.length === 0) || actualDevices.length === 0) {
-            const row = new UserDataRow(this.extension, 'Virtual', undefined, undefined, this.extendedData.businessHoursCallHandling, this.extendedData.afterHoursCallHandling, this.extendedData.notifications, this.extendedData.callerID, this.extendedData.blockedCallSettings, this.extendedData.blockedPhoneNumbers, this.extendedData.presenseLines, this.extendedData.presenseSettings, this.extendedData.presenseAllowedUsers, this.extendedData.intercomStatus, this.extendedData.delegates, this.extendedData.pERLs, this.extendedData.roles, this.extendedData.incommingCallInfo, this.extendedData.businessHours, this.extendedData.forwardAllCalls, this.extendedData.defaultBridge, this.userGroups, this.phoneNumberMap, this.tempExtension)
+            const row = new UserDataRow(this.extension, 'Virtual', undefined, undefined, this.extendedData.businessHoursCallHandling, this.extendedData.afterHoursCallHandling, this.extendedData.notifications, this.extendedData.callerID, this.extendedData.blockedCallSettings, this.extendedData.blockedPhoneNumbers, this.extendedData.presenseLines, this.extendedData.presenseSettings, this.extendedData.presenseAllowedUsers, this.extendedData.intercomStatus, this.extendedData.delegates, this.extendedData.pERLs, this.extendedData.roles, this.extendedData.incommingCallInfo, this.extendedData.businessHours, this.extendedData.forwardAllCalls, this.extendedData.defaultBridge, this.userGroups, this.phoneNumberMap, this.tempExtension, this.extendedData.intercomUsers)
             rows.push(row)
         }
 
@@ -59,6 +59,7 @@ export interface ExtendedUserData {
     presenseSettings?: PresenseSettings
     presenseAllowedUsers?: PresenseAllowedUser[]
     intercomStatus?: IntercomStatus
+    intercomUsers?: IntercomUser[]
     delegates?: Delegate[]
     pERLs?: PERL[]
     roles?: Role[]
@@ -500,4 +501,11 @@ export interface DefaultBridge {
     pins: {
         web: string
     }
+}
+
+export interface IntercomUser {
+    uri?: string
+    id: string
+    extensionNumber: string
+    name: string
 }

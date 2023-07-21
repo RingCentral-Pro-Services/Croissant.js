@@ -4,7 +4,7 @@ import { Message } from "../../../../../models/Message";
 import { SyncError } from "../../../../../models/SyncError";
 import { RestCentral } from "../../../../../rcapi/RestCentral";
 import { ERL } from "../../../Automatic Location Updates/models/ERL";
-import { BlockedPhoneNumber, CalledNumber, CallerIDDevice, CallerIDFeature, CallHandling, CallHandlingForwardingNumber, CallHandlingForwardingRule, CustomRule, Device, ForwardingNumber, PERL, PhoneNumber, PresenseAllowedUser, PresenseLine, UserDataBundle } from "../../User Data Download/models/UserDataBundle";
+import { BlockedPhoneNumber, CalledNumber, CallerIDDevice, CallerIDFeature, CallHandling, CallHandlingForwardingNumber, CallHandlingForwardingRule, CustomRule, Device, ForwardingNumber, IntercomUser, PERL, PhoneNumber, PresenseAllowedUser, PresenseLine, UserDataBundle } from "../../User Data Download/models/UserDataBundle";
 import { Role } from "../models/Role";
 
 interface DeviceModelPayload {
@@ -31,6 +31,7 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
     const basePresenceSettingsURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/presence'
     const baseNotificationsSettingsURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/notification-settings'
     const baseIntercomURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/intercom'
+    const baseIntercomUsersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/intercom/permissions'
     const baseCallHandlingURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/answering-rule/ruleId?showInactiveNumbers=true'
     const baseBlockedCallsURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/caller-blocking'
     const baseBlockedPnoneNumbersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/caller-blocking/phone-numbers'
@@ -85,6 +86,7 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
         await setNotifications(bundle, emailSuffix, accessToken)
         if (deviceIDs && deviceIDs.length > 0) {
             await enableIntercom(bundle, deviceIDs[0], accessToken)
+            await setIntercomUsers(bundle, originalExtensions, targetExtensions, accessToken)
         }
 
         for (let customRule of bundle.extendedData!.customRules!) {
@@ -576,6 +578,68 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
             console.log(e)
             postMessage(new Message(`Failed to enable intercom for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to enable intercom', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const setIntercomUsers = async (bundle: UserDataBundle, originalExtensions: Extension[], targetExtensions: Extension[], token: string) => {
+        if (!bundle.extendedData?.intercomStatus?.enabled || !bundle.extendedData.intercomUsers || bundle.extendedData.intercomUsers.length === 0) return
+
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            // const response = await RestCentral.get(baseIntercomUsersURL.replace('extensionId', `${bundle.extension.data.id}`), headers)
+            
+            const goodUsers: IntercomUser[] = []
+            const badUsers: IntercomUser[] = []
+
+            for(const user of bundle.extendedData!.intercomUsers) {
+                const originalExtension = originalExtensions.find((extension) => `${extension.data.id}` === `${user.id}`)
+                if (!originalExtension) {
+                    badUsers.push(user)
+                    continue
+                }
+
+                const targetExtension = targetExtensions.find((extension) => extension.data.name === originalExtension.data.name && originalExtension.prettyType() === extension.prettyType())
+                if (!targetExtension) {
+                    badUsers.push(user)
+                    continue
+                }
+
+                goodUsers.push({
+                    id: `${targetExtension.data.id}`,
+                    extensionNumber: targetExtension.data.extensionNumber,
+                    name: targetExtension.data.name,
+                })
+            }
+
+            if (badUsers.length > 0) {
+                postMessage(new Message(`${badUsers.length} users were removed from ${bundle.extension.data.name}'s intercom allowed users because they could not be found`, 'warning'))
+                postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Users removed from intercom allowed users', badUsers.map((user) => user.name).join(', ')]))
+            }
+
+            if (goodUsers.length === 0) return
+
+            const response = await RestCentral.put(baseIntercomUsersURL.replace('extensionId', `${bundle.extension.data.id}`), headers, {extensions: goodUsers})
+            
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to set intercom users`)
+            console.log(e)
+            postMessage(new Message(`Failed to set intercom users for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to set intercom users', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }

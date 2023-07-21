@@ -58,7 +58,7 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
                         continue
                     }
                     const unassignedExt = unassignedExtensions.pop()!
-                    bundle.phoneNumberMap.set(bundle.extendedData!.devices[i].phoneLines[0].phoneInfo.phoneNumber, unassignedExt.data!.phoneNumbers![0])
+                    bundle.phoneNumberMap.set(actualDevices[i].phoneLines[0].phoneInfo.phoneNumber, unassignedExt.data!.phoneNumbers![0])
                     unassignedIDs.push(`${unassignedExt.data.id}`)
                 }
 

@@ -1,6 +1,6 @@
 import ExcelFormattable from "../../../../../models/ExcelFormattable";
 import { Extension } from "../../../../../models/Extension";
-import { BlockedCallSettings, BlockedPhoneNumber, BusinessHours, CallerID, CallHandling, DefaultBridge, Delegate, Device, PERL, ForwardAllCalls, IncommingCallInfo, IntercomStatus, Notifications, PresenseAllowedUser, PresenseLine, PresenseSettings, Role, PhoneNumber } from "./UserDataBundle";
+import { BlockedCallSettings, BlockedPhoneNumber, BusinessHours, CallerID, CallHandling, DefaultBridge, Delegate, Device, PERL, ForwardAllCalls, IncommingCallInfo, IntercomStatus, Notifications, PresenseAllowedUser, PresenseLine, PresenseSettings, Role, PhoneNumber, IntercomUser } from "./UserDataBundle";
 
 export class UserDataRow implements ExcelFormattable {
     constructor(public extension: Extension, public type: string, public device?: Device, public directNumber?: string, 
@@ -9,7 +9,7 @@ export class UserDataRow implements ExcelFormattable {
                 public blockedPhoneNumbers?: BlockedPhoneNumber[], public presenseLines?: PresenseLine[], public presenseSettings?: PresenseSettings,
                 public presenseAllowedUsers?: PresenseAllowedUser[], public intercomStatus?: IntercomStatus, public delegates?: Delegate[], public erls?: PERL[],
                 public roles?: Role[], public incommingCallInfo?: IncommingCallInfo, public businessHours?: BusinessHours, public forwardAllCalls?: ForwardAllCalls,
-                public defaultBridge?: DefaultBridge, public userGroups?: string, public phoneNumberMap?: Map<string, PhoneNumber>, public tempExtension?: string) {}
+                public defaultBridge?: DefaultBridge, public userGroups?: string, public phoneNumberMap?: Map<string, PhoneNumber>, public tempExtension?: string, public intercomUsers?: IntercomUser[]) {}
 
     toExcelRow(): string[] {
         return [
@@ -56,6 +56,7 @@ export class UserDataRow implements ExcelFormattable {
             this.presenseSettings?.allowSeeMyPresence === true ? 'ON' : 'OFF',
             this.prettyPresenseUsers(),
             this.intercomStatus?.enabled ? 'ON' : 'OFF',
+            this.prettyIntercomUsers(),
             this.prettyDelegates(),
             this.defaultBridge?.pins.web ?? '',
             this.greeting('Introductory'),
@@ -354,6 +355,17 @@ export class UserDataRow implements ExcelFormattable {
             result += `${erl.address.zip}\n\n`
         }
         
+        return result
+    }
+
+    prettyIntercomUsers() {
+        if (!this.intercomUsers) return ''
+        let result = ''
+
+        for (const intercomUser of this.intercomUsers) {
+            result += `${intercomUser.name} - ${intercomUser.extensionNumber}\n`
+        }
+
         return result
     }
 

@@ -17,6 +17,7 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
     const basePresenseSettingsURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/presence'
     const basePresenseAllowedUsersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/presence/permission'
     const baseIntercomURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/intercom'
+    const baseIntercomUsersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/intercom/permissions'
     const baseDelegatesURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/delegates'
     const basePERLURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/emergency-locations?perPage=1000'
     const baseRoleURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/assigned-role'
@@ -48,6 +49,7 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
         await fetchPresenseSettings(userDataBundle, accessToken)
         await fetchPresenseAllowedUsers(userDataBundle, extensions, accessToken)
         await fetchIntercomStatus(userDataBundle, accessToken)
+        await fetchIntercomUsers(userDataBundle, accessToken)
         if (shouldFetchDelegates) {
             await fetchDelegates(userDataBundle, accessToken)
         }
@@ -467,6 +469,34 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
             console.log(e)
             postMessage(new Message(`Failed to get intercom status for ${userDataBundle.extension.data.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(userDataBundle.extension.data.name, parseInt(userDataBundle.extension.data.extensionNumber), ['Failed to fetch intercom status', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const fetchIntercomUsers = async (userDataBundle: UserDataBundle, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const response = await RestCentral.get(baseIntercomUsersURL.replace('extensionId', `${userDataBundle.extension.data.id}`), headers)
+            userDataBundle.extendedData!.intercomUsers = response.data.extensions || []
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to get intercom users`)
+            console.log(e)
+            postMessage(new Message(`Failed to get intercom allowed users for ${userDataBundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(userDataBundle.extension.data.name, parseInt(userDataBundle.extension.data.extensionNumber), ['Failed to fetch intercom allowed users', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
