@@ -47,7 +47,7 @@ const usePhoneNumberList = () => {
                 const newPhoneNumbers = [...phoneNumbers, ...numbers]
                 setPhoneNumbers(newPhoneNumbers)
 
-                if (response.data.navigation && response.data.navigation.nextPage) {
+                if (page < response.data.paging.totalPages) {
                     setPage(page + 1)
                 }
                 else {
