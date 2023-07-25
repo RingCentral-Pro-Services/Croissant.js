@@ -120,6 +120,9 @@ const MigrateUsers = () => {
     const [overridenSiteBundle, setOverridenSiteBundle] = useState<SiteDataBundle>()
     const [originalAccountDevices, setOriginalAccountDevices] = useState<Device[]>([])
     const [originalAccountNumbers, setOriginalAccountNumbers] = useState<PhoneNumber[]>([])
+    const [shouldShowAreaCodeSelector, setShouldShowAreaCodeSelector] = useState(false)
+    const [targetAccountAreaCodes, setTargetAccountAreaCodes] = useState<string[]>([])
+    const [selectedAreaCodes, setSelectedAreaCodes] = useState<string[]>([])
     // const [originalAccountPrompts, setOriginalAccountPrompts] = useState<IVRAudioPrompt[]>([])
     const [settings, setSettings] = useState({
         shouldOverrideSites: false,
@@ -129,7 +132,8 @@ const MigrateUsers = () => {
         specificExtension: '',
         targetSiteName: '',
         shouldAddEmailSuffix: true,
-        emailSuffix: '.ps.ringcentral.com'
+        emailSuffix: '.ps.ringcentral.com',
+        shouldRestrictAreaCodes: false
     })
 
     const handleSiteFetchCompletion = (sites: SiteData[]) => {
@@ -237,6 +241,14 @@ const MigrateUsers = () => {
         if (!isDoneFetchingSites) return
         fetchERLs()
     }, [isDoneFetchingSites])
+
+    useEffect(() => {
+        if (isPhoneNumberMapPending) return
+        const areaCodes = phoneNumbers.map((number) => number.phoneNumber.substring(0, 5))
+        const uniqueAreaCodes = new Set(areaCodes)
+        setTargetAccountAreaCodes(Array.from(uniqueAreaCodes))
+        setShouldShowAreaCodeSelector(true)
+    }, [isPhoneNumberMapPending])
 
     useEffect(() => {
         if (isOriginalExtensionListPending) return
@@ -698,6 +710,13 @@ const MigrateUsers = () => {
         }
 
         unassignedExtensions = unassignedExtensions.filter((extension) => extension.data.phoneNumbers && extension.data.phoneNumbers.length !== 0)
+        if (settings.shouldRestrictAreaCodes) {
+            console.log('Filtering unassigned extensions based on area code')
+            console.log(`Selected area codes`, selectedAreaCodes)
+            unassignedExtensions = unassignedExtensions.filter((extension) => selectedAreaCodes.includes(extension.data.phoneNumbers![0].phoneNumber.substring(0, 5)))
+            console.log('Filtered unassigned extensions')
+            console.log(unassignedExtensions)
+        }
 
         console.log(`Migrating ${userDataBundles.length} users`)
         console.log(userDataBundles)
@@ -1030,6 +1049,15 @@ const MigrateUsers = () => {
                                 onChange={(value) => setSettings({...settings, shouldAddEmailSuffix: value})}
                             >
                                 <Input disabled={!settings.shouldAddEmailSuffix} sx={{width: 250}} placeholder='Email suffix' value={settings.emailSuffix} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSettings({...settings, emailSuffix: e.target.value.trim()})} />
+                            </SettingToggle>
+
+                            <SettingToggle
+                                title="Restrict unassigned extension area codes"
+                                description="Use unassigned phone numbers with these area codes"
+                                checked={settings.shouldRestrictAreaCodes}
+                                onChange={(value) => setSettings({...settings, shouldRestrictAreaCodes: value})}
+                            >
+                                {shouldShowAreaCodeSelector ? <div className="mini-margin-top"> <AdaptiveFilter options={targetAccountAreaCodes} title='Area Codes' placeholder='Search' setSelected={setSelectedAreaCodes} /> </div> : <></>}
                             </SettingToggle>
                         </Accordion.Panel>
                     </Accordion.Item>

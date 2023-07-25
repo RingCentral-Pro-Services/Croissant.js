@@ -137,6 +137,22 @@ body {
   margin-right: 10px!important;
 }
 
+.mini-margin-top {
+  margin-top: 5px!important;
+}
+
+.mini-margin-right {
+  margin-right: 5px!important;
+}
+
+.mini-margin-bottom {
+  margin-bottom: 5px!important;
+}
+
+.mini-margin-left {
+  margin-left: 5px!important;
+}
+
 .healthy-margin-right {
   margin-right: 10px!important;
 }
