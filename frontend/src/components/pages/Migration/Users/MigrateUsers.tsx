@@ -679,6 +679,10 @@ const MigrateUsers = () => {
             unassignedLEExtensions[index].data.phoneNumbers = phoneNumberMap.get(`${unassignedLEExtensions[index].data.id}`) || []
         }
 
+        if (settings.shouldRestrictAreaCodes) {
+            unassignedLEExtensions = unassignedLEExtensions.filter((extension) => selectedAreaCodes.includes(extension.data.phoneNumbers![0].phoneNumber.substring(0, 5)))
+        }
+
         const createdLEs = await createLEs(leBundles, unassignedLEExtensions, targetERLs, targetExts, availablePhoneNumbers)
         targetExts = [...targetExts, ...createdLEs]
 
