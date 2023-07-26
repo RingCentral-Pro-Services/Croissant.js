@@ -25,13 +25,13 @@ export class UserDataRow implements ExcelFormattable {
             this.userGroups ?? '', // User groups
             this.extension.data.contact.businessPhone ?? '',
             this.extension.data.contact.mobilePhone ?? '',
-            this.extension.data.regionalSettings?.formattingLocale.name ?? '',
+            this.extension.data.regionalSettings?.timezone.description ?? '',
             this.extension.data.regionalSettings?.formattingLocale.name ?? '',
             this.extension.data.regionalSettings?.language.name ?? '',
             this.extension.data.regionalSettings?.timeFormat ?? '',
             this.prettyBusinessHours(),
             this.roles?.at(0)?.displayName ?? '',
-            this.extension.data.hidden ? 'ON' : 'OFF',
+            !this.extension.data.hidden ? 'ON' : 'OFF',
             '', // Receive RC communications
             '', // Send email when phone added
             this.extension.data.site?.name ?? '',
