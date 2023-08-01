@@ -1052,6 +1052,15 @@ const MigrateUsers = () => {
             />
             <Header title='Migration' body='Migrate from one account to another' />
             <ToolCard>
+                <h2>Things to know</h2>
+                <ol>
+                    <li>Call Queues with disabled greetings will not have the greeting properly disabled. You will need to go back and disable the greeting in service web.</li>
+                    <li>Call Queue managers will receive an email, even if they're disabled</li>
+                    <li>All users, regardless of their status, will be built as Not Activated</li>
+                    <li>Unassigned extensions must exist in the account and must be built with existing devices</li>
+                </ol>
+            </ToolCard>
+            <ToolCard>
                 <h2>Original Account</h2>
                 <p>Enter the UID that you are migrating <em>from</em></p>
                 <UIDInputField disabled={hasOriginalAccountToken} disabledText={originalCompanyName} setTargetUID={setOriginalUID} loading={isOriginalAccountTokenPending} error={originalAccountTokenError} />
