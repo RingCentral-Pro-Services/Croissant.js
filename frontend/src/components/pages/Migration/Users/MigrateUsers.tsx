@@ -85,6 +85,10 @@ import { UnassignedDeviceRow } from "./models/UnassignedDevice";
 import { ERLRow } from "./models/ERLRow";
 import useCompanyNumbers from "./hooks/useCompanyNumbers";
 import { CompanyNumberRow } from "./models/CompanyNumberRow";
+import useEntitlements from "../../../../hooks/useEntitlements";
+import { useAtomValue } from 'jotai'
+import { userAtom } from "../../../../App";
+import Modal from "../../../shared/Modal";
 
 
 const MigrateUsers = () => {
@@ -101,6 +105,8 @@ const MigrateUsers = () => {
     const [isPullingData, setIsPullingData] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
     const [isPending, setIsPending] = useState(false)
+    const [isShowingModal, setIsShowingModal] = useState(false)
+    const currentUser = useAtomValue(userAtom)
     const supportedExtensionTypes = ['ERLs', 'Custom Roles', 'Call Recording Settings', 'Cost Centers', 'User', 'Limited Extension', 'Call Queue', 'IVR Menu', 'Prompt Library', 'Message-Only', 'Announcement-Only', 'Call Monitoring Groups', 'Park Location', 'User Group']
 
     const [sites, setSites] = useState<SiteData[]>([])
@@ -143,6 +149,7 @@ const MigrateUsers = () => {
 
     useLogin('migrateusers', isPullingData || isMigrating)
     useSidebar('Auto-Migrate')
+    const {fetchEntitlements, requestEntitlement, entitlements} = useEntitlements()
     const {fetchToken: fetchOriginalAccountToken, companyName: originalCompanyName, hasCustomerToken: hasOriginalAccountToken, error: originalAccountTokenError, isTokenPending: isOriginalAccountTokenPending, userName: originalUserName} = useGetAccessToken()
     const {fetchToken: fetchTargetAccountToken, companyName: targetCompanyName, hasCustomerToken: hasTargetAccountToken, error: targetAccountTokenError, isTokenPending: isTargetAccountTokenPending, userName: targetUserName} = useGetAccessToken()
     const {postMessage, postNotification, postError, messages, errors, notifications} = useMessageQueue()
@@ -199,6 +206,16 @@ const MigrateUsers = () => {
     const {writeExcel} = useWriteExcelFile()
     const {exportToExcel} = useExportToExcel()
     const {exportPrettyExcel} = useExportPrettyExcel()
+
+    useEffect(() => {
+        fetchEntitlements(currentUser.email)
+    }, [])
+
+    useEffect(() => {
+        if (!entitlements.entitled) {
+            setIsShowingModal(true)
+        }
+    }, [entitlements])
     
     useEffect(() => {
         if (originalUID.length < 5) return
@@ -1017,8 +1034,22 @@ const MigrateUsers = () => {
         writeExcel(['Original Number', 'Temp Number', 'Extension Type', 'Extension Name', 'Extension Number', 'Site'], numberMapRows, 'Number Map', 'number-map.xlsx')
     }
 
+    const handleRequestEntitlementClick = () => {
+        requestEntitlement({name: currentUser.name, external_id: currentUser.email, email: currentUser.email})
+    }
+
     return (
         <>
+            <Modal 
+                open={isShowingModal}
+                setOpen={setIsShowingModal}
+                title="You don't have access to this tool"
+                body="This tool is still in testing and its usage is restricted to certain people. It will become generally available once testing is complete. You can request access below if you feel that you need access to the tool early."
+                acceptLabel="Request Access"
+                rejectLabel="Go back"
+                handleAccept={() => handleRequestEntitlementClick()}
+                handleReject={() => console.log('')}
+            />
             <Header title='Migration' body='Migrate from one account to another' />
             <ToolCard>
                 <h2>Original Account</h2>
@@ -1072,7 +1103,7 @@ const MigrateUsers = () => {
                 <AdaptiveFilter options={supportedExtensionTypes} title='Extension Types' placeholder='Search' setSelected={setSelectedExtensionTypes} />
                 {shouldShowSiteFilter ? <AdaptiveFilter options={siteNames} title='Sites' placeholder='Search' setSelected={setSelectedSiteNames} /> : <></>}
                 {isMultiSiteEnabled ? <FormControlLabel control={<Checkbox defaultChecked value={settings.shouldMigrateSites} onChange={(e) => setSettings({...settings, shouldMigrateSites: e.target.checked})} />} label="Migrate Sites" /> : <></>}
-                <Button variant='filled' onClick={handleDisoverButtonClick} disabled={isPullingData} >Discover</Button>
+                <Button variant='filled' onClick={handleDisoverButtonClick} disabled={!entitlements.entitled || isPullingData} >Discover</Button>
                 <div className="healthy-margin-top">
                     <FormControl>
                         <FormLabel id="demo-row-radio-buttons-group-label">Pull numbers from</FormLabel>
