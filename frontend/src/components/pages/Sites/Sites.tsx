@@ -55,6 +55,11 @@ const Sites = () => {
         fetchRegionalFormats()
     }, [hasCustomerToken])
 
+    useEffect(() => {
+        console.log('Regional formats')
+        console.log(regionalFormats)
+    }, [isRegionalFormatListPenging])
+
     const handleFileSelect = () => {
         if (!selectedFile) return
         readVerticalExcel(selectedFile, selectedSheet)

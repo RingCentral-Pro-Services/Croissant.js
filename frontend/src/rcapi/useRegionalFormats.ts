@@ -33,7 +33,7 @@ const useRegionalFormats = () => {
                     else return 1
                 })
                 createMap(formats)
-                setRegionalFormats(formats)
+                // setRegionalFormats(formats)
                 setIsRegionalFormatListPenging(false)
             }
             catch (e: any) {
@@ -47,6 +47,15 @@ const useRegionalFormats = () => {
         let map = new Map<string, RegionalFormat>()
         for (const format of formats) {
             map.set(format.name, format)
+        }
+
+        const aussieFormat = formats.find((format) => format.name === 'English (Australian)')
+        if (aussieFormat) {
+            console.log('Found Aussie format')
+            map.set('English (Australia)', aussieFormat)
+            let adjustedAussieFormat = {...aussieFormat}
+            adjustedAussieFormat.name = 'English (Australia)'
+            setRegionalFormats([...formats, adjustedAussieFormat])
         }
         setRegionalFormatMap(map)
     }
