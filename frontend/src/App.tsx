@@ -69,11 +69,11 @@ function App() {
 
   useEffect(() => {
     document.title = "Croissant"
-    const storedTheme = localStorage.getItem('theme')
+    // const storedTheme = localStorage.getItem('theme')
     const storedUser = localStorage.getItem('currentUser')
-    if (storedTheme) {
-      setcolorTheme(storedTheme)
-    }
+    // if (storedTheme) {
+    //   setcolorTheme(storedTheme)
+    // }
     if (storedUser) {
       const user = JSON.parse(storedUser)
       setUser({
