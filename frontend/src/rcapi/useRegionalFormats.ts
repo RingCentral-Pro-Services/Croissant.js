@@ -56,6 +56,8 @@ const useRegionalFormats = () => {
             let adjustedAussieFormat = {...aussieFormat}
             adjustedAussieFormat.name = 'English (Australia)'
             setRegionalFormats([...formats, adjustedAussieFormat])
+        } else {
+            setRegionalFormats(formats)
         }
         setRegionalFormatMap(map)
     }
