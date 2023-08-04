@@ -50,7 +50,7 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
             if (bundle.extendedData?.devices.length != 0) {
                 const deviceCount = bundle.extendedData!.devices.length
                 let actualDevices: Device[] = []
-                actualDevices = bundle.extendedData!.devices.filter((device) => device.phoneLines && device.phoneLines.length !== 0)
+                actualDevices = bundle.extendedData!.devices.filter((device) => device.phoneLines && device.phoneLines.length !== 0 && device.phoneLines[0].lineType !== 'StandaloneFree')
                 let unassignedIDs: string[] = []
                 for (let i = 0; i < actualDevices.length; i++) {
                     if (unassignedExtensions.length === 0) {
