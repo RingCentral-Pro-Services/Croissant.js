@@ -23,7 +23,7 @@ export class UserDataBundle {
             // Some accounts have virtual users that somehow have devices. Though the devices do not have phone lines.
             // The check below filters out any devices that do not have phone lines so the tool doesn't inaccurately report
             // virtual users as fully licenced users.
-            actualDevices = this.extendedData.devices.filter((device) => device.phoneLines && device.phoneLines.length !== 0)
+            actualDevices = this.extendedData.devices.filter((device) => device.phoneLines && device.phoneLines.length !== 0 && device.phoneLines[0].lineType !== 'StandaloneFree')
 
             for (let i = 0; i < actualDevices.length; i++) {
                 const row = new UserDataRow(this.extension, 'Full DL', actualDevices[i], undefined, this.extendedData.businessHoursCallHandling, this.extendedData.afterHoursCallHandling, this.extendedData.notifications, this.extendedData.callerID, this.extendedData.blockedCallSettings, this.extendedData.blockedPhoneNumbers, this.extendedData.presenseLines, this.extendedData.presenseSettings, this.extendedData.presenseAllowedUsers, this.extendedData.intercomStatus, this.extendedData.delegates, this.extendedData.pERLs, this.extendedData.roles, this.extendedData.incommingCallInfo, this.extendedData.businessHours, this.extendedData.forwardAllCalls, this.extendedData.defaultBridge, this.userGroups, this.phoneNumberMap, this.tempExtension, this.extendedData.intercomUsers)
