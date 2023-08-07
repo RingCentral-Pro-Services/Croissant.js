@@ -60,6 +60,37 @@ app.get('/oauth2callback', (req: any, res: any) => {
   })
 })
 
+app.get('/oauth2biz', (req: any, res: any) => {
+  let state = req.query.state
+  const code = req.query.code
+
+  if (!code) {
+    res.redirect(`/error`)
+    return
+  }
+
+  const rcsdk = new SDK({
+    server: SDK.server.production,
+    clientId: process.env.RC_CLIENT_ID,
+    clientSecret: process.env.RC_CLIENT_SECRET,
+    redirectUri: process.env.RC_SEGREGATED_REDIRECT_URI
+  })
+  var platform = rcsdk.platform()
+  var resp = platform.login({
+    code: code
+  })
+  .then((data: any) => {
+    data.json()
+    .then((data: any) => {
+      const refreshToken = data["refresh_token"]
+      const accessToken = data["access_token"]
+      res.cookie('auth_token', accessToken)
+      res.cookie('auth_refresh', refreshToken)
+      res.redirect(`/biztoken?state=${state}`)
+    })
+  })
+})
+
 app.get('/refresh', (req: any, res: any) => {
   const refreshToken = req.query.refresh_token
   const header = {

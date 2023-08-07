@@ -37,6 +37,7 @@ import UserDataDownload from './components/pages/Migration/User Data Download/Us
 import { MantineProvider } from '@mantine/core';
 import { UserDetailsProvider } from './providers/UserDetailsProvider';
 import { atom, useAtom } from 'jotai'
+import BizToken from './components/shared/BizToken';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -101,6 +102,7 @@ function App() {
             <Suspense fallback={<Loading/>}>
               <Routes>
                 <Route path='/token' element={<Token />} />
+                <Route path='/biztoken' element={<BizToken />} />
                 <Route path='/' element={<CreateMenus />} />
                 <Route path='/auditmenus' element={<AuditMenus />} />
                 <Route path='/accountdump' element={<ExtensionAudit />} />

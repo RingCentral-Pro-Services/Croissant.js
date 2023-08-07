@@ -48,7 +48,7 @@ export class Extension implements ExcelFormattable, DataGridFormattable {
             case 'Site':
                 return 'Site';
             case 'DigitalUser':
-                return 'Digital User';
+                return 'User';
             case 'FaxUser':
                 return 'Fax User';
             case 'FlexibleUser':

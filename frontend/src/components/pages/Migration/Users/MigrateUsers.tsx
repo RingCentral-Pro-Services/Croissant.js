@@ -89,6 +89,8 @@ import useEntitlements from "../../../../hooks/useEntitlements";
 import { useAtomValue } from 'jotai'
 import { userAtom } from "../../../../App";
 import Modal from "../../../shared/Modal";
+import useSegregatedLogin from "../../../../rcapi/useSegregatedLogin";
+import { useLocation } from "react-router-dom";
 
 
 const MigrateUsers = () => {
@@ -106,6 +108,7 @@ const MigrateUsers = () => {
     const [isMigrating, setIsMigrating] = useState(false)
     const [isPending, setIsPending] = useState(false)
     const [isShowingModal, setIsShowingModal] = useState(false)
+    const [isShowingSegregatedModal, setIsShowingSegregatedModal] = useState(false)
     const currentUser = useAtomValue(userAtom)
     const supportedExtensionTypes = ['ERLs', 'Custom Roles', 'Call Recording Settings', 'Cost Centers', 'User', 'Limited Extension', 'Call Queue', 'IVR Menu', 'Prompt Library', 'Message-Only', 'Announcement-Only', 'Call Monitoring Groups', 'Park Location', 'User Group']
 
@@ -149,6 +152,9 @@ const MigrateUsers = () => {
 
     useLogin('migrateusers', isPullingData || isMigrating)
     useSidebar('Auto-Migrate')
+    const {forwardToSegregatedLogin} = useSegregatedLogin('migrateusers')
+    const location = useLocation()
+    const params = new URLSearchParams(location.search);
     const {fetchEntitlements, requestEntitlement, entitlements} = useEntitlements()
     const {fetchToken: fetchOriginalAccountToken, companyName: originalCompanyName, hasCustomerToken: hasOriginalAccountToken, error: originalAccountTokenError, isTokenPending: isOriginalAccountTokenPending, userName: originalUserName} = useGetAccessToken()
     const {fetchToken: fetchTargetAccountToken, companyName: targetCompanyName, hasCustomerToken: hasTargetAccountToken, error: targetAccountTokenError, isTokenPending: isTargetAccountTokenPending, userName: targetUserName} = useGetAccessToken()
@@ -248,6 +254,12 @@ const MigrateUsers = () => {
         if (!hasOriginalAccountToken) return
         fetchSites()
     }, [hasOriginalAccountToken])
+
+    useEffect(() => {
+        const authed = params.get("authed");
+        if (!authed || authed !== 'true') return
+        fetchSites()
+    }, [])
 
     useEffect(() => {
         if (isTargetExtensionListPending) return
@@ -1050,6 +1062,16 @@ const MigrateUsers = () => {
                 handleAccept={() => handleRequestEntitlementClick()}
                 handleReject={() => console.log('')}
             />
+            <Modal 
+                open={isShowingSegregatedModal}
+                setOpen={setIsShowingSegregatedModal}
+                title="Login to segregated accounts"
+                body="AT&T Office@Hand & RC with Verizon accounts cannot be accessed via UID. To access one of these accounts, you'll need to click the proceed to login button below and sign in as the customer. The account you sign in as needs to be a Super Admin."
+                acceptLabel="Proceed to login"
+                rejectLabel="Go back"
+                handleAccept={() => forwardToSegregatedLogin()}
+                handleReject={() => console.log('')}
+            />
             <Header title='Migration' body='Migrate from one account to another' />
             <ToolCard>
                 <h2>Things to know</h2>
@@ -1064,6 +1086,7 @@ const MigrateUsers = () => {
                 <h2>Original Account</h2>
                 <p>Enter the UID that you are migrating <em>from</em></p>
                 <UIDInputField disabled={hasOriginalAccountToken} disabledText={originalCompanyName} setTargetUID={setOriginalUID} loading={isOriginalAccountTokenPending} error={originalAccountTokenError} />
+                <Button onClick={() => setIsShowingSegregatedModal(true)}>Segregated Login</Button>
             </ToolCard>
             <ToolCard>
                 <Accordion defaultValue="">
@@ -1112,7 +1135,7 @@ const MigrateUsers = () => {
                 <AdaptiveFilter options={supportedExtensionTypes} title='Extension Types' placeholder='Search' setSelected={setSelectedExtensionTypes} />
                 {shouldShowSiteFilter ? <AdaptiveFilter options={siteNames} title='Sites' placeholder='Search' setSelected={setSelectedSiteNames} /> : <></>}
                 {isMultiSiteEnabled ? <FormControlLabel control={<Checkbox defaultChecked value={settings.shouldMigrateSites} onChange={(e) => setSettings({...settings, shouldMigrateSites: e.target.checked})} />} label="Migrate Sites" /> : <></>}
-                <Button variant='filled' onClick={handleDisoverButtonClick} disabled={!entitlements.entitled || isPullingData} >Discover</Button>
+                <Button variant='filled' onClick={handleDisoverButtonClick} disabled={!entitlements.entitled || isPullingData || isOriginalExtensionListPending} >Discover</Button>
                 <div className="healthy-margin-top">
                     <FormControl>
                         <FormLabel id="demo-row-radio-buttons-group-label">Pull numbers from</FormLabel>

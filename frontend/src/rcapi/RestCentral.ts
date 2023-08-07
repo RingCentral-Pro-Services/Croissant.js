@@ -10,7 +10,14 @@ export class RestCentral {
     static get = async (url: string, headers: any) => {
         if (this.isCustomerTokenAboutToExpire()) {
             console.log('Customer token is about to expire. Fetching new token.')
-            await this.fetchCustomerTokenAsync()
+            const accountType = sessionStorage.getItem('accountType')
+
+            if (!accountType || accountType !== 'segregated') {
+                await this.fetchCustomerTokenAsync()
+            }
+            else {
+                await this.refreshSegregatedTokenAsync()
+            }
         }
         if (this.isRCTokenAboutToExpire()) {
             console.log('RC token is about to expire. Fetching new token.')
@@ -181,6 +188,28 @@ export class RestCentral {
             localStorage.setItem('rc_token_expiry', date.getTime().toString())
             localStorage.setItem('rc_access_token', res.data.access_token)
             localStorage.setItem('rc_refresh_token', res.data.refresh_token)
+        } catch (res: any) {
+            console.log('Failed to refresh token')
+        }
+    }
+
+    static refreshSegregatedTokenAsync = async () => {
+        console.log('Refreshing segragated custom token token')
+        const refreshToken = localStorage.getItem('cs_refresh_token')
+        if (!refreshToken) return
+
+        try {
+            const res = await axios({
+                method: "GET",
+                url: `/refresh?refresh_token=${refreshToken}`,
+            })
+            console.log('Successfully refreshed token')
+            console.log(res)
+            let date = new Date()
+            date.setTime(date.getTime() + 1 * 60 * 60 * 1000)
+            localStorage.setItem('cs_token_expiry', date.getTime().toString())
+            localStorage.setItem('cs_access_token', res.data.access_token)
+            localStorage.setItem('cs_refresh_token', res.data.refresh_token)
         } catch (res: any) {
             console.log('Failed to refresh token')
         }
