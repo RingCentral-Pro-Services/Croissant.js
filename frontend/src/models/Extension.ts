@@ -125,7 +125,7 @@ export class Extension implements ExcelFormattable, DataGridFormattable {
     }
 
     status() {
-        if ((this.data.type === 'User' || this.data.type === 'VirtualUser') && (this.data.password && this.data.password !== '' || this.data.ivrPin && this.data.ivrPin !== '')) {
+        if ((this.data.type === 'User' || this.data.type === 'VirtualUser' || this.data.type === 'Voicemail') && (this.data.password && this.data.password !== '' || this.data.ivrPin && this.data.ivrPin !== '')) {
             return 'Enabled'
         }
         else if (this.data.type === 'Limited') {
