@@ -2,7 +2,14 @@ import { useEffect, useState } from "react";
 import { RestCentral } from "./RestCentral";
 import { Message } from "../models/Message";
 import { Extension } from "../models/Extension";
+import { wait } from "../helpers/rcapi";
+import { ExtensionData } from "../models/ExtensionData";
 
+
+interface ExtensionResponse {
+    extensions: Extension[]
+    hasNextPage: boolean
+}
 
 /*
 * This hook is meant to replace useExtensionList.ts
@@ -13,64 +20,70 @@ const useExtensions = (postMessage: (message: Message) => void) => {
     let [isExtensionListPending, setisExtensionListPending] = useState(true)
     const [isMultiSiteEnabled, setIsMultiSiteEnabled] = useState(false)
     let error = ""
-    const baseExtensionsURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension'
-    const accessToken = localStorage.getItem('cs_access_token')
     let [extensionsList, setExtensionsList] = useState<Extension[]>([])
-    let [page, setPage] = useState(1)
-    let [shouldFetch, setShouldFetch] = useState(false)
-    let [rateLimitInterval, setRateLimitInterval] = useState(0)
+    const baseWaitingPeriod = 250
+    const baseURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension?page=PAGE&perPage=1000'
 
-    const fetchExtensions = () => {
-        setExtensionsList([])
-        setShouldFetch(true)
-        setisExtensionListPending(true)
-        setPage(1)
+    const fetchExtensions = async () => {
+        const accessToken = localStorage.getItem('cs_access_token')
+        if (!accessToken) {
+            throw new Error('No access token')
+        }
+
+        const extensions: Extension[] = []
+        let nextPage = true
+        let page = 1
+        while (nextPage) {
+            const response = await getExtensions(page, accessToken)
+            extensions.push(...response.extensions)
+            if (response.hasNextPage) {
+                nextPage = true
+                page += 1
+            }
+            else {
+                nextPage = false
+            }
+        }
+
+        setExtensionsList(extensions)
+        setisExtensionListPending(false)
+        determineMode(extensions)
+        return extensions
     }
 
-    useEffect(() => {
-        if (!accessToken || !shouldFetch) return
-        
-        let extensionsURL = `${baseExtensionsURL}?page=${page}&perPage=1000`;
+    const getExtensions = async (page: number, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
 
-            setTimeout(async () => {
-                try {
-                    const headers = {
-                        "Accept": "application/json",
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${accessToken}`
-                    }
-                    let response = await RestCentral.get(extensionsURL, headers)
-                    console.log(response)
+            const response = await RestCentral.get(baseURL.replace('PAGE', `${page}`), headers)
+            const extensionData = response.data.records as ExtensionData[]
+            const extensions = extensionData.map((data) => new Extension(data))
+            let hasNextPage = false
+            if (page < response.data.paging.totalPages) hasNextPage = true
+            const deviceResponse: ExtensionResponse = {
+                extensions: extensions,
+                hasNextPage: hasNextPage
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
 
-                    let resRecords = response.data.records
-                    let newRecords = [...extensionsList]
-                    for (let index = 0; index < resRecords.length; index++) {
-                        let extensionData = resRecords[index]
-                        let extension = new Extension(extensionData)
-                        newRecords.push(extension)
-                    }
-                    setExtensionsList(newRecords)
-                    setRateLimitInterval(0)
-
-                    if (response.data.navigation.nextPage) {
-                        setRateLimitInterval(response.rateLimitInterval)
-                        setPage(page + 1)
-                    }
-                    else {
-                        determineMode(newRecords)
-                        setisExtensionListPending(false)
-                        setShouldFetch(false)
-                        setRateLimitInterval(0)
-                        setPage(1)
-                    }
-                }
-                catch (e) {
-                    console.log('Something bad happened')
-                    console.log(e)
-                    postMessage(new Message('Failed to fetch extensions', 'error'))
-                }
-            }, rateLimitInterval)
-    }, [page, shouldFetch, accessToken, extensionsList, rateLimitInterval, postMessage])
+            return deviceResponse
+        }
+        catch (e: any) {
+            console.log(`Failed to get company numbers`)
+            console.log(e)
+            postMessage(new Message(`Failed to get company numbers ${e.error ?? ''}`, 'error'))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+            return {
+                extensions: [],
+                hasNextPage: false
+            }
+        }
+    }
 
     const determineMode = (extensions: Extension[]) => {
         const sites = extensions.filter((extension) => extension.prettyType() === 'Site')
