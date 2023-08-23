@@ -21,6 +21,11 @@ import UIDInputField from "../../shared/UIDInputField";
 import AdaptiveFilter from "../../shared/AdaptiveFilter";
 import LaunchIcon from '@mui/icons-material/Launch';
 import { IconExternalLink } from "@tabler/icons-react";
+import { IVRIntakePipeline } from "./models/IVRIntakePipeline";
+import { ExcelDataProvider } from "../../../helpers/ExcelDataProvider";
+import { ZodValidator } from "../../../helpers/ZodValidator";
+import { IVRTransformer } from "./models/IVRTransformer";
+import { MessageQueue } from "../../../models/Transformer";
 
 const DirectCreateMenus = () => {
     useLogin('create-ivr')
@@ -55,11 +60,29 @@ const DirectCreateMenus = () => {
     const [maxProgressValue, setMaxProgressValue] = useState(0)
     const {createMenus, isSyncing} = useCreateIVRs(setProgressValue, postMessage, postTimedMessage, postError, isMultiSiteEnabled)
 
-    const handleFileSelect = () => {
+    const handleFileSelect = async () => {
         if (!selectedFile) return
 
         setIsPending(true)
-        fetchExtensions()
+        // fetchExtensions()
+
+
+        const messageQueue: MessageQueue = {
+            postMessage: postMessage,
+            postError: postError,
+            postTimedMessage: postTimedMessage
+        }
+        const dataProvider = new ExcelDataProvider(selectedFile, selectedSheet)
+        const validator = new ZodValidator(ivrSchema)
+        const transformer = new IVRTransformer(extensionsList, audioPromptList)
+        const pipeline = new IVRIntakePipeline(dataProvider, transformer, validator, messageQueue)
+        const processedMenus = await pipeline.run()
+        console.log('Processed menus')
+        console.log(processedMenus)
+        setFilteredMenus(processedMenus)
+        setMenus(processedMenus)
+        setReadyToSync(true)
+        setIsPending(false)
     }
 
     const handleSyncButtonClick = () => {
@@ -72,22 +95,27 @@ const DirectCreateMenus = () => {
     }
 
     useEffect(() => {
-        if (isAudioPromptListPending) return
-        if (!selectedFile) return
+        if (!hasCustomerToken) return
+        fetchExtensions()
+    }, [hasCustomerToken])
 
-        console.log('audio prompts ->', audioPromptList)
-        if (selectedFile.name.includes('.csv')) {
-            readLucidchart(selectedFile, extensionsList, audioPromptList)
-        }
-        else if (selectedFile.name.includes('.xlsx')) {
-            readFile(selectedFile, selectedSheet)
-        }
+    // useEffect(() => {
+    //     if (isAudioPromptListPending) return
+    //     if (!selectedFile) return
+
+    //     console.log('audio prompts ->', audioPromptList)
+    //     if (selectedFile.name.includes('.csv')) {
+    //         readLucidchart(selectedFile, extensionsList, audioPromptList)
+    //     }
+    //     else if (selectedFile.name.includes('.xlsx')) {
+    //         readFile(selectedFile, selectedSheet)
+    //     }
         
-    }, [isAudioPromptListPending, extensionsList, selectedFile])
+    // }, [isAudioPromptListPending, extensionsList, selectedFile])
 
     useEffect(() => {
         if (isExtensionListPending) return
-        if (!selectedFile) return
+        // if (!selectedFile) return
 
         fetchAudioPrompts()
     }, [isExtensionListPending, selectedFile])
