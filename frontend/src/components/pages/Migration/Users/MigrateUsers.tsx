@@ -1080,6 +1080,10 @@ const MigrateUsers = () => {
                     <li>Call Queue managers will receive an email, even if they're disabled</li>
                     <li>All users, regardless of their status, will be built as Not Activated</li>
                     <li>Unassigned extensions must exist in the account and must be built with existing devices</li>
+                    <li>The next available extension will be used if the original extension number is already in use</li>
+                    <li>The next available extension will be used if the original extension number length exceeds the max length in the new account</li>
+                    <li>ATT/Verizon accounts are only supported as the original account. You cannot migrate <em>to</em> one of these accounts</li>
+                    <li>For ATT/Verizon accounts, you will need to click the segregated login button below and login as the customer</li>
                 </ol>
             </ToolCard>
             <ToolCard>
