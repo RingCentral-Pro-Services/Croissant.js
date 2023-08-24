@@ -70,7 +70,7 @@ export class UserDataRow implements ExcelFormattable {
             this.afterHoursGreeting('ConnectingAudio'),
             this.afterHoursGreeting('HoldMusic'),
             this.blockedCallSettings?.mode ?? '',
-            this.blockedPhoneNumbers?.map((number) => number.phoneNumber).join(', ') ?? '',
+            this.blockedPhoneNumbers?.map((number) => `${number.label} - ${number.phoneNumber}`).join('\n') ?? '',
             '', // Robocalls
             '', // Trusted numbers
             this.blockedCallSettings?.noCallerId ?? '',
@@ -93,6 +93,12 @@ export class UserDataRow implements ExcelFormattable {
             this.notifications?.voicemails.includeTranscription ? 'ON' : 'OFF',
             this.prettyPERLs(),
             this.notifications?.emailAddresses?.join('\n') ?? '',
+            this.notifications?.voicemails.advancedEmailAddresses?.join(', ') ?? '',
+            this.notifications?.inboundFaxes.advancedEmailAddresses?.join(', ') ?? '',
+            this.notifications?.outboundFaxes.advancedEmailAddresses?.join(', ') ?? '',
+            this.notifications?.missedCalls.advancedEmailAddresses?.join(', ') ?? '',
+            this.notifications?.inboundTexts.advancedEmailAddresses?.join(', ') ?? '',
+            this.notifications?.smsEmailAddresses?.join(', ') ?? '',
             this.prettyVoicemailNotificationSettings(),
             this.prettyFaxNotificationSettings(),
             this.notifications?.missedCalls.notifyByEmail ? 'Notify' : 'Do not notify',
@@ -237,14 +243,25 @@ export class UserDataRow implements ExcelFormattable {
         let result = ''
 
         if (!this.businessHoursCallHandling || !this.businessHoursCallHandling.forwarding?.rules) return result
+        const softPhoneOnTop = this.businessHoursCallHandling.forwarding.softPhonesPositionTop
+
+        if (softPhoneOnTop) {
+            const softPhoneRingCount = `${this.businessHoursCallHandling.forwarding.softPhonesAlwaysRing ? 'Always Ring' : this.prettyRingTime(this.businessHoursCallHandling.forwarding.softPhonesRingCount)}`
+            result += `1 -- Desktop and Mobile Apps - ${softPhoneRingCount} (${this.businessHoursCallHandling.forwarding.notifyMySoftPhones ? 'Enabled' : 'Disabled'})\n`
+        }
 
         for (let i = 0; i < this.businessHoursCallHandling?.forwarding?.rules.length; i++) {
             const rule = this.businessHoursCallHandling.forwarding?.rules[i]
-            result += `${rule.index} -- ${this.prettyRingTime(rule.ringCount)}\n`
+            result += `${softPhoneOnTop ? rule.index + 1 : rule.index} -- ${this.prettyRingTime(rule.ringCount)} (${rule.enabled ? 'Enabled' : 'Disabled'})\n`
             for (const endpoint of rule.forwardingNumbers) {
                 result += `${endpoint.label} ${endpoint.phoneNumber}\n`
             }
             result += '\n'
+        }
+
+        if (!softPhoneOnTop) {
+            const softPhoneRingCount = `${this.businessHoursCallHandling.forwarding.softPhonesAlwaysRing ? 'Always Ring' : this.prettyRingTime(this.businessHoursCallHandling.forwarding.softPhonesRingCount)}`
+            result += `${this.businessHoursCallHandling.forwarding.rules.length + 1} -- Desktop and Mobile Apps - ${softPhoneRingCount} (${this.businessHoursCallHandling.forwarding.notifyMySoftPhones ? 'Enabled' : 'Disabled'})`
         }
 
         return result
