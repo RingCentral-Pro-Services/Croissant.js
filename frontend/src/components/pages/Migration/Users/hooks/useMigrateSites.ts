@@ -76,6 +76,46 @@ const useMigrateSites = (postMessage: (message: Message) => void, postTimedMessa
             if (e.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+            await retryExtension(site, token)
+        }
+    }
+
+    const retryExtension = async (site: SiteData, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+
+            // if (site.code) delete site.code
+
+            if (site.email) {
+                site.email = `${site.email}.ps.ringcentral.com`
+            }
+            else {
+                site.email = `noreply-${site.extensionNumber}@ps.ringcentral.com`
+            }
+            delete site.id
+            
+            const data: SiteDatWithoutExtension = structuredClone(site)
+            delete data.extensionNumber
+
+            const response = await RestCentral.post(baseURL, headers, data)
+            site.id = response.data.id
+            site.tempExtensionNumber = response.data.extensionNumber
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
             console.log(`Failed to create site`)
             console.log(e)
             postMessage(new Message(`Failed to create site ${site.name} ${e.error ?? ''}`, 'error'))
