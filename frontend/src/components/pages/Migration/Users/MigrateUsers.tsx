@@ -519,6 +519,10 @@ const MigrateUsers = () => {
         }
 
         const roles = await fetchCustomRoles()
+        // console.log('Role permission')
+        // for (const permission of roles[0].permissions) {
+        //     console.log(permission.id)
+        // }
         const userDataBundles = await fetchUsers(selectedExtensions.filter((ext) => ext.prettyType() === 'User'), originalExtensionList)
         
         // Message-only extensions and announcement-only extensions
@@ -573,6 +577,18 @@ const MigrateUsers = () => {
             console.log('User groups')
             console.log(userGroupsDataBundles)
             setUserGroupBundles(userGroupsDataBundles)
+        }
+
+        for (let i = 0; i < callQueueDataBundles.length; i++) {
+            callQueueDataBundles[i].extensions = originalExtensionList
+        }
+
+        for (let i = 0; i < userDataBundles.length; i++) {
+            userDataBundles[i].extensions = originalExtensionList
+        }
+
+        for (let i = 0; i < siteDataBundles.length; i++) {
+            siteDataBundles[i].extensions = originalExtensionList
         }
 
         setSiteBundles(siteDataBundles)
@@ -1090,7 +1106,7 @@ const MigrateUsers = () => {
                 <h2>Original Account</h2>
                 <p>Enter the UID that you are migrating <em>from</em></p>
                 <UIDInputField disabled={hasOriginalAccountToken} disabledText={originalCompanyName} setTargetUID={setOriginalUID} loading={isOriginalAccountTokenPending} error={originalAccountTokenError} />
-                <Button onClick={() => setIsShowingSegregatedModal(true)}>Segregated Login</Button>
+                <Button color='gray' onClick={() => setIsShowingSegregatedModal(true)} disabled={hasOriginalAccountToken} >Segregated Login</Button>
             </ToolCard>
             <ToolCard>
                 <Accordion defaultValue="">

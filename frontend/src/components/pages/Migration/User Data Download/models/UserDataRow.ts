@@ -1,15 +1,19 @@
 import ExcelFormattable from "../../../../../models/ExcelFormattable";
 import { Extension } from "../../../../../models/Extension";
-import { BlockedCallSettings, BlockedPhoneNumber, BusinessHours, CallerID, CallHandling, DefaultBridge, Delegate, Device, PERL, ForwardAllCalls, IncommingCallInfo, IntercomStatus, Notifications, PresenseAllowedUser, PresenseLine, PresenseSettings, Role, PhoneNumber, IntercomUser } from "./UserDataBundle";
+import { BlockedCallSettings, BlockedPhoneNumber, BusinessHours, CallerID, CallHandling, DefaultBridge, Delegate, Device, PERL, ForwardAllCalls, IncommingCallInfo, IntercomStatus, Notifications, PresenseAllowedUser, PresenseLine, PresenseSettings, Role, PhoneNumber, IntercomUser, CustomRule } from "./UserDataBundle";
 
 export class UserDataRow implements ExcelFormattable {
+
+    public extensions: Extension[] = []
+
     constructor(public extension: Extension, public type: string, public device?: Device, public directNumber?: string, 
                 public businessHoursCallHandling?: CallHandling, public afterHoursCallHandling?: CallHandling,
                 public notifications?: Notifications, public callerID?: CallerID, public blockedCallSettings?: BlockedCallSettings,
                 public blockedPhoneNumbers?: BlockedPhoneNumber[], public presenseLines?: PresenseLine[], public presenseSettings?: PresenseSettings,
                 public presenseAllowedUsers?: PresenseAllowedUser[], public intercomStatus?: IntercomStatus, public delegates?: Delegate[], public erls?: PERL[],
                 public roles?: Role[], public incommingCallInfo?: IncommingCallInfo, public businessHours?: BusinessHours, public forwardAllCalls?: ForwardAllCalls,
-                public defaultBridge?: DefaultBridge, public userGroups?: string, public phoneNumberMap?: Map<string, PhoneNumber>, public tempExtension?: string, public intercomUsers?: IntercomUser[]) {}
+                public defaultBridge?: DefaultBridge, public userGroups?: string, public phoneNumberMap?: Map<string, PhoneNumber>, public tempExtension?: string, public intercomUsers?: IntercomUser[],
+                public customRules?: CustomRule[]) {}
 
     toExcelRow(): string[] {
         return [
@@ -88,7 +92,7 @@ export class UserDataRow implements ExcelFormattable {
             this.prettyAfterHoursVoicemailAction(),
             this.afterHoursGreeting('Voicemail'),
             this.afterHoursCallHandling?.voicemail?.recipient.displayName ?? '',
-            '', // Custom roles
+            this.prettyCustomRules(), // Custom roles
             this.prettyIncommingCallInfo(),
             this.notifications?.voicemails.includeTranscription ? 'ON' : 'OFF',
             this.prettyPERLs(),
@@ -166,6 +170,105 @@ export class UserDataRow implements ExcelFormattable {
             }
         }
         return ''
+    }
+
+    prettyCustomRules() {
+        if (!this.customRules || this.customRules.length === 0) return ''
+
+        let result = ''
+
+        for (let index = 0; index < this.customRules?.length; index++) {
+            const rule = this.customRules[index]
+            result += `Name: ${rule.name}\n\n`
+            result += `Enabled: ${rule.enabled ? 'Yes' : 'No'}\n\n`
+
+            if (rule.schedule) {
+                result += 'Schedule:\n'
+                result += `${this.prettyRuleHours(rule)}\n`
+            }
+            
+            if (rule.calledNumbers) {
+                result += 'Called Numbers:\n'
+                for (const calledNumber of rule.calledNumbers) {
+                    result += `${calledNumber.phoneNumber}\n`
+                }
+                result += '\n'
+            }
+
+            if (rule.callers) {
+                result += 'Callers:\n'
+                for (const caller of rule.callers) {
+                    result += `${caller.name ?? ''} - ${caller.callerId}\n`
+                }
+                result += '\n'
+            }
+
+            result += 'Action:\n'
+            result += `${this.prettyRuleAction(rule)}\n\n`
+
+            result += '-----------------\n\n'
+        }
+
+        return result
+    }
+
+    prettyRuleAction(rule: CustomRule) {
+        if (rule.callHandlingAction === 'UnconditionalForwarding' && rule.unconditionalForwarding) {
+            return `Transfer to ${rule.unconditionalForwarding.phoneNumber}`
+        }
+        else if (rule.callHandlingAction === 'TransferToExtension' && rule.transfer) {
+            const transferExtension = this.extensions.find((ext) => `${ext.data.id}` === `${rule.transfer?.extension.id}`)
+            return `Transfer to ${transferExtension?.data.name} - Ext. ${transferExtension?.data.extensionNumber}`
+        }
+        else if (rule.callHandlingAction === 'TakeMessagesOnly' && rule.voicemail) {
+            return `Send to Voicemail`
+        }
+        else if (rule.callHandlingAction) {
+            return `Play Announcement`
+        }
+
+        return ''
+    }
+
+    prettyRuleHours(rule: CustomRule) {
+        let result = ''
+
+        if (!rule.schedule) return result
+        if (rule.schedule.ref) return `${rule.schedule.ref}\n`
+        if (Object.keys(rule.schedule).length === 0) return '24/7\n'
+
+        if (rule.schedule.weeklyRanges) {
+            const weeklyRanges = rule.schedule.weeklyRanges
+            if (weeklyRanges.sunday) {
+                result += `Sunday: ${this.convertTo12HourTime(weeklyRanges.sunday[0].from)} - ${this.convertTo12HourTime(weeklyRanges.sunday[0].to)}\n`
+            }
+            if (weeklyRanges.monday) {
+                result += `Monday: ${this.convertTo12HourTime(weeklyRanges.monday[0].from)} - ${this.convertTo12HourTime(weeklyRanges.monday[0].to)}\n`
+            }
+            if (weeklyRanges.tuesday) {
+                result += `Tuesday: ${this.convertTo12HourTime(weeklyRanges.tuesday[0].from)} - ${this.convertTo12HourTime(weeklyRanges.tuesday[0].to)}\n`
+            }
+            if (weeklyRanges.wednesday) {
+                result += `Wednesday: ${this.convertTo12HourTime(weeklyRanges.wednesday[0].from)} - ${this.convertTo12HourTime(weeklyRanges.wednesday[0].to)}\n`
+            }
+            if (weeklyRanges.thursday) {
+                result += `Thursday: ${this.convertTo12HourTime(weeklyRanges.thursday[0].from)} - ${this.convertTo12HourTime(weeklyRanges.thursday[0].to)}\n`
+            }
+            if (weeklyRanges.friday) {
+                result += `Friday: ${this.convertTo12HourTime(weeklyRanges.friday[0].from)} - ${this.convertTo12HourTime(weeklyRanges.friday[0].to)}\n`
+            }
+            if (weeklyRanges.saturday) {
+                result += `Saturday: ${this.convertTo12HourTime(weeklyRanges.saturday[0].from)} - ${this.convertTo12HourTime(weeklyRanges.saturday[0].to)}\n`
+            }
+        }
+        else if (rule.schedule.ranges) {
+            result += '(Shown in GMT timezone)\n'
+            for (const range of rule.schedule.ranges) {
+                result += `${range.from} - ${range.to}\n`
+            }
+        }
+
+        return result
     }
 
     prettyVoicemailAction() {
