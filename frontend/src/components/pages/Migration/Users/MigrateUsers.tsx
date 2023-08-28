@@ -49,7 +49,7 @@ import { IVRDataBundle } from "./models/IVRDataBundle";
 import { IVRAudioPrompt } from "./models/IVRPrompt";
 import { LimitedExtensionDataBundle } from "./models/LimitedExtensionDataBundle";
 import { MessageOnlyDataBundle } from "./models/MessageOnlyDataBundle";
-import { Role } from "./models/Role";
+import { CustomRoleExport, Role } from "./models/Role";
 import useFetchCallMonitoringGroups from "./hooks/useFetchCallMonitoringGrous";
 import { CallMonitoringDataBundle } from "./models/CallMonitoringDataBundle";
 import useCreateCallMonitoringGroups from "./hooks/useCreateCallMonitoringGroups";
@@ -91,6 +91,7 @@ import { userAtom } from "../../../../App";
 import Modal from "../../../shared/Modal";
 import useSegregatedLogin from "../../../../rcapi/useSegregatedLogin";
 import { useLocation } from "react-router-dom";
+
 
 
 const MigrateUsers = () => {
@@ -519,10 +520,10 @@ const MigrateUsers = () => {
         }
 
         const roles = await fetchCustomRoles()
-        // console.log('Role permission')
-        // for (const permission of roles[0].permissions) {
-        //     console.log(permission.id)
-        // }
+        console.log('Role permission')
+        for (const permission of roles[0].permissions) {
+            console.log(permission.id)
+        }
         const userDataBundles = await fetchUsers(selectedExtensions.filter((ext) => ext.prettyType() === 'User'), originalExtensionList)
         
         // Message-only extensions and announcement-only extensions
@@ -957,6 +958,8 @@ const MigrateUsers = () => {
             return 1
         })
 
+        const roles = customRoles.map((role) => new CustomRoleExport(role))
+
         await exportPrettyExcel([
             {sheetName: 'Users', data: rows, startingRow: 6},
             {sheetName: 'Call Queues', data: callQueueBundles, startingRow: 5},
@@ -971,7 +974,8 @@ const MigrateUsers = () => {
             {sheetName: 'Hot Desk Phones', data: hotDeskingDeviceRows, startingRow: 3},
             {sheetName: 'Unassigned Devices', data: unassignedDeviceRows, startingRow: 4},
             {sheetName: 'Emergency Response Locations', data: erlRows, startingRow: 3},
-            {sheetName: 'Company Numbers', data: companyNumberRows, startingRow: 3}
+            {sheetName: 'Company Numbers', data: companyNumberRows, startingRow: 3},
+            {sheetName: 'Custom Roles', data: roles, vertical: true, startingRow: 2, startingColumnIndex: 3},
         ], 'Migration Template.xlsx', '/migration-template.xlsx')
 
         for (let ivr of ivrBundles) {

@@ -7,13 +7,15 @@ interface ExcelSheetData {
     data: ExcelFormattable[]
     startingRow: number
     spliceAt?: number
+    startingColumnIndex?: number
+    vertical?: boolean
 }
 
 const useExportPrettyExcel = () => {
 
     const exportPrettyExcel = async (sheetData: ExcelSheetData[], filename: string, templatePath: string) => {
         const workbook = new Excel.Workbook()
-        const workbookTemplate =  await fetch(templatePath)
+        const workbookTemplate = await fetch(templatePath)
         const workbookArrayBuffer = await workbookTemplate.arrayBuffer()
         const book = await workbook.xlsx.load(workbookArrayBuffer)
         book.clearThemes()
@@ -31,8 +33,17 @@ const useExportPrettyExcel = () => {
                 }
             }
 
-            worksheet.insertRows(sheet.startingRow, excelData, 'i+')
-            worksheet.spliceRows(sheet.spliceAt ?? sheet.startingRow - 1, 1)
+            if (sheet.vertical) {
+                excelData.forEach((column, columnIndex) => {
+                    column.forEach((cellValue, rowIndex) => {
+                        const cell = worksheet.getCell(rowIndex + sheet.startingRow, columnIndex + sheet.startingColumnIndex!);
+                        cell.value = cellValue;
+                    });
+                });
+            } else {
+                worksheet.insertRows(sheet.startingRow, excelData, 'i+')
+                worksheet.spliceRows(sheet.spliceAt ?? sheet.startingRow - 1, 1)
+            }
 
         }
 
@@ -41,7 +52,7 @@ const useExportPrettyExcel = () => {
         FileSaver.saveAs(blob, filename)
     }
 
-    return {exportPrettyExcel}
+    return { exportPrettyExcel }
 
 }
 
