@@ -82,7 +82,7 @@ const MigrateQueues = () => {
 
     useEffect(() => {
         if (!isAuditing) return
-        auditQueue(selectedExtensions[currentExtensionIndex], extensionsList)
+        // auditQueue(selectedExtensions[currentExtensionIndex], extensionsList)
     }, [currentExtensionIndex, isAuditing])
 
     useEffect(() => {

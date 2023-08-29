@@ -6,7 +6,7 @@ import useExtensionList from "../../../rcapi/useExtensionList"
 import useFetchCallQueueMembers from "../../../rcapi/useFetchCallQueueMembers"
 import useWriteExcelFile from "../../../hooks/useWriteExcelFile"
 import Header from "../../shared/Header"
-import {Button} from '@mantine/core'
+import {Button, Checkbox, Group} from '@mantine/core'
 import useAnalytics from "../../../hooks/useAnalytics"
 import UIDInputField from "../../shared/UIDInputField"
 import useGetCallQueueSettings from "../../../rcapi/useGetCallQueueSettings"
@@ -22,6 +22,16 @@ import RCExtension from "../../../models/RCExtension"
 import AdaptiveFilter from "../../shared/AdaptiveFilter"
 import useAuditCallQueue from "./hooks/useAuditCallQueue"
 import { sanitize } from "../../../helpers/Sanatize"
+import ToolCard from "../../shared/ToolCard"
+
+export interface QueueAuditSettings {
+    includeBusinessHours: boolean
+    includeMembers: boolean
+    includeManagers: boolean
+    includeMemberStatus: boolean
+    includeNotificationSettings: boolean
+    includeCallHandling: boolean
+}
 
 const CallQueues = () => {
     let [targetUID, setTargetUID] = useState("")
@@ -35,6 +45,14 @@ const CallQueues = () => {
     const [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
     const [isSyncing, setIsSyncing] = useState(false)
     const [aditedQueues, setAditedQueues] = useState<CallQueue[]>([])
+    const [auditSettings, setAuditSettings] = useState<QueueAuditSettings>({
+        includeBusinessHours: true,
+        includeMembers: true,
+        includeManagers: true,
+        includeMemberStatus: true,
+        includeNotificationSettings: true,
+        includeCallHandling: true
+    })
 
     const increaseProgress = (queue: CallQueue) => {
         setAditedQueues([...aditedQueues, queue])
@@ -70,7 +88,7 @@ const CallQueues = () => {
             exportQueues()
             return
         }
-        auditQueue(selectedExtensions[currentExtensionIndex], extensionsList)
+        auditQueue(selectedExtensions[currentExtensionIndex], extensionsList, auditSettings)
     }, [currentExtensionIndex, isSyncing])
 
     useEffect(() => {
@@ -150,6 +168,15 @@ const CallQueues = () => {
                 {!isPhoneNumberMapPending && isMultiSiteEnabled ? <AdaptiveFilter options={siteNames} defaultSelected={siteNames} title='Sites' placeholder='Search...' setSelected={setSelectedSiteNames} />  : <></>}
                 <Button className='healthy-margin-right' disabled={!hasCustomerToken || isPhoneNumberMapPending || isPending} variant="filled" onClick={handleClick}>Go</Button>
                 {isCallQueueSettingsPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
+                <div className="mega-margin-top">
+                    <Group classNames='mega-margin-top'>
+                        <Checkbox checked={auditSettings.includeBusinessHours} onChange={(event) => setAuditSettings({...auditSettings, includeBusinessHours: event.currentTarget.checked})} label="Business Hours" />
+                        <Checkbox checked={auditSettings.includeMembers} onChange={(event) => setAuditSettings({...auditSettings, includeMembers: event.currentTarget.checked})} label="Members" />
+                        <Checkbox checked={auditSettings.includeMemberStatus} onChange={(event) => setAuditSettings({...auditSettings, includeMemberStatus: event.currentTarget.checked})} label="Member Status" />
+                        <Checkbox checked={auditSettings.includeManagers} onChange={(event) => setAuditSettings({...auditSettings, includeManagers: event.currentTarget.checked})} label="Managers" />
+                        <Checkbox checked={auditSettings.includeNotificationSettings} onChange={(event) => setAuditSettings({...auditSettings, includeNotificationSettings: event.currentTarget.checked})} label="Notification Settings" />
+                    </Group>
+                </div>
                 {isPending ? <progress className='healthy-margin-top' value={currentExtensionIndex} max={selectedExtensions.length} /> : <></>}
                 {timedMessages.length > 0 ? <MessagesArea messages={timedMessages} /> : <></>}
                 {!isCallQueueSettingsPending ? <FeedbackArea gridData={callQueues} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}

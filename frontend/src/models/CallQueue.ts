@@ -8,8 +8,12 @@ import { TransferPayload, UnconditionalForwardingPayload } from "./TransferPaylo
 import { DataGridFormattable } from "./DataGridFormattable";
 import { PhoneNumber } from "./PhoneNumber";
 import { CallQueueManager } from "./CallQueueManager";
+import { BusinessHours } from "../components/pages/Migration/User Data Download/models/UserDataBundle";
 
 class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattable, DataGridFormattable {
+
+    public businessHours?: BusinessHours
+
     constructor(
         public extension: RCExtension,
         public siteID: number | string,
@@ -46,9 +50,12 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
             `${this.extension.extensionNumber}`,
             this.extension.site,
             this.extension.status,
-            this.phoneNumbers?.map((p) => p.phoneNumber).join(', ') || '', this.managers?.join(',') || '',
+            this.phoneNumbers?.map((p) => p.phoneNumber).join(', ') || '', 
+            this.managers?.join(',') || '',
             this.extension.contact.email ?? '',
+            '',
             `${this.members}`,
+            this.prettyBusinessHours(),
             this.prettyGreeting(this.greeting('Introductory')),
             this.prettyGreeting(this.greeting('ConnectingAudio')),
             this.prettyGreeting(this.greeting('HoldMusic')),
@@ -108,6 +115,46 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
             return this.extension.site ?? 'N/A'
         }
         return this[key as keyof CallQueue]
+    }
+
+    prettyBusinessHours() {
+        let result = ''
+
+        if (!this.businessHours) return result
+        if (Object.keys(this.businessHours.schedule).length === 0) return '24/7'
+
+        const weeklyRanges = this.businessHours.schedule.weeklyRanges
+        if (weeklyRanges.sunday) {
+            result += `Sunday: ${this.convertTo12HourTime(weeklyRanges.sunday[0].from)} - ${this.convertTo12HourTime(weeklyRanges.sunday[0].to)}\n`
+        }
+        if (weeklyRanges.monday) {
+            result += `Monday: ${this.convertTo12HourTime(weeklyRanges.monday[0].from)} - ${this.convertTo12HourTime(weeklyRanges.monday[0].to)}\n`
+        }
+        if (weeklyRanges.tuesday) {
+            result += `Tuesday: ${this.convertTo12HourTime(weeklyRanges.tuesday[0].from)} - ${this.convertTo12HourTime(weeklyRanges.tuesday[0].to)}\n`
+        }
+        if (weeklyRanges.wednesday) {
+            result += `Wednesday: ${this.convertTo12HourTime(weeklyRanges.wednesday[0].from)} - ${this.convertTo12HourTime(weeklyRanges.wednesday[0].to)}\n`
+        }
+        if (weeklyRanges.thursday) {
+            result += `Thursday: ${this.convertTo12HourTime(weeklyRanges.thursday[0].from)} - ${this.convertTo12HourTime(weeklyRanges.thursday[0].to)}\n`
+        }
+        if (weeklyRanges.friday) {
+            result += `Friday: ${this.convertTo12HourTime(weeklyRanges.friday[0].from)} - ${this.convertTo12HourTime(weeklyRanges.friday[0].to)}\n`
+        }
+        if (weeklyRanges.saturday) {
+            result += `Saturday: ${this.convertTo12HourTime(weeklyRanges.saturday[0].from)} - ${this.convertTo12HourTime(weeklyRanges.saturday[0].to)}\n`
+        }
+        return result
+    }
+
+    convertTo12HourTime(time: string) {
+        const hour = parseInt(time.split(':')[0])
+        const minute = time.split(':')[1]
+        if (hour === 0) return `12:${minute} AM`
+        if (hour === 12) return `12:${minute} PM`
+        if (hour < 12) return `${hour}:${minute} AM`
+        return `${hour - 12}:${minute} PM`
     }
 
     prettyNotificationSettings() {

@@ -5,6 +5,7 @@ import { Message } from "../../../../models/Message"
 import RCExtension from "../../../../models/RCExtension"
 import { SyncError } from "../../../../models/SyncError"
 import { RestCentral } from "../../../../rcapi/RestCentral"
+import { QueueAuditSettings } from "../CallQueues"
 
 const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void, callback: (queue: CallQueue) => void) => {
     const baseMembersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId/members'
@@ -12,9 +13,10 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
     const baseMemberStatusURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId'
     const baseManagersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/call-queues/groupId/permissions'
     const baseNotificationsURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/notification-settings'
+    const baseBusinessHoursURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/business-hours'
     const baseWaitingPeriod = 250
 
-    const auditQueue = async (extension: RCExtension, extensions: RCExtension[]) => {
+    const auditQueue = async (extension: RCExtension, extensions: RCExtension[], auditSettings: QueueAuditSettings) => {
         const accessToken = localStorage.getItem('cs_access_token')
         if (!accessToken) {
             throw new Error('No access token')
@@ -22,11 +24,12 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
 
         const queue = new CallQueue(extension, 0, [])
 
-        await fetchQueueMembers(queue, accessToken)
-        await fetchCallHandling(queue, extensions, accessToken)
-        await fetchEditableMemberStatus(queue, accessToken)
-        await fetchManagers(queue, accessToken)
-        await fetchNotificationsSettings(queue, accessToken)
+        if (auditSettings.includeMembers) await fetchQueueMembers(queue, accessToken)
+        if (auditSettings.includeCallHandling) await fetchCallHandling(queue, extensions, accessToken)
+        if (auditSettings.includeMemberStatus) await fetchEditableMemberStatus(queue, accessToken)
+        if (auditSettings.includeManagers) await fetchManagers(queue, accessToken)
+        if (auditSettings.includeNotificationSettings) await fetchNotificationsSettings(queue, accessToken)
+        if (auditSettings.includeBusinessHours) await fetchBusinessHours(queue, accessToken)
         callback(queue)
     }
 
@@ -57,6 +60,37 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
             console.log(e)
             postMessage(new Message(`Failed to get members for ${queue.extension.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to get members', ''], e.error ?? '', queue))
+            
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const fetchBusinessHours = async (queue: CallQueue, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const url = baseBusinessHoursURL.replace('extensionId', `${queue.extension.id}`)
+            const response = await RestCentral.get(url, headers)
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+
+            queue.businessHours = response.data
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to get business hours ${queue.extension.name}`)
+            console.log(e)
+            postMessage(new Message(`Failed to get business hours for ${queue.extension.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to get business hours', ''], e.error ?? '', queue))
             
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
