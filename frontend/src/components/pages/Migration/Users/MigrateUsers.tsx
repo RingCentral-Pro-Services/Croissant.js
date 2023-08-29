@@ -156,7 +156,6 @@ const MigrateUsers = () => {
     const {forwardToSegregatedLogin} = useSegregatedLogin('migrateusers')
     const location = useLocation()
     const params = new URLSearchParams(location.search);
-    const {fetchEntitlements, requestEntitlement, entitlements} = useEntitlements()
     const {fetchToken: fetchOriginalAccountToken, companyName: originalCompanyName, hasCustomerToken: hasOriginalAccountToken, error: originalAccountTokenError, isTokenPending: isOriginalAccountTokenPending, userName: originalUserName} = useGetAccessToken()
     const {fetchToken: fetchTargetAccountToken, companyName: targetCompanyName, hasCustomerToken: hasTargetAccountToken, error: targetAccountTokenError, isTokenPending: isTargetAccountTokenPending, userName: targetUserName} = useGetAccessToken()
     const {postMessage, postNotification, postError, messages, errors, notifications} = useMessageQueue()
@@ -213,16 +212,6 @@ const MigrateUsers = () => {
     const {writeExcel} = useWriteExcelFile()
     const {exportToExcel} = useExportToExcel()
     const {exportPrettyExcel} = useExportPrettyExcel()
-
-    useEffect(() => {
-        fetchEntitlements(currentUser.email)
-    }, [])
-
-    useEffect(() => {
-        if (!entitlements.entitled) {
-            setIsShowingModal(true)
-        }
-    }, [entitlements])
     
     useEffect(() => {
         if (originalUID.length < 5) return
@@ -1066,22 +1055,8 @@ const MigrateUsers = () => {
         writeExcel(['Original Number', 'Temp Number', 'Extension Type', 'Extension Name', 'Extension Number', 'Site'], numberMapRows, 'Number Map', 'number-map.xlsx')
     }
 
-    const handleRequestEntitlementClick = () => {
-        requestEntitlement({name: currentUser.name, external_id: currentUser.email, email: currentUser.email})
-    }
-
     return (
         <>
-            <Modal 
-                open={isShowingModal}
-                setOpen={setIsShowingModal}
-                title="You don't have access to this tool"
-                body="This tool is still in testing and its usage is restricted to certain people. It will become generally available once testing is complete. You can request access below if you feel that you need access to the tool early."
-                acceptLabel="Request Access"
-                rejectLabel="Go back"
-                handleAccept={() => handleRequestEntitlementClick()}
-                handleReject={() => console.log('')}
-            />
             <Modal 
                 open={isShowingSegregatedModal}
                 setOpen={setIsShowingSegregatedModal}
@@ -1159,7 +1134,7 @@ const MigrateUsers = () => {
                 <AdaptiveFilter options={supportedExtensionTypes} title='Extension Types' placeholder='Search' setSelected={setSelectedExtensionTypes} />
                 {shouldShowSiteFilter ? <AdaptiveFilter options={siteNames} title='Sites' placeholder='Search' setSelected={setSelectedSiteNames} /> : <></>}
                 {isMultiSiteEnabled ? <FormControlLabel control={<Checkbox defaultChecked value={settings.shouldMigrateSites} onChange={(e) => setSettings({...settings, shouldMigrateSites: e.target.checked})} />} label="Migrate Sites" /> : <></>}
-                <Button variant='filled' onClick={handleDisoverButtonClick} disabled={!entitlements.entitled || isPullingData || isOriginalExtensionListPending} >Discover</Button>
+                <Button variant='filled' onClick={handleDisoverButtonClick} disabled={ isPullingData || isOriginalExtensionListPending} >Discover</Button>
                 <div className="healthy-margin-top">
                     <FormControl>
                         <FormLabel id="demo-row-radio-buttons-group-label">Pull numbers from</FormLabel>
