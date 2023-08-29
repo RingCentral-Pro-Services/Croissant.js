@@ -91,6 +91,7 @@ import { userAtom } from "../../../../App";
 import Modal from "../../../shared/Modal";
 import useSegregatedLogin from "../../../../rcapi/useSegregatedLogin";
 import { useLocation } from "react-router-dom";
+import useAnalytics from "../../../../hooks/useAnalytics";
 
 
 
@@ -155,6 +156,7 @@ const MigrateUsers = () => {
     useSidebar('Auto-Migrate')
     const {forwardToSegregatedLogin} = useSegregatedLogin('migrateusers')
     const location = useLocation()
+    const {fireEvent} = useAnalytics()
     const params = new URLSearchParams(location.search);
     const {fetchToken: fetchOriginalAccountToken, companyName: originalCompanyName, hasCustomerToken: hasOriginalAccountToken, error: originalAccountTokenError, isTokenPending: isOriginalAccountTokenPending, userName: originalUserName} = useGetAccessToken()
     const {fetchToken: fetchTargetAccountToken, companyName: targetCompanyName, hasCustomerToken: hasTargetAccountToken, error: targetAccountTokenError, isTokenPending: isTargetAccountTokenPending, userName: targetUserName} = useGetAccessToken()
@@ -463,6 +465,7 @@ const MigrateUsers = () => {
 
     const handleDisoverButtonClick = async () => {
         setIsPullingData(true)
+        fireEvent('migration-phase-1')
 
         // Devices
         const devices = await fetchAccountDevices()
@@ -596,6 +599,7 @@ const MigrateUsers = () => {
     const handleMigrateButtonClick = async () => {
         setIsPending(true)
         setIsMigrating(true)
+        fireEvent('migration-phase-2')
         let targetExts = targetExtensionList
         let targetERLs = targetERLList
         let roles: Role[] = []
