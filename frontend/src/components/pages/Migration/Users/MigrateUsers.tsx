@@ -512,10 +512,6 @@ const MigrateUsers = () => {
         }
 
         const roles = await fetchCustomRoles()
-        console.log('Role permission')
-        for (const permission of roles[0].permissions) {
-            console.log(permission.id)
-        }
         const userDataBundles = await fetchUsers(selectedExtensions.filter((ext) => ext.prettyType() === 'User'), originalExtensionList)
         
         // Message-only extensions and announcement-only extensions
