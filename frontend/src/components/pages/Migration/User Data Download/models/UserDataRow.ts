@@ -36,8 +36,6 @@ export class UserDataRow implements ExcelFormattable {
             this.prettyBusinessHours(),
             this.roles?.at(0)?.displayName ?? '',
             !this.extension.data.hidden ? 'ON' : 'OFF',
-            '', // Receive RC communications
-            '', // Send email when phone added
             this.extension.data.site?.name ?? '',
             this.getPhoneNumber(),
             this.getTempPhoneNumber(),
@@ -75,8 +73,6 @@ export class UserDataRow implements ExcelFormattable {
             this.afterHoursGreeting('HoldMusic'),
             this.blockedCallSettings?.mode ?? '',
             this.blockedPhoneNumbers?.map((number) => `${number.label} - ${number.phoneNumber}`).join('\n') ?? '',
-            '', // Robocalls
-            '', // Trusted numbers
             this.blockedCallSettings?.noCallerId ?? '',
             this.blockedCallSettings?.payPhones ?? '',
             this.prettyForwardAllCalls(),
