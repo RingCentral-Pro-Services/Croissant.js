@@ -53,6 +53,8 @@ const CallQueues = () => {
         includeNotificationSettings: true,
         includeCallHandling: true
     })
+    const settingsOptions = ['Business Hours', 'Members', 'Member Status', 'Managers', 'Notification Settings']
+    const [selectedSettingsOptions, setSelectedSettingsOptions] = useState<string[]>(settingsOptions)
 
     const increaseProgress = (queue: CallQueue) => {
         setAditedQueues([...aditedQueues, queue])
@@ -101,6 +103,35 @@ const CallQueues = () => {
         if (!hasCustomerToken) return
         fetchExtensions()
     }, [hasCustomerToken])
+
+    useEffect(() => {
+        const options: QueueAuditSettings = {
+            includeBusinessHours: false,
+            includeMembers: false,
+            includeManagers: false,
+            includeMemberStatus: false,
+            includeNotificationSettings: false,
+            includeCallHandling: true
+        }
+
+        if (selectedSettingsOptions.includes('Business Hours')) {
+            options.includeBusinessHours = true
+        }
+        if (selectedSettingsOptions.includes('Members')) {
+            options.includeMembers = true
+        }
+        if (selectedSettingsOptions.includes('Managers')) {
+            options.includeManagers = true
+        }
+        if (selectedSettingsOptions.includes('Member Status')) {
+            options.includeMemberStatus = true
+        }
+        if (selectedSettingsOptions.includes('Notification Settings')) {
+            options.includeNotificationSettings = true
+        }
+
+        setAuditSettings(options)
+    }, [selectedSettingsOptions])
 
     useEffect(() => {
         if (isExtensionListPending) return
@@ -166,17 +197,9 @@ const CallQueues = () => {
                 <h2>Export Call Queues</h2>
                 <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} loading={isTokenPending} error={tokenError} />
                 {!isPhoneNumberMapPending && isMultiSiteEnabled ? <AdaptiveFilter options={siteNames} defaultSelected={siteNames} title='Sites' placeholder='Search...' setSelected={setSelectedSiteNames} />  : <></>}
+                <AdaptiveFilter options={settingsOptions} defaultSelected={settingsOptions} setSelected={setSelectedSettingsOptions} placeholder='Search' title='Included Settings' />
                 <Button className='healthy-margin-right' disabled={!hasCustomerToken || isPhoneNumberMapPending || isPending} variant="filled" onClick={handleClick}>Go</Button>
                 {isCallQueueSettingsPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
-                <div className="mega-margin-top">
-                    <Group classNames='mega-margin-top'>
-                        <Checkbox checked={auditSettings.includeBusinessHours} onChange={(event) => setAuditSettings({...auditSettings, includeBusinessHours: event.currentTarget.checked})} label="Business Hours" />
-                        <Checkbox checked={auditSettings.includeMembers} onChange={(event) => setAuditSettings({...auditSettings, includeMembers: event.currentTarget.checked})} label="Members" />
-                        <Checkbox checked={auditSettings.includeMemberStatus} onChange={(event) => setAuditSettings({...auditSettings, includeMemberStatus: event.currentTarget.checked})} label="Member Status" />
-                        <Checkbox checked={auditSettings.includeManagers} onChange={(event) => setAuditSettings({...auditSettings, includeManagers: event.currentTarget.checked})} label="Managers" />
-                        <Checkbox checked={auditSettings.includeNotificationSettings} onChange={(event) => setAuditSettings({...auditSettings, includeNotificationSettings: event.currentTarget.checked})} label="Notification Settings" />
-                    </Group>
-                </div>
                 {isPending ? <progress className='healthy-margin-top' value={currentExtensionIndex} max={selectedExtensions.length} /> : <></>}
                 {timedMessages.length > 0 ? <MessagesArea messages={timedMessages} /> : <></>}
                 {!isCallQueueSettingsPending ? <FeedbackArea gridData={callQueues} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
