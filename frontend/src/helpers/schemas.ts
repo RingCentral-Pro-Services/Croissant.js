@@ -284,7 +284,7 @@ export const createSiteSchema = z.object({
     'Outbound Cnam': z.string({
         required_error: 'Missing outbound cnam',
         invalid_type_error: 'Outbound cnam data type invalid'
-    }),
+    }).optional(),
     'Main Extension Number': z.coerce.string().optional(),
     'Site Code': z.coerce.string().optional()
 })

@@ -52,7 +52,7 @@ export class Site implements DataGridFormattable {
         return {
             name: this.data.name,
             ...(this.data.extensionNumber && { extensionNumber: this.data.extensionNumber }),
-            callerIdName: this.data.outboundCnam,
+            ... (this.data.outboundCnam && { callerIdName: this.data.outboundCnam }),
             businessAddress: {
                 street: `${this.data.street1}${this.data.street2 ? `, ${this.data.street2}` : ''}`,
                 city: this.data.city,
