@@ -112,7 +112,7 @@ const useExcelToSites = (regionalFormats: RegionalFormat[]) => {
                 city: item['City'],
                 state: item['State'],
                 zip: item['Postal Code'],
-                country: ['USA', 'United States'].includes(item['Country']) ? 'US' : item['Country'],
+                country: getCountry(item['Country']),
                 timezone: timezoneMap.get(item['Timezone']) || '51',
                 userLanguage: regionalFormats.find(rf => rf.name === item['User Language'])?.id || '',
                 greetingLanguage: regionalFormats.find(rf => rf.name === item['Greeting Language'])?.id || '',
@@ -128,6 +128,16 @@ const useExcelToSites = (regionalFormats: RegionalFormat[]) => {
 
         setSites(sites)
         setIsConvertPending(false)
+    }
+
+    const getCountry = (rawCountry: string) => {
+        if (['usa', 'united states'].includes(rawCountry.toLowerCase())) {
+            return 'US'
+        }
+        else if (['australia'].includes(rawCountry.toLowerCase())) { 
+            return 'AU'
+        }
+        return rawCountry
     }
 
     const getTimeFormat = (rawFormat: string) => {
