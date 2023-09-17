@@ -4,14 +4,18 @@ import { SyncError } from "../models/SyncError";
 import { Message } from "../models/Message";
 
 export class ZodValidator implements Validator {
-    constructor(private schema: z.Schema, public messageQueue?: MessageQueue) {}
+    constructor(private schema?: z.Schema, public messageQueue?: MessageQueue) {}
 
-    validate(data: any[]): any[] {
+    validate(data: any[], schema?: z.Schema): any[] {
         let validItems: any[] = []
+        const zodSchema = this.schema ?? schema
+        if (!zodSchema) {
+            return []
+        }
 
         for (let index = 0; index < data.length; index++) {
             try {
-                const valid = this.schema.parse(data[index])
+                const valid = zodSchema.parse(data[index])
                 validItems.push(valid)
             }
             catch(error: any) {

@@ -327,3 +327,10 @@ export const LocationUpdateSchema = z.object({
     'State': z.string().optional(),
     'Postal Code': z.coerce.string().optional(),
 })
+
+export const accountIDSchema = z.object({
+    'UID': z.coerce.string({
+        required_error: 'Missing UID',
+        invalid_type_error: 'UID data type invalid'
+    })
+})

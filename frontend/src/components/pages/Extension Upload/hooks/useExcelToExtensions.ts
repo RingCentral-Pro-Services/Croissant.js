@@ -5,11 +5,11 @@ import { Message } from "../../../../models/Message"
 import RCExtension from "../../../../models/RCExtension"
 import { SyncError } from "../../../../models/SyncError"
 
-const useExcelToExtensions = (shouldAlterEmails: boolean, postMessage: (message: Message) => void, postError: (error: SyncError) => void) => {
+const useExcelToExtensions = (shouldAlterEmails: boolean, postMessage: (message: Message) => void, postError: (error: SyncError) => void, shouldFailIfSiteNotFound: boolean = true) => {
     const [extensions, setExtensions] = useState<Extension[]>([])
     const [isExtensionConverPending, setIsExtensionConverPending] = useState(true)
 
-    const convertExcelToExtensions = (excelData: any[], extensionList: RCExtension[], roles: Role[]) => {
+    const convertExcelToExtensions = async (excelData: any[], extensionList: RCExtension[], roles: Role[]) => {
         let extensions: Extension[] = []
         for (let index = 0; index < excelData.length; index++) {
             const currentItem = excelData[index]
@@ -46,7 +46,7 @@ const useExcelToExtensions = (shouldAlterEmails: boolean, postMessage: (message:
                 roles: findRole(currentItem['Role'], roles)
             }
 
-            if (data.site?.id === '') {
+            if (shouldFailIfSiteNotFound && data.site?.id === '') {
                 postMessage(new Message(`Extension ${data.name} - Ext. ${data.extensionNumber} cannot be created because the site it's assigned to (${currentItem['Site Name']}) does not exist`, 'error'))
                 postError(new SyncError(data.name, parseInt(data.extensionNumber), ['Site not found', currentItem['Site Name']], '', data))
                 continue
@@ -57,6 +57,7 @@ const useExcelToExtensions = (shouldAlterEmails: boolean, postMessage: (message:
         }
         setExtensions(extensions)
         setIsExtensionConverPending(false)
+        return extensions
     }
 
     const findRole = (name: string, roles: Role[]) => {

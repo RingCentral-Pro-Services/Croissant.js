@@ -38,6 +38,7 @@ import { MantineProvider } from '@mantine/core';
 import { UserDetailsProvider } from './providers/UserDetailsProvider';
 import { atom, useAtom } from 'jotai'
 import BizToken from './components/shared/BizToken';
+import AccountTemplates from './components/pages/Bulk Account Templates/AccountTemplates';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -138,6 +139,7 @@ function App() {
                 <Route path='/migratequeues' element={<MigrateQueues />} />
                 <Route path='/userexport' element={<UserDataDownload />} />
                 <Route path='/migrateusers' element={<MigrateUsers />} />
+                <Route path='/accounttemplates' element={<AccountTemplates />} />
                 <Route path='/error' element={<FatalError />} />
               </Routes>
             </Suspense>

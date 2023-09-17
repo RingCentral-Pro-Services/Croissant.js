@@ -100,7 +100,7 @@ const useExcelToSites = (regionalFormats: RegionalFormat[]) => {
         ['Asia/Pyongyang', '93'],
     ])
 
-    const convert = (data: any) => {
+    const convert = async (data: any) => {
         const sites: Site[] = []
 
         for (const item of data) {
@@ -114,9 +114,9 @@ const useExcelToSites = (regionalFormats: RegionalFormat[]) => {
                 zip: item['Postal Code'],
                 country: getCountry(item['Country']),
                 timezone: timezoneMap.get(item['Timezone']) || '51',
-                userLanguage: regionalFormats.find(rf => rf.name === item['User Language'])?.id || '',
-                greetingLanguage: regionalFormats.find(rf => rf.name === item['Greeting Language'])?.id || '',
-                regionalFormat: regionalFormats.find(rf => rf.name === item['Regional Format'])?.id || '',
+                userLanguage: regionalFormats.find(rf => rf.name === item['User Language'])?.id || item['User Language'],
+                greetingLanguage: regionalFormats.find(rf => rf.name === item['Greeting Language'])?.id || item['Greeting Language'],
+                regionalFormat: regionalFormats.find(rf => rf.name === item['Regional Format'])?.id || item['Regional Format'],
                 timeFormat: getTimeFormat(`${item['Time Format']}`),
                 outboundCnam: item['Outbound Cnam'],
                 siteCode: item['Site Code'],
@@ -128,6 +128,7 @@ const useExcelToSites = (regionalFormats: RegionalFormat[]) => {
 
         setSites(sites)
         setIsConvertPending(false)
+        return sites
     }
 
     const getCountry = (rawCountry: string) => {

@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { Message } from "./Message";
 import { SyncError } from "./SyncError";
 
@@ -7,7 +8,7 @@ export interface Transformer<T> {
 }
 
 export interface Validator {
-    validate(data: any[]): any[];
+    validate(data: any[], schema?: z.Schema, ): any[];
     messageQueue?: MessageQueue
 }
 
