@@ -61,6 +61,7 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
         await setMemberStatus(queue, accessToken)
         await addQueueMembers(queue, accessToken)
         await setCallHandling(queue, accessToken)
+        await disableConnectingMessage(queue, accessToken)
         await setNotificationSettings(queue, accessToken)
         if (queue.afterHoursAction && queue.afterHoursAction !== '') {
             await setSchedule(queue, accessToken)
@@ -212,6 +213,52 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(e)
             postMessage(new Message(`Failed to set call handling ${queue.extension.name}. ${e.error ?? ''}`, 'error'))
             postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set call handling', ''], e.error ?? '', queue))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const disableConnectingMessage = async (queue: CallQueue, token: string) => {
+        if (!queue.greetings) return
+        const introGreeting = queue.greetings.find((greeting) => greeting.type === 'Introductory')
+        if ((!introGreeting) || (introGreeting && introGreeting.preset.name !== 'None')) return
+
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+
+            const url = baseCallHandlingURL.replace('extensionId', `${queue.extension.id}`)
+
+            const body = {
+                greetings: [
+                    {
+                        type: 'ConnectingMessage',
+                        preset: {
+                            id: 134405
+                        }
+                    }
+                ]
+            }
+
+            const response = await RestCentral.put(url, headers, body)
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+
+            console.log(`Failed to disable connecting message for ${queue.extension.name}`)
+            console.log(e)
+            postMessage(new Message(`Failed to disable connecting message ${queue.extension.name}. ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to disable connecting message', ''], e.error ?? '', queue))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
