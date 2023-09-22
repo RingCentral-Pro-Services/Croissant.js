@@ -39,6 +39,7 @@ import { UserDetailsProvider } from './providers/UserDetailsProvider';
 import { atom, useAtom } from 'jotai'
 import BizToken from './components/shared/BizToken';
 import AccountTemplates from './components/pages/Bulk Account Templates/AccountTemplates';
+import AutoAudit from './components/pages/Migration/Audit/AutoAudit';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -141,6 +142,7 @@ function App() {
                 <Route path='/migrateusers' element={<MigrateUsers />} />
                 <Route path='/accounttemplates' element={<AccountTemplates />} />
                 <Route path='/error' element={<FatalError />} />
+                <Route path='/autoaudit' element={<AutoAudit />} />
               </Routes>
             </Suspense>
           </ErrorBoundary>
