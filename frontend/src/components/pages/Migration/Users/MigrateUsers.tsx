@@ -1,4 +1,4 @@
-import { Checkbox, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, TextField } from "@mui/material";
+import { Checkbox, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, TextField } from "@mui/material";
 import { Accordion, Button, Input, Text } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import ExtensionIsolator from "../../../../helpers/ExtensionIsolator";
@@ -92,6 +92,9 @@ import Modal from "../../../shared/Modal";
 import useSegregatedLogin from "../../../../rcapi/useSegregatedLogin";
 import { useLocation } from "react-router-dom";
 import useAnalytics from "../../../../hooks/useAnalytics";
+import ImportAccountData from "./components/ImportAccountData";
+const FileSaver = require('file-saver');
+
 
 
 
@@ -134,6 +137,7 @@ const MigrateUsers = () => {
     const [shouldShowAreaCodeSelector, setShouldShowAreaCodeSelector] = useState(false)
     const [targetAccountAreaCodes, setTargetAccountAreaCodes] = useState<string[]>([])
     const [selectedAreaCodes, setSelectedAreaCodes] = useState<string[]>([])
+    const [isShowingImportModal, setIsShowingImportModal] = useState(false)
     // const [originalAccountPrompts, setOriginalAccountPrompts] = useState<IVRAudioPrompt[]>([])
     const [settings, setSettings] = useState({
         shouldOverrideSites: false,
@@ -461,6 +465,34 @@ const MigrateUsers = () => {
         }
 
         return targetSiteBundle
+    }
+
+    const handleExportButtonClick = () => {
+        const accountData = {
+            mainSite: mainSiteBundle,
+            sites: siteBundles,
+            ivrs: ivrBundles,
+            prompts: originalAccountPrompts,
+            users: userDataBundles,
+            limitedExtensions: leBundles,
+            callQueues: callQueueBundles,
+            messageOnlyExtensions: messageOnlyBundles,
+            callMonitoring: callMonitoringBundles,
+            userGroups: userGroupBundles,
+            customRoles: customRoles,
+            parkLocations: parkLocationBundles,
+            costCenters: costCenterBundles,
+            devices: originalAccountDevices,
+            numbers: originalAccountNumbers,
+        }
+
+        const stringifiedAccountData = JSON.stringify(accountData)
+        const blob = new Blob([stringifiedAccountData])
+        FileSaver.saveAs(blob, 'Account.json')
+    }
+
+    const handleImportButtonClick = () => {
+
     }
 
     const handleDisoverButtonClick = async () => {
@@ -1067,6 +1099,7 @@ const MigrateUsers = () => {
                 handleAccept={() => forwardToSegregatedLogin()}
                 handleReject={() => console.log('')}
             />
+            <ImportAccountData isOpen={isShowingImportModal} setIsOpen={setIsShowingImportModal} />
             <Header title='Migration' body='Migrate from one account to another' />
             <ToolCard>
                 <h2>Things to know</h2>
@@ -1135,6 +1168,7 @@ const MigrateUsers = () => {
                 {shouldShowSiteFilter ? <AdaptiveFilter options={siteNames} title='Sites' placeholder='Search' setSelected={setSelectedSiteNames} /> : <></>}
                 {isMultiSiteEnabled ? <FormControlLabel control={<Checkbox defaultChecked value={settings.shouldMigrateSites} onChange={(e) => setSettings({...settings, shouldMigrateSites: e.target.checked})} />} label="Migrate Sites" /> : <></>}
                 <Button variant='filled' onClick={handleDisoverButtonClick} disabled={ isPullingData || isOriginalExtensionListPending} >Discover</Button>
+                <Button variant='outline' className="healthy-margin-left" onClick={handleExportButtonClick}>Export Account Data</Button>
                 <div className="healthy-margin-top">
                     <FormControl>
                         <FormLabel id="demo-row-radio-buttons-group-label">Pull numbers from</FormLabel>
@@ -1170,6 +1204,7 @@ const MigrateUsers = () => {
                 <p>Enter the UID that you are migrating <em>to</em></p>
                 <UIDInputField disabled={hasTargetAccountToken} disabledText={targetCompanyName} setTargetUID={setTargetUID} loading={isTargetAccountTokenPending} error={targetAccountTokenError} />
                 <Button variant='filled' onClick={handleMigrateButtonClick} disabled={!hasTargetAccountToken || isERLListPending || isTargetERLListPending || isMigrating} >Migrate</Button>
+                {/* <Button onClick={() => setIsShowingImportModal(true)}>Import Account Data</Button> */}
                 <Button className='healthy-margin-left' sx={{top: 7}} variant='subtle' color='dark' leftIcon={<IconDownload />} onClick={handleDownloadUsersClick} >Migration Template</Button>
                 <Button className='healthy-margin-left' sx={{top: 7}} variant='subtle' color='dark' leftIcon={<IconDownload />} onClick={handleDownloadNumberMapClick} >Number Map</Button>
                 <ProgressBar label='Main Site' value={assignMainSiteNumbersProgress} max={maxAssignMainSiteNumbersProgress} />
