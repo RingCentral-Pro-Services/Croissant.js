@@ -22,6 +22,8 @@ import UIDInputField from "../../shared/UIDInputField";
 import useExcelToExtensions from "./hooks/useExcelToExtensions";
 import useExtension from "./hooks/useExtension";
 import useFetchRoles from "./hooks/useFetchRoles";
+import useDeviceDictionary from "./hooks/useDeviceDictionary";
+import { Device } from "../Migration/User Data Download/models/UserDataBundle";
 
 const ExtensionUpload = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -41,6 +43,7 @@ const ExtensionUpload = () => {
     const [deficitLabel, setDeficitLabel] = useState('')
     const [selectedExtensionTypes, setSelectedExtensionTypes] = useState<string[]>([])
     const [shouldAlterEmails, setShouldAlterEmails] = useState(true)
+    const [deviceDictionary, setDeviceDictionary] = useState<Device[]>([])
     const defaultSheet = 'Users'
     const supportedExtensionTypes = ['Announcement-Only', 'Message-Only', 'Limited Extension', 'User', 'Virtual User']
 
@@ -55,11 +58,19 @@ const ExtensionUpload = () => {
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const {fetchExtensions, extensionsList, isExtensionListPending, isMultiSiteEnabled} = useExtensionList(postMessage)
+    const {fetchDeviceDictionary} = useDeviceDictionary(postMessage, postTimedMessage, postError)
     const {readFile, excelData, isExcelDataPending} = useReadExcel()
     const {validate, validatedData, isDataValidationPending} = useValidateExcelData(extensionSchema, postMessage, postError)
     const {convertExcelToExtensions, isExtensionConverPending, extensions} = useExcelToExtensions(shouldAlterEmails, postMessage, postError)
-    const {fetchRoles, roles, isRoleListPending} = useFetchRoles()
+    const {fetchRoles, roles} = useFetchRoles(postMessage, postTimedMessage, postError)
     const {createExtension} = useExtension(postMessage, postTimedMessage, postError, isMultiSiteEnabled, increaseProgress)
+
+    const setup = async () => {
+        await fetchExtensions()
+        await fetchRoles()
+        const devices = await fetchDeviceDictionary()
+        setDeviceDictionary(devices)
+    }
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -69,13 +80,8 @@ const ExtensionUpload = () => {
 
     useEffect(() => {
         if (!hasCustomerToken) return
-        fetchExtensions()
+        setup()
     }, [hasCustomerToken])
-
-    useEffect(() => {
-        if (isExtensionListPending) return
-        fetchRoles()
-    }, [isExtensionListPending])
 
     useEffect(() => {
         if (isExcelDataPending) return
@@ -84,7 +90,7 @@ const ExtensionUpload = () => {
  
     useEffect(() => {
         if (isDataValidationPending) return
-        convertExcelToExtensions(validatedData, extensionsList, roles)
+        convertExcelToExtensions(validatedData, extensionsList, roles, deviceDictionary)
     }, [isDataValidationPending, validatedData])
 
     useEffect(() => {
@@ -105,6 +111,9 @@ const ExtensionUpload = () => {
         if ((limitedExtensions.length - unassignedLEs.length) > 0) {
             label += leLabel
         }
+
+        console.log('Read Extensions')
+        console.log(extensions)
 
         setDeficitLabel(label)
 
@@ -168,6 +177,15 @@ const ExtensionUpload = () => {
         fireEvent('extension-upload')
     }
 
+    const printData = () => {
+        console.log('Extensions')
+        console.log(extensionsList)
+        console.log('Roles')
+        console.log(roles)
+        console.log('Device dictionary')
+        console.log(deviceDictionary)
+    }
+
     return (
         <>
             <Header title='Extension Upload' body={`Create extensions using the BRD's users tab`} documentationURL="https://dqgriffin.com/blog/rgOq6D6cGUzNteQkEXE4">
@@ -175,6 +193,7 @@ const ExtensionUpload = () => {
             </Header>
             <div className="tool-card">
                 <h2>Extension Upload</h2>
+                <Button onClick={printData}>Print</Button>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} error={tokenError} loading={isTokenPending} setTargetUID={setTargetUID} />
                 <FileSelect enabled={!isSyncing} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
                 <AdaptiveFilter title='Extension Types' placeholder='search' options={supportedExtensionTypes} defaultSelected={supportedExtensionTypes} setSelected={setSelectedExtensionTypes} disabled={isExtensionConverPending || isSyncing} />

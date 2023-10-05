@@ -4,12 +4,13 @@ import { ExtensionData, Role } from "../../../../models/ExtensionData"
 import { Message } from "../../../../models/Message"
 import RCExtension from "../../../../models/RCExtension"
 import { SyncError } from "../../../../models/SyncError"
+import { Device } from "../../Migration/User Data Download/models/UserDataBundle"
 
 const useExcelToExtensions = (shouldAlterEmails: boolean, postMessage: (message: Message) => void, postError: (error: SyncError) => void, shouldFailIfSiteNotFound: boolean = true) => {
     const [extensions, setExtensions] = useState<Extension[]>([])
     const [isExtensionConverPending, setIsExtensionConverPending] = useState(true)
 
-    const convertExcelToExtensions = async (excelData: any[], extensionList: RCExtension[], roles: Role[]) => {
+    const convertExcelToExtensions = async (excelData: any[], extensionList: RCExtension[], roles: Role[], deviceDictionary: Device[]) => {
         let extensions: Extension[] = []
         for (let index = 0; index < excelData.length; index++) {
             const currentItem = excelData[index]
@@ -22,6 +23,10 @@ const useExcelToExtensions = (shouldAlterEmails: boolean, postMessage: (message:
                 firstName = result[0]
                 lastName = result[1]
             }
+
+            const deviceType = currentItem['Existing Device Type'] ?? ''
+            const deviceMac = currentItem['MAC Address']
+            const deviceData = deviceDictionary.find((deviceModel) => deviceModel.model.name === deviceType || deviceModel.model.name.replaceAll(' ', '').includes(deviceType.replaceAll(' ', '')))
 
 
             let data: ExtensionData = {
@@ -43,7 +48,8 @@ const useExcelToExtensions = (shouldAlterEmails: boolean, postMessage: (message:
                 hidden: false,
                 ivrPin: currentItem['Pin'],
                 password: currentItem['Password'],
-                roles: findRole(currentItem['Role'], roles)
+                roles: findRole(currentItem['Role'], roles),
+                ...(deviceData && {device: {id: deviceData.model.id, macAddress: deviceMac}})
             }
 
             if (shouldFailIfSiteNotFound && data.site?.id === '') {

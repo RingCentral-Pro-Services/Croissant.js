@@ -198,7 +198,9 @@ export const extensionSchema = z.object({
     'Dept': z.string().optional(),
     'Pin': z.coerce.string().optional(),
     'Password': z.string().optional(),
-    'Role': z.string().optional()
+    'Role': z.string().optional(),
+    'Existing Device Type': z.string().optional(),
+    'MAC Address': z.string().optional()
 })
 
 export const callMonitoringSchema = z.object({

@@ -3,10 +3,21 @@ import { Message } from "../../../../models/Message"
 import { SyncError } from "../../../../models/SyncError"
 import { RestCentral } from "../../../../rcapi/RestCentral"
 
+interface DeviceModelPayload {
+    deviceId: string
+    model: {
+        id: string
+    }
+    serial: string
+}
+
 const useExtension = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void, isMultiSiteEnabled: boolean, callback: () => void) => {
     const baseCreateURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension'
     const baseUpdateURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId'
     const baseRoleURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/assigned-role'
+    const baseDeviceModelURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/device/bulk-update'
+    const baseDeviceListURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/device'
+    const baseDeviceURL = ''
     const baseWaitingPeriod = 250
 
     const createExtension = async (extension: Extension, id?: string) => {
@@ -31,6 +42,7 @@ const useExtension = (postMessage: (message: Message) => void, postTimedMessage:
                 await setRole(extension, accessToken)
             }
         }
+        await addDevice(extension, accessToken)
         callback()
     }
 
@@ -103,6 +115,85 @@ const useExtension = (postMessage: (message: Message) => void, postTimedMessage:
             const url = baseRoleURL.replace('extensionId', `${extension.data.id}`)
             console.log(`Role URL: ${url}`)
             const response = await RestCentral.put(url, headers, extension.rolePayload())
+            
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to set role ${extension.data.name}`)
+            console.log(e)
+            postMessage(new Message(`Failed to set role ${extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(extension.data.name, parseInt(extension.data.extensionNumber), ['Failed to set role', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const getDeviceIDs = async (extension: Extension, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const response = await RestCentral.get(baseDeviceListURL.replace('extensionId', `${extension.data.id}`), headers)
+            console.log('Device response')
+            console.log(response.data)
+            const deviceIDs = response.data.records.map((record: any) => record.id)
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+            return deviceIDs
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to get device IDs`)
+            console.log(e)
+            postMessage(new Message(`Failed to get device IDs for ${extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(extension.data.name, parseInt(extension.data.extensionNumber), ['Failed to get device IDs', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+            return []
+        }
+    }
+
+    const addDevice = async (extension: Extension, token: string) => {
+        if (!extension.data.device) return 
+
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+
+            const deviceIDs = await getDeviceIDs(extension, token)
+            if (!deviceIDs || deviceIDs.length < 1)
+            console.log('Device IDs')
+            console.log(deviceIDs)
+
+            const device: DeviceModelPayload = {
+                deviceId: deviceIDs[0],
+                serial: extension.data.device.macAddress,
+                model: {
+                    id: extension.data.device.id
+                }
+            }
+
+            const body = {
+                records: [device]
+            }
+            
+            const response = await RestCentral.post(baseDeviceModelURL, headers, body)
             
             if (response.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)

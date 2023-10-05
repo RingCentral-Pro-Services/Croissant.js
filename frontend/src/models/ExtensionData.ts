@@ -84,6 +84,10 @@ export interface ExtensionData {
         id: string
         name: string
     }
+    device?: {
+        id: string,
+        macAddress: string
+    }
 }
 
 export interface CustomField {

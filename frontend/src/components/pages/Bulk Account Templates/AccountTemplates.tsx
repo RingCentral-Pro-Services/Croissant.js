@@ -59,7 +59,7 @@ const AccountTemplates = () => {
         // Users
         const userData = await reader.read('Users')
         const validatedUserData = validator.validate(userData, extensionSchema)
-        const users = await convertExcelToExtensions(validatedUserData, [], [])
+        const users = await convertExcelToExtensions(validatedUserData, [], [], [])
 
         // Call Queues
         const callQueueData = await reader.read('Call Queues')
