@@ -106,10 +106,10 @@ const useExcelToSites = (regionalFormats: RegionalFormat[]) => {
         for (const item of data) {
             const data: SiteData = {
                 name: item['Site Name'],
-                street1: item['Address 1'],
+                street1: item['Address 1'] ?? item['Address'],
                 extensionNumber: item['Main Extension Number'],
                 street2: item['Address 2'],
-                city: item['City'],
+                city: item['City'] ?? item['Suburb'],
                 state: item['State'],
                 zip: item['Postal Code'],
                 country: getCountry(item['Country']),
