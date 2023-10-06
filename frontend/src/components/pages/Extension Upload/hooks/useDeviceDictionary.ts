@@ -1923,6 +1923,9 @@ const useDeviceDictionary = (postMessage: (message: Message) => void, postTimedM
                 "Authorization": `Bearer ${token}`
             }
 
+            setTimeout(() => {
+                return defaultDevices
+            }, 5000)
             const response = await RestCentral.get(url, headers)
             const devices = response.data.records as Device[]
             

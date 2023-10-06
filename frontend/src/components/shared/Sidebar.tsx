@@ -92,6 +92,7 @@ const mockdata = [
         initiallyOpened: false,
         links: [
             { label: 'Account Dump', link: '/accountdump' },
+            { label: 'Upload Devices', link: '/uploaddevices' },
             { label: 'Account Templates', link: '/accounttemplates' },
             { label: 'Extension Upload', link: '/extensionupload' },
             { label: 'Delete Extensions', link: '/deleteextensions' },

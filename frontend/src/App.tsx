@@ -40,6 +40,7 @@ import { atom, useAtom } from 'jotai'
 import BizToken from './components/shared/BizToken';
 import AccountTemplates from './components/pages/Bulk Account Templates/AccountTemplates';
 import AutoAudit from './components/pages/Migration/Audit/AutoAudit';
+import UploadDevices from './components/pages/Device Upload/UploadDevices';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -143,6 +144,7 @@ function App() {
                 <Route path='/accounttemplates' element={<AccountTemplates />} />
                 <Route path='/error' element={<FatalError />} />
                 <Route path='/autoaudit' element={<AutoAudit />} />
+                <Route path='/uploaddevices' element={<UploadDevices />} />
               </Routes>
             </Suspense>
           </ErrorBoundary>

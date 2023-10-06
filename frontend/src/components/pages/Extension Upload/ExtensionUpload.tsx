@@ -177,15 +177,6 @@ const ExtensionUpload = () => {
         fireEvent('extension-upload')
     }
 
-    const printData = () => {
-        console.log('Extensions')
-        console.log(extensionsList)
-        console.log('Roles')
-        console.log(roles)
-        console.log('Device dictionary')
-        console.log(deviceDictionary)
-    }
-
     return (
         <>
             <Header title='Extension Upload' body={`Create extensions using the BRD's users tab`} documentationURL="https://dqgriffin.com/blog/rgOq6D6cGUzNteQkEXE4">
@@ -193,7 +184,6 @@ const ExtensionUpload = () => {
             </Header>
             <div className="tool-card">
                 <h2>Extension Upload</h2>
-                <Button onClick={printData}>Print</Button>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} error={tokenError} loading={isTokenPending} setTargetUID={setTargetUID} />
                 <FileSelect enabled={!isSyncing} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
                 <AdaptiveFilter title='Extension Types' placeholder='search' options={supportedExtensionTypes} defaultSelected={supportedExtensionTypes} setSelected={setSelectedExtensionTypes} disabled={isExtensionConverPending || isSyncing} />

@@ -336,3 +336,10 @@ export const accountIDSchema = z.object({
         invalid_type_error: 'UID data type invalid'
     })
 })
+
+export const deviceUploadSchema = z.object({
+    'Extension': z.coerce.string(),
+    'Device Type': z.string(),
+    'MAC Address': z.string(),
+    'Device Name': z.coerce.string().optional()
+})
