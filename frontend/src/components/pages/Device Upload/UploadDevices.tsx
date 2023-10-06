@@ -7,6 +7,7 @@ import useMessageQueue from "../../../hooks/useMessageQueue";
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
 import useReadExcel from "../../../hooks/useReadExcel";
 import useValidateExcelData from "../../../hooks/useValidateExcelData";
+import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel";
 import useExtensions from "../../../rcapi/useExtensions";
 import useGetAccessToken from "../../../rcapi/useGetAccessToken";
 import FeedbackArea from "../../shared/FeedbackArea";
@@ -42,6 +43,7 @@ const UploadDevices = () => {
     const {validate, validatedData, isDataValidationPending} = useValidateExcelData(deviceUploadSchema, postMessage, postError)
     const {readDevices, isDeviceReadPending, prospectiveDevices} = useReadDeviceData(postMessage, postTimedMessage, postError)
     const {uploadDevice} = useUploadDevice(postMessage, postTimedMessage, postError)
+    const {writePrettyExcel} = useWritePrettyExcel()
 
     const handleFileSelect = () => {
         if (!selectedFile) return
@@ -83,15 +85,20 @@ const UploadDevices = () => {
             setProgressValue((prev) => prev + 1)
         }
     }
+
+    const handleTemplateButtonClick = () => {
+        writePrettyExcel([], [], 'Devices', 'device-upload.xlsx', '/device-upload-template.xlsx')
+    }
     
     return (
         <>
             <Header title="Upload Devices" body="Upload devices in bulk" />
             <ToolCard>
-                <h2>Upload Devices</h2>
+                <h2 className="inline mega-margin-right">Upload Devices</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} error={tokenError} loading={isTokenPending} setTargetUID={setTargetUID} />
                 <FileSelect enabled={!isSyncing} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
                 <Button disabled={!isReady} onClick={handleSyncButtonClick}>Sync</Button>
+                <Button className='healthy-margin-left' variant='outline' onClick={handleTemplateButtonClick}>Template</Button>
                 {(hasCustomerToken && !isReady) ? <LoadingIndicator label="Getting ready" /> : <></>}
                 <ProgressBar value={progressValue} max={prospectiveDevices.length} label='' />
                 <FeedbackArea gridData={prospectiveDevices} messages={messages} errors={errors} timedMessages={timedMessages} />
