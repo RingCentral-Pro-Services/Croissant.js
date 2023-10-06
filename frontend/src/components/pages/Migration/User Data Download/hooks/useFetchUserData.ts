@@ -84,6 +84,11 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
                 }
             }
         }
+
+        if (userDataBundle.extension.data.type === 'DigitalUser') {
+            userDataBundle.extension.data.type = 'User'
+        }
+
         callback()
     }
 
