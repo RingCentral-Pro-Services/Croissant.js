@@ -6,7 +6,7 @@ import { RestCentral } from "../../../../../rcapi/RestCentral"
 const useSiteList = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void, callback: (siteData: SiteData[]) => void) => {
     const baseURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/sites?perPage=1000'
     const baseWaitingPeriod = 250
-    const [isFetchingSites, setIsFetchingSites] = useState(false)
+    const [isFetchingSites, setIsFetchingSites] = useState(true)
 
     const fetchSites = async () => {
         const accessToken = localStorage.getItem('cs_access_token')
@@ -19,6 +19,7 @@ const useSiteList = (postMessage: (message: Message) => void, postTimedMessage: 
         await getSites(sites, accessToken)
         setIsFetchingSites(false)
         callback(sites)
+        return sites
     }
 
     const getSites = async (sites: SiteData[], token: string) => {
