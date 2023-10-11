@@ -83,7 +83,7 @@ const mockdata = [
         initiallyOpened: false,
         links: [
           { label: 'Auto Migrate', link: '/migrateusers' },
-          { label: 'Auto Audit', link: '/autoaudit' },
+          // { label: 'Auto Audit', link: '/autoaudit' },
         ],
     },
     {
