@@ -1,4 +1,4 @@
-import { Button } from "@mantine/core";
+import { Button, Loader } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import useLogin from "../../../../hooks/useLogin";
 import useMessageQueue from "../../../../hooks/useMessageQueue";
@@ -176,11 +176,11 @@ const AutoAudit = () => {
                     <UIDInputField disabled={hasNewAccountToken} disabledText={newCompanyName} setTargetUID={setNewAccountUID} loading={isNewAccountTokenPending} error={newAccountTokenError} />
                 </div>
 
-                <Button onClick={handleAuditButtonClick}>Audit</Button>
+                <Button disabled={isPullingData} onClick={handleAuditButtonClick}>Audit</Button>
             </ToolCard>
 
             <ToolCard>
-                <FeedbackArea gridData={[]} messages={messages} errors={errors} timedMessages={timedMessages} />
+                <FeedbackArea defaultTab={1} gridData={[]} messages={messages} errors={errors} timedMessages={timedMessages} />
             </ToolCard>
         </>
     )

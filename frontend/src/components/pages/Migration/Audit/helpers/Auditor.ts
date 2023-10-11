@@ -10,10 +10,12 @@ export class Auditor {
         const discrepencies: AuditDiscrepency[] = []
 
         discrepencies.push(this.compareSites(originalAccountData, newAccountData))
+        discrepencies.push(this.compareUsers(originalAccountData, newAccountData))
         discrepencies.push(this.compareIVRs(originalAccountData, newAccountData))
         discrepencies.push(this.compareLimitedExtensions(originalAccountData, newAccountData))
         discrepencies.push(this.compareCallQueues(originalAccountData, newAccountData))
         discrepencies.push(this.compareMessageOnlyExtensions(originalAccountData, newAccountData))
+        discrepencies.push(this.comparePrompts(originalAccountData, newAccountData))
 
         return discrepencies
     }
@@ -1009,6 +1011,547 @@ export class Auditor {
                 }
             }
 
+        }
+
+        return discrepencies
+    }
+
+    private compareUsers(originalAccountData: AccountData, newAccountData: AccountData) {
+        const discrepencies: AuditDiscrepency[] = []
+
+        for (const user of originalAccountData.users) {
+            const newAccountCounterpart = newAccountData.users.find((currentItem) => currentItem.extension.data.name === user.extension.data.name)
+            if (!newAccountCounterpart) {
+                this.postMessage(new Message(`User '${user.extension.data.name}' was not found in the new account`, 'error'))
+                discrepencies.push(new AuditDiscrepency({
+                    name: user.extension.data.name,
+                    extensionNumber: user.extension.data.extensionNumber,
+                    issue: {
+                        path: 'extension',
+                        expectedValue: 'something',
+                        foundValue: 'nothing'
+                    }
+                }))
+                continue
+            }
+
+            if (user.extension.data.extensionNumber !== newAccountCounterpart.extension.data.extensionNumber) {
+                this.postMessage(new Message(`User '${user.extension.data.name}' has a different extension number. Expected: ${user.extension.data.extensionNumber}. Found: ${newAccountCounterpart.extension.data.extensionNumber}`, 'error'))
+                discrepencies.push(new AuditDiscrepency({
+                    name: user.extension.data.name,
+                    extensionNumber: user.extension.data.extensionNumber,
+                    issue: {
+                        path: 'extension number',
+                        expectedValue: user.extension.data.extensionNumber,
+                        foundValue: newAccountCounterpart.extension.data.extensionNumber
+                    }
+                }))
+            }
+
+            if (user.extension.data.site?.name !== newAccountCounterpart.extension.data.site?.name) {
+                this.postMessage(new Message(`User '${user.extension.data.name}' is assigned to a different site. Expected: ${user.extension.data.site?.name}. Found: ${newAccountCounterpart.extension.data.site?.name}`, 'error'))
+                discrepencies.push(new AuditDiscrepency({
+                    name: user.extension.data.name,
+                    extensionNumber: user.extension.data.extensionNumber,
+                    issue: {
+                        path: 'site',
+                        expectedValue: user.extension.data.site?.name ?? '',
+                        foundValue: newAccountCounterpart.extension.data.site?.name ?? ''
+                    }
+                }))
+            }
+
+            if (user.extension.data.costCenter && user.extension.data.costCenter?.name !== newAccountCounterpart.extension.data.costCenter?.name) {
+                this.postMessage(new Message(`User '${user.extension.data.name}' is assigned to a different cost center. Expected: ${user.extension.data.costCenter?.name}. Found: ${newAccountCounterpart.extension.data.costCenter?.name}`, 'error'))
+                discrepencies.push(new AuditDiscrepency({
+                    name: user.extension.data.name,
+                    extensionNumber: user.extension.data.extensionNumber,
+                    issue: {
+                        path: 'cost center',
+                        expectedValue: user.extension.data.costCenter?.name ?? '',
+                        foundValue: newAccountCounterpart.extension.data.costCenter?.name ?? ''
+                    }
+                }))
+            }
+
+            if (user.extension.data.hidden !== newAccountCounterpart.extension.data.hidden) {
+                this.postMessage(new Message(`User '${user.extension.data.name}' has a different hidden status. Expected: ${user.extension.data.hidden}. Found: ${newAccountCounterpart.extension.data.hidden}`, 'error'))
+                discrepencies.push(new AuditDiscrepency({
+                    name: user.extension.data.name,
+                    extensionNumber: user.extension.data.extensionNumber,
+                    issue: {
+                        path: 'hidden status',
+                        expectedValue: `${user.extension.data.hidden ? 'Hidden' : 'Not Hidden'}`,
+                        foundValue: `${newAccountCounterpart.extension.data.hidden ? 'Hidden' : 'Not Hidden'}`
+                    }
+                }))
+            }
+
+            if (user.extendedData?.directNumbers?.length !== newAccountCounterpart.extendedData?.directNumbers?.length) {
+                this.postMessage(new Message(`User '${user.extension.data.name}' has a different number of phone numbers. Expected: ${user.extendedData?.directNumbers?.length}. Found: ${newAccountCounterpart.extendedData?.directNumbers?.length}`, 'error'))
+                discrepencies.push(new AuditDiscrepency({
+                    name: user.extension.data.name,
+                    extensionNumber: user.extension.data.extensionNumber,
+                    issue: {
+                        path: 'direct numbers',
+                        expectedValue: `${user.extendedData?.directNumbers?.length}`,
+                        foundValue: `${newAccountCounterpart.extendedData?.directNumbers?.length}`
+                    }
+                }))
+            }
+
+            for (const device of user.extendedData?.devices ?? []) {
+                const newAccountDevice = newAccountCounterpart.extendedData?.devices.find((currentDevice) => currentDevice.name === device.name)
+                if (!newAccountDevice) {
+                    this.postMessage(new Message(`User '${user.extension.data.name}' is missing device ${device.name}. Expected: ${device.name}. Found: nothing`, 'error'))
+                    discrepencies.push(new AuditDiscrepency({
+                        name: user.extension.data.name,
+                        extensionNumber: user.extension.data.extensionNumber,
+                        issue: {
+                            path: 'device',
+                            expectedValue: `${device.name}`,
+                            foundValue: `nothing`
+                        }
+                    }))
+                    continue
+                }
+
+                if (device.emergency.location?.name !== newAccountDevice?.emergency.location?.name) {
+                    this.postMessage(new Message(`User '${user.extension.data.name}' has a different ERL for device ${device.name}. Expected: ${device.emergency.location?.name}. Found: ${newAccountDevice?.emergency.location?.name}`, 'error'))
+                    discrepencies.push(new AuditDiscrepency({
+                        name: user.extension.data.name,
+                        extensionNumber: user.extension.data.extensionNumber,
+                        issue: {
+                            path: 'device ERL',
+                            expectedValue: `${device.emergency.location?.name}`,
+                            foundValue: `${newAccountDevice.emergency.location?.name}`
+                        }
+                    }))
+                }
+            }
+
+            if (user.extendedData?.blockedCallSettings?.mode !== newAccountCounterpart.extendedData?.blockedCallSettings?.mode) {
+                this.postMessage(new Message(`User '${user.extension.data.name}' has a different blocked call mode. Expected: ${user.extendedData?.blockedCallSettings?.mode}. Found: ${newAccountCounterpart.extendedData?.blockedCallSettings?.mode}`, 'error'))
+                discrepencies.push(new AuditDiscrepency({
+                    name: user.extension.data.name,
+                    extensionNumber: user.extension.data.extensionNumber,
+                    issue: {
+                        path: 'blocked calls mode',
+                        expectedValue: `${user.extendedData?.blockedCallSettings?.mode}`,
+                        foundValue: `${newAccountCounterpart.extendedData?.blockedCallSettings?.mode}`
+                    }
+                }))
+            }
+
+            if (user.extendedData?.blockedCallSettings?.noCallerId !== newAccountCounterpart.extendedData?.blockedCallSettings?.noCallerId) {
+                this.postMessage(new Message(`User '${user.extension.data.name}' has a different blocked call no caller ID setting. Expected: ${user.extendedData?.blockedCallSettings?.noCallerId}. Found: ${newAccountCounterpart.extendedData?.blockedCallSettings?.noCallerId}`, 'error'))
+                discrepencies.push(new AuditDiscrepency({
+                    name: user.extension.data.name,
+                    extensionNumber: user.extension.data.extensionNumber,
+                    issue: {
+                        path: 'blocked calls - no caller ID',
+                        expectedValue: `${user.extendedData?.blockedCallSettings?.noCallerId}`,
+                        foundValue: `${newAccountCounterpart.extendedData?.blockedCallSettings?.noCallerId}`
+                    }
+                }))
+            }
+
+            if (user.extendedData?.blockedCallSettings?.payPhones !== newAccountCounterpart.extendedData?.blockedCallSettings?.payPhones) {
+                this.postMessage(new Message(`User '${user.extension.data.name}' has a different blocked call payphones setting. Expected: ${user.extendedData?.blockedCallSettings?.payPhones}. Found: ${newAccountCounterpart.extendedData?.blockedCallSettings?.payPhones}`, 'error'))
+                discrepencies.push(new AuditDiscrepency({
+                    name: user.extension.data.name,
+                    extensionNumber: user.extension.data.extensionNumber,
+                    issue: {
+                        path: 'blocked calls - payphone',
+                        expectedValue: `${user.extendedData?.blockedCallSettings?.payPhones}`,
+                        foundValue: `${newAccountCounterpart.extendedData?.blockedCallSettings?.payPhones}`
+                    }
+                }))
+            }
+
+            const newBlockedNumbers = newAccountCounterpart.extendedData?.blockedPhoneNumbers ?? []
+            for (const blockedNumber of user.extendedData?.blockedPhoneNumbers ?? []) {
+                if (!newBlockedNumbers.includes(blockedNumber)) {
+                    this.postMessage(new Message(`User '${user.extension.data.name}' is missing blocked number ${blockedNumber}. Expected: ${blockedNumber}. Found: nothing`, 'error'))
+                    discrepencies.push(new AuditDiscrepency({
+                        name: user.extension.data.name,
+                        extensionNumber: user.extension.data.extensionNumber,
+                        issue: {
+                            path: 'blocked numbers',
+                            expectedValue: `${blockedNumber}}`,
+                            foundValue: `nothing`
+                        }
+                    }))
+                }
+            }
+
+            for (const customRule of user.extendedData?.customRules ?? []) {
+                const newAccountRule = newAccountCounterpart.extendedData?.customRules?.find((rule) => rule.name === customRule.name)
+                if (!newAccountRule) {
+                    this.postMessage(new Message(`User '${user.extension.data.name}' is missing custom rule ${customRule.name}. Expected: ${customRule.name}. Found: nothing`, 'error'))
+                    discrepencies.push(new AuditDiscrepency({
+                        name: user.extension.data.name,
+                        extensionNumber: user.extension.data.extensionNumber,
+                        issue: {
+                            path: 'custom rule',
+                            expectedValue: `${customRule.name}`,
+                            foundValue: `nothing`
+                        }
+                    }))
+                }
+            }
+
+            const newAccountDelegates = newAccountCounterpart.extendedData?.delegates?.map((delegate) => delegate.extension.name)
+            for (const delegate of newAccountCounterpart.extendedData?.delegates ?? []) {
+                if (!newAccountDelegates?.includes(delegate.extension.name)) {
+                    this.postMessage(new Message(`User '${user.extension.data.name}' is missing delegate ${delegate.extension.name}. Expected: ${delegate.extension.name} - Ext. ${delegate.extension.extensionNumber}. Found: nothing`, 'error'))
+                    discrepencies.push(new AuditDiscrepency({
+                        name: user.extension.data.name,
+                        extensionNumber: user.extension.data.extensionNumber,
+                        issue: {
+                            path: 'delegates',
+                            expectedValue: `${delegate.extension.name} - Ext. ${delegate.extension.extensionNumber}`,
+                            foundValue: `nothing`
+                        }
+                    }))
+                }
+            }
+
+            if (user.extendedData?.forwardAllCalls?.enabled !== newAccountCounterpart.extendedData?.forwardAllCalls?.enabled) {
+                this.postMessage(new Message(`User '${user.extension.data.name}' has a different forward all calls setting. Expected: ${user.extendedData?.forwardAllCalls?.enabled ? 'Enabled' : 'Disabled'}. Found: ${newAccountCounterpart.extendedData?.forwardAllCalls?.enabled ? 'Enabled' : 'Disabled'}`, 'error'))
+                discrepencies.push(new AuditDiscrepency({
+                    name: user.extension.data.name,
+                    extensionNumber: user.extension.data.extensionNumber,
+                    issue: {
+                        path: 'forward all calls',
+                        expectedValue: `${user.extendedData?.forwardAllCalls?.enabled ? 'Enabled' : 'Disabled'}`,
+                        foundValue: `${newAccountCounterpart.extendedData?.forwardAllCalls?.enabled ? 'Enabled' : 'Disabled'}`
+                    }
+                }))
+            }
+
+            if (user.extendedData?.incommingCallInfo?.additionalDigits.enabled !== newAccountCounterpart.extendedData?.incommingCallInfo?.additionalDigits.enabled) {
+                this.postMessage(new Message(`User '${user.extension.data.name}' has a different incomming calls addition digits setting. Expected: ${user.extendedData?.incommingCallInfo?.additionalDigits.enabled ? 'Enabled' : 'Disabled'}. Found: ${newAccountCounterpart.extendedData?.incommingCallInfo?.additionalDigits.enabled ? 'Enabled' : 'Disabled'}`, 'error'))
+                discrepencies.push(new AuditDiscrepency({
+                    name: user.extension.data.name,
+                    extensionNumber: user.extension.data.extensionNumber,
+                    issue: {
+                        path: 'incomming calls',
+                        expectedValue: `${user.extendedData?.incommingCallInfo?.additionalDigits.enabled ? 'Enabled' : 'Disabled'}`,
+                        foundValue: `${newAccountCounterpart.extendedData?.incommingCallInfo?.additionalDigits.enabled ? 'Enabled' : 'Disabled'}`
+                    }
+                }))
+            }
+
+            if (user.extendedData?.intercomStatus?.enabled !== newAccountCounterpart.extendedData?.intercomStatus?.enabled) {
+                this.postMessage(new Message(`User '${user.extension.data.name}' has a different intercom setting. Expected: ${user.extendedData?.intercomStatus?.enabled ? 'Enabled' : 'Disabled'}. Found: ${newAccountCounterpart.extendedData?.intercomStatus?.enabled ? 'Enabled' : 'Disabled'}`, 'error'))
+                discrepencies.push(new AuditDiscrepency({
+                    name: user.extension.data.name,
+                    extensionNumber: user.extension.data.extensionNumber,
+                    issue: {
+                        path: 'intercom setting',
+                        expectedValue: `${user.extendedData?.intercomStatus?.enabled ? 'Enabled' : 'Disabled'}`,
+                        foundValue: `${newAccountCounterpart.extendedData?.intercomStatus?.enabled ? 'Enabled' : 'Disabled'}`
+                    }
+                }))
+            }
+
+            const newIntercomUsers = newAccountCounterpart.extendedData?.intercomUsers?.map((user) => user.name)
+            for (const intercomUser of user.extendedData?.intercomUsers ?? []) {
+                if (!newIntercomUsers?.includes(intercomUser.name)) {
+                    this.postMessage(new Message(`User '${user.extension.data.name}' is missing intercom allowed user ${intercomUser.name} - Ext. ${intercomUser.extensionNumber}. Expected: ${intercomUser.name} - Ext. ${intercomUser.extensionNumber}. Found: nothing`, 'error'))
+                    discrepencies.push(new AuditDiscrepency({
+                        name: user.extension.data.name,
+                        extensionNumber: user.extension.data.extensionNumber,
+                        issue: {
+                            path: 'intercom - allowed users',
+                            expectedValue: `${intercomUser.name} - Ext. ${intercomUser.extensionNumber}`,
+                            foundValue: `nothing`
+                        }
+                    }))
+                }
+            }
+
+            const newPerls = newAccountCounterpart.extendedData?.pERLs?.map((perl) => perl.name)
+            for (const perl of user.extendedData?.pERLs ?? []) {
+                if (!newPerls?.includes(perl.name)) {
+                    this.postMessage(new Message(`User '${user.extension.data.name}' is missing personal ERL ${perl.name}. Expected: ${perl.name}. Found: nothing`, 'error'))
+                    discrepencies.push(new AuditDiscrepency({
+                        name: user.extension.data.name,
+                        extensionNumber: user.extension.data.extensionNumber,
+                        issue: {
+                            path: 'personal erl',
+                            expectedValue: `${perl.name}`,
+                            foundValue: `nothing`
+                        }
+                    }))
+                }
+            }
+
+            const newPresenseAllowedUsers = newAccountCounterpart.extendedData?.presenseAllowedUsers?.map((user) => user.extensionName)
+            for (const presenseAllowedUser of user.extendedData?.presenseAllowedUsers ?? []) {
+                if (!newPresenseAllowedUsers?.includes(presenseAllowedUser.extensionName)) {
+                    this.postMessage(new Message(`User '${user.extension.data.name}' is missing presense allowed user ${presenseAllowedUser.extensionName}. Expected: ${presenseAllowedUser.extensionName}. Found: nothing`, 'error'))
+                    discrepencies.push(new AuditDiscrepency({
+                        name: user.extension.data.name,
+                        extensionNumber: user.extension.data.extensionNumber,
+                        issue: {
+                            path: 'presense - allowed user',
+                            expectedValue: `${presenseAllowedUser.extensionName}`,
+                            foundValue: `nothing`
+                        }
+                    }))
+                }
+            }
+
+            const newPresenseLines = newAccountCounterpart.extendedData?.presenseLines?.map((line) => line.id)
+            for (const presenseLine of user.extendedData?.presenseLines ?? []) {
+                if (!newPresenseLines?.includes(presenseLine.id)) {
+                    this.postMessage(new Message(`User '${user.extension.data.name}' is missing presense line ${presenseLine.id}. Expected: Line ${presenseLine.id} - ${presenseLine.extension.extensionName} (Ext. ${presenseLine.extension.extensionNumber}). Found: nothing`, 'error'))
+                    discrepencies.push(new AuditDiscrepency({
+                        name: user.extension.data.name,
+                        extensionNumber: user.extension.data.extensionNumber,
+                        issue: {
+                            path: 'presense - line',
+                            expectedValue: `Line ${presenseLine.id} - ${presenseLine.extension.extensionName} (Ext. ${presenseLine.extension.extensionNumber})`,
+                            foundValue: `nothing`
+                        }
+                    }))
+                }
+            }
+
+            if (user.extendedData?.presenseSettings?.allowSeeMyPresence !== newAccountCounterpart.extendedData?.presenseSettings?.allowSeeMyPresence) {
+                this.postMessage(new Message(`User '${user.extension.data.name}' has a different allow see my presense setting. Expected: ${user.extendedData?.presenseSettings?.allowSeeMyPresence ? 'Yes' : 'No'} Found: ${newAccountCounterpart.extendedData?.presenseSettings?.allowSeeMyPresence ? 'Yes' : 'No'}`, 'error'))
+                discrepencies.push(new AuditDiscrepency({
+                    name: user.extension.data.name,
+                    extensionNumber: user.extension.data.extensionNumber,
+                    issue: {
+                        path: 'presense - allow see my presense',
+                        expectedValue: `${user.extendedData?.presenseSettings?.allowSeeMyPresence ? 'Yes' : 'No'}`,
+                        foundValue: `${newAccountCounterpart.extendedData?.presenseSettings?.allowSeeMyPresence ? 'Yes' : 'No'}`
+                    }
+                }))
+            }
+
+            if (user.extendedData?.presenseSettings?.pickUpCallsOnHold !== newAccountCounterpart.extendedData?.presenseSettings?.pickUpCallsOnHold) {
+                this.postMessage(new Message(`User '${user.extension.data.name}' has a different pickup calls on hold setting. Expected: ${user.extendedData?.presenseSettings?.pickUpCallsOnHold ? 'Yes' : 'No'} Found: ${newAccountCounterpart.extendedData?.presenseSettings?.pickUpCallsOnHold ? 'Yes' : 'No'}`, 'error'))
+                discrepencies.push(new AuditDiscrepency({
+                    name: user.extension.data.name,
+                    extensionNumber: user.extension.data.extensionNumber,
+                    issue: {
+                        path: 'presense - pickup calls on hold',
+                        expectedValue: `${user.extendedData?.presenseSettings?.pickUpCallsOnHold ? 'Yes' : 'No'}`,
+                        foundValue: `${newAccountCounterpart.extendedData?.presenseSettings?.pickUpCallsOnHold ? 'Yes' : 'No'}`
+                    }
+                }))
+            }
+
+            const newAccountRoles = newAccountCounterpart.extendedData?.roles?.map((role) => role.displayName)
+            for (const role of user.extendedData?.roles ?? []) {
+                if (!newAccountRoles?.includes(role.displayName)) {
+                    this.postMessage(new Message(`User '${user.extension.data.name}' is not assigned the ${role.displayName} role. Expected: ${role.displayName} Found: nothing`, 'error'))
+                    discrepencies.push(new AuditDiscrepency({
+                        name: user.extension.data.name,
+                        extensionNumber: user.extension.data.extensionNumber,
+                        issue: {
+                            path: 'role',
+                            expectedValue: `${role.displayName}`,
+                            foundValue: `nothing`
+                        }
+                    }))
+                }
+            }
+
+            for (const greeting of user.extendedData?.businessHoursCallHandling?.greetings ?? []) {
+                const newAccountGreeting = newAccountCounterpart.extendedData?.businessHoursCallHandling?.greetings.find((currentGreeting) => currentGreeting.type === greeting.type)
+                if (!newAccountGreeting) {
+                    this.postMessage(new Message(`User '${user.extension.data.name}' has an incorrect ${greeting.type} greeting. Expected: ${greeting.preset ? greeting.preset.name : 'Custom greeting'}. Found: nothing`, 'error'))
+                    discrepencies.push(new AuditDiscrepency({
+                        name: user.extension.data.name,
+                        extensionNumber: user.extension.data.extensionNumber,
+                        issue: {
+                            path: `business hours greeting ${greeting.type}`,
+                            expectedValue: `${greeting.preset ? greeting.preset.name : 'Custom greeting'}`,
+                            foundValue: `nothing`
+                        }
+                    }))
+                    continue
+                }
+
+                if (greeting.custom && !newAccountGreeting.custom) {
+                    this.postMessage(new Message(`User '${user.extension.data.name}' has an incorrect ${greeting.type} greeting. Expected: ${greeting.preset ? greeting.preset.name : 'Custom greeting'}. Found: nothing`, 'error'))
+                    discrepencies.push(new AuditDiscrepency({
+                        name: user.extension.data.name,
+                        extensionNumber: user.extension.data.extensionNumber,
+                        issue: {
+                            path: `business hours greeting ${greeting.type}`,
+                            expectedValue: `${greeting.preset ? greeting.preset.name : 'Custom greeting'}`,
+                            foundValue: `nothing`
+                        }
+                    }))
+                }
+
+                if ((greeting.preset && newAccountGreeting.preset) && greeting.preset.name !== newAccountGreeting.preset.name) {
+                    this.postMessage(new Message(`User '${user.extension.data.name}' has an incorrect ${greeting.type} greeting. Expected: ${greeting.preset ? greeting.preset.name : 'Custom greeting'}. Found: ${newAccountGreeting.preset.name}`, 'error'))
+                    discrepencies.push(new AuditDiscrepency({
+                        name: user.extension.data.name,
+                        extensionNumber: user.extension.data.extensionNumber,
+                        issue: {
+                            path: `business hours greeting ${greeting.type}`,
+                            expectedValue: greeting.preset.name,
+                            foundValue: newAccountGreeting.preset.name
+                        }
+                    }))
+                }
+            }
+
+            if (user.extendedData?.businessHoursCallHandling?.callHandlingAction !== newAccountCounterpart.extendedData?.businessHoursCallHandling?.callHandlingAction) {
+                this.postMessage(new Message(`User '${user.extension.data.name}' has an incorrect business hours call handling action. Expected: ${user.extendedData?.businessHoursCallHandling?.callHandlingAction} Found: ${newAccountCounterpart.extendedData?.businessHoursCallHandling?.callHandlingAction}`, 'error'))
+                discrepencies.push(new AuditDiscrepency({
+                    name: user.extension.data.name,
+                    extensionNumber: user.extension.data.extensionNumber,
+                    issue: {
+                        path: `business hours call handling action`,
+                        expectedValue: user.extendedData?.businessHoursCallHandling?.callHandlingAction ?? '',
+                        foundValue: newAccountCounterpart.extendedData?.businessHoursCallHandling?.callHandlingAction ?? ''
+                    }
+                }))
+            }
+
+            if (user.extendedData?.businessHoursCallHandling?.screening !== newAccountCounterpart.extendedData?.businessHoursCallHandling?.screening) {
+                this.postMessage(new Message(`User '${user.extension.data.name}' has an incorrect business hours call screening setting. Expected: ${user.extendedData?.businessHoursCallHandling?.screening} Found: ${newAccountCounterpart.extendedData?.businessHoursCallHandling?.screening}`, 'error'))
+                discrepencies.push(new AuditDiscrepency({
+                    name: user.extension.data.name,
+                    extensionNumber: user.extension.data.extensionNumber,
+                    issue: {
+                        path: `business hours call handling action`,
+                        expectedValue: user.extendedData?.businessHoursCallHandling?.screening ?? '',
+                        foundValue: newAccountCounterpart.extendedData?.businessHoursCallHandling?.screening ?? ''
+                    }
+                }))
+            }
+
+            if ((user.extendedData?.businessHoursCallHandling?.missedCall && newAccountCounterpart.extendedData?.businessHoursCallHandling?.missedCall) && user.extendedData?.businessHoursCallHandling?.missedCall?.actionType !== newAccountCounterpart.extendedData?.businessHoursCallHandling?.missedCall?.actionType) {
+                this.postMessage(new Message(`User '${user.extension.data.name}' has an incorrect business hours missed call action. Expected: ${user.extendedData?.businessHoursCallHandling?.missedCall.actionType} Found: ${newAccountCounterpart.extendedData?.businessHoursCallHandling?.missedCall.actionType}`, 'error'))
+                discrepencies.push(new AuditDiscrepency({
+                    name: user.extension.data.name,
+                    extensionNumber: user.extension.data.extensionNumber,
+                    issue: {
+                        path: `business hours missed call action`,
+                        expectedValue: user.extendedData?.businessHoursCallHandling?.missedCall.actionType ?? '',
+                        foundValue: newAccountCounterpart.extendedData?.businessHoursCallHandling?.missedCall.actionType ?? ''
+                    }
+                }))
+            }
+
+            if (user.extendedData?.businessHoursCallHandling?.forwarding?.ringingMode !== newAccountCounterpart.extendedData?.businessHoursCallHandling?.forwarding?.ringingMode) {
+                this.postMessage(new Message(`User '${user.extension.data.name}' has an incorrect business hours ring mode. Expected: ${user.extendedData?.businessHoursCallHandling?.forwarding?.ringingMode} Found: ${newAccountCounterpart.extendedData?.businessHoursCallHandling?.forwarding?.ringingMode}`, 'error'))
+                discrepencies.push(new AuditDiscrepency({
+                    name: user.extension.data.name,
+                    extensionNumber: user.extension.data.extensionNumber,
+                    issue: {
+                        path: `business hours ring mode`,
+                        expectedValue: user.extendedData?.businessHoursCallHandling?.forwarding?.ringingMode ?? '',
+                        foundValue: newAccountCounterpart.extendedData?.businessHoursCallHandling?.forwarding?.ringingMode ?? ''
+                    }
+                }))
+            }
+
+            if (user.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesAlwaysRing !== newAccountCounterpart.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesAlwaysRing) {
+                this.postMessage(new Message(`User '${user.extension.data.name}' has an incorrect business hours softphones always ring setting. Expected: ${user.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesAlwaysRing} Found: ${newAccountCounterpart.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesAlwaysRing}`, 'error'))
+                discrepencies.push(new AuditDiscrepency({
+                    name: user.extension.data.name,
+                    extensionNumber: user.extension.data.extensionNumber,
+                    issue: {
+                        path: `business hours ring mode`,
+                        expectedValue: user.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesAlwaysRing ? 'Yes' : 'No',
+                        foundValue: newAccountCounterpart.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesAlwaysRing ? 'Yes' : 'No'
+                    }
+                }))
+            }
+
+            if (user.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesPositionTop !== newAccountCounterpart.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesPositionTop) {
+                this.postMessage(new Message(`User '${user.extension.data.name}' has an incorrect softphone position. Expected: ${user.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesPositionTop} Found: ${newAccountCounterpart.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesPositionTop}`, 'error'))
+                discrepencies.push(new AuditDiscrepency({
+                    name: user.extension.data.name,
+                    extensionNumber: user.extension.data.extensionNumber,
+                    issue: {
+                        path: `business hours softphone position`,
+                        expectedValue: user.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesPositionTop ? 'Yes' : 'No',
+                        foundValue: newAccountCounterpart.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesPositionTop ? 'Yes' : 'No'
+                    }
+                }))
+            }
+
+            if (user.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesRingCount !== newAccountCounterpart.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesRingCount) {
+                this.postMessage(new Message(`User '${user.extension.data.name}' has an incorrect business hours missed call action. Expected: ${user.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesRingCount} Found: ${newAccountCounterpart.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesRingCount}`, 'error'))
+                discrepencies.push(new AuditDiscrepency({
+                    name: user.extension.data.name,
+                    extensionNumber: user.extension.data.extensionNumber,
+                    issue: {
+                        path: `business hours softphone ring count`,
+                        expectedValue: `${user.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesRingCount}`,
+                        foundValue: `${newAccountCounterpart.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesRingCount}`
+                    }
+                }))
+            }
+            
+            const newHandlingRules = newAccountCounterpart.extendedData?.businessHoursCallHandling?.forwarding?.rules ?? []
+            for (const handlingRule of user.extendedData?.businessHoursCallHandling?.forwarding?.rules ?? []) {
+                const matchingRule = newHandlingRules.find((rule) => rule.index === handlingRule.index)
+                if (!matchingRule) {
+                    this.postMessage(new Message(`User '${user.extension.data.name}' is missing a business hours call handling rule. Expected: ${user.extendedData?.businessHoursCallHandling?.forwarding?.rules.length} rules. Found: ${newAccountCounterpart.extendedData?.businessHoursCallHandling?.forwarding?.rules.length} rules`, 'error'))
+                    discrepencies.push(new AuditDiscrepency({
+                        name: user.extension.data.name,
+                        extensionNumber: user.extension.data.extensionNumber,
+                        issue: {
+                            path: `business hours call handling rule`,
+                            expectedValue: `${user.extendedData?.businessHoursCallHandling?.forwarding?.rules.length} rules`,
+                            foundValue: `${newAccountCounterpart.extendedData?.businessHoursCallHandling?.forwarding?.rules} rules`
+                        }
+                    }))
+                    continue
+                }
+
+                const newForwardingNumbers = matchingRule.forwardingNumbers.map((number) => number.label)
+                for (const forwardingNumber of handlingRule.forwardingNumbers ?? []) {
+                    if (!newForwardingNumbers.includes(forwardingNumber.label)) {
+                        this.postMessage(new Message(`User '${user.extension.data.name}' is missing device '${forwardingNumber.label}' in their call handling. Expected: ${forwardingNumber.label} Found: nothing`, 'error'))
+                        discrepencies.push(new AuditDiscrepency({
+                            name: user.extension.data.name,
+                            extensionNumber: user.extension.data.extensionNumber,
+                            issue: {
+                                path: `business hours softphone ring count`,
+                                expectedValue: `${forwardingNumber.label}`,
+                                foundValue: `nothing`
+                            }
+                        }))
+                    }
+                }
+            }
+
+        }
+
+        return discrepencies
+    }
+
+    private comparePrompts(originalAccountData: AccountData, newAccountData: AccountData) {
+        const discrepencies: AuditDiscrepency[] = []
+
+        const newAccountPrompts = newAccountData.prompts.map((prompt) => prompt.filename)
+        for (const prompt of originalAccountData.prompts) {
+            if (!newAccountPrompts.includes(prompt.filename)) {
+                this.postMessage(new Message(`IVR prompt '${prompt.filename}' is missing. Expected: ${prompt.filename} Found: nothing`, 'error'))
+                discrepencies.push(new AuditDiscrepency({
+                    name: prompt.filename,
+                    extensionNumber: 'N/A',
+                    issue: {
+                        path: `ivr prompt`,
+                        expectedValue: `${prompt.filename}`,
+                        foundValue: `nothing`
+                    }
+                }))
+            }
         }
 
         return discrepencies
