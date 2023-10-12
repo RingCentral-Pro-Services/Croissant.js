@@ -165,7 +165,7 @@ const mockdata = [
         <Navbar.Section className={classes.header}>
           <Group position="apart">
             {/* <Logo width={rem(120)} /> */}
-            <Code sx={{ fontWeight: 700 }}>Croissant v3.1.2</Code>
+            <Code sx={{ fontWeight: 700 }}>Croissant v3.2.0</Code>
           </Group>
         </Navbar.Section>
   
