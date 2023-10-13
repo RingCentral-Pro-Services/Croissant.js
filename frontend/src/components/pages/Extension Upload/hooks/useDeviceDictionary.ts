@@ -1898,6 +1898,102 @@ const defaultDevices = [
         "countryId": 1,
         "assistedProvisioningCapability": "Disabled",
         "orderingCapability": "Enabled"
+    },
+    {
+        "sku": "HP-87",
+        "skuId": "LC_HD_746",
+        "type": "HardPhone",
+        "model": {
+            "id": "155",
+            "name": "Mitel 6920",
+            "deviceClass": "ConferencePhone",
+            "lineCount": 2,
+            "addons": [],
+            "features": []
+        },
+        "countryId": 1,
+        "assistedProvisioningCapability": "Enabled",
+        "orderingCapability": "Enabled"
+    },
+    {
+        "sku": "HP-87",
+        "skuId": "LC_HD_746",
+        "type": "HardPhone",
+        "model": {
+            "id": "156",
+            "name": "Mitel 6930",
+            "deviceClass": "ConferencePhone",
+            "lineCount": 2,
+            "addons": [],
+            "features": []
+        },
+        "countryId": 1,
+        "assistedProvisioningCapability": "Enabled",
+        "orderingCapability": "Enabled"
+    },
+    {
+        "sku": "HP-87",
+        "skuId": "LC_HD_746",
+        "type": "HardPhone",
+        "model": {
+            "id": "157",
+            "name": "Mitel 6940",
+            "deviceClass": "ConferencePhone",
+            "lineCount": 2,
+            "addons": [],
+            "features": []
+        },
+        "countryId": 1,
+        "assistedProvisioningCapability": "Enabled",
+        "orderingCapability": "Enabled"
+    },
+    {
+        "sku": "HP-87",
+        "skuId": "LC_HD_746",
+        "type": "HardPhone",
+        "model": {
+            "id": "187",
+            "name": "Mitel IP 480",
+            "deviceClass": "ConferencePhone",
+            "lineCount": 2,
+            "addons": [],
+            "features": []
+        },
+        "countryId": 1,
+        "assistedProvisioningCapability": "Enabled",
+        "orderingCapability": "Enabled"
+    },
+    {
+        "sku": "HP-87",
+        "skuId": "LC_HD_746",
+        "type": "HardPhone",
+        "model": {
+            "id": "188",
+            "name": "Mitel IP 480g",
+            "deviceClass": "ConferencePhone",
+            "lineCount": 2,
+            "addons": [],
+            "features": []
+        },
+        "countryId": 1,
+        "assistedProvisioningCapability": "Enabled",
+        "orderingCapability": "Enabled"
+    },
+    {
+        "sku": "HP-87",
+        "skuId": "LC_HD_746",
+        "type": "HardPhone",
+        "model": {
+            "id": "183",
+            "name": "Mitel IP 485g",
+            "deviceClass": "ConferencePhone",
+            "lineCount": 2,
+            "addons": [],
+            "features": []
+        },
+        "countryId": 1,
+        "assistedProvisioningCapability": "Enabled",
+        "orderingCapability": "Enabled"
     }
 ]
 
@@ -1911,8 +2007,9 @@ const useDeviceDictionary = (postMessage: (message: Message) => void, postTimedM
             throw new Error('No access token')
         }
 
-        const devices = await getDevices(accessToken)
-        return devices
+        // const devices = await getDevices(accessToken)
+        // return devices
+        return defaultDevices as unknown[] as Device[]
     }
 
     const getDevices = async (token: string) => {
