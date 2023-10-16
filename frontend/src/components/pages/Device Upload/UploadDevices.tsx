@@ -94,6 +94,15 @@ const UploadDevices = () => {
         <>
             <Header title="Upload Devices" body="Upload devices in bulk" />
             <ToolCard>
+                <p>Things to know</p>
+                <ul>
+                    <li>Extensions must have an "existing device" in service web before running this tool</li>
+                    <li>The tool will not work if the extension has anything other than an "existing device"</li>
+                    <li>Do not try to use a device that isn't listed in the dropdown</li>
+                    <li>Reach out in the Croissant Tool chat if you are having issues</li>
+                </ul>
+            </ToolCard>
+            <ToolCard>
                 <h2 className="inline mega-margin-right">Upload Devices</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} error={tokenError} loading={isTokenPending} setTargetUID={setTargetUID} />
                 <FileSelect enabled={!isSyncing} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
