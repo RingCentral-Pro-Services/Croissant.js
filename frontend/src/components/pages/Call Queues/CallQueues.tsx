@@ -22,7 +22,7 @@ import RCExtension from "../../../models/RCExtension"
 import AdaptiveFilter from "../../shared/AdaptiveFilter"
 import useAuditCallQueue from "./hooks/useAuditCallQueue"
 import { sanitize } from "../../../helpers/Sanatize"
-import ToolCard from "../../shared/ToolCard"
+import * as Excel from 'exceljs'
 
 export interface QueueAuditSettings {
     includeBusinessHours: boolean
@@ -138,7 +138,7 @@ const CallQueues = () => {
 
         if (isMultiSiteEnabled) {
             const sites = extensionsList.filter((ext) => ext.prettyType[ext.type] === 'Site')
-            const names = sites.map((site) => site.name)
+            const names = sites.map((site) => site.name).sort()
             setSiteNames(['Main Site', ...names])
             setSelectedSiteNames(['Main Site', ...names])
         }
@@ -172,7 +172,7 @@ const CallQueues = () => {
         console.log('Queues')
         console.log(aditedQueues)
         const header = ['Queue Name', 'Extension', 'Site', 'Status', 'Members (Ext)', 'Greeting', 'Audio While Connecting', 'Hold Music', 'Voicemail', 'Interrupt Audio', 'Interrupt Prompt', 'Ring Type', 'Total Ring Time', 'User Ring Time' , 'Max Wait Time Action', 'Max Wait Time Destination', 'Max Callers Action', 'Max Callers Destination', 'No Answer Action', 'Wrap Up Time']
-        writePrettyExcel(header, aditedQueues, 'Call Queues', `Queues - ${sanitize(companyName)}.xlsx`, '/call-queue-template.xlsx')
+        writePrettyExcel(header, aditedQueues, 'Call Queues', `Queues - ${sanitize(companyName)}.xlsx`, '/call-queue-template.xlsx', setupSheet)
         setisPending(false)
         setProgressValue(aditedQueues.length * 2)
     }
@@ -183,10 +183,20 @@ const CallQueues = () => {
         console.log('Queues')
         console.log(adjsutedQueues)
         const header = ['Queue Name', 'Extension', 'Site', 'Status', 'Members (Ext)', 'Greeting', 'Audio While Connecting', 'Hold Music', 'Voicemail', 'Interrupt Audio', 'Interrupt Prompt', 'Ring Type', 'Total Ring Time', 'User Ring Time' , 'Max Wait Time Action', 'Max Wait Time Destination', 'Max Callers Action', 'Max Callers Destination', 'No Answer Action', 'Wrap Up Time']
-        writePrettyExcel(header, adjsutedQueues, 'Call Queues', 'queues.xlsx', '/call-queue-template.xlsx')
+        writePrettyExcel(header, adjsutedQueues, 'Call Queues', 'queues.xlsx', '/call-queue-template.xlsx', setupSheet)
         setisPending(false)
         setProgressValue(adjsutedQueues.length * 2)
     }, [isCallQueueSettingsPending])
+
+    const setupSheet = (sheet: Excel.Worksheet) => {
+        sheet.getColumn("D").eachCell({ includeEmpty: true }, function(cell, rowNumber) {
+            cell.dataValidation = {
+              type: 'list',
+              allowBlank: true,
+              formulae: [`"${siteNames.toString()}"`]
+            };
+        });
+    }
 
     return (
         <>

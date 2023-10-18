@@ -3,7 +3,7 @@ import ExcelFormattable from '../models/ExcelFormattable'
 const FileSaver = require('file-saver');
 
 const useWritePrettyExcel = () => {
-    const writePrettyExcel = (header: string[], data: ExcelFormattable[], sheetname: string, filename: string, templatePath?: string) => {
+    const writePrettyExcel = (header: string[], data: ExcelFormattable[], sheetname: string, filename: string, templatePath?: string, setupSheet?: (sheet: Excel.Worksheet) => void) => {
         const excelData: string[][] = []
         if (!templatePath) excelData[0] = header
         
@@ -12,14 +12,14 @@ const useWritePrettyExcel = () => {
         }
 
         if (templatePath) {
-            writeTemplatedXLSX(excelData, sheetname, filename, templatePath)
+            writeTemplatedXLSX(excelData, sheetname, filename, templatePath, setupSheet)
         }
         else {
-            writeXLSX(excelData, sheetname, filename)
+            writeXLSX(excelData, sheetname, filename, setupSheet)
         }
     }
 
-    const writeTemplatedXLSX = (excelData: string[][], sheetname: string, filename: string, templatePath: string) => {
+    const writeTemplatedXLSX = (excelData: string[][], sheetname: string, filename: string, templatePath: string, setupSheet?: (sheet: Excel.Worksheet) => void) => {
         const workbook = new Excel.Workbook()
 
         fetch(templatePath)
@@ -31,6 +31,11 @@ const useWritePrettyExcel = () => {
                     book.clearThemes()
 
                     const worksheet = workbook.getWorksheet(sheetname)
+
+                    if (setupSheet) {
+                        setupSheet(worksheet)
+                    }
+
                     worksheet.insertRows(3, excelData, 'i+')
                     worksheet.spliceRows(2, 1)
 
@@ -48,9 +53,14 @@ const useWritePrettyExcel = () => {
         })
     }
 
-    const writeXLSX = (excelData: string[][], sheetname: string, filename: string) => {
+    const writeXLSX = (excelData: string[][], sheetname: string, filename: string, setupSheet?: (sheet: Excel.Worksheet) => void) => {
         const workbook = new Excel.Workbook()
         const worksheet = workbook.addWorksheet(sheetname)
+
+        if (setupSheet) {
+            setupSheet(worksheet)
+        }
+        
         worksheet.insertRows(1, excelData)
 
         workbook.xlsx.writeBuffer()

@@ -21,6 +21,7 @@ import useDeviceDictionary from "../Extension Upload/hooks/useDeviceDictionary";
 import { Device } from "../Migration/User Data Download/models/UserDataBundle";
 import useReadDeviceData from "./hooks/useReadDeviceData";
 import useUploadDevice from "./hooks/useUploadDevice";
+import * as Excel from 'exceljs'
 
 const UploadDevices = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -51,6 +52,14 @@ const UploadDevices = () => {
     }
 
     useEffect(() => {
+        async function fetchDevices() {
+            const devices = await fetchDeviceDictionary()
+            setDeviceDictionary(devices)
+        }
+        fetchDevices()
+    }, [])
+
+    useEffect(() => {
         if (targetUID.length < 5) return
         localStorage.setItem('target_uid', targetUID)
         fetchToken(targetUID)
@@ -73,8 +82,8 @@ const UploadDevices = () => {
 
     const setup = async () => {
         await fetchExtensions()
-        const devices = await fetchDeviceDictionary()
-        setDeviceDictionary(devices)
+        // const devices = await fetchDeviceDictionary()
+        // setDeviceDictionary(devices)
         setIsReady(true)
     }
 
@@ -87,9 +96,23 @@ const UploadDevices = () => {
     }
 
     const handleTemplateButtonClick = () => {
-        writePrettyExcel([], [], 'Devices', 'device-upload.xlsx', '/device-upload-template.xlsx')
+        writePrettyExcel([], [], 'Devices', 'device-upload.xlsx', '/device-upload-template.xlsx', setupSheet)
     }
     
+    const setupSheet = (sheet: Excel.Worksheet) => {
+
+        const deviceNames = deviceDictionary.map((device) => device.model.name)
+        deviceNames.sort()
+        
+        sheet.getColumn("B").eachCell({ includeEmpty: true }, function(cell, rowNumber) {
+            cell.dataValidation = {
+              type: 'list',
+              allowBlank: true,
+              formulae: [`"${deviceNames.toString()}"`]
+            };
+        });
+    }
+
     return (
         <>
             <Header title="Upload Devices" body="Upload devices in bulk" />

@@ -18,6 +18,7 @@ import { IVRMenu } from "../../../models/IVRMenu";
 import RCExtension from "../../../models/RCExtension";
 import AdaptiveFilter from "../../shared/AdaptiveFilter";
 import { sanitize } from "../../../helpers/Sanatize";
+import * as Excel from 'exceljs'
 
 const DirectAuditMenus = () => {
     const {fireEvent} = useAnalytics()
@@ -63,7 +64,7 @@ const DirectAuditMenus = () => {
 
         if (isMultiSiteEnabled) {
             const sites = extensionsList.filter((ext) => ext.prettyType[ext.type] === 'Site')
-            const names = sites.map((site) => site.name)
+            const names = sites.map((site) => site.name).sort()
             setSiteNames(['Main Site', ...names])
             setSelectedSiteNames(['Main Site', ...names])
         }
@@ -99,8 +100,18 @@ const DirectAuditMenus = () => {
         let header = ['Menu Name', 'Menu Ext', 'Site', 'Prompt Mode', 'Prompt Name/Script', 'Key 1 Action', 'Key 1 Destination', 'Key 2 Action', 'Key 2 Destination', 'Key 3 Action', 'Key 3 Destination',
                      'Key 4 Action', 'Key 4 Destination', 'Key 5 Action', 'Key 5 Destination', 'Key 6 Action', 'Key 6 Destination', 'Key 7 Action', 'Key 7 Destination',
                      'Key 8 Action', 'Key 8 Destination', 'Key 9 Action', 'Key 9 Destination', 'Key 0 Action', 'Key 0 Destination', 'Key # Press', 'Key * Press']
-        writePrettyExcel(header, prettyIVRs, 'IVRs', `IVRs - ${sanitize(companyName)}.xlsx`, '/ivrs-brd.xlsx')
+        writePrettyExcel(header, prettyIVRs, 'IVRs', `IVRs - ${sanitize(companyName)}.xlsx`, '/ivrs-brd.xlsx', setupSheet)
     }, [isIVRBeautificationPending, prettyIVRs])
+
+    const setupSheet = (sheet: Excel.Worksheet) => {
+        sheet.getColumn("D").eachCell({ includeEmpty: true }, function(cell, rowNumber) {
+            cell.dataValidation = {
+              type: 'list',
+              allowBlank: true,
+              formulae: [`"${siteNames.toString()}"`]
+            };
+        });
+    }
     
     return (
         <div className="main-content">
