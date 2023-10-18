@@ -20,6 +20,7 @@ import useSidebar from "../../../hooks/useSidebar"
 import useCallQueue from "./hooks/useCallQueue"
 import LaunchIcon from '@mui/icons-material/Launch';
 import { IconExternalLink } from "@tabler/icons-react"
+import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel"
 
 const CreateCallQueues = () => {
     let [isPending, setIsPending] = useState(true)
@@ -40,6 +41,7 @@ const CreateCallQueues = () => {
     const defaultSheet = "Call Queues"
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
     const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending, userName} = useGetAccessToken()
+    const {writePrettyExcel} = useWritePrettyExcel()
 
     const increaseProgress = () => {
         setCurrentExtensionIndex( prev => prev + 1)
@@ -95,6 +97,10 @@ const CreateCallQueues = () => {
         console.log(queues)
     }, [isQueueConvertPending])
 
+    const handleTemplateDownloadClick = () => {
+        writePrettyExcel([], [], 'Call Queues', 'queues.xlsx', '/call-queue-template.xlsx')
+    }
+
     return (
         <>
             <Header title="Create Call Queues" body="Create and update call queues in bulk" documentationURL='https://dqgriffin.com/blog/3IfuqLAoOfN2fPXXFh19'>
@@ -106,7 +112,7 @@ const CreateCallQueues = () => {
                 <FileSelect enabled={hasCustomerToken} accept=".xlsx" handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Create Call Queues" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
                 {isPending ? <></> : <Button disabled={isSyncing} variant="filled" onClick={handleSyncButtonClick}>Sync</Button>}
-                <Button className='healthy-margin-left' variant='outline' onClick={() => window.open('https://docs.google.com/spreadsheets/d/1NW5wnPJFJKAfZQ6jc57JMRP4ddJr4-qSoLlQXZ3g_ko/edit?usp=sharing', '_blank')} rightIcon={<IconExternalLink />} >Template</Button>
+                <Button className='healthy-margin-left' variant='outline' onClick={handleTemplateDownloadClick}>Template</Button>
                 {(isSyncing && currentExtensionIndex >= queues.length) ? <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button> : <></>}
                 {!(queues.length > 0) ? <></> : <progress id='sync_progress' value={currentExtensionIndex} max={queues.length} />}
                 {isQueueConvertPending ? <></> : <FeedbackArea gridData={queues} messages={messages} timedMessages={timedMessages} errors={errors} />}
