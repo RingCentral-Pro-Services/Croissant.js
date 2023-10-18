@@ -188,14 +188,12 @@ const CallQueues = () => {
         setProgressValue(adjsutedQueues.length * 2)
     }, [isCallQueueSettingsPending])
 
-    const setupSheet = (sheet: Excel.Worksheet) => {
-        sheet.getColumn("D").eachCell({ includeEmpty: true }, function(cell, rowNumber) {
-            cell.dataValidation = {
-              type: 'list',
-              allowBlank: true,
-              formulae: [`"${siteNames.toString()}"`]
-            };
-        });
+    const setupSheet = (workbook: Excel.Workbook) => {
+        const worksheet = workbook.getWorksheet('Dynamic Data')
+        if (worksheet) {
+            const column = worksheet.getColumn('A')
+            column.values = siteNames
+        }
     }
 
     return (

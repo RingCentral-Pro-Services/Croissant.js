@@ -3,7 +3,7 @@ import ExcelFormattable from '../models/ExcelFormattable'
 const FileSaver = require('file-saver');
 
 const useWritePrettyExcel = () => {
-    const writePrettyExcel = (header: string[], data: ExcelFormattable[], sheetname: string, filename: string, templatePath?: string, setupSheet?: (sheet: Excel.Worksheet) => void) => {
+    const writePrettyExcel = (header: string[], data: ExcelFormattable[], sheetname: string, filename: string, templatePath?: string, setupSheet?: (sheet: Excel.Workbook) => void) => {
         const excelData: string[][] = []
         if (!templatePath) excelData[0] = header
         
@@ -19,7 +19,7 @@ const useWritePrettyExcel = () => {
         }
     }
 
-    const writeTemplatedXLSX = (excelData: string[][], sheetname: string, filename: string, templatePath: string, setupSheet?: (sheet: Excel.Worksheet) => void) => {
+    const writeTemplatedXLSX = (excelData: string[][], sheetname: string, filename: string, templatePath: string, setupSheet?: (sheet: Excel.Workbook) => void) => {
         const workbook = new Excel.Workbook()
 
         fetch(templatePath)
@@ -33,7 +33,7 @@ const useWritePrettyExcel = () => {
                     const worksheet = workbook.getWorksheet(sheetname)
 
                     if (setupSheet) {
-                        setupSheet(worksheet)
+                        setupSheet(workbook)
                     }
 
                     worksheet.insertRows(3, excelData, 'i+')
@@ -53,12 +53,12 @@ const useWritePrettyExcel = () => {
         })
     }
 
-    const writeXLSX = (excelData: string[][], sheetname: string, filename: string, setupSheet?: (sheet: Excel.Worksheet) => void) => {
+    const writeXLSX = (excelData: string[][], sheetname: string, filename: string, setupSheet?: (sheet: Excel.Workbook) => void) => {
         const workbook = new Excel.Workbook()
         const worksheet = workbook.addWorksheet(sheetname)
 
         if (setupSheet) {
-            setupSheet(worksheet)
+            setupSheet(workbook)
         }
         
         worksheet.insertRows(1, excelData)

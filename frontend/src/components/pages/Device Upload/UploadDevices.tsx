@@ -99,18 +99,18 @@ const UploadDevices = () => {
         writePrettyExcel([], [], 'Devices', 'device-upload.xlsx', '/device-upload-template.xlsx', setupSheet)
     }
     
-    const setupSheet = (sheet: Excel.Worksheet) => {
+    const setupSheet = (workbook: Excel.Workbook) => {
 
         const deviceNames = deviceDictionary.map((device) => device.model.name)
+        console.log('device names')
+        console.log(deviceNames)
         deviceNames.sort()
-        
-        sheet.getColumn("B").eachCell({ includeEmpty: true }, function(cell, rowNumber) {
-            cell.dataValidation = {
-              type: 'list',
-              allowBlank: true,
-              formulae: [`"${deviceNames.toString()}"`]
-            };
-        });
+
+        const worksheet = workbook.getWorksheet('Dynamic Data')
+        if (worksheet) {
+            const column = worksheet.getColumn('A')
+            column.values = deviceNames
+        }
     }
 
     return (
