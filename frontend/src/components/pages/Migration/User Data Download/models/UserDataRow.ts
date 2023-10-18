@@ -369,15 +369,30 @@ export class UserDataRow implements ExcelFormattable {
     prettyAfterHoursDeviceRingTime() {
         let result = ''
 
-        if (!this.afterHoursCallHandling || !this.afterHoursCallHandling.forwarding?.rules || this.afterHoursCallHandling.callHandlingAction !== 'ForwardCalls') return result
+        if (!this.afterHoursCallHandling || !this.afterHoursCallHandling.forwarding?.rules) return result
+        const softPhoneOnTop = this.afterHoursCallHandling.forwarding.softPhonesPositionTop
+
+        if (softPhoneOnTop) {
+            const softPhoneRingCount = `${this.afterHoursCallHandling.forwarding.softPhonesAlwaysRing ? 'Always Ring' : this.prettyRingTime(this.afterHoursCallHandling.forwarding.softPhonesRingCount)}`
+            result += `1 -- Desktop and Mobile Apps - ${softPhoneRingCount} (${this.afterHoursCallHandling.forwarding.notifyMySoftPhones ? 'Enabled' : 'Disabled'})\n`
+        }
 
         for (let i = 0; i < this.afterHoursCallHandling?.forwarding?.rules.length; i++) {
             const rule = this.afterHoursCallHandling.forwarding?.rules[i]
-            result += `${rule.index} -- ${this.prettyRingTime(rule.ringCount)}\n`
+            if (typeof rule.index !== 'number') {
+                continue
+            }
+
+            result += `${softPhoneOnTop ? rule.index + 1 : rule.index} -- ${this.prettyRingTime(rule.ringCount)} (${rule.enabled ? 'Enabled' : 'Disabled'})\n`
             for (const endpoint of rule.forwardingNumbers) {
                 result += `${endpoint.label} ${endpoint.phoneNumber}\n`
             }
             result += '\n'
+        }
+
+        if (!softPhoneOnTop) {
+            const softPhoneRingCount = `${this.afterHoursCallHandling.forwarding.softPhonesAlwaysRing ? 'Always Ring' : this.prettyRingTime(this.afterHoursCallHandling.forwarding.softPhonesRingCount)}`
+            result += `${this.afterHoursCallHandling.forwarding.rules.length + 1} -- Desktop and Mobile Apps - ${softPhoneRingCount} (${this.afterHoursCallHandling.forwarding.notifyMySoftPhones ? 'Enabled' : 'Disabled'})`
         }
 
         return result

@@ -107,6 +107,13 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
             }
         }
 
+        if (customAfterHoursGreetings) {
+            for (const greeting of customAfterHoursGreetings) {
+                console.log('setting custom greeting')
+                await setCustomGreeting(bundle, 'after-hours-rule', greeting, accessToken)
+            }
+        }
+
         await setBlockedCallSettings(bundle, accessToken)
         for (const number of bundle.extendedData!.blockedPhoneNumbers!) {
             await addBlockedNumber(bundle, number, accessToken)
@@ -1041,6 +1048,7 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
                 "Authorization": `Bearer ${token}`
             }
             const body = {
+                callHandlingAction: callHandling.callHandlingAction,
                 forwarding: callHandling.forwarding,
                 missedCall: callHandling.missedCall,
                 voicemail: callHandling.voicemail,
