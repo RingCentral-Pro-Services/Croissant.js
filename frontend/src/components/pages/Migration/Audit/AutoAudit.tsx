@@ -1,5 +1,6 @@
 import { Button, Loader } from "@mantine/core";
 import React, { useEffect, useState } from "react";
+import useExportPrettyExcel from "../../../../hooks/useExportPrettyExcel";
 import useLogin from "../../../../hooks/useLogin";
 import useMessageQueue from "../../../../hooks/useMessageQueue";
 import usePostTimedMessage from "../../../../hooks/usePostTimedMessage";
@@ -18,6 +19,7 @@ import useSiteList from "../Sites/hooks/useSiteList";
 import { compareObjects } from "./helpers/AuditEngine";
 import { Auditor } from "./helpers/Auditor";
 import useAccountData, { AccountData } from "./hooks/useFetchAccountData";
+import { AuditDiscrepency } from "./models/AuditDiscrepency";
 
 export interface AuditSettings {
     shouldOverrideSites: boolean,
@@ -43,6 +45,7 @@ const AutoAudit = () => {
     const [isDoneFetchingSites, setIsDoneFetchingSites] = useState(false)
     const [isDoneFetchingTargetSites, setIsDoneFetchingTargetSites] = useState(false)
     const [shouldShowSiteFilter, setShouldShowSiteFilter] = useState(false)
+    const [discrepencies, setDiscrepencies] = useState<AuditDiscrepency[]>([])
     const supportedExtensionTypes = ['ERLs', 'Custom Roles', 'Call Recording Settings', 'Cost Centers', 'User', 'Limited Extension', 'Call Queue', 'IVR Menu', 'Prompt Library', 'Message-Only', 'Announcement-Only', 'Call Monitoring Groups', 'Park Location', 'User Group']
     const [settings, setSettings] = useState<AuditSettings>({
         shouldOverrideSites: false,
@@ -77,6 +80,7 @@ const AutoAudit = () => {
     const {extensionsList: originalExtensionList, fetchExtensions: fetchOriginalExtensions, isExtensionListPending: isOriginalExtensionListPending, isMultiSiteEnabled} = useExtensions(postMessage)
     const {extensionsList: targetExtensionList, fetchExtensions: fetchTargetExtensions, isExtensionListPending: isTargetListPending} = useExtensions(postMessage)
     const {fetchToken: fetchTargetToken} = useJWKS()
+    const {exportPrettyExcel} = useExportPrettyExcel()
     
     const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError, userName} = useGetAccessToken()
     const {fetchToken: fetchNewAccountToken, hasCustomerToken: hasNewAccountToken, companyName: newCompanyName, isTokenPending: isNewAccountTokenPending, error: newAccountTokenError, userName: newAccountUserName} = useGetAccessToken()
@@ -161,7 +165,8 @@ const AutoAudit = () => {
         // console.log('Compare result')
         // console.log(result)
         const auditor = new Auditor(postMessage)
-        const discrepencies = auditor.compareAccounts(originalAccountData, newAccountData)
+        const issues = auditor.compareAccounts(originalAccountData, newAccountData)
+        setDiscrepencies(issues)
     }
 
     const handleFilterSelection = (selected: DataGridFormattable[]) => {
@@ -170,6 +175,21 @@ const AutoAudit = () => {
         console.log('filtered extensions')
         console.log(extensions)
         setFilteredExtensions(extensions)
+    }
+
+    const handleExportButtonClick = () => {
+        exportPrettyExcel([
+            {
+                sheetName: 'Discrepancies',
+                data: discrepencies,
+                startingRow: 3
+            },
+            {
+                sheetName: 'Messages',
+                data: messages,
+                startingRow: 3
+            }
+        ], `audit-results-migration-${companyName}.xlsx`, '/migration-audit-template.xlsx')
     }
 
 
@@ -196,6 +216,8 @@ const AutoAudit = () => {
                 </div>
 
                 <Button disabled={isPullingData} onClick={handleAuditButtonClick}>Audit</Button>
+
+                <Button variant='outline' className="healthy-margin-left" onClick={handleExportButtonClick}>Export Discrepencies</Button>
             </ToolCard>
 
             <ToolCard>

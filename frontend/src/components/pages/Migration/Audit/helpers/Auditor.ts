@@ -9,13 +9,13 @@ export class Auditor {
     compareAccounts(originalAccountData: AccountData, newAccountData: AccountData, ) {
         const discrepencies: AuditDiscrepency[] = []
 
-        discrepencies.push(this.compareSites(originalAccountData, newAccountData))
-        discrepencies.push(this.compareUsers(originalAccountData, newAccountData))
-        discrepencies.push(this.compareIVRs(originalAccountData, newAccountData))
-        discrepencies.push(this.compareLimitedExtensions(originalAccountData, newAccountData))
-        discrepencies.push(this.compareCallQueues(originalAccountData, newAccountData))
-        discrepencies.push(this.compareMessageOnlyExtensions(originalAccountData, newAccountData))
-        discrepencies.push(this.comparePrompts(originalAccountData, newAccountData))
+        discrepencies.push(...this.compareSites(originalAccountData, newAccountData))
+        discrepencies.push(...this.compareUsers(originalAccountData, newAccountData))
+        discrepencies.push(...this.compareIVRs(originalAccountData, newAccountData))
+        discrepencies.push(...this.compareLimitedExtensions(originalAccountData, newAccountData))
+        discrepencies.push(...this.compareCallQueues(originalAccountData, newAccountData))
+        discrepencies.push(...this.compareMessageOnlyExtensions(originalAccountData, newAccountData))
+        discrepencies.push(...this.comparePrompts(originalAccountData, newAccountData))
 
         return discrepencies
     }
@@ -30,9 +30,10 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: site.extension.name,
                     extensionNumber: site.extension.extensionNumber,
+                    objectType: 'Site',
                     issue: {
                         path: 'extension',
-                        expectedValue: 'something',
+                        expectedValue: site.extension.name,
                         foundValue: 'nothing'
                     }
                 }))
@@ -44,6 +45,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: site.extension.name,
                     extensionNumber: site.extension.extensionNumber,
+                    objectType: 'Site',
                     issue: {
                         path: 'extension number',
                         expectedValue: site.extension.extensionNumber,
@@ -57,6 +59,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: site.extension.name,
                     extensionNumber: site.extension.extensionNumber,
+                    objectType: 'Site',
                     issue: {
                         path: 'caller id name',
                         expectedValue: site.extension.callerIdName,
@@ -70,6 +73,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: site.extension.name,
                     extensionNumber: site.extension.extensionNumber,
+                    objectType: 'Site',
                     issue: {
                         path: 'site code',
                         expectedValue: site.extension.code ?? '',
@@ -83,6 +87,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: site.extension.name,
                     extensionNumber: site.extension.extensionNumber,
+                    objectType: 'Site',
                     issue: {
                         path: 'time zone',
                         expectedValue: site.extension.regionalSettings.timezone?.name ?? '',
@@ -96,6 +101,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: site.extension.name,
                     extensionNumber: site.extension.extensionNumber,
+                    objectType: 'Site',
                     issue: {
                         path: 'direct numbers',
                         expectedValue: `${site.extendedData?.directNumbers?.length ?? ''}`,
@@ -109,6 +115,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: site.extension.name,
                     extensionNumber: site.extension.extensionNumber,
+                    objectType: 'Site',
                     issue: {
                         path: 'business hours call handling action',
                         expectedValue: site.extendedData?.businessHoursCallHandling?.callHandlingAction ?? '',
@@ -122,6 +129,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: site.extension.name,
                     extensionNumber: site.extension.extensionNumber,
+                    objectType: 'Site',
                     issue: {
                         path: 'business hours call handling transfer',
                         expectedValue: site.extendedData?.businessHoursCallHandling?.transfer.extension.extensionNumber ?? '',
@@ -136,6 +144,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: site.extension.name,
                     extensionNumber: site.extension.extensionNumber,
+                    objectType: 'Site',
                     issue: {
                         path: 'business hours',
                         expectedValue: issue.expectedValue,
@@ -151,9 +160,10 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: site.extension.name,
                         extensionNumber: site.extension.extensionNumber,
+                        objectType: 'Site',
                         issue: {
                             path: 'custom rule',
-                            expectedValue: 'something',
+                            expectedValue: rule.name,
                             foundValue: 'nothing'
                         }
                     }))
@@ -165,6 +175,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: `${site.extension.name} - ${rule.name}`,
                         extensionNumber: site.extension.extensionNumber,
+                        objectType: 'Site',
                         issue: {
                             path: 'custom rule - called numbers',
                             expectedValue: `${rule.calledNumbers?.length} called numbers`,
@@ -178,6 +189,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: `${site.extension.name} - ${rule.name}`,
                         extensionNumber: site.extension.extensionNumber,
+                        objectType: 'Site',
                         issue: {
                             path: 'custom rule - called numbers',
                             expectedValue: `${rule.callers?.length} callers`,
@@ -201,9 +213,10 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: messageOnly.extension.data.name,
                     extensionNumber: messageOnly.extension.data.extensionNumber,
+                    objectType: 'Message-Only / Announcement-Only',
                     issue: {
                         path: 'extension',
-                        expectedValue: 'something',
+                        expectedValue: messageOnly.extension.data.name,
                         foundValue: 'nothing'
                     }
                 }))
@@ -215,6 +228,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: messageOnly.extension.data.name,
                     extensionNumber: messageOnly.extension.data.extensionNumber,
+                    objectType: 'Message-Only / Announcement-Only',
                     issue: {
                         path: 'extension number',
                         expectedValue: messageOnly.extension.data.extensionNumber,
@@ -228,6 +242,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: messageOnly.extension.data.name,
                     extensionNumber: messageOnly.extension.data.extensionNumber,
+                    objectType: 'Message-Only / Announcement-Only',
                     issue: {
                         path: 'site',
                         expectedValue: messageOnly.extension.data.site?.name ?? '',
@@ -241,6 +256,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: messageOnly.extension.data.name,
                     extensionNumber: messageOnly.extension.data.extensionNumber,
+                    objectType: 'Message-Only / Announcement-Only',
                     issue: {
                         path: 'cost center',
                         expectedValue: messageOnly.extension.data.costCenter?.name ?? '',
@@ -254,6 +270,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: messageOnly.extension.data.name,
                     extensionNumber: messageOnly.extension.data.extensionNumber,
+                    objectType: 'Message-Only / Announcement-Only',
                     issue: {
                         path: 'hidden status',
                         expectedValue: `${messageOnly.extension.data.hidden ? 'Hidden' : 'Not Hidden'}`,
@@ -267,6 +284,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: messageOnly.extension.data.name,
                     extensionNumber: messageOnly.extension.data.extensionNumber,
+                    objectType: 'Message-Only / Announcement-Only',
                     issue: {
                         path: 'direct numbers',
                         expectedValue: `${messageOnly.extendedData?.directNumbers?.length}`,
@@ -280,6 +298,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: messageOnly.extension.data.name,
                     extensionNumber: messageOnly.extension.data.extensionNumber,
+                    objectType: 'Message-Only / Announcement-Only',
                     issue: {
                         path: 'greeting type',
                         expectedValue: messageOnly.extendedData?.greeting?.type ?? '',
@@ -303,9 +322,10 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: ivr.extension.data.name,
                     extensionNumber: ivr.extension.data.extensionNumber,
+                    objectType: 'IVR Menu',
                     issue: {
                         path: 'extension',
-                        expectedValue: 'something',
+                        expectedValue: ivr.extension.data.name,
                         foundValue: 'nothing'
                     }
                 }))
@@ -317,6 +337,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: ivr.extension.data.name,
                     extensionNumber: ivr.extension.data.extensionNumber,
+                    objectType: 'IVR Menu',
                     issue: {
                         path: 'extension number',
                         expectedValue: ivr.extension.data.extensionNumber,
@@ -330,6 +351,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: ivr.extension.data.name,
                     extensionNumber: ivr.extension.data.extensionNumber,
+                    objectType: 'IVR Menu',
                     issue: {
                         path: 'site',
                         expectedValue: ivr.extension.data.site?.name ?? '',
@@ -343,6 +365,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: ivr.extension.data.name,
                     extensionNumber: ivr.extension.data.extensionNumber,
+                    objectType: 'IVR Menu',
                     issue: {
                         path: 'cost center',
                         expectedValue: ivr.extension.data.costCenter?.name ?? '',
@@ -356,6 +379,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: ivr.extension.data.name,
                     extensionNumber: ivr.extension.data.extensionNumber,
+                    objectType: 'IVR Menu',
                     issue: {
                         path: 'hidden status',
                         expectedValue: `${ivr.extension.data.hidden ? 'Hidden' : 'Not Hidden'}`,
@@ -369,6 +393,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: ivr.extension.data.name,
                     extensionNumber: ivr.extension.data.extensionNumber,
+                    objectType: 'IVR Menu',
                     issue: {
                         path: 'direct numbers',
                         expectedValue: `${ivr.extendedData?.directNumbers?.length}`,
@@ -382,6 +407,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: ivr.extension.data.name,
                     extensionNumber: ivr.extension.data.extensionNumber,
+                    objectType: 'IVR Menu',
                     issue: {
                         path: 'prompt mode',
                         expectedValue: `${ivr.extendedData?.ivrData?.prompt?.mode}`,
@@ -395,6 +421,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: ivr.extension.data.name,
                     extensionNumber: ivr.extension.data.extensionNumber,
+                    objectType: 'IVR Menu',
                     issue: {
                         path: 'prompt',
                         expectedValue: `${ivr.extendedData?.ivrData?.prompt?.text}`,
@@ -410,9 +437,10 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: ivr.extension.data.name,
                         extensionNumber: ivr.extension.data.extensionNumber,
+                        objectType: 'IVR Menu',
                         issue: {
                             path: `key press ${action.input}`,
-                            expectedValue: 'something',
+                            expectedValue: `key press ${action.input}`,
                             foundValue: 'nothing'
                         }
                     }))
@@ -424,6 +452,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: ivr.extension.data.name,
                         extensionNumber: ivr.extension.data.extensionNumber,
+                        objectType: 'IVR Menu',
                         issue: {
                             path: 'key press action',
                             expectedValue: action.action,
@@ -437,6 +466,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: ivr.extension.data.name,
                         extensionNumber: ivr.extension.data.extensionNumber,
+                        objectType: 'IVR Menu',
                         issue: {
                             path: 'key press action',
                             expectedValue: action.extension?.name ?? '',
@@ -450,6 +480,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: ivr.extension.data.name,
                         extensionNumber: ivr.extension.data.extensionNumber,
+                        objectType: 'IVR Menu',
                         issue: {
                             path: 'key press action',
                             expectedValue: action.phoneNumber ?? '',
@@ -472,9 +503,10 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: limitedExtension.extension.data.name,
                     extensionNumber: limitedExtension.extension.data.extensionNumber,
+                    objectType: 'Limited Extension',
                     issue: {
                         path: 'extension',
-                        expectedValue: 'something',
+                        expectedValue: limitedExtension.extension.data.name,
                         foundValue: 'nothing'
                     }
                 }))
@@ -486,6 +518,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: limitedExtension.extension.data.name,
                     extensionNumber: limitedExtension.extension.data.extensionNumber,
+                    objectType: 'Limited Extension',
                     issue: {
                         path: 'extension number',
                         expectedValue: limitedExtension.extension.data.extensionNumber,
@@ -499,6 +532,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: limitedExtension.extension.data.name,
                     extensionNumber: limitedExtension.extension.data.extensionNumber,
+                    objectType: 'Limited Extension',
                     issue: {
                         path: 'site',
                         expectedValue: limitedExtension.extension.data.site?.name ?? '',
@@ -512,6 +546,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: limitedExtension.extension.data.name,
                     extensionNumber: limitedExtension.extension.data.extensionNumber,
+                    objectType: 'Limited Extension',
                     issue: {
                         path: 'cost center',
                         expectedValue: limitedExtension.extension.data.costCenter?.name ?? '',
@@ -525,6 +560,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: limitedExtension.extension.data.name,
                     extensionNumber: limitedExtension.extension.data.extensionNumber,
+                    objectType: 'Limited Extension',
                     issue: {
                         path: 'hidden status',
                         expectedValue: `${limitedExtension.extension.data.hidden ? 'Hidden' : 'Not Hidden'}`,
@@ -538,6 +574,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: limitedExtension.extension.data.name,
                     extensionNumber: limitedExtension.extension.data.extensionNumber,
+                    objectType: 'Limited Extension',
                     issue: {
                         path: 'direct numbers',
                         expectedValue: `${limitedExtension.extendedData?.directNumbers?.length}`,
@@ -552,6 +589,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: limitedExtension.extension.data.name,
                         extensionNumber: limitedExtension.extension.data.extensionNumber,
+                        objectType: 'Limited Extension',
                         issue: {
                             path: 'device name',
                             expectedValue: limitedExtension.extendedData.devices[0].name,
@@ -565,6 +603,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: limitedExtension.extension.data.name,
                         extensionNumber: limitedExtension.extension.data.extensionNumber,
+                        objectType: 'Limited Extension',
                         issue: {
                             path: 'device name',
                             expectedValue: limitedExtension.extendedData.devices[0].model.name,
@@ -578,6 +617,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: limitedExtension.extension.data.name,
                         extensionNumber: limitedExtension.extension.data.extensionNumber,
+                        objectType: 'Limited Extension',
                         issue: {
                             path: 'device name',
                             expectedValue: limitedExtension.extendedData.devices[0].type,
@@ -591,6 +631,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: limitedExtension.extension.data.name,
                         extensionNumber: limitedExtension.extension.data.extensionNumber,
+                        objectType: 'Limited Extension',
                         issue: {
                             path: 'device name',
                             expectedValue: limitedExtension.extendedData.devices[0].useAsCommonPhone ? 'Hot Desking' : 'Not hot desking',
@@ -604,6 +645,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: limitedExtension.extension.data.name,
                         extensionNumber: limitedExtension.extension.data.extensionNumber,
+                        objectType: 'Limited Extension',
                         issue: {
                             path: 'device ER:',
                             expectedValue: limitedExtension.extendedData.devices[0].emergency.location?.name ?? '',
@@ -627,9 +669,10 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: queue.extension.data.name,
                     extensionNumber: queue.extension.data.extensionNumber,
+                    objectType: 'Call Queue',
                     issue: {
                         path: 'extension',
-                        expectedValue: 'something',
+                        expectedValue: queue.extension.data.name,
                         foundValue: 'nothing'
                     }
                 }))
@@ -641,6 +684,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: queue.extension.data.name,
                     extensionNumber: queue.extension.data.extensionNumber,
+                    objectType: 'Call Queue',
                     issue: {
                         path: 'extension number',
                         expectedValue: queue.extension.data.extensionNumber,
@@ -654,6 +698,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: queue.extension.data.name,
                     extensionNumber: queue.extension.data.extensionNumber,
+                    objectType: 'Call Queue',
                     issue: {
                         path: 'site',
                         expectedValue: queue.extension.data.site?.name ?? '',
@@ -667,6 +712,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: queue.extension.data.name,
                     extensionNumber: queue.extension.data.extensionNumber,
+                    objectType: 'Call Queue',
                     issue: {
                         path: 'cost center',
                         expectedValue: queue.extension.data.costCenter?.name ?? '',
@@ -680,6 +726,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: queue.extension.data.name,
                     extensionNumber: queue.extension.data.extensionNumber,
+                    objectType: 'Call Queue',
                     issue: {
                         path: 'hidden status',
                         expectedValue: `${queue.extension.data.hidden ? 'Hidden' : 'Not Hidden'}`,
@@ -693,6 +740,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: queue.extension.data.name,
                     extensionNumber: queue.extension.data.extensionNumber,
+                    objectType: 'Call Queue',
                     issue: {
                         path: 'direct numbers',
                         expectedValue: `${queue.extendedData?.directNumbers?.length}`,
@@ -709,6 +757,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: queue.extension.data.name,
                         extensionNumber: queue.extension.data.extensionNumber,
+                        objectType: 'Call Queue',
                         issue: {
                             path: 'members',
                             expectedValue: `${member.extensionNumber}`,
@@ -726,6 +775,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: queue.extension.data.name,
                         extensionNumber: queue.extension.data.extensionNumber,
+                        objectType: 'Call Queue',
                         issue: {
                             path: 'managers',
                             expectedValue: `${manager.extension.extensionNumber}`,
@@ -743,6 +793,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: queue.extension.data.name,
                         extensionNumber: queue.extension.data.extensionNumber,
+                        objectType: 'Call Queue',
                         issue: {
                             path: 'member presense',
                             expectedValue: `${memberPresense.member.extensionNumber}`,
@@ -756,6 +807,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: queue.extension.data.name,
                         extensionNumber: queue.extension.data.extensionNumber,
+                        objectType: 'Call Queue',
                         issue: {
                             path: 'member presense',
                             expectedValue: `${memberPresense.acceptCurrentQueueCalls ? 'Accept current queue calls': `Don't accept current queue calls`}`,
@@ -769,6 +821,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: queue.extension.data.name,
                         extensionNumber: queue.extension.data.extensionNumber,
+                        objectType: 'Call Queue',
                         issue: {
                             path: 'member presense',
                             expectedValue: `${memberPresense.acceptQueueCalls ? 'Accept current queue calls': `Don't accept current queue calls`}`,
@@ -783,6 +836,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: queue.extension.data.name,
                     extensionNumber: queue.extension.data.extensionNumber,
+                    objectType: 'Call Queue',
                     issue: {
                         path: 'ring type',
                         expectedValue: queue.extendedData?.businessHoursCallHandling?.queue?.transferMode ?? '',
@@ -796,6 +850,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: queue.extension.data.name,
                     extensionNumber: queue.extension.data.extensionNumber,
+                    objectType: 'Call Queue',
                     issue: {
                         path: 'wait time',
                         expectedValue: `${queue.extendedData?.businessHoursCallHandling?.queue?.agentTimeout}`,
@@ -809,6 +864,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: queue.extension.data.name,
                     extensionNumber: queue.extension.data.extensionNumber,
+                    objectType: 'Call Queue',
                     issue: {
                         path: 'interrupt audio mode',
                         expectedValue: queue.extendedData?.businessHoursCallHandling?.queue?.holdAudioInterruptionMode ?? '',
@@ -822,6 +878,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: queue.extension.data.name,
                     extensionNumber: queue.extension.data.extensionNumber,
+                    objectType: 'Call Queue',
                     issue: {
                         path: 'interrupt audio period',
                         expectedValue: `${queue.extendedData?.businessHoursCallHandling?.queue?.holdAudioInterruptionPeriod}`,
@@ -835,6 +892,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: queue.extension.data.name,
                     extensionNumber: queue.extension.data.extensionNumber,
+                    objectType: 'Call Queue',
                     issue: {
                         path: 'wait time',
                         expectedValue: `${queue.extendedData?.businessHoursCallHandling?.queue?.holdTime}`,
@@ -848,6 +906,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: queue.extension.data.name,
                     extensionNumber: queue.extension.data.extensionNumber,
+                    objectType: 'Call Queue',
                     issue: {
                         path: 'max wait time action',
                         expectedValue: `${queue.extendedData?.businessHoursCallHandling?.queue?.holdTimeExpirationAction}`,
@@ -861,6 +920,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: queue.extension.data.name,
                     extensionNumber: queue.extension.data.extensionNumber,
+                    objectType: 'Call Queue',
                     issue: {
                         path: 'max callers',
                         expectedValue: `${queue.extendedData?.businessHoursCallHandling?.queue?.maxCallers}`,
@@ -874,6 +934,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: queue.extension.data.name,
                     extensionNumber: queue.extension.data.extensionNumber,
+                    objectType: 'Call Queue',
                     issue: {
                         path: 'max callers action',
                         expectedValue: `${queue.extendedData?.businessHoursCallHandling?.queue?.maxCallersAction}`,
@@ -887,6 +948,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: queue.extension.data.name,
                     extensionNumber: queue.extension.data.extensionNumber,
+                    objectType: 'Call Queue',
                     issue: {
                         path: 'no answer action',
                         expectedValue: `${queue.extendedData?.businessHoursCallHandling?.queue?.noAnswerAction}`,
@@ -900,6 +962,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: queue.extension.data.name,
                     extensionNumber: queue.extension.data.extensionNumber,
+                    objectType: 'Call Queue',
                     issue: {
                         path: 'wrap up time',
                         expectedValue: `${queue.extendedData?.businessHoursCallHandling?.queue?.wrapUpTime}`,
@@ -915,6 +978,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: queue.extension.data.name,
                         extensionNumber: queue.extension.data.extensionNumber,
+                        objectType: 'Call Queue',
                         issue: {
                             path: 'business hours transfer',
                             expectedValue: `${transferAction.action} tranfer to ${transferAction.extension.name} - Ext. ${transferAction.extension.extensionNumber}`,
@@ -929,6 +993,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: queue.extension.data.name,
                         extensionNumber: queue.extension.data.extensionNumber,
+                        objectType: 'Call Queue',
                         issue: {
                             path: 'business hours transfer',
                             expectedValue: `${transferAction.action} tranfer to ${transferAction.extension.name} - Ext. ${transferAction.extension.extensionNumber}`,
@@ -945,6 +1010,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: queue.extension.data.name,
                         extensionNumber: queue.extension.data.extensionNumber,
+                        objectType: 'Call Queue',
                         issue: {
                             path: 'business hours transfer',
                             expectedValue: `${transferAction.action} tranfer to ${transferAction.phoneNumber} - Ext. ${transferAction.phoneNumber}`,
@@ -959,6 +1025,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: queue.extension.data.name,
                         extensionNumber: queue.extension.data.extensionNumber,
+                        objectType: 'Call Queue',
                         issue: {
                             path: 'business hours transfer',
                             expectedValue: `${transferAction.action} tranfer to ${transferAction.phoneNumber}`,
@@ -975,6 +1042,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: queue.extension.data.name,
                         extensionNumber: queue.extension.data.extensionNumber,
+                        objectType: 'Call Queue',
                         issue: {
                             path: `business hours greeting ${greeting.type}`,
                             expectedValue: `${greeting.preset ? greeting.preset.name : 'Custom greeting'}`,
@@ -989,6 +1057,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: queue.extension.data.name,
                         extensionNumber: queue.extension.data.extensionNumber,
+                        objectType: 'Call Queue',
                         issue: {
                             path: `business hours greeting ${greeting.type}`,
                             expectedValue: `${greeting.preset ? greeting.preset.name : 'Custom greeting'}`,
@@ -1002,6 +1071,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: queue.extension.data.name,
                         extensionNumber: queue.extension.data.extensionNumber,
+                        objectType: 'Call Queue',
                         issue: {
                             path: `business hours greeting ${greeting.type}`,
                             expectedValue: greeting.preset.name,
@@ -1026,9 +1096,10 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: user.extension.data.name,
                     extensionNumber: user.extension.data.extensionNumber,
+                    objectType: 'User',
                     issue: {
                         path: 'extension',
-                        expectedValue: 'something',
+                        expectedValue: user.extension.data.name,
                         foundValue: 'nothing'
                     }
                 }))
@@ -1040,6 +1111,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: user.extension.data.name,
                     extensionNumber: user.extension.data.extensionNumber,
+                    objectType: 'User',
                     issue: {
                         path: 'extension number',
                         expectedValue: user.extension.data.extensionNumber,
@@ -1053,6 +1125,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: user.extension.data.name,
                     extensionNumber: user.extension.data.extensionNumber,
+                    objectType: 'User',
                     issue: {
                         path: 'site',
                         expectedValue: user.extension.data.site?.name ?? '',
@@ -1066,6 +1139,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: user.extension.data.name,
                     extensionNumber: user.extension.data.extensionNumber,
+                    objectType: 'User',
                     issue: {
                         path: 'cost center',
                         expectedValue: user.extension.data.costCenter?.name ?? '',
@@ -1079,6 +1153,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: user.extension.data.name,
                     extensionNumber: user.extension.data.extensionNumber,
+                    objectType: 'User',
                     issue: {
                         path: 'hidden status',
                         expectedValue: `${user.extension.data.hidden ? 'Hidden' : 'Not Hidden'}`,
@@ -1092,6 +1167,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: user.extension.data.name,
                     extensionNumber: user.extension.data.extensionNumber,
+                    objectType: 'User',
                     issue: {
                         path: 'direct numbers',
                         expectedValue: `${user.extendedData?.directNumbers?.length}`,
@@ -1107,6 +1183,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: user.extension.data.name,
                         extensionNumber: user.extension.data.extensionNumber,
+                        objectType: 'User',
                         issue: {
                             path: 'device',
                             expectedValue: `${device.name}`,
@@ -1121,6 +1198,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: user.extension.data.name,
                         extensionNumber: user.extension.data.extensionNumber,
+                        objectType: 'User',
                         issue: {
                             path: 'device ERL',
                             expectedValue: `${device.emergency.location?.name}`,
@@ -1135,6 +1213,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: user.extension.data.name,
                     extensionNumber: user.extension.data.extensionNumber,
+                    objectType: 'User',
                     issue: {
                         path: 'blocked calls mode',
                         expectedValue: `${user.extendedData?.blockedCallSettings?.mode}`,
@@ -1148,6 +1227,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: user.extension.data.name,
                     extensionNumber: user.extension.data.extensionNumber,
+                    objectType: 'User',
                     issue: {
                         path: 'blocked calls - no caller ID',
                         expectedValue: `${user.extendedData?.blockedCallSettings?.noCallerId}`,
@@ -1161,6 +1241,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: user.extension.data.name,
                     extensionNumber: user.extension.data.extensionNumber,
+                    objectType: 'User',
                     issue: {
                         path: 'blocked calls - payphone',
                         expectedValue: `${user.extendedData?.blockedCallSettings?.payPhones}`,
@@ -1176,6 +1257,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: user.extension.data.name,
                         extensionNumber: user.extension.data.extensionNumber,
+                        objectType: 'User',
                         issue: {
                             path: 'blocked numbers',
                             expectedValue: `${blockedNumber}}`,
@@ -1192,6 +1274,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: user.extension.data.name,
                         extensionNumber: user.extension.data.extensionNumber,
+                        objectType: 'User',
                         issue: {
                             path: 'custom rule',
                             expectedValue: `${customRule.name}`,
@@ -1208,6 +1291,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: user.extension.data.name,
                         extensionNumber: user.extension.data.extensionNumber,
+                        objectType: 'User',
                         issue: {
                             path: 'delegates',
                             expectedValue: `${delegate.extension.name} - Ext. ${delegate.extension.extensionNumber}`,
@@ -1222,6 +1306,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: user.extension.data.name,
                     extensionNumber: user.extension.data.extensionNumber,
+                    objectType: 'User',
                     issue: {
                         path: 'forward all calls',
                         expectedValue: `${user.extendedData?.forwardAllCalls?.enabled ? 'Enabled' : 'Disabled'}`,
@@ -1235,6 +1320,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: user.extension.data.name,
                     extensionNumber: user.extension.data.extensionNumber,
+                    objectType: 'User',
                     issue: {
                         path: 'incomming calls',
                         expectedValue: `${user.extendedData?.incommingCallInfo?.additionalDigits.enabled ? 'Enabled' : 'Disabled'}`,
@@ -1248,6 +1334,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: user.extension.data.name,
                     extensionNumber: user.extension.data.extensionNumber,
+                    objectType: 'User',
                     issue: {
                         path: 'intercom setting',
                         expectedValue: `${user.extendedData?.intercomStatus?.enabled ? 'Enabled' : 'Disabled'}`,
@@ -1263,6 +1350,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: user.extension.data.name,
                         extensionNumber: user.extension.data.extensionNumber,
+                        objectType: 'User',
                         issue: {
                             path: 'intercom - allowed users',
                             expectedValue: `${intercomUser.name} - Ext. ${intercomUser.extensionNumber}`,
@@ -1279,6 +1367,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: user.extension.data.name,
                         extensionNumber: user.extension.data.extensionNumber,
+                        objectType: 'User',
                         issue: {
                             path: 'personal erl',
                             expectedValue: `${perl.name}`,
@@ -1295,6 +1384,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: user.extension.data.name,
                         extensionNumber: user.extension.data.extensionNumber,
+                        objectType: 'User',
                         issue: {
                             path: 'presense - allowed user',
                             expectedValue: `${presenseAllowedUser.extensionName}`,
@@ -1311,6 +1401,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: user.extension.data.name,
                         extensionNumber: user.extension.data.extensionNumber,
+                        objectType: 'User',
                         issue: {
                             path: 'presense - line',
                             expectedValue: `Line ${presenseLine.id} - ${presenseLine.extension.extensionName} (Ext. ${presenseLine.extension.extensionNumber})`,
@@ -1325,6 +1416,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: user.extension.data.name,
                     extensionNumber: user.extension.data.extensionNumber,
+                    objectType: 'User',
                     issue: {
                         path: 'presense - allow see my presense',
                         expectedValue: `${user.extendedData?.presenseSettings?.allowSeeMyPresence ? 'Yes' : 'No'}`,
@@ -1338,6 +1430,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: user.extension.data.name,
                     extensionNumber: user.extension.data.extensionNumber,
+                    objectType: 'User',
                     issue: {
                         path: 'presense - pickup calls on hold',
                         expectedValue: `${user.extendedData?.presenseSettings?.pickUpCallsOnHold ? 'Yes' : 'No'}`,
@@ -1353,6 +1446,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: user.extension.data.name,
                         extensionNumber: user.extension.data.extensionNumber,
+                        objectType: 'User',
                         issue: {
                             path: 'role',
                             expectedValue: `${role.displayName}`,
@@ -1369,6 +1463,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: user.extension.data.name,
                         extensionNumber: user.extension.data.extensionNumber,
+                        objectType: 'User',
                         issue: {
                             path: `business hours greeting ${greeting.type}`,
                             expectedValue: `${greeting.preset ? greeting.preset.name : 'Custom greeting'}`,
@@ -1383,6 +1478,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: user.extension.data.name,
                         extensionNumber: user.extension.data.extensionNumber,
+                        objectType: 'User',
                         issue: {
                             path: `business hours greeting ${greeting.type}`,
                             expectedValue: `${greeting.preset ? greeting.preset.name : 'Custom greeting'}`,
@@ -1396,6 +1492,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: user.extension.data.name,
                         extensionNumber: user.extension.data.extensionNumber,
+                        objectType: 'User',
                         issue: {
                             path: `business hours greeting ${greeting.type}`,
                             expectedValue: greeting.preset.name,
@@ -1410,6 +1507,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: user.extension.data.name,
                     extensionNumber: user.extension.data.extensionNumber,
+                    objectType: 'User',
                     issue: {
                         path: `business hours call handling action`,
                         expectedValue: user.extendedData?.businessHoursCallHandling?.callHandlingAction ?? '',
@@ -1423,6 +1521,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: user.extension.data.name,
                     extensionNumber: user.extension.data.extensionNumber,
+                    objectType: 'User',
                     issue: {
                         path: `business hours call handling action`,
                         expectedValue: user.extendedData?.businessHoursCallHandling?.screening ?? '',
@@ -1436,6 +1535,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: user.extension.data.name,
                     extensionNumber: user.extension.data.extensionNumber,
+                    objectType: 'User',
                     issue: {
                         path: `business hours missed call action`,
                         expectedValue: user.extendedData?.businessHoursCallHandling?.missedCall.actionType ?? '',
@@ -1449,6 +1549,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: user.extension.data.name,
                     extensionNumber: user.extension.data.extensionNumber,
+                    objectType: 'User',
                     issue: {
                         path: `business hours ring mode`,
                         expectedValue: user.extendedData?.businessHoursCallHandling?.forwarding?.ringingMode ?? '',
@@ -1462,6 +1563,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: user.extension.data.name,
                     extensionNumber: user.extension.data.extensionNumber,
+                    objectType: 'User',
                     issue: {
                         path: `business hours ring mode`,
                         expectedValue: user.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesAlwaysRing ? 'Yes' : 'No',
@@ -1475,6 +1577,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: user.extension.data.name,
                     extensionNumber: user.extension.data.extensionNumber,
+                    objectType: 'User',
                     issue: {
                         path: `business hours softphone position`,
                         expectedValue: user.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesPositionTop ? 'Yes' : 'No',
@@ -1488,6 +1591,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: user.extension.data.name,
                     extensionNumber: user.extension.data.extensionNumber,
+                    objectType: 'User',
                     issue: {
                         path: `business hours softphone ring count`,
                         expectedValue: `${user.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesRingCount}`,
@@ -1504,6 +1608,7 @@ export class Auditor {
                     discrepencies.push(new AuditDiscrepency({
                         name: user.extension.data.name,
                         extensionNumber: user.extension.data.extensionNumber,
+                        objectType: 'User',
                         issue: {
                             path: `business hours call handling rule`,
                             expectedValue: `${user.extendedData?.businessHoursCallHandling?.forwarding?.rules.length} rules`,
@@ -1520,6 +1625,7 @@ export class Auditor {
                         discrepencies.push(new AuditDiscrepency({
                             name: user.extension.data.name,
                             extensionNumber: user.extension.data.extensionNumber,
+                            objectType: 'User',
                             issue: {
                                 path: `business hours softphone ring count`,
                                 expectedValue: `${forwardingNumber.label}`,
@@ -1545,6 +1651,7 @@ export class Auditor {
                 discrepencies.push(new AuditDiscrepency({
                     name: prompt.filename,
                     extensionNumber: 'N/A',
+                    objectType: 'IVR Prompt',
                     issue: {
                         path: `ivr prompt`,
                         expectedValue: `${prompt.filename}`,
