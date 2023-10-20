@@ -1101,7 +1101,7 @@ export class Auditor {
             }
 
             for (const device of user.extendedData?.devices ?? []) {
-                const newAccountDevice = newAccountCounterpart.extendedData?.devices.find((currentDevice) => currentDevice.name === device.name)
+                const newAccountDevice = newAccountCounterpart.extendedData?.devices.find((currentDevice) => currentDevice.name === device.name && currentDevice.model?.id === device.model?.id)
                 if (!newAccountDevice) {
                     this.postMessage(new Message(`User '${user.extension.data.name}' is missing device ${device.name}. Expected: ${device.name}. Found: nothing`, 'error'))
                     discrepencies.push(new AuditDiscrepency({

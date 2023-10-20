@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import useLogin from "../../../../hooks/useLogin";
 import useMessageQueue from "../../../../hooks/useMessageQueue";
 import usePostTimedMessage from "../../../../hooks/usePostTimedMessage";
+import { DataGridFormattable } from "../../../../models/DataGridFormattable";
 import { Extension } from "../../../../models/Extension";
 import { Message } from "../../../../models/Message";
 import useExtensions from "../../../../rcapi/useExtensions";
@@ -38,6 +39,7 @@ const AutoAudit = () => {
     const [selectedSiteNames, setSelectedSiteNames] = useState<string[]>([])
     const [selectedExtensionTypes, setSelectedExtensionTypes] = useState<string[]>([])
     const [selectedExtensions, setSelectedExtensions] = useState<Extension[]>([])
+    const [filteredExtensions, setFilteredExtensions] = useState<Extension[]>([])
     const [isDoneFetchingSites, setIsDoneFetchingSites] = useState(false)
     const [isDoneFetchingTargetSites, setIsDoneFetchingTargetSites] = useState(false)
     const [shouldShowSiteFilter, setShouldShowSiteFilter] = useState(false)
@@ -134,14 +136,23 @@ const AutoAudit = () => {
     async function handleAuditButtonClick() {
         setIsPullingData(true)
         const originalSelected = originalExtensionList.filter((ext) => ext.data.status !== 'Unassigned' && selectedExtensionTypes.includes(ext.prettyType()) && selectedSiteNames.includes(ext.data.site?.name ?? ''))
-        const originalAccountData = await fetchAccountData(sites, originalExtensionList, originalSelected)
+        const originalAccountData = await fetchAccountData(sites, originalExtensionList, filteredExtensions)
         console.log('Old Account Data')
         console.log(originalAccountData)
         await fetchTargetToken(newAccountUID)
         const targetSites = await fetchSites()
         const newExtensions = await fetchTargetExtensions()
+        
+        const newTargetSelected: Extension[] = []
+        for (const extension of filteredExtensions) {
+            const targetExtension = newExtensions.find((newExtension) => newExtension.data.name === extension.data.name && newExtension.data.type === extension.data.type && newExtension.data.site?.name === extension.data.site?.name)
+            if (targetExtension) {
+                newTargetSelected.push(targetExtension)
+            }
+        }
+
         const targetSelected = newExtensions.filter((ext) => ext.data.status !== 'Unassigned' && selectedExtensionTypes.includes(ext.prettyType()) && selectedSiteNames.includes(ext.data.site?.name ?? ''))
-        const newAccountData = await fetchAccountData(targetSites, newExtensions, targetSelected)
+        const newAccountData = await fetchAccountData(targetSites, newExtensions, newTargetSelected)
         console.log('New Account Data')
         console.log(newAccountData)
 
@@ -151,6 +162,14 @@ const AutoAudit = () => {
         // console.log(result)
         const auditor = new Auditor(postMessage)
         const discrepencies = auditor.compareAccounts(originalAccountData, newAccountData)
+    }
+
+    const handleFilterSelection = (selected: DataGridFormattable[]) => {
+        if (isPullingData) return
+        const extensions = selected as Extension[]
+        console.log('filtered extensions')
+        console.log(extensions)
+        setFilteredExtensions(extensions)
     }
 
 
@@ -180,7 +199,7 @@ const AutoAudit = () => {
             </ToolCard>
 
             <ToolCard>
-                <FeedbackArea defaultTab={1} gridData={[]} messages={messages} errors={errors} timedMessages={timedMessages} />
+                <FeedbackArea defaultTab={0} gridData={selectedExtensions} onFilterSelection={handleFilterSelection} messages={messages} errors={errors} timedMessages={timedMessages} />
             </ToolCard>
         </>
     )
