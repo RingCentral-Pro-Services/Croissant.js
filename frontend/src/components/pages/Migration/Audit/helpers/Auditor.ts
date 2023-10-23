@@ -16,7 +16,11 @@ export class Auditor {
         discrepencies.push(...this.compareCallQueues(originalAccountData, newAccountData))
         discrepencies.push(...this.compareMessageOnlyExtensions(originalAccountData, newAccountData))
         discrepencies.push(...this.comparePrompts(originalAccountData, newAccountData))
-
+        discrepencies.push(...this.compareCallRecordingSettings(originalAccountData, newAccountData))
+        discrepencies.push(...this.compareCallMonitoringGroups(originalAccountData, newAccountData))
+        discrepencies.push(...this.compareParkLocations(originalAccountData, newAccountData))
+        discrepencies.push(...this.compareUserGroups(originalAccountData, newAccountData))
+        discrepencies.push(...this.compareCustomRoles(originalAccountData, newAccountData))
         return discrepencies
     }
 
@@ -1253,14 +1257,14 @@ export class Auditor {
             const newBlockedNumbers = newAccountCounterpart.extendedData?.blockedPhoneNumbers ?? []
             for (const blockedNumber of user.extendedData?.blockedPhoneNumbers ?? []) {
                 if (!newBlockedNumbers.includes(blockedNumber)) {
-                    this.postMessage(new Message(`User '${user.extension.data.name}' is missing blocked number ${blockedNumber}. Expected: ${blockedNumber}. Found: nothing`, 'error'))
+                    this.postMessage(new Message(`User '${user.extension.data.name}' is missing blocked number ${blockedNumber.phoneNumber}. Expected: ${blockedNumber.phoneNumber}. Found: nothing`, 'error'))
                     discrepencies.push(new AuditDiscrepency({
                         name: user.extension.data.name,
                         extensionNumber: user.extension.data.extensionNumber,
                         objectType: 'User',
                         issue: {
                             path: 'blocked numbers',
-                            expectedValue: `${blockedNumber}}`,
+                            expectedValue: `${blockedNumber.phoneNumber}}`,
                             foundValue: `nothing`
                         }
                     }))
@@ -1573,21 +1577,21 @@ export class Auditor {
             }
 
             if (user.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesPositionTop !== newAccountCounterpart.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesPositionTop) {
-                this.postMessage(new Message(`User '${user.extension.data.name}' has an incorrect softphone position. Expected: ${user.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesPositionTop} Found: ${newAccountCounterpart.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesPositionTop}`, 'error'))
+                this.postMessage(new Message(`User '${user.extension.data.name}' has an incorrect softphone position. Expected: ${user.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesPositionTop ? 'Top' : 'Bottom'} Found: ${newAccountCounterpart.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesPositionTop ? 'Top' : 'Bottom'}`, 'error'))
                 discrepencies.push(new AuditDiscrepency({
                     name: user.extension.data.name,
                     extensionNumber: user.extension.data.extensionNumber,
                     objectType: 'User',
                     issue: {
                         path: `business hours softphone position`,
-                        expectedValue: user.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesPositionTop ? 'Yes' : 'No',
-                        foundValue: newAccountCounterpart.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesPositionTop ? 'Yes' : 'No'
+                        expectedValue: user.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesPositionTop ? 'Top' : 'Bottom',
+                        foundValue: newAccountCounterpart.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesPositionTop ? 'Top' : 'Bottom'
                     }
                 }))
             }
 
             if (user.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesRingCount !== newAccountCounterpart.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesRingCount) {
-                this.postMessage(new Message(`User '${user.extension.data.name}' has an incorrect business hours missed call action. Expected: ${user.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesRingCount} Found: ${newAccountCounterpart.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesRingCount}`, 'error'))
+                this.postMessage(new Message(`User '${user.extension.data.name}' has an incorrect business hours softphone ring count. Expected: ${user.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesRingCount} Found: ${newAccountCounterpart.extendedData?.businessHoursCallHandling?.forwarding?.softPhonesRingCount}`, 'error'))
                 discrepencies.push(new AuditDiscrepency({
                     name: user.extension.data.name,
                     extensionNumber: user.extension.data.extensionNumber,
@@ -1663,4 +1667,249 @@ export class Auditor {
 
         return discrepencies
     }
+
+    private compareCallRecordingSettings(originalAccountData: AccountData, newAccountData: AccountData) {
+        const discrepencies: AuditDiscrepency[] = []
+
+        if (originalAccountData.callRecordingSettings?.onDemand.enabled !== newAccountData.callRecordingSettings?.onDemand.enabled) {
+            this.postMessage(new Message(`New account has different on-demand call recording setting. Expected: ${originalAccountData.callRecordingSettings?.onDemand.enabled ? 'Enabled' : 'Disabled'} Found: ${newAccountData.callRecordingSettings?.onDemand.enabled ? 'Enabled' : 'Disabled'}`, 'error'))
+            discrepencies.push(new AuditDiscrepency({
+                name: 'Call Recording Settings',
+                extensionNumber: 'N/A',
+                objectType: 'Call Recording',
+                issue: {
+                    path: `On-demand call recording`,
+                    expectedValue: `${originalAccountData.callRecordingSettings?.onDemand.enabled ? 'Enabled' : 'Disabled'}`,
+                    foundValue: `${newAccountData.callRecordingSettings?.onDemand.enabled ? 'Enabled' : 'Disabled'}`
+                }
+            }))
+        }
+
+        if (originalAccountData.callRecordingSettings?.automatic.enabled !== newAccountData.callRecordingSettings?.automatic.enabled) {
+            this.postMessage(new Message(`New account has different automatic call recording setting. Expected: ${originalAccountData.callRecordingSettings?.automatic.enabled ? 'Enabled' : 'Disabled'} Found: ${newAccountData.callRecordingSettings?.automatic.enabled ? 'Enabled' : 'Disabled'}`, 'error'))
+            discrepencies.push(new AuditDiscrepency({
+                name: 'Call Recording Settings',
+                extensionNumber: 'N/A',
+                objectType: 'Call Recording',
+                issue: {
+                    path: `automatic call recording`,
+                    expectedValue: `${originalAccountData.callRecordingSettings?.automatic.enabled ? 'Enabled' : 'Disabled'}`,
+                    foundValue: `${newAccountData.callRecordingSettings?.automatic.enabled ? 'Enabled' : 'Disabled'}`
+                }
+            }))
+        }
+
+        const newMembers = newAccountData.callRecordingSettings?.members?.map((member) => member.name)
+        for (const member of originalAccountData.callRecordingSettings?.members ?? []) {
+            if (!newMembers?.includes(member.name)) {
+                this.postMessage(new Message(`New account does not have automatic call recording enabled for ${member.name} Ext ${member.extensionNumber}. Expected: ${member.name} Ext. ${member.extensionNumber} Found: nothing`, 'error'))
+                discrepencies.push(new AuditDiscrepency({
+                    name: 'Call Recording Settings',
+                    extensionNumber: 'N/A',
+                    objectType: 'Call Recording',
+                    issue: {
+                        path: `automatic call recording`,
+                        expectedValue: `${member.name} Ext. ${member.extensionNumber}`,
+                        foundValue: `nothing`
+                    }
+                }))
+            }
+        }
+
+        return discrepencies
+    }
+
+    private compareCallMonitoringGroups(originalAccountData: AccountData, newAccountData: AccountData) {
+        const discrepencies: AuditDiscrepency[] = []
+
+        for (const group of originalAccountData.callMonitoring) {
+            const newAccountCounterpart = newAccountData.callMonitoring.find((callMonitoringGroup) => callMonitoringGroup.data.name === group.data.name)
+            if (!newAccountCounterpart) {
+                this.postMessage(new Message(`Call monitoring group ${group.data.name} is missing in the new account. Expected: ${group.data.name} Found: nothing`, 'error'))
+                discrepencies.push(new AuditDiscrepency({
+                    name: group.data.name,
+                    extensionNumber: 'N/A',
+                    objectType: 'Call Monitoring Group',
+                    issue: {
+                        path: `call monitoring group`,
+                        expectedValue: `${group.data.name}`,
+                        foundValue: `nothing`
+                    }
+                }))
+                continue
+            }
+
+            const newMembers = newAccountCounterpart.data.members.map((member) => member.extensionNumber)
+            for (const member of group.data.members) {
+                if (!newMembers.includes(member.extensionNumber)) {
+                    this.postMessage(new Message(`Call monitoring group ${group.data.name} is missing member ${member.extensionNumber}. Expected: ${member.extensionNumber} Found: nothing`, 'error'))
+                    discrepencies.push(new AuditDiscrepency({
+                        name: group.data.name,
+                        extensionNumber: 'N/A',
+                        objectType: 'Call Monitoring Group',
+                        issue: {
+                            path: `call monitoring member`,
+                            expectedValue: `${member.extensionNumber}`,
+                            foundValue: `nothing`
+                        }
+                    }))
+                }
+            }
+        }
+
+        return discrepencies
+    }
+
+    private compareParkLocations(originalAccountData: AccountData, newAccountData: AccountData) {
+        const discrepencies: AuditDiscrepency[] = []
+
+        for (const parkLocation of originalAccountData.parkLocations ?? []) {
+            const newAccountCounterpart = newAccountData.parkLocations.find((currentItem) => currentItem.extension.data.name === parkLocation.extension.data.name)
+
+            if (!newAccountCounterpart) {
+                this.postMessage(new Message(`Park location ${parkLocation.extension.data.name} Ext. ${parkLocation.extension.data.extensionNumber} is missing. Expected: ${parkLocation.extension.data.name} Ext. ${parkLocation.extension.data.extensionNumber} Found: nothing`, 'error'))
+                discrepencies.push(new AuditDiscrepency({
+                    name: parkLocation.extension.data.name,
+                    extensionNumber: parkLocation.extension.data.extensionNumber,
+                    objectType: 'Park Location',
+                    issue: {
+                        path: `missing park location`,
+                        expectedValue: `${parkLocation.extension.data.name} Ext. ${parkLocation.extension.data.extensionNumber}`,
+                        foundValue: `nothing`
+                    }
+                }))
+                continue
+            }
+
+            const newMembers = newAccountCounterpart.members?.map((member) => member.name)
+            for (const member of parkLocation.members ?? []) {
+                if (!newMembers?.includes(member.name)) {
+                    this.postMessage(new Message(`Park location ${parkLocation.extension.data.name} Ext. ${parkLocation.extension.data.extensionNumber} is missing member ${member.name} Ext. ${member.extensionNumber}. Expected: ${member.name} Ext. ${member.extensionNumber} Found: nothing`, 'error'))
+                    discrepencies.push(new AuditDiscrepency({
+                        name: parkLocation.extension.data.name,
+                        extensionNumber: parkLocation.extension.data.extensionNumber,
+                        objectType: 'Park Location',
+                        issue: {
+                            path: `missing park location member`,
+                            expectedValue: `${member.name} Ext. ${member.extensionNumber}`,
+                            foundValue: `nothing`
+                        }
+                    }))
+                }
+            }
+
+        }
+
+        return discrepencies
+    }
+
+    private compareUserGroups(originalAccountData: AccountData, newAccountData: AccountData) {
+        const discrepencies: AuditDiscrepency[] = []
+
+        for (const group of originalAccountData.userGroups ?? []) {
+            const newAccountCounterpart = newAccountData.userGroups.find((currentItem) => currentItem.data.displayName === group.data.displayName)
+            if (!newAccountCounterpart) {
+                this.postMessage(new Message(`User Group ${group.data.displayName} is missing. Expected: ${group.data.displayName} Found: nothing`, 'error'))
+                discrepencies.push(new AuditDiscrepency({
+                    name: group.data.displayName,
+                    extensionNumber: 'N/A',
+                    objectType: 'User Group',
+                    issue: {
+                        path: `missing user group`,
+                        expectedValue: `${group.data.displayName}`,
+                        foundValue: `nothing`
+                    }
+                }))
+                continue
+            }
+
+            const newMembers = newAccountCounterpart.data.members?.map((member) => member.extensionNumber)
+            for (const member of group.data.members ?? []) {
+                if (!newMembers?.includes(member.extensionNumber)) {
+                    this.postMessage(new Message(`User Group ${group.data.displayName} is missing member ${member.extensionNumber}. Expected: ${member.extensionNumber} Found: nothing`, 'error'))
+                    discrepencies.push(new AuditDiscrepency({
+                        name: group.data.displayName,
+                        extensionNumber: 'N/A',
+                        objectType: 'User Group',
+                        issue: {
+                            path: `missing user group member`,
+                            expectedValue: `${member.extensionNumber}`,
+                            foundValue: `nothing`
+                        }
+                    }))
+                }
+            }
+
+            const newManagers = newAccountCounterpart.data.managers.map((manager) => manager.extensionNumber)
+            for (const manager of group.data.managers ?? []) {
+                if (!newManagers.includes(manager.extensionNumber)) {
+                    this.postMessage(new Message(`User Group ${group.data.displayName} is missing manager ${manager.extensionNumber}. Expected: ${manager.extensionNumber} Found: nothing`, 'error'))
+                    discrepencies.push(new AuditDiscrepency({
+                        name: group.data.displayName,
+                        extensionNumber: 'N/A',
+                        objectType: 'User Group',
+                        issue: {
+                            path: `missing user group manager`,
+                            expectedValue: `${manager.extensionNumber}`,
+                            foundValue: `nothing`
+                        }
+                    }))
+                }
+            }
+        }
+
+        return discrepencies
+    }
+
+    private compareCustomRoles(originalAccountData: AccountData, newAccountData: AccountData) {
+        const discrepencies: AuditDiscrepency[] = []
+
+        for (const role of originalAccountData.customeRoles ?? []) {
+            const newAccountCounterpart = newAccountData.customeRoles.find((currentItem) => currentItem.displayName === role.displayName)
+            if (!newAccountCounterpart) {
+                this.postMessage(new Message(`Custom role ${role.displayName} is missing. Expected: ${role.displayName} Found: nothing`, 'error'))
+                discrepencies.push(new AuditDiscrepency({
+                    name: role.displayName,
+                    extensionNumber: 'N/A',
+                    objectType: 'Custom Role',
+                    issue: {
+                        path: `missing custom role`,
+                        expectedValue: `${role.displayName}`,
+                        foundValue: `nothing`
+                    }
+                }))
+                continue
+            }
+
+            for (const permission of role.permissions ?? []) {
+                const newAccountPermission = newAccountCounterpart.permissions.find((currentItem) => currentItem.id === permission.id)
+                if (!newAccountPermission) {
+                    this.postMessage(new Message(`Custom role ${role.displayName} is missing permission ${permission.id}. Expected: ${permission.id} Found: nothing`, 'error'))
+                    discrepencies.push(new AuditDiscrepency({
+                        name: role.displayName,
+                        extensionNumber: 'N/A',
+                        objectType: 'Custom Role',
+                        issue: {
+                            path: `missing custom role permission`,
+                            expectedValue: `${permission.id}`,
+                            foundValue: `nothing`
+                        }
+                    }))
+                }
+            }
+        }
+
+        return discrepencies
+    }
+
+    private compareCostCenters(originalAccountData: AccountData, newAccountData: AccountData) {
+        const discrepencies: AuditDiscrepency[] = []
+
+        for (const costCenter of originalAccountData.costCenters ?? []) {
+            const newAccountCounterpart = newAccountData.costCenters.find((currentItem) => currentItem.name === costCenter.name)
+        }
+
+        return discrepencies
+    }
+
 }

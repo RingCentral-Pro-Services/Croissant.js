@@ -1,4 +1,5 @@
 import { Button, Loader } from "@mantine/core";
+import { IconDownload } from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
 import useExportPrettyExcel from "../../../../hooks/useExportPrettyExcel";
 import useLogin from "../../../../hooks/useLogin";
@@ -149,7 +150,15 @@ const AutoAudit = () => {
         
         const newTargetSelected: Extension[] = []
         for (const extension of filteredExtensions) {
-            const targetExtension = newExtensions.find((newExtension) => newExtension.data.name === extension.data.name && newExtension.data.type === extension.data.type && newExtension.data.site?.name === extension.data.site?.name)
+            let targetExtension = null
+
+            if (isMultiSiteEnabled) {
+                targetExtension = newExtensions.find((newExtension) => newExtension.data.name === extension.data.name && newExtension.data.type === extension.data.type && newExtension.data.site?.name === extension.data.site?.name)
+            }
+            else {
+                targetExtension = newExtensions.find((newExtension) => newExtension.data.name === extension.data.name && newExtension.data.type === extension.data.type)
+            }
+
             if (targetExtension) {
                 newTargetSelected.push(targetExtension)
             }
@@ -196,6 +205,15 @@ const AutoAudit = () => {
     return (
         <>
             <Header title="Auto Audit" body="" />
+
+            <ToolCard>
+                <h2>Things to know</h2>
+
+                <ol>
+                    <li>Putting the old account and new account IDs in the wrong field will yield incorrect audit results</li>
+                </ol>
+            </ToolCard>
+
             <ToolCard>
                 <h2>Accounts</h2>
 
@@ -215,9 +233,9 @@ const AutoAudit = () => {
                     <UIDInputField disabled={hasNewAccountToken} disabledText={newCompanyName} setTargetUID={setNewAccountUID} loading={isNewAccountTokenPending} error={newAccountTokenError} />
                 </div>
 
-                <Button disabled={isPullingData} onClick={handleAuditButtonClick}>Audit</Button>
+                <Button disabled={!hasCustomerToken || selectedExtensionTypes.length === 0 || isPullingData} onClick={handleAuditButtonClick}>Audit</Button>
 
-                <Button variant='outline' className="healthy-margin-left" onClick={handleExportButtonClick}>Export Discrepencies</Button>
+                <Button variant='outline' className="healthy-margin-left" onClick={handleExportButtonClick} rightIcon={<IconDownload />}>Export Discrepencies</Button>
             </ToolCard>
 
             <ToolCard>
