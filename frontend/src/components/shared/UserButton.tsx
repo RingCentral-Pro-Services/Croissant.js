@@ -27,13 +27,14 @@ import {
     name: string;
     email: string;
     icon?: React.ReactNode;
+    onClick?: () => void
   }
   
-  export function UserButton({ image, name, email, icon, ...others }: UserButtonProps) {
+  export function UserButton({ image, name, email, icon, onClick, ...others }: UserButtonProps) {
     const { classes } = useStyles();
   
     return (
-      <UnstyledButton className={classes.user} {...others}>
+      <UnstyledButton className={classes.user} onClick={onClick} {...others}>
         <Group>
           {/* <Avatar src={null} placeholder={name} radius="xl" />*/}
   

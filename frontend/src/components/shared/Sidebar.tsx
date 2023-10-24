@@ -28,6 +28,7 @@ import { UserButton } from "./UserButton";
 
 import { useAtomValue } from 'jotai'
 import { userAtom } from "../../App";
+import Modal from "./Modal";
 
 const mockdata = [
     {
@@ -159,8 +160,20 @@ const mockdata = [
     const { classes } = useStyles();
     const links = mockdata.map((item) => <LinksGroup {...item} key={item.label} />);
     const user = useAtomValue(userAtom)
+    const [isShowingSignOutModal, setIsShowingSignOutModal] = useState(false)
+
+    const handleSignOutButtonClick = () => {
+      localStorage.removeItem('rc_access_token')
+      localStorage.removeItem('rc_refresh_token')
+      localStorage.removeItem('rc_token_expiry')
+      let url = `${process.env.REACT_APP_AUTH_BASE}&client_id=${process.env.REACT_APP_CLIENT_ID}&redirect_uri=${process.env.REACT_APP_AUTH_REDIRECT}&state=create-ivr`
+      window.location.replace(url)
+    }
   
     return (
+      <>
+      <Modal open={isShowingSignOutModal} setOpen={setIsShowingSignOutModal} handleAccept={handleSignOutButtonClick} title='Sign out?' body='Do you want to sign out and be redirected to the login page?' rejectLabel='No, go back' acceptLabel='Yes, sign out' />
+
       <Navbar sx={{position: 'fixed'}} width={{ sm: 250 }} p="md" className={classes.navbar}>
         <Navbar.Section className={classes.header}>
           <Group position="apart">
@@ -178,9 +191,11 @@ const mockdata = [
             image="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=255&q=80"
             name={user.name}
             email={user.email}
+            onClick={() => setIsShowingSignOutModal(true)}
           />
         </Navbar.Section>
       </Navbar>
+      </>
     );
   }
 
