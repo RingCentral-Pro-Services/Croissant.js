@@ -174,7 +174,7 @@ const AutoAudit = () => {
         // console.log('Compare result')
         // console.log(result)
         const auditor = new Auditor(postMessage)
-        const issues = auditor.compareAccounts(originalAccountData, newAccountData)
+        const issues = auditor.compareAccounts(originalAccountData, newAccountData, selectedExtensionTypes)
         setDiscrepencies(issues)
     }
 

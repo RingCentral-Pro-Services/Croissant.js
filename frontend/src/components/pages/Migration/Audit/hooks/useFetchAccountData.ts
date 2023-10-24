@@ -3,6 +3,7 @@ import { Extension } from "../../../../../models/Extension"
 import { Message } from "../../../../../models/Message"
 import { SyncError } from "../../../../../models/SyncError"
 import useFetchERLs from "../../../Automatic Location Updates/hooks/useFetchERLs"
+import { ERL } from "../../../Automatic Location Updates/models/ERL"
 import { Device, PhoneNumber, UserDataBundle } from "../../User Data Download/models/UserDataBundle"
 import useAccountDevices from "../../Users/hooks/useAccountDevices"
 import useCompanyNumbers from "../../Users/hooks/useCompanyNumbers"
@@ -54,7 +55,8 @@ export interface AccountData {
     callRecordingSettings?: CallRecordingDataBundle,
     mainSite?: SiteDataBundle,
     phoneNumbers: PhoneNumber[]
-    users: UserDataBundle[]
+    users: UserDataBundle[],
+    erls: ERL[]
 }
 
 const useAccountData = (settings: AuditSettings, selectedExtensionTypes: string[], selectedSiteNames: string[], selectedExtensions: Extension[], postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
@@ -100,7 +102,8 @@ const useAccountData = (settings: AuditSettings, selectedExtensionTypes: string[
             callRecordingSettings: undefined,
             mainSite: undefined,
             phoneNumbers: [],
-            users: []
+            users: [],
+            erls: []
         }
 
         // Devices
@@ -110,6 +113,9 @@ const useAccountData = (settings: AuditSettings, selectedExtensionTypes: string[
         // Company numbers
         const numbers = await fetchCompanyNumbers()
         accountData.phoneNumbers = numbers
+
+        const erls = await fetchERLs()
+        accountData.erls = erls
 
         // Main site
         if (settings.shouldMigrateSites && selectedSiteNames.includes('Main Site')) {
