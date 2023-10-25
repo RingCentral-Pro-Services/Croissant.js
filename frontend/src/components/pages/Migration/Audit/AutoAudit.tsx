@@ -235,7 +235,7 @@ const AutoAudit = () => {
 
                 <Button disabled={!hasCustomerToken || selectedExtensionTypes.length === 0 || isPullingData} onClick={handleAuditButtonClick}>Audit</Button>
 
-                <Button variant='outline' className="healthy-margin-left" onClick={handleExportButtonClick} rightIcon={<IconDownload />}>Export Discrepencies</Button>
+                <Button variant='outline' className="healthy-margin-left" onClick={handleExportButtonClick} rightIcon={<IconDownload />}>Export Discrepancies</Button>
             </ToolCard>
 
             <ToolCard>
