@@ -29,7 +29,7 @@ const useReadDeviceData = (postMessage: (message: Message) => void, postTimedMes
             }
 
             const deviceType = item['Device Type'] ?? ''
-            const deviceData = deviceDictionary.find((deviceModel) => deviceModel.model.name === deviceType || deviceModel.model.name.replaceAll(' ', '').includes(deviceType.replaceAll(' ', '')))
+            const deviceData = deviceDictionary.find((deviceModel) => deviceModel.model.name === deviceType)
 
             if (!deviceData) {
                 postMessage(new Message(`Device mode '${deviceType}' was not found. Ext. ${extensionNumber}'s device will not be updated`, 'error'))
