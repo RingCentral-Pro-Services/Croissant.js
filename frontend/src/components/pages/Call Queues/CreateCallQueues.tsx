@@ -6,7 +6,7 @@ import useExtensionList from "../../../rcapi/useExtensionList"
 import useExcelToQueues from "../../../rcapi/useExcelToQueues"
 import useCreateCallQueues from "../../../rcapi/useCreateCallQueues"
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage"
-import {Button} from '@mantine/core'
+import {Button, Modal} from '@mantine/core'
 import FeedbackArea from "../../shared/FeedbackArea"
 import UIDInputField from "../../shared/UIDInputField"
 import useGetAccessToken from "../../../rcapi/useGetAccessToken"
@@ -21,6 +21,8 @@ import useCallQueue from "./hooks/useCallQueue"
 import LaunchIcon from '@mui/icons-material/Launch';
 import { IconExternalLink } from "@tabler/icons-react"
 import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel"
+import CallQueue from "../../../models/CallQueue"
+import { sanitize } from "../../../helpers/Sanatize"
 
 const CreateCallQueues = () => {
     let [isPending, setIsPending] = useState(true)
@@ -28,6 +30,8 @@ const CreateCallQueues = () => {
     const [targetUID, setTargetUID] = useState('')
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
     const [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
+    const [isShowingWarningModal, setIsShowingWarningModal] = useState(false)
+    const [existingQueues, setExistingQueues] = useState<CallQueue[]>([])
     const [selectedFile, setSelectedFile] = useState<File | null>()
     const [selectedSheet, setSelectedSheet] = useState<string>('')
 
@@ -93,9 +97,41 @@ const CreateCallQueues = () => {
     useEffect(() => {
         if (isQueueConvertPending) return
         setIsPending(false)
+        const existingQueues = getExistingQueues(queues)
+        if (existingQueues.length !== 0) {
+            setExistingQueues(existingQueues)
+            setIsShowingWarningModal(true)
+        }
+        console.log('Existing queues')
+        console.log(existingQueues)
+
         console.log('Queues')
         console.log(queues)
     }, [isQueueConvertPending])
+
+    const getExistingQueues = (queues: CallQueue[]) => {
+        const existingExtensionNumbers = extensionsList.filter((ext) => ext.extensionNumber && ext.prettyType[ext.type] === 'Call Queue').map((ext) => `${ext.extensionNumber}`)
+        const existingQueues: CallQueue[] = []
+
+        console.log('Existing extension numbers:')
+        console.log(existingExtensionNumbers)
+
+        const ivrExtensions = queues.filter((ext) => ext.extension.extensionNumber).map((ext) => ext.extension.extensionNumber)
+        console.log('Queue Extensions')
+        console.log(ivrExtensions)
+
+        for (const queue of queues) {
+            if (existingExtensionNumbers.includes(`${queue.extension.extensionNumber}`)) {
+                existingQueues.push(queue)
+            }
+        }
+
+        return existingQueues
+    }
+
+    const handleExportExistingQueuesClick = () => {
+        writePrettyExcel([], existingQueues, 'Call Queues', `overlapping-queues-${sanitize(companyName)}.xlsx`, '/call-queue-template.xlsx')
+    }
 
     const handleTemplateDownloadClick = () => {
         writePrettyExcel([], [], 'Call Queues', 'queues.xlsx', '/call-queue-template.xlsx')
@@ -103,6 +139,22 @@ const CreateCallQueues = () => {
 
     return (
         <>
+            <Modal opened={isShowingWarningModal} onClose={ () => setIsShowingWarningModal(false)} title="Overlapping Queues " closeOnClickOutside={false}>
+                <p>Warning! Due to overlapping extension numbers, uploading this file will overwrite {existingQueues.length} Queues that already exist in the account. Please review your file carefully to prevent any unintended changes.</p>
+                <p>Overlapping IVRs:</p>
+                <div className="modal-content">
+                    <ul>
+                        {existingQueues.map((menu) => (
+                            <li key={menu.extension.extensionNumber}>{menu.extension.name} Ext. {menu.extension.extensionNumber}</li>
+                        ))}
+                    </ul>
+                </div>
+                <div className="modal-buttons">
+                    <Button variant='outline' onClick={handleExportExistingQueuesClick}>Export Overlapping Queues</Button>
+                    <Button className="healthy-margin-left" onClick={() => setIsShowingWarningModal(false)}>Okay</Button>
+                </div>
+            </Modal>
+
             <Header title="Create Call Queues" body="Create and update call queues in bulk" documentationURL='https://dqgriffin.com/blog/3IfuqLAoOfN2fPXXFh19'>
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
