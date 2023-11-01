@@ -10,7 +10,7 @@ import useCreateIVRs from "../../../rcapi/useCreateIVRs";
 import useReadLucidchart from "../../../hooks/useReadLucidchart";
 import { IVRMenu } from "../../../models/IVRMenu";
 import useFilterServices from "../../../hooks/useFilterServices";
-import { Button } from '@mantine/core'
+import { Button, Modal } from '@mantine/core'
 import FeedbackArea from "../../shared/FeedbackArea";
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
 import useGetAudioPrompts from "../../../rcapi/useGetAudioPrompts";
@@ -26,6 +26,8 @@ import { ExcelDataProvider } from "../../../helpers/ExcelDataProvider";
 import { ZodValidator } from "../../../helpers/ZodValidator";
 import { IVRTransformer } from "./models/IVRTransformer";
 import { MessageQueue } from "../../../models/Transformer";
+import useWriteExcelFile from "../../../hooks/useWriteExcelFile";
+import { sanitize } from "../../../helpers/Sanatize";
 
 const DirectCreateMenus = () => {
     useLogin('create-ivr')
@@ -33,7 +35,9 @@ const DirectCreateMenus = () => {
     let [targetUID, setTargetUID] = useState("")
     let [isReadyToSync, setReadyToSync] = useState(false)
     let [isPending, setIsPending] = useState(false)
+    const [isShowingWarningModal, setIsShowingWarningModal] = useState(false)
     const [menus, setMenus] = useState<IVRMenu[]>([])
+    const [existingMenus, setExistingMenus] = useState<IVRMenu[]>([])
     let {messages, errors, postMessage, postError} = useMessageQueue()
     const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError} = useGetAccessToken()
     const { extensionsList, isExtensionListPending, isMultiSiteEnabled, fetchExtensions } = useExtensionList(postMessage)
@@ -60,6 +64,8 @@ const DirectCreateMenus = () => {
     const [maxProgressValue, setMaxProgressValue] = useState(0)
     const {createMenus, isSyncing} = useCreateIVRs(setProgressValue, postMessage, postTimedMessage, postError, isMultiSiteEnabled)
 
+    const {writeExcel} = useWriteExcelFile()
+
     const handleFileSelect = async () => {
         if (!selectedFile) return
 
@@ -79,10 +85,37 @@ const DirectCreateMenus = () => {
         const processedMenus = await pipeline.run()
         console.log('Processed menus')
         console.log(processedMenus)
+
+        const existingMenus = getExistingMenus(processedMenus)
+        if (existingMenus.length !== 0) {
+            setExistingMenus(existingMenus)
+            setIsShowingWarningModal(true)
+        }
+
         setFilteredMenus(processedMenus)
         setMenus(processedMenus)
         setReadyToSync(true)
         setIsPending(false)
+    }
+
+    const getExistingMenus = (menus: IVRMenu[]) => {
+        const existingExtensionNumbers = extensionsList.filter((ext) => ext.extensionNumber && ext.prettyType[ext.type] === 'IVR Menu').map((ext) => `${ext.extensionNumber}`)
+        const existingMenus: IVRMenu[] = []
+
+        console.log('Existing extension numbers:')
+        console.log(existingExtensionNumbers)
+
+        const ivrExtensions = menus.filter((ext) => ext.data.extensionNumber).map((ext) => ext.data.extensionNumber)
+        console.log('IVR Extensions')
+        console.log(ivrExtensions)
+
+        for (const menu of menus) {
+            if (existingExtensionNumbers.includes(`${menu.data.extensionNumber}`)) {
+                existingMenus.push(menu)
+            }
+        }
+
+        return existingMenus
     }
 
     const handleSyncButtonClick = () => {
@@ -92,6 +125,13 @@ const DirectCreateMenus = () => {
         createMenus(filterMenus, extensionsList)
         fireEvent('create-menu')
         // createMenus(menus, extensionsList)
+    }
+
+    const handleExportExistingMenusClick = () => {
+        let header = ['Menu Name', 'Menu Ext', 'Phone Number', 'Site', 'Prompt Mode', 'Prompt Name/Script', 'Key 1 Action', 'Key 1 Destination', 'Key 2 Action', 'Key 2 Destination', 'Key 3 Action', 'Key 3 Destination',
+                     'Key 4 Action', 'Key 4 Destination', 'Key 5 Action', 'Key 5 Destination', 'Key 6 Action', 'Key 6 Destination', 'Key 7 Action', 'Key 7 Destination',
+                     'Key 8 Action', 'Key 8 Destination', 'Key 9 Action', 'Key 9 Destination', 'Key 0 Action', 'Key 0 Destination', 'Key # Press', 'Key * Press']
+        writeExcel(header, existingMenus, 'Overlapping IVRs', `overlapping-ivrs-${sanitize(companyName)}.xlsx`)
     }
 
     useEffect(() => {
@@ -174,6 +214,22 @@ const DirectCreateMenus = () => {
     
     return (
         <div>
+            <Modal opened={isShowingWarningModal} onClose={ () => setIsShowingWarningModal(false)} title="Overlapping IVRs " closeOnClickOutside={false}>
+                <p>Warning! Due to overlapping extension numbers, uploading this file will overwrite {existingMenus.length} IVRs that already exist in the account. Please review your file carefully to prevent any unintended changes.</p>
+                <p>Overlapping IVRs:</p>
+                <div className="modal-content">
+                    <ul>
+                        {existingMenus.map((menu) => (
+                            <li key={menu.data.extensionNumber}>{menu.data.name} Ext. {menu.data.extensionNumber}</li>
+                        ))}
+                    </ul>
+                </div>
+                <div className="modal-buttons">
+                    <Button variant='outline' onClick={handleExportExistingMenusClick}>Export Overlapping IVRs</Button>
+                    <Button className="healthy-margin-left" onClick={() => setIsShowingWarningModal(false)}>Okay</Button>
+                </div>
+            </Modal>
+
             <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} loading={isTokenPending} error={tokenError} />
             <FileSelect enabled={hasCustomerToken} accept=".xlsx, .csv" handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={isPending} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
             {isDisplayingFilterBox ? <AdaptiveFilter title='Pages' placeholder='Search...' setSelected={setSelectedSites} options={pages.map((page) => page.label)} defaultSelected={pages.map((page) => page.label)} /> : <></>}

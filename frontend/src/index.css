@@ -502,3 +502,13 @@ html, body {
 .error-container > h2 {
   margin: 0;
 }
+
+.modal-content {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.modal-buttons {
+  display: flex;
+  margin-top: 10px;
+}
