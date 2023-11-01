@@ -22,6 +22,7 @@ import { Device } from "../Migration/User Data Download/models/UserDataBundle";
 import useReadDeviceData from "./hooks/useReadDeviceData";
 import useUploadDevice from "./hooks/useUploadDevice";
 import * as Excel from 'exceljs'
+import useCreateUnassignedDevices from "./hooks/useCreateUnassignedDevices";
 
 const UploadDevices = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -43,7 +44,8 @@ const UploadDevices = () => {
     const {fetchDeviceDictionary} = useDeviceDictionary(postMessage, postTimedMessage, postError)
     const {validate, validatedData, isDataValidationPending} = useValidateExcelData(deviceUploadSchema, postMessage, postError)
     const {readDevices, isDeviceReadPending, prospectiveDevices} = useReadDeviceData(postMessage, postTimedMessage, postError)
-    const {uploadDevice} = useUploadDevice(postMessage, postTimedMessage, postError)
+    const {uploadDevice, uploadUnassignedDevice} = useUploadDevice(postMessage, postTimedMessage, postError)
+    const {createDevices} = useCreateUnassignedDevices(postMessage, postTimedMessage, postError)
     const {writePrettyExcel} = useWritePrettyExcel()
 
     const handleFileSelect = () => {
@@ -77,6 +79,8 @@ const UploadDevices = () => {
 
     useEffect(() => {
         if (isDataValidationPending) return
+        console.log('Valid data')
+        console.log(validatedData)
         readDevices(validatedData, deviceDictionary, extensionsList)
     }, [isDataValidationPending])
 
@@ -89,9 +93,21 @@ const UploadDevices = () => {
 
     const handleSyncButtonClick = async () => {
         setIsSyncing(true)
-        for (const device of prospectiveDevices) {
+
+        const unassignedDevices = prospectiveDevices.filter((device) => device.data.extension.data.name === 'Unassigned')
+        const assignedDevices = prospectiveDevices.filter((device) => device.data.extension.data.name !== 'Unassigned')
+        const unassignedDeviceIDs = await createDevices(unassignedDevices.length)
+
+        for (const device of assignedDevices) {
             await uploadDevice(device)
             setProgressValue((prev) => prev + 1)
+        }
+
+        for (const device of unassignedDevices) {
+            if (unassignedDeviceIDs.length !== 0) {
+                await uploadUnassignedDevice(device, unassignedDeviceIDs.pop()!)
+                setProgressValue((prev) => prev + 1)
+            }
         }
     }
 
@@ -119,6 +135,7 @@ const UploadDevices = () => {
             <ToolCard>
                 <p>Things to know</p>
                 <ul>
+                    <li>You can upload devices as unassigned by omitting the extension number</li>
                     <li>Extensions must have an "existing device" in service web before running this tool</li>
                     <li>The tool will not work if the extension has anything other than an "existing device"</li>
                     <li>Do not try to use a device that isn't listed in the dropdown</li>

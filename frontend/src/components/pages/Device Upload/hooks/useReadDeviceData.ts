@@ -14,7 +14,26 @@ const useReadDeviceData = (postMessage: (message: Message) => void, postTimedMes
 
         for (const item of excelData) {
             const extensionNumber = item['Extension']
-            const extension = extensions.find((ext) => `${ext.data.extensionNumber}` === `${extensionNumber}`)
+            let extension = extensions.find((ext) => `${ext.data.extensionNumber}` === `${extensionNumber}`)
+
+            if (!extensionNumber) {
+                // The user did not supply an extension number.
+                // The devcie will be uploaded, but not assigned to an extension
+
+                const unassigned = new Extension({
+                    name: 'Unassigned',
+                    contact: {
+                        firstName: 'Unassigned',
+                        email: 'Unassigned'
+                    },
+                    extensionNumber: 'Unassigned',
+                    status: 'Unassigned',
+                    type: 'User',
+                    id: 'Unassigned'
+                })
+
+                extension = unassigned
+            }
 
             if (!extension) {
                 postMessage(new Message(`Ext. ${extensionNumber} was not found in the account`, 'error'))

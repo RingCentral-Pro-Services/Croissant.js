@@ -338,7 +338,7 @@ export const accountIDSchema = z.object({
 })
 
 export const deviceUploadSchema = z.object({
-    'Extension': z.coerce.string(),
+    'Extension': z.coerce.string().optional(),
     'Device Type': z.string(),
     'MAC Address': z.string(),
     'Device Name': z.coerce.string().optional()

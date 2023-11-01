@@ -31,6 +31,18 @@ const useUploadDevice = (postMessage: (message: Message) => void, postTimedMessa
         }
     }
 
+    const uploadUnassignedDevice = async (prospectiveDevice: ProspectiveDevice, id: string) => {
+        const accessToken = localStorage.getItem('cs_access_token')
+        if (!accessToken) {
+            throw new Error('No access token')
+        }
+
+        const deviceID = await setUnassignedDevice(prospectiveDevice, id, accessToken)
+        if (deviceID) {
+            await setDeviceName(prospectiveDevice, deviceID, accessToken)
+        }
+    }
+
     const getDeviceIDs = async (extension: Extension, token: string) => {
         try {
             const headers = {
@@ -115,6 +127,53 @@ const useUploadDevice = (postMessage: (message: Message) => void, postTimedMessa
         }
     }
 
+    const setUnassignedDevice = async (device: ProspectiveDevice, id: string, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+
+            const devicePayload: DeviceModelPayload = {
+                deviceId: id,
+                serial: device.data.macAddress,
+                model: {
+                    id: device.data.modelID
+                }
+            }
+
+            const body = {
+                records: [devicePayload]
+            }
+            
+            const response = await RestCentral.post(baseDeviceModelURL, headers, body)
+
+            if (response.data.records[0].error) {
+                postMessage(new Message(`Failed to set unassigned device. ${response.data.records[0].error.message}`, 'error'))
+                postError(new SyncError('Unassigned', 'Unassigned', ['Failed to set unassigned device', device.data.macAddress], response.data.records[0].error.message))
+            }
+            
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+            return id
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to set unassigned device`)
+            console.log(e)
+            postMessage(new Message(`Failed to set unassigned device ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(device.data.extension.data.name, parseInt(device.data.extension.data.extensionNumber), ['Failed to set unassigned device', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+            return undefined
+        }
+    }
+
     const setDeviceName = async (device: ProspectiveDevice, id: string, token: string) => {
         if (!device.data.name || device.data.name === '') return 
         
@@ -149,7 +208,7 @@ const useUploadDevice = (postMessage: (message: Message) => void, postTimedMessa
         }
     }
 
-    return {uploadDevice}
+    return {uploadDevice, uploadUnassignedDevice}
 }
 
 export default useUploadDevice
