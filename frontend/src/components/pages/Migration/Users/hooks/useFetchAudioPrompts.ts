@@ -10,6 +10,7 @@ const useFetchAudioPrompts = (postMessage: (message: Message) => void, postTimed
     const {fetchPromptContent} = useFetchPromptContent(postMessage, postTimedMessage, postError)
 
     const fetchAudioPrompts = async (prompts: IVRAudioPrompt[]) => {
+        setProgressValue(0)
         setMaxProgress(prompts.length)
         for (let i = 0; i < prompts.length; i++) {
             await fetchPromptContent(prompts[i])

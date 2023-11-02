@@ -15,6 +15,7 @@ const useFetchLEs = (postMessage: (message: Message) => void, postTimedMessage: 
 
     const fetchLEs = async (extensions: Extension[]) => {
         const dataBundles: LimitedExtensionDataBundle[] = []
+        setProgressValue(0)
 
         setMaxProgress(extensions.length)
         for (const extension of extensions) {

@@ -24,6 +24,7 @@ const useFetchCallMonitoringGroups = (postMessage: (message: Message) => void, p
         // The actualGroups array contains on the actual call monitoring groups
         const actualGroups: CallMonitoringDataBundle[] = []
         if (!groups) return []
+        setProgressValue(0)
         setMaxProgress(groups.length)
 
         for (let i = 0; i < groups.length; i++) {

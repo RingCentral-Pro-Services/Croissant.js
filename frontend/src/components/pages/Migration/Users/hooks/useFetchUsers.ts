@@ -14,6 +14,7 @@ const useFetchUsers = (postMessage: (message: Message) => void, postTimedMessage
     const fetchUsers = async (users: Extension[], extensions: Extension[]) => {
         const dataBundles: UserDataBundle[] = []
 
+        setProgressValue(0)
         setMaxProgress(users.length)
         for (const extenson of users) {
             const bundle = new UserDataBundle(extenson, undefined)

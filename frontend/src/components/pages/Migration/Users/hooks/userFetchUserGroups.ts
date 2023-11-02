@@ -19,6 +19,7 @@ const useFetchUserGroups = (postMessage: (message: Message) => void, postTimedMe
         }
 
         const bundles = await fetchBaseData(accessToken)
+        setProgressValue(0)
         setMaxProgress(bundles.length)
 
         for (let i = 0; i < bundles.length; i++) {

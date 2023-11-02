@@ -14,6 +14,7 @@ import useJWKS from "../../../../rcapi/useJWKS";
 import AdaptiveFilter from "../../../shared/AdaptiveFilter";
 import FeedbackArea from "../../../shared/FeedbackArea";
 import Header from "../../../shared/Header";
+import ProgressBar from "../../../shared/ProgressBar";
 import ToolCard from "../../../shared/ToolCard";
 import UIDInputField from "../../../shared/UIDInputField";
 import useSiteList from "../Sites/hooks/useSiteList";
@@ -85,7 +86,8 @@ const AutoAudit = () => {
     
     const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError, userName} = useGetAccessToken()
     const {fetchToken: fetchNewAccountToken, hasCustomerToken: hasNewAccountToken, companyName: newCompanyName, isTokenPending: isNewAccountTokenPending, error: newAccountTokenError, userName: newAccountUserName} = useGetAccessToken()
-    const {fetchAccountData} = useAccountData(settings, selectedExtensionTypes, selectedSiteNames, selectedExtensions, postMessage, postTimedMessage, postError)
+    const {fetchAccountData, step, progressLabel, progressValue, maxProgress} = useAccountData(settings, selectedExtensionTypes, selectedSiteNames, selectedExtensions, postMessage, postTimedMessage, postError)
+    const {fetchAccountData: fetchNewAccountData, step: newAccountStep, progressLabel: newAccountProgressLabel, progressValue: newAccountProgressValue, maxProgress: newAccountMaxProgress} = useAccountData(settings, selectedExtensionTypes, selectedSiteNames, selectedExtensions, postMessage, postTimedMessage, postError)
 
     useEffect(() => {
         if (originalAccountUID.length < 5) return
@@ -165,7 +167,7 @@ const AutoAudit = () => {
         }
 
         const targetSelected = newExtensions.filter((ext) => ext.data.status !== 'Unassigned' && selectedExtensionTypes.includes(ext.prettyType()) && selectedSiteNames.includes(ext.data.site?.name ?? ''))
-        const newAccountData = await fetchAccountData(targetSites, newExtensions, newTargetSelected)
+        const newAccountData = await fetchNewAccountData(targetSites, newExtensions, newTargetSelected)
         console.log('New Account Data')
         console.log(newAccountData)
 
@@ -236,6 +238,11 @@ const AutoAudit = () => {
                 <Button disabled={!hasCustomerToken || selectedExtensionTypes.length === 0 || isPullingData} onClick={handleAuditButtonClick}>Audit</Button>
 
                 <Button variant='outline' className="healthy-margin-left" onClick={handleExportButtonClick} rightIcon={<IconDownload />}>Export Discrepancies</Button>
+
+                <div className="healthy-margin-top">
+                    {isPullingData ? <ProgressBar value={progressValue} max={maxProgress} label={`${progressLabel} (Step ${step} / 17)`} /> : <></>}
+                    {isPullingData ? <ProgressBar value={newAccountProgressValue} max={newAccountMaxProgress} label={`${newAccountProgressLabel} (Step ${newAccountStep} / 17)`} /> : <></>}
+                </div>
             </ToolCard>
 
             <ToolCard>

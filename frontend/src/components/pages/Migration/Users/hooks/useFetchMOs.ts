@@ -13,6 +13,7 @@ const useFetchMOs = (postMessage: (message: Message) => void, postTimedMessage: 
     const fetchMOs = async (extensions: Extension[]) => {
         const dataBundles: MessageOnlyDataBundle[] = []
 
+        setProgressValue(0)
         setMaxProgress(extensions.length)
 
         for (const extension of extensions) {

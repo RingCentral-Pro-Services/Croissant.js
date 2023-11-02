@@ -16,6 +16,7 @@ const useFetchCallQueues = (postMessage: (message: Message) => void, postTimedMe
             throw new Error('No access token')
         }
 
+        setProgressValue(0)
         setMaxProgress(extensions.length)
         const bundles: CallQueueDataBundle[] = []
         for (const extension of extensions) {

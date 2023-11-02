@@ -18,6 +18,7 @@ const useFetchParkLocations = (postMessage: (message: Message) => void, postTime
             throw new Error('No access token')
         }
 
+        setProgressValue(0)
         setMaxProgress(extensions.length)
         let bundles: ParkLocationDataBundle[] = []
         for (const extension of extensions) {

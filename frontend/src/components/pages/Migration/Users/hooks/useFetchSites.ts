@@ -23,6 +23,7 @@ const useFetchSites = (postMessage: (message: Message) => void, postTimedMessage
 
         const bundles: SiteDataBundle[] = []
 
+        setProgressValue(0)
         setMaxProgress(sites.length)
         for (const site of sites) {
             bundles.push(new SiteDataBundle(site))

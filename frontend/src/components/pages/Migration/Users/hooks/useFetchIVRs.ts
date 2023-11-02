@@ -16,6 +16,7 @@ const useFetchIVRs = (postMessage: (message: Message) => void, postTimedMessage:
             throw new Error('No access token')
         }
 
+        setProgressValue(0)
         setMaxProgress(extensions.length)
         const bundles: IVRDataBundle[] = []
         for (const extension of extensions) {

@@ -53,6 +53,7 @@ const useFetchMainSite = (postMessage: (message: Message) => void, postTimedMess
         await fetchBusinessHoursCallHandling(bundle, accessToken)
         await fetchAfterHoursCallHandling(bundle, accessToken)
         const rules = await fetchCustomRuleIDs(bundle, accessToken)
+        setProgressValue(0)
         setMaxProgress(rules.length)
         for (const rule of rules) {
             fetchCustomRule(bundle, rule.id, accessToken)
