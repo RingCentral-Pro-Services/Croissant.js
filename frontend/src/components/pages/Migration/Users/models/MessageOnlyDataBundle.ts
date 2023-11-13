@@ -6,6 +6,7 @@ import { Notifications, PhoneNumber } from "../../User Data Download/models/User
 export class MessageOnlyDataBundle implements ExcelFormattable {
     public hasEncounteredFatalError = false
     public tempExtension = ''
+    public vmRecipient = ''
     
     constructor(public extension: Extension, public extendedData?: ExtendedMOData, public phoneNumberMap?: Map<string, PhoneNumber>) {}
 
