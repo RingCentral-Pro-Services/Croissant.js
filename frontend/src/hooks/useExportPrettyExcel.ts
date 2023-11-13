@@ -22,6 +22,12 @@ const useExportPrettyExcel = () => {
 
         for (const sheet of sheetData) {
             const worksheet = book.getWorksheet(sheet.sheetName)
+
+            if (!worksheet) {
+                console.log(`Worksheet ${sheet.sheetName} not found`)
+                continue
+            }
+
             const excelData: string[][] = []
 
             for (const item of sheet.data) {
