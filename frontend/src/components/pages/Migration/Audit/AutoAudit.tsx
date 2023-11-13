@@ -1,4 +1,4 @@
-import { Button, Loader } from "@mantine/core";
+import { Button } from "@mantine/core";
 import { IconDownload } from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
 import useExportPrettyExcel from "../../../../hooks/useExportPrettyExcel";
@@ -7,7 +7,6 @@ import useMessageQueue from "../../../../hooks/useMessageQueue";
 import usePostTimedMessage from "../../../../hooks/usePostTimedMessage";
 import { DataGridFormattable } from "../../../../models/DataGridFormattable";
 import { Extension } from "../../../../models/Extension";
-import { Message } from "../../../../models/Message";
 import useExtensions from "../../../../rcapi/useExtensions";
 import useGetAccessToken from "../../../../rcapi/useGetAccessToken";
 import useJWKS from "../../../../rcapi/useJWKS";
@@ -18,10 +17,21 @@ import ProgressBar from "../../../shared/ProgressBar";
 import ToolCard from "../../../shared/ToolCard";
 import UIDInputField from "../../../shared/UIDInputField";
 import useSiteList from "../Sites/hooks/useSiteList";
-import { compareObjects } from "./helpers/AuditEngine";
-import { Auditor } from "./helpers/Auditor";
 import useAccountData, { AccountData } from "./hooks/useFetchAccountData";
 import { AuditDiscrepency } from "./models/AuditDiscrepency";
+import { UserDataRow } from "../User Data Download/models/UserDataRow";
+import { AuditSitePair } from "./models/AuditSitePair";
+import { AuditLePair } from "./models/AuditLePair";
+import { AuditErlPair } from "./models/AuditErlPair";
+import { AuditIvrPair } from "./models/AuditIvrPair";
+import { AuditMoPair } from "./models/AuditMoPair";
+import { AuditQueuePair } from "./models/AuditQueuePair";
+import { AuditCallMonitoringGroupPair } from "./models/AuditCallMonitoringGroupPair";
+import { AuditParkLocationPair } from "./models/AuditParkLocationPair";
+import { AuditUserGroupPair } from "./models/AuditUserGroupPair";
+import { AuditPromptPair } from "./models/AuditPromptPair";
+import { AuditCallRecordingPair } from "./models/AuditCallRecordingPair";
+import { AuditUserRowPair } from "./models/AuditUserRowPair";
 
 export interface AuditSettings {
     shouldOverrideSites: boolean,
@@ -39,6 +49,8 @@ const AutoAudit = () => {
     const [originalAccountUID, setOriginalAccountUID] = useState("")
     const [newAccountUID, setNewAccountUID] = useState("")
     const [isPullingData, setIsPullingData] = useState(false)
+    const [originalAccountData, setOriginalAccountData] = useState<AccountData>()
+    const [newAccountData, setNewAccountData] = useState<AccountData>()
     const [siteNames, setSiteNames] = useState<string[]>([])
     const [selectedSiteNames, setSelectedSiteNames] = useState<string[]>([])
     const [selectedExtensionTypes, setSelectedExtensionTypes] = useState<string[]>([])
@@ -47,8 +59,7 @@ const AutoAudit = () => {
     const [isDoneFetchingSites, setIsDoneFetchingSites] = useState(false)
     const [isDoneFetchingTargetSites, setIsDoneFetchingTargetSites] = useState(false)
     const [shouldShowSiteFilter, setShouldShowSiteFilter] = useState(false)
-    const [discrepencies, setDiscrepencies] = useState<AuditDiscrepency[]>([])
-    const supportedExtensionTypes = ['ERLs', 'Custom Roles', 'Call Recording Settings', 'Cost Centers', 'User', 'Limited Extension', 'Call Queue', 'IVR Menu', 'Prompt Library', 'Message-Only', 'Announcement-Only', 'Call Monitoring Groups', 'Park Location', 'User Group']
+    const supportedExtensionTypes = ['ERLs', 'Call Recording Settings', 'User', 'Limited Extension', 'Call Queue', 'IVR Menu', 'Prompt Library', 'Message-Only', 'Announcement-Only', 'Call Monitoring Groups', 'Park Location', 'User Group']
     const [settings, setSettings] = useState<AuditSettings>({
         shouldOverrideSites: false,
         shouldRemoveSites: false,
@@ -108,9 +119,9 @@ const AutoAudit = () => {
     }, [hasCustomerToken])
 
     useEffect(() => {
-        if (isFetchingSites) return
+        if (!hasCustomerToken) return
         fetchOriginalExtensions()
-    }, [isFetchingSites])
+    }, [hasCustomerToken])
 
     useEffect(() => {
         if (isOriginalExtensionListPending) return
@@ -144,6 +155,7 @@ const AutoAudit = () => {
         setIsPullingData(true)
         const originalSelected = originalExtensionList.filter((ext) => ext.data.status !== 'Unassigned' && selectedExtensionTypes.includes(ext.prettyType()) && selectedSiteNames.includes(ext.data.site?.name ?? ''))
         const originalAccountData = await fetchAccountData(sites, originalExtensionList, filteredExtensions)
+        setOriginalAccountData(originalAccountData)
         console.log('Old Account Data')
         console.log(originalAccountData)
         await fetchTargetToken(newAccountUID)
@@ -168,16 +180,9 @@ const AutoAudit = () => {
 
         const targetSelected = newExtensions.filter((ext) => ext.data.status !== 'Unassigned' && selectedExtensionTypes.includes(ext.prettyType()) && selectedSiteNames.includes(ext.data.site?.name ?? ''))
         const newAccountData = await fetchNewAccountData(targetSites, newExtensions, newTargetSelected)
+        setNewAccountData(newAccountData)
         console.log('New Account Data')
         console.log(newAccountData)
-
-        // const auditEngine = new AuditEngine()
-        // const result = compareObjects(originalAccountData.ivrs[0], newAccountData.ivrs[0])
-        // console.log('Compare result')
-        // console.log(result)
-        const auditor = new Auditor(postMessage)
-        const issues = auditor.compareAccounts(originalAccountData, newAccountData, selectedExtensionTypes)
-        setDiscrepencies(issues)
     }
 
     const handleFilterSelection = (selected: DataGridFormattable[]) => {
@@ -188,19 +193,269 @@ const AutoAudit = () => {
         setFilteredExtensions(extensions)
     }
 
-    const handleExportButtonClick = () => {
-        exportPrettyExcel([
+    const handleTemplateDownloadClick = async () => {
+
+        const originalUserRows: UserDataRow[] = []
+        const newUserRows: UserDataRow[] = []
+
+        console.log('original extension list')
+        console.log(originalExtensionList)
+
+        for (const bundle of originalAccountData?.users ?? []) {
+            for (const row of bundle.toRows()) {
+                originalUserRows.push(row)
+            }
+        }
+
+        for (const bundle of newAccountData?.users ?? []) {
+            for (const row of bundle.toRows()) {
+                newUserRows.push(row)
+            }
+        }
+
+        for (let siteBundle of originalAccountData?.sites ?? []) {
+            const businessHoursID = siteBundle.extendedData?.businessHoursCallHandling?.extension?.id ?? siteBundle.extendedData?.businessHoursCallHandling?.transfer?.extension?.id
+            if (businessHoursID) {
+                const extension = originalExtensionList.find((ext) => `${ext.data.id}` === businessHoursID)
+                if (extension) {
+                    siteBundle.businessHoursRecpient = `${extension.data.name} - Ext. ${extension.data.extensionNumber}`
+                }
+            }
+
+            const afterHoursID = siteBundle.extendedData?.afterHoursCallHandling?.extension?.id ?? siteBundle.extendedData?.afterHoursCallHandling?.transfer?.extension?.id
+            if (afterHoursID) {
+                const extension = originalExtensionList.find((ext) => `${ext.data.id}` === afterHoursID)
+                if (extension) {
+                    siteBundle.afterHoursRecipient = `${extension.data.name} - Ext. ${extension.data.extensionNumber}`
+                }
+            }
+        }
+
+        for (let siteBundle of newAccountData?.sites ?? []) {
+            const businessHoursID = siteBundle.extendedData?.businessHoursCallHandling?.extension?.id ?? siteBundle.extendedData?.businessHoursCallHandling?.transfer?.extension?.id
+            if (businessHoursID) {
+                const extension = targetExtensionList.find((ext) => `${ext.data.id}` === businessHoursID)
+                if (extension) {
+                    siteBundle.businessHoursRecpient = `${extension.data.name} - Ext. ${extension.data.extensionNumber}`
+                }
+            }
+
+            const afterHoursID = siteBundle.extendedData?.afterHoursCallHandling?.extension?.id ?? siteBundle.extendedData?.afterHoursCallHandling?.transfer?.extension?.id
+            if (afterHoursID) {
+                const extension = targetExtensionList.find((ext) => `${ext.data.id}` === afterHoursID)
+                if (extension) {
+                    siteBundle.afterHoursRecipient = `${extension.data.name} - Ext. ${extension.data.extensionNumber}`
+                }
+            }
+        }
+
+        for (let ivr of originalAccountData?.ivrs ?? []) {
+            if (ivr.extendedData?.ivrData?.prompt && ivr.extendedData.ivrData.prompt.mode === 'Audio' && ivr.extendedData.ivrData.prompt.audio) {
+                const originalPrompt = originalAccountData?.prompts.find((prompt) => prompt.id === ivr.extendedData?.ivrData?.prompt?.audio?.id)
+                if (!originalPrompt) continue
+                ivr.extendedData.ivrData.prompt.audio.displayName = originalPrompt.filename
+            }
+
+            if (ivr.extendedData?.ivrData?.actions) {
+                for (let action of ivr.extendedData!.ivrData!.actions) {
+                    if (action.extension) {
+                        const originalExtension = originalExtensionList.find((ext) => `${ext.data.id}` === action.extension?.id)
+                        if (!originalExtension) continue
+                        action.extension.extensionNumber = originalExtension.data.extensionNumber
+                    }
+                }
+            }
+        }
+
+        for (let ivr of newAccountData?.ivrs ?? []) {
+            if (ivr.extendedData?.ivrData?.prompt && ivr.extendedData.ivrData.prompt.mode === 'Audio' && ivr.extendedData.ivrData.prompt.audio) {
+                const originalPrompt = newAccountData?.prompts.find((prompt) => prompt.id === ivr.extendedData?.ivrData?.prompt?.audio?.id)
+                if (!originalPrompt) continue
+                ivr.extendedData.ivrData.prompt.audio.displayName = originalPrompt.filename
+            }
+
+            if (ivr.extendedData?.ivrData?.actions) {
+                for (let action of ivr.extendedData!.ivrData!.actions) {
+                    if (action.extension) {
+                        const originalExtension = targetExtensionList.find((ext) => `${ext.data.id}` === action.extension?.id)
+                        if (!originalExtension) continue
+                        action.extension.extensionNumber = originalExtension.data.extensionNumber
+                    }
+                }
+            }
+        }
+
+        for (let mo of originalAccountData?.messageOnlyExtensions ?? []) {
+            if (!mo.extendedData?.vmRecipientID) continue
+            const extension = originalExtensionList.find((ext) => `${ext.data.id}` == mo.extendedData?.vmRecipientID)
+            if (!extension) continue
+            mo.vmRecipient = `${extension.data.name} - Ext. ${extension.data.extensionNumber}`
+        }
+
+        for (let mo of newAccountData?.messageOnlyExtensions ?? []) {
+            if (!mo.extendedData?.vmRecipientID) continue
+            const extension = targetExtensionList.find((ext) => `${ext.data.id}` == mo.extendedData?.vmRecipientID)
+            if (!extension) continue
+            mo.vmRecipient = `${extension.data.name} - Ext. ${extension.data.extensionNumber}`
+        }
+
+
+        const auditSites: AuditSitePair[] = []
+        for (let site of originalAccountData?.sites ?? []) {
+            const newAccountCounterpart = newAccountData?.sites.find((currentSite) => currentSite.extension.name === site.extension.name)
+            auditSites.push(new AuditSitePair(site, newAccountCounterpart))
+        }
+
+        const auditLes: AuditLePair[] = []
+        for (const le of originalAccountData?.limitedExtensions ?? []) {
+            const newAccountCounterpart = newAccountData?.limitedExtensions.find((currentLE) => currentLE.extension.data.name === le.extension.data.name)
+            auditLes.push(new AuditLePair(le, newAccountCounterpart))
+        }
+
+        const auditErls: AuditErlPair[] = []
+        for (const erl of originalAccountData?.erls ?? []) {
+            const newAccountCounterpart = newAccountData?.erls.find((currentERL) => currentERL.name === erl.name)
+            auditErls.push(new AuditErlPair(erl, newAccountCounterpart))
+        }
+
+        const auditIvrs: AuditIvrPair[] = [];
+        for (const ivr of originalAccountData?.ivrs ?? []) {
+            const newAccountCounterpart = newAccountData?.ivrs.find((currentIVR) => currentIVR.extension.data.name === ivr.extension.data.name)
+            auditIvrs.push(new AuditIvrPair(ivr, newAccountCounterpart))
+        }
+
+        const auditMos: AuditMoPair[] = []
+        for (const mo of originalAccountData?.messageOnlyExtensions.filter((ext) => ext.extension.data.type === 'Voicemail') ?? []) {
+            const newAccountCounterpart = newAccountData?.messageOnlyExtensions.find((currentMO) => currentMO.extension.data.name === mo.extension.data.name)
+            auditMos.push(new AuditMoPair(mo, newAccountCounterpart))
+        }
+
+        const auditAos: AuditMoPair[] = []
+        for (const ao of originalAccountData?.messageOnlyExtensions.filter((ext) => ext.extension.data.type === 'Announcement') ?? []) {
+            const newAccountCounterpart = newAccountData?.messageOnlyExtensions.find((currentMO) => currentMO.extension.data.name === ao.extension.data.name)
+            auditAos.push(new AuditMoPair(ao, newAccountCounterpart))
+        }
+
+        const auditQueues: AuditQueuePair[] = []
+        for (const queue of originalAccountData?.callQueues ?? []) {
+            const newAccountCounterpart = newAccountData?.callQueues.find((currentQueue) => currentQueue.extension.data.name === queue.extension.data.name)
+            auditQueues.push(new AuditQueuePair(queue, newAccountCounterpart))
+        }
+
+        const auditCallMonitoring: AuditCallMonitoringGroupPair[] = []
+        for (const group of originalAccountData?.callMonitoring ?? []) {
+            const newAccountCounterpart = newAccountData?.callMonitoring.find((currentGroup) => currentGroup.data.name === group.data.name)
+            auditCallMonitoring.push(new AuditCallMonitoringGroupPair(group, newAccountCounterpart))
+        }
+
+        const auditParkLocations: AuditParkLocationPair[] = []
+        for (const parkLocation of originalAccountData?.parkLocations ?? []) {
+            const newAccountCounterpart = newAccountData?.parkLocations.find((currentParkLocation) => currentParkLocation.extension.data.name === parkLocation.extension.data.name)
+            auditParkLocations.push(new AuditParkLocationPair(parkLocation, newAccountCounterpart))
+        }
+
+        const auditUserGroups: AuditUserGroupPair[] = []
+        for (const group of originalAccountData?.userGroups ?? []) {
+            const newAccountCounterpart = newAccountData?.userGroups.find((currentGroup) => currentGroup.data.displayName === group.data.displayName)
+            auditUserGroups.push(new AuditUserGroupPair(group, newAccountCounterpart))
+        }
+
+        const auditPrompts: AuditPromptPair[] = []
+        for (const prompt of originalAccountData?.prompts ?? []) {
+            const newAccountCounterpart = newAccountData?.prompts.find((currentPrompt) => currentPrompt.filename === prompt.filename)
+            auditPrompts.push(new AuditPromptPair(prompt, newAccountCounterpart))
+        }
+
+        const auditCallRecordingSettings: AuditCallRecordingPair = new AuditCallRecordingPair(originalAccountData?.callRecordingSettings, newAccountData?.callRecordingSettings)
+
+        const auditUserRows: AuditUserRowPair[] = []
+        for (const user of originalAccountData?.users ?? []) {
+            const newAccountCounterpart = newAccountData?.users.find((currentUser) => currentUser.extension.data.name === user.extension.data.name)
+            const originalRows = user.toRows()
+
+            // The user doesn't exist in the new account
+            if (!newAccountCounterpart) {
+                for (const row of originalRows) {
+                    auditUserRows.push(new AuditUserRowPair(row, undefined))
+                }
+                continue
+            }
+
+            const newRows = newAccountCounterpart.toRows()
+            for (const originalRow of originalRows) {
+                if (originalRow.device && originalRow.device.type === 'WebRTC') continue
+                const newRow = newRows.find((row) => row.type === originalRow.type && row.device?.type === originalRow.device?.type && row.device?.name === originalRow.device?.name)
+                auditUserRows.push(new AuditUserRowPair(originalRow, newRow))
+            }
+        }
+
+        await exportPrettyExcel([
             {
-                sheetName: 'Discrepancies',
-                data: discrepencies,
-                startingRow: 3
+                sheetName: 'Sites (Audit)',
+                data: auditSites,
+                startingRow: 4
             },
             {
-                sheetName: 'Messages',
-                data: messages,
-                startingRow: 3
-            }
-        ], `audit-results-migration-${companyName}.xlsx`, '/migration-audit-template.xlsx')
+                sheetName: 'LEs (Audit)',
+                data: auditLes ?? [],
+                startingRow: 4
+            },
+            {
+                sheetName: 'ERL (Audit)',
+                data: auditErls,
+                startingRow: 4
+            },
+            {
+                sheetName: 'IVRs (Audit)',
+                data: auditIvrs,
+                startingRow: 4
+            },
+            {
+                sheetName: 'Message Only (Audit)',
+                data: auditMos,
+                startingRow: 4
+            },
+            {
+                sheetName: 'Announcement Only (Audit)',
+                data: auditAos,
+                startingRow: 4
+            },
+            {
+                sheetName: 'Call Queues (Audit)',
+                data: auditQueues,
+                startingRow: 5
+            },
+            {
+                sheetName: 'Call Monitoring Groups (Audit)',
+                data: auditCallMonitoring,
+                startingRow: 5
+            },
+            {
+                sheetName: 'Park Locations (Audit)',
+                data: auditParkLocations,
+                startingRow: 5
+            },
+            {
+                sheetName: 'User Groups (Audit)',
+                data: auditUserGroups,
+                startingRow: 5
+            },
+            {
+                sheetName: 'Prompt Library (Audit)',
+                data: auditPrompts,
+                startingRow: 5
+            },
+            {
+                sheetName: 'Call Recording Settings (Audit)',
+                data: [auditCallRecordingSettings],
+                startingRow: 5
+            },
+            {
+                sheetName: 'Users (Audit)',
+                data: auditUserRows,
+                startingRow: 5
+            },
+        ], 'migration-audit-template.xlsx', '/migration-audit-revamp.xlsx')
     }
 
 
@@ -237,7 +492,9 @@ const AutoAudit = () => {
 
                 <Button disabled={!hasCustomerToken || selectedExtensionTypes.length === 0 || isPullingData} onClick={handleAuditButtonClick}>Audit</Button>
 
-                <Button variant='outline' className="healthy-margin-left" onClick={handleExportButtonClick} rightIcon={<IconDownload />}>Export Discrepancies</Button>
+                {/* <Button variant='outline' className="healthy-margin-left" onClick={handleExportButtonClick} rightIcon={<IconDownload />}>Export Discrepancies</Button> */}
+
+                <Button variant='outline' className="healthy-margin-left" onClick={handleTemplateDownloadClick} rightIcon={<IconDownload />}>Export Template</Button>
 
                 <div className="healthy-margin-top">
                     {isPullingData ? <ProgressBar value={progressValue} max={maxProgress} label={`${progressLabel} (Step ${step} / 17)`} /> : <></>}

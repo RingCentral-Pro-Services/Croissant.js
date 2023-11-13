@@ -292,11 +292,6 @@ const useAccountData = (settings: AuditSettings, selectedExtensionTypes: string[
 
         setProgressLabel('Fetching IVR Prompts')
         let originalPrompts = await fetchOriginalAccountPrompts()
-        // Prompt library
-        if (selectedExtensionTypes.includes('Prompt Library')) {
-            setProgressLabel('Fetching prompts library')
-            await fetchAudioPrompts(originalPrompts)
-        }
         accountData.prompts = originalPrompts
         setStep((prev) => prev + 1)
         setMaxProgress(0)
