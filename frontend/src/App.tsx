@@ -43,6 +43,7 @@ import AutoAudit from './components/pages/Migration/Audit/AutoAudit';
 import UploadDevices from './components/pages/Device Upload/UploadDevices';
 import ManageCustomFields from './components/pages/Custom Fields/ManageCustomFields';
 import { AssignCustomFields } from './components/pages/Custom Fields/AssignCustomFields';
+import { CustomFields } from './components/pages/Custom Fields/CustomFields';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -147,8 +148,7 @@ function App() {
                 <Route path='/error' element={<FatalError />} />
                 <Route path='/autoaudit' element={<AutoAudit />} />
                 <Route path='/uploaddevices' element={<UploadDevices />} />
-                <Route path='/customfields' element={<ManageCustomFields />} />
-                <Route path='/assigncustomfields' element={<AssignCustomFields />} />
+                <Route path='/customfields' element={<CustomFields />} />
               </Routes>
             </Suspense>
           </ErrorBoundary>

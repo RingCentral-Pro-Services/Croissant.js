@@ -33,7 +33,7 @@ export const AssignCustomFields = () => {
     const [progressMax, setProgressMax] = useState(0)
     const defaultSheet = 'Custom Fields'
 
-    useLogin('assigncustomfields', isSyncing)
+    useLogin('customfields', isSyncing)
     const {fireEvent} = useAnalytics()
     const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError, userName} = useGetAccessToken()
     const {postMessage, postError, messages, errors} = useMessageQueue()
@@ -95,7 +95,6 @@ export const AssignCustomFields = () => {
 
     return (
         <>
-            <Header title="Assign custom fields" body="" />
             <ToolCard>
                 <h2>Assign Custom Fields</h2>
                 <UIDInputField 

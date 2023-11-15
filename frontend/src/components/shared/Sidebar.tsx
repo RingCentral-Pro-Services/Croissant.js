@@ -100,7 +100,6 @@ const mockdata = [
             { label: 'Edit Extensions', link: '/editextensions' },
             { label: 'Notifications', link: '/notificationsaudit' },
             { label: 'Custom Fields', link: '/customfields' },
-            { label: 'Assign Custom Fields', link: '/assigncustomfields' },
             { label: 'Desk Phones', link: '/deskphones' },
             { label: 'Intercom', link: '/intercom' },
             { label: 'Presense', link: '/presence' },

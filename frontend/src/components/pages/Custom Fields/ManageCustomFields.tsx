@@ -80,9 +80,7 @@ const ManageCustomFields = () => {
                 customField={editedCustomField}
                 onSubmit={handleModalSubmit}
                 handleDelete={handleDeleteClick}
-            />
-
-            <Header title="Manage Custom Fields" body="" />
+            />            
             <ToolCard>
                 <h2>Manage Custom Fields</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} error={tokenError} loading={isTokenPending} setTargetUID={setTargetUID} />
