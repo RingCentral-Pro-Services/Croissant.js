@@ -343,3 +343,18 @@ export const deviceUploadSchema = z.object({
     'MAC Address': z.string(),
     'Device Name': z.coerce.string().optional()
 })
+
+export const customFieldSchema = z.object({
+    'Custom Field Name': z.coerce.string({
+        required_error: 'Missing custom field name',
+        invalid_type_error: 'Missing custom field data type invalid'
+    }),
+    'Extension Number': z.coerce.string({
+        required_error: 'Missing extension number',
+        invalid_type_error: 'Extension number data type invalid'
+    }),
+    'Value': z.coerce.string({
+        required_error: 'Missing value',
+        invalid_type_error: 'Value data type invalid'
+    })
+})
