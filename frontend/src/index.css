@@ -512,3 +512,15 @@ html, body {
   display: flex;
   margin-top: 10px;
 }
+
+.card {
+  width: 350px;
+}
+
+.scroll-vertical {
+  overflow-y: auto;
+}
+
+.scroll-horizontal {
+  overflow-x: auto;
+}

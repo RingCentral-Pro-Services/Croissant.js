@@ -99,6 +99,8 @@ const mockdata = [
             { label: 'Delete Extensions', link: '/deleteextensions' },
             { label: 'Edit Extensions', link: '/editextensions' },
             { label: 'Notifications', link: '/notificationsaudit' },
+            { label: 'Custom Fields', link: '/customfields' },
+            { label: 'Assign Custom Fields', link: '/assigncustomfields' },
             { label: 'Desk Phones', link: '/deskphones' },
             { label: 'Intercom', link: '/intercom' },
             { label: 'Presense', link: '/presence' },
@@ -174,7 +176,7 @@ const mockdata = [
       <>
       <Modal open={isShowingSignOutModal} setOpen={setIsShowingSignOutModal} handleAccept={handleSignOutButtonClick} title='Sign out?' body='Do you want to sign out and be redirected to the login page?' rejectLabel='No, go back' acceptLabel='Yes, sign out' />
 
-      <Navbar sx={{position: 'fixed'}} width={{ sm: 250 }} p="md" className={classes.navbar}>
+      <Navbar sx={{position: 'fixed', zIndex: 1}} width={{ sm: 250 }} p="md" className={classes.navbar}>
         <Navbar.Section className={classes.header}>
           <Group position="apart">
             {/* <Logo width={rem(120)} /> */}
