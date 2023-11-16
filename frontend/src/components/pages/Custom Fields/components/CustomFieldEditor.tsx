@@ -37,6 +37,7 @@ export const CustomFieldEditor = (props: {isShowingModal: boolean, close: () => 
             id: customField.data.id
         }
         console.log(updatedCustomField)
+        setDeleteClicksRemaining(3)
         onSubmit(updatedCustomField)
         return
     }
@@ -53,9 +54,14 @@ export const CustomFieldEditor = (props: {isShowingModal: boolean, close: () => 
         props.handleDelete(customField.data)
     }
 
+    const handleClose = () => {
+        setDeleteClicksRemaining(3)
+        close()
+    }
+
     return (
         <>
-            <Modal opened={isShowingModal} onClose={() => close()} >
+            <Modal opened={isShowingModal} onClose={handleClose} >
                 <Input.Wrapper label="Name" description="Enter a name for the custom field" error="">
                     <Input value={inputValue} onChange={(e) => setInputValue(e.target.value)} />
                 </Input.Wrapper>
