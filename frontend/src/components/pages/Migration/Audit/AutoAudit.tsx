@@ -468,6 +468,8 @@ const AutoAudit = () => {
 
                 <ol>
                     <li>Putting the old account and new account IDs in the wrong field will yield incorrect audit results</li>
+                    <li>The tool will omit the .ps.ringcentral.com from email addresses so they match in the generated sheet</li>
+                    <li>The tool will omit the leading N from device serial numbers so they match in the generated sheet</li>
                 </ol>
             </ToolCard>
 
