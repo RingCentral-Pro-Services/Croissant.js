@@ -1,9 +1,15 @@
 import * as xlsx from 'xlsx'
+import { ExcelRange } from '../models/ExcelRange';
+
+export interface ExcelReaderOptions {
+    header?: number,
+    range?: ExcelRange,
+}
 
 export class ExcelReader {
     constructor(private file: File) { }
 
-    async read(sheetName: string): Promise<any[]> {
+    async read(sheetName: string, options?: ExcelReaderOptions): Promise<any[]> {
         const excelData: any[] = []
         const buffer = await this.file.arrayBuffer()
         let wb = xlsx.read(buffer);
@@ -11,7 +17,12 @@ export class ExcelReader {
         if (sheets.length === 1) {
             // Workbook only has one sheet, read it and return it
             const temp = xlsx.utils.sheet_to_json(
-                wb.Sheets[wb.SheetNames[0]])
+                wb.Sheets[wb.SheetNames[0]],
+                {
+                    ...(options?.header && { header: options.header }),
+                    ...(options?.range && { range: `${options.range.start}:${options.range.end}` })
+                }
+            )
             temp.forEach((res: any) => {
                 excelData.push(res)
             })
@@ -21,7 +32,12 @@ export class ExcelReader {
             for (let i = 0; i < sheets.length; i++) {
                 if (wb.SheetNames[i] === sheetName) {
                     const temp = xlsx.utils.sheet_to_json(
-                        wb.Sheets[wb.SheetNames[i]])
+                        wb.Sheets[wb.SheetNames[i]],
+                        {
+                            ...(options?.header && { header: options.header }),
+                            ...(options?.range && { range: `${options.range.start}:${options.range.end}` })
+                        }
+                    )
                     temp.forEach((res: any) => {
                         excelData.push(res)
                     })
