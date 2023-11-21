@@ -7,7 +7,7 @@ export class AuditLePair implements ExcelFormattable {
             newLeBundle.extension.data.contact.email = newLeBundle.extension.data.contact.email.replace('.ps.ringcentral.com', '')
         }
 
-        if (newLeBundle && newLeBundle.extendedData?.devices && newLeBundle.extendedData.devices.length > 0 && newLeBundle.extendedData.devices[0].serial.startsWith('N')) {
+        if (newLeBundle && newLeBundle.extendedData?.devices && newLeBundle.extendedData.devices.length > 0 && newLeBundle.extendedData.devices[0].serial && newLeBundle.extendedData.devices[0].serial.startsWith('N')) {
             newLeBundle.extendedData.devices[0].serial = newLeBundle.extendedData.devices[0].serial.substring(1)
         }
     }
