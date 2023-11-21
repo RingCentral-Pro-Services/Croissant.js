@@ -16,6 +16,16 @@ export class Extension implements ExcelFormattable, DataGridFormattable {
 
             this.data.password = `Ring$Central1!`
         }
+
+        if ((this.data.password && this.data.password !== '') && (!this.data.ivrPin || this.data.ivrPin === '')) {
+            console.log('Generating IVR PIN')
+            this.data.ivrPin = this.generatePIN()
+        }
+
+        if ((this.data.ivrPin && this.data.ivrPin !== '') && (!this.data.password || this.data.password === '')) {
+            this.data.password = `Ring$Central1!`
+        }
+
     }
 
     generatePIN() {
