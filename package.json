@@ -7,7 +7,8 @@
   "license": "MIT",
   "scripts": {
     "start": "node build/app.js",
-    "build": "tsc && cd frontend && npm install && npm run build"
+    "build": "tsc && cd frontend && npm install && npm run build",
+    "rebuild": "tsc && cd frontend && npm install && npm run build && cd .. && npm start"
   },
   "dependencies": {
     "@ringcentral/sdk": "^5.0.0",

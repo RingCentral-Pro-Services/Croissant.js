@@ -129,7 +129,10 @@ export interface Device {
         name: string
         id: string
     }
-    extension?: {}
+    extension?: {
+        id: string,
+        extensionNumber: string
+    }
 }
 
 export interface CallHandlingForwardingRule {
@@ -310,9 +313,10 @@ export interface Notifications {
             fullName?: string
             extensionNumber?: string
             status?: string
-            emailAddresses?: string
+            emailAddresses: string[]
         }
     ]
+    includeManagers?: boolean
     emailAddresses: string[]
     smsEmailAddresses: string[]
     advancedMode: boolean
