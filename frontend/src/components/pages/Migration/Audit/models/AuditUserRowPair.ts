@@ -4,7 +4,7 @@ import { UserDataRow } from "../../User Data Download/models/UserDataRow";
 export class AuditUserRowPair implements ExcelFormattable {
     constructor(private originalUser: UserDataRow, private newUser: UserDataRow | undefined) {
         // Remove leading N from serial number
-        if (newUser?.device && newUser.device.serial.startsWith('N')) {
+        if (newUser?.device && newUser.device.serial && newUser.device.serial.startsWith('N')) {
             newUser.device.serial = newUser.device.serial.substring(1);
         }
 
