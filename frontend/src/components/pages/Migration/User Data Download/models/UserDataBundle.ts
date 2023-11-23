@@ -12,7 +12,7 @@ export class UserDataBundle {
     public tempExtension = ''
     public extensions: Extension[] = []
 
-    constructor(public extension: Extension, public extendedData: ExtendedUserData | undefined, public phoneNumberMap?: Map<string, PhoneNumber>) {}
+    constructor(public extension: Extension, public extendedData: ExtendedUserData | undefined, public phoneNumberMap?: Map<string, PhoneNumber>) { }
 
     toRows(): UserDataRow[] {
         const rows: UserDataRow[] = []
@@ -221,6 +221,29 @@ export interface CallHandling {
     }
 }
 
+export interface CallHandlingQueueSettings {
+    transferMode: string
+    noAnswerAction: string
+    fixedOrderAgents?: FixedOrderAgent[]
+    holdAudioInterruptionMode: string
+    holdAudioInterruptionPeriod?: number
+    holdTimeExpirationAction: string
+    agentTimeout?: number
+    holdTime: number
+    wrapUpTime?: number
+    maxCallersAction?: string
+    maxCallers: number
+    transfer?: TransferPayload[]
+    unconditionalForwarding?: UnconditionalForwardingPayload[]
+    voicemail?: {
+        enabled: boolean
+        recipient: {
+            uri?: string
+            id: string
+        }
+    }
+}
+
 export interface CustomRule {
     uri?: string
     id?: string
@@ -370,14 +393,14 @@ export interface CallerIDDevice {
 
 export interface CallerIDFeature {
     feature: string
-            callerId: {
-                type: string
-                phoneInfo: {
-                    phoneNumber: string
-                    id?: string
-                    uri?: string
-                }
-            }
+    callerId: {
+        type: string
+        phoneInfo: {
+            phoneNumber: string
+            id?: string
+            uri?: string
+        }
+    }
 }
 
 export interface BlockedCallSettings {

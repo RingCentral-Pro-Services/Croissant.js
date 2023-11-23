@@ -6,6 +6,9 @@ export class CallQueueDataBundle implements ExcelFormattable {
     public hasEncounteredFatalError = false
     public tempExtension = ''
     public extensions: Extension[] = []
+
+    // Used for Ring Group to Call Queue conversion tool
+    public originalExtension?: Extension
     
     constructor(public extension: Extension, public extendedData?: ExtendedQueueData, public phoneNumberMap?: Map<string, PhoneNumber>) {}
 
@@ -507,7 +510,7 @@ export interface OverflowQueue {
     status: string
 }
 
-interface CallQueueMember {
+export interface CallQueueMember {
     uri?: string
     id: string
     extensionNumber: string
