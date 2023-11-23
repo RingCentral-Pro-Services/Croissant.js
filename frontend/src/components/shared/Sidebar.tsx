@@ -112,7 +112,7 @@ const mockdata = [
   //   icon: IconTransform,
   //   initiallyOpened: false,
   //   links: [
-  //     { label: 'Call Queue → Ring Group', link: '/convertcallqueues' },
+  //     { label: 'Call Queue → Ring Group', link: '/convert-call-queues' },
   //   ],
   // },
   {

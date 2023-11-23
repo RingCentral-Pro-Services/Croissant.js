@@ -150,7 +150,7 @@ function App() {
                 <Route path='/autoaudit' element={<AutoAudit />} />
                 <Route path='/uploaddevices' element={<UploadDevices />} />
                 <Route path='/customfields' element={<CustomFields />} />
-                <Route path='/convertcallqueues' element={<ConvertCallQueues />} />
+                <Route path='/convert-call-queues' element={<ConvertCallQueues />} />
               </Routes>
             </Suspense>
           </ErrorBoundary>

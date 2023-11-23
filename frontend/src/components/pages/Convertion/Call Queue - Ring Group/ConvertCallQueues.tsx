@@ -49,7 +49,7 @@ export const ConvertCallQueues = () => {
     })
     const [mode, setMode] = useState('Call Queue → Ring Group')
 
-    useLogin('convertcallqueues', isSyncing)
+    useLogin('convert-call-queues', isSyncing)
     const {fireEvent} = useAnalytics()
     const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError, userName} = useGetAccessToken()
     let {messages, errors, postMessage, postError} = useMessageQueue()
@@ -186,7 +186,7 @@ export const ConvertCallQueues = () => {
                 <h2>Things to know</h2>
                 <ol>
                     <li>Only settings common to call queues and ring groups will be set</li>
-                    <li>By default, the new extension have a different email address and extension number</li>
+                    <li>By default, the new extension will have a different email address and extension number</li>
                     <li>By default, phone numbers will not be reassigned</li>
                     <li>Choosing to delete the old extension may have call flow implications</li>
                     <li>Only users with Digital Lines will be added to Ring Groups</li>
