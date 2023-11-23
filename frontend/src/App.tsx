@@ -44,7 +44,7 @@ import UploadDevices from './components/pages/Device Upload/UploadDevices';
 import ManageCustomFields from './components/pages/Custom Fields/ManageCustomFields';
 import { AssignCustomFields } from './components/pages/Custom Fields/AssignCustomFields';
 import { CustomFields } from './components/pages/Custom Fields/CustomFields';
-import { ConvertCallQueues } from './components/pages/Convertion/Call Queue - Ring Group/ConvertCallQueues';
+import { ConvertCallQueues } from './components/pages/Conversion/Call Queue - Ring Group/ConvertCallQueues';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
