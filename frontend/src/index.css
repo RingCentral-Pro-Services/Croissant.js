@@ -41,6 +41,17 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.hidden {
+  display: none;
+}
+
+.access-denied {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: 100px;
+}
+
 .info-link{
   text-decoration: none;
   color: black;

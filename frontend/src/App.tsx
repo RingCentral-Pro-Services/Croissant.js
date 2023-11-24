@@ -46,6 +46,7 @@ import { AssignCustomFields } from './components/pages/Custom Fields/AssignCusto
 import { CustomFields } from './components/pages/Custom Fields/CustomFields';
 import { ConvertCallQueues } from './components/pages/Conversion/Call Queue - Ring Group/ConvertCallQueues';
 import { ConvertUsers } from './components/pages/Conversion/User - Limited Extension/ConvertUsers';
+import { AccessDenied } from './components/pages/Access Denied/AccessDenied';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -109,6 +110,7 @@ function App() {
           <ErrorBoundary fallback={<FatalError />}>
             <Suspense fallback={<Loading/>}>
               <Routes>
+              <Route path='/access-denied' element={<AccessDenied />} />
                 <Route path='/token' element={<Token />} />
                 <Route path='/biztoken' element={<BizToken />} />
                 <Route path='/' element={<CreateMenus />} />
