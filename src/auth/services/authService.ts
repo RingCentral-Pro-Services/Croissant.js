@@ -7,7 +7,7 @@ export const processAuth = async (req: Request, res: Response, next: any) => {
     const code = req.query.code
 
     if (!code || typeof code !== 'string') {
-        res.redirect(`/error`)
+        res.redirect(`/token`)
         return
     }
 
