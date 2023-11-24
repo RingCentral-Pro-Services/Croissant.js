@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { SDK } from '@ringcentral/sdk';
+import { getUserData } from './userService'
 const axios = require('axios').default;
 
 export const processAuth = async (req: Request, res: Response, next: any) => {
@@ -23,6 +24,8 @@ export const processAuth = async (req: Request, res: Response, next: any) => {
 
     const refreshToken = data["refresh_token"]
     const accessToken = data["access_token"]
+
+    const user = await getUserData(accessToken)
 
     res.cookie('auth_token', accessToken)
     res.cookie('auth_refresh', refreshToken)
