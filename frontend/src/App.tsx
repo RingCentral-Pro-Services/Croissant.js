@@ -45,6 +45,7 @@ import ManageCustomFields from './components/pages/Custom Fields/ManageCustomFie
 import { AssignCustomFields } from './components/pages/Custom Fields/AssignCustomFields';
 import { CustomFields } from './components/pages/Custom Fields/CustomFields';
 import { ConvertCallQueues } from './components/pages/Conversion/Call Queue - Ring Group/ConvertCallQueues';
+import { ConvertUsers } from './components/pages/Conversion/User - Limited Extension/ConvertUsers';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -151,6 +152,7 @@ function App() {
                 <Route path='/uploaddevices' element={<UploadDevices />} />
                 <Route path='/customfields' element={<CustomFields />} />
                 <Route path='/convert-call-queues' element={<ConvertCallQueues />} />
+                <Route path='/convert-users' element={<ConvertUsers />} />
               </Routes>
             </Suspense>
           </ErrorBoundary>
