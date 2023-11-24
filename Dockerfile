@@ -6,4 +6,4 @@ COPY . .
 
 EXPOSE 3000
 
-CMD npm install; npm run build ; npm start
+CMD cd backend ; npm install; npm run build ; npm start
