@@ -20,7 +20,8 @@
     "express-session": "^1.17.3",
     "formidable": "^2.0.1",
     "nodemailer": "^6.7.5",
-    "pg": "^8.7.3"
+    "pg": "^8.11.3",
+    "sequelize": "^6.35.1"
   },
   "engines": {
     "node": "16.15.1"

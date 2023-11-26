@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { SDK } from '@ringcentral/sdk';
 import { getUserData } from './userService'
+import { isDepartmentWhiteListed, isUserWhiteListed } from '../../access-control/services/accessControlService'
 const axios = require('axios').default;
 
 export const processAuth = async (req: Request, res: Response, next: any) => {
@@ -19,13 +20,29 @@ export const processAuth = async (req: Request, res: Response, next: any) => {
         redirectUri: process.env.RC_REDIRECT_URI
     })
     const platform = rcsdk.platform()
-    var response = await platform.login({ code: code})
+    var response = await platform.login({ code: code })
     const data = await response.json()
 
     const refreshToken = data["refresh_token"]
     const accessToken = data["access_token"]
 
     const user = await getUserData(accessToken)
+
+    if (!user) {
+        res.redirect(`/token`)
+        return
+    }
+
+    const departmentWhitelisted = await isDepartmentWhiteListed(user.contact.department)
+
+    if (!departmentWhitelisted) {
+        const userWhiteListed = await isUserWhiteListed(user.id)
+
+        if (!userWhiteListed) {
+            res.redirect(`/access-denied`)
+            return
+        }
+    }
 
     res.cookie('auth_token', accessToken)
     res.cookie('auth_refresh', refreshToken)
@@ -48,7 +65,7 @@ export const processBizAuth = async (req: Request, res: Response, next: any) => 
         redirectUri: process.env.RC_SEGREGATED_REDIRECT_URI
     })
     const platform = rcsdk.platform()
-    var response = await platform.login({ code: code})
+    var response = await platform.login({ code: code })
     const data = await response.json()
 
     const refreshToken = data["refresh_token"]
@@ -63,7 +80,7 @@ export const refreshToken = async (req: Request, res: Response, next: any) => {
     const refreshToken = req.query.refresh_token
 
     if (!refreshToken || typeof refreshToken !== 'string') {
-        res.status(400).send({message: 'Invalid refresh token'})
+        res.status(400).send({ message: 'Invalid refresh token' })
         return
     }
 
@@ -72,12 +89,12 @@ export const refreshToken = async (req: Request, res: Response, next: any) => {
         "Authorization": "Basic " + Buffer.from(process.env.RC_CLIENT_ID + ":" + process.env.RC_CLIENT_SECRET).toString('base64')
     }
 
-    const response = await axios.post(`${process.env.RC_PLATFORM_URL}/restapi/oauth/token`, `grant_type=refresh_token&refresh_token=${refreshToken}&client_id=${process.env.RC_CLIENT_ID}`, {headers: headers})
+    const response = await axios.post(`${process.env.RC_PLATFORM_URL}/restapi/oauth/token`, `grant_type=refresh_token&refresh_token=${refreshToken}&client_id=${process.env.RC_CLIENT_ID}`, { headers: headers })
     const accessToken = response.data.access_token
     const newRefreshToken = response.data.refresh_token
 
     if (!accessToken || !newRefreshToken) {
-        res.status(500).send({message: 'Internal server error'})
+        res.status(500).send({ message: 'Internal server error' })
         return
     }
 
