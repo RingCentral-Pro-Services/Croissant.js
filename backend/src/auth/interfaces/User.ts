@@ -7,4 +7,7 @@ export interface User {
         email: string
         department: string
     }
+    account: {
+        id: string
+    }
 }

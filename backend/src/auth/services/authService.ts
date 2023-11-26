@@ -3,6 +3,8 @@ import { SDK } from '@ringcentral/sdk';
 import { getUserData } from './userService'
 import { isDepartmentWhiteListed, isUserWhiteListed } from '../../access-control/services/accessControlService'
 import { isUserAdmin } from "../../access-control/services/dbService";
+import { AuditTrailItem } from "../../audit-trail/interface/AuditTrailItem";
+import { addAuditTrailItem } from "../../audit-trail/services/dbService";
 const axios = require('axios').default;
 
 export const processAuth = async (req: Request, res: Response, next: any) => {
@@ -40,10 +42,25 @@ export const processAuth = async (req: Request, res: Response, next: any) => {
         const userWhiteListed = await isUserWhiteListed(user.id)
 
         if (!userWhiteListed) {
+            const auditItem: AuditTrailItem = {
+                action: 'Failed login attempt (Not whitelisted)',
+                initiator: user.name,
+                tool: 'Auth',
+                type: 'login'
+            }
+            addAuditTrailItem(auditItem)
             res.redirect(`/access-denied`)
             return
         }
     }
+
+    const auditItem: AuditTrailItem = {
+        action: 'Successfully logged in',
+        initiator: user.name,
+        tool: 'Auth',
+        type: 'login'
+    }
+    addAuditTrailItem(auditItem)
 
     const isAdmin = await isUserAdmin(user.id)
 

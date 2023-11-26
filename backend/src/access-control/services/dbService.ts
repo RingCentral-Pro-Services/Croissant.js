@@ -65,12 +65,43 @@ export const getDepartment = async (name: string) => {
     return department
 }
 
-export const deleteDepartment = async (id: number) => {
-    await DepartmentModel.destroy({
+export const getDepartmentById = async (id: number) => {
+    const departmentFromDb = await DepartmentModel.findOne({
         where: {
             id: id
         }
     })
+
+    if (!departmentFromDb) {
+        return null
+    }
+
+    const department: Department = {
+        id: departmentFromDb.dataValues.id,
+        name: departmentFromDb.dataValues.name,
+        addedByName: departmentFromDb.dataValues.addedByName,
+        addedByEmail: departmentFromDb.dataValues.addedByEmail,
+        createdAt: departmentFromDb.dataValues.createdAt,
+        updatedAt: departmentFromDb.dataValues.updatedAt
+    }
+
+    return department
+}
+
+export const deleteDepartment = async (id: number) => {
+    try {
+        await DepartmentModel.destroy({
+            where: {
+                id: id
+            }
+        })
+        return true
+    }
+    catch (error) {
+        console.log('Error while deleting department')
+        console.log(error)
+        return false
+    }
 }
 
 // Admins -----------------------------------------------------------------
@@ -108,11 +139,19 @@ export const createAdmin = async (data: {name: string, addedByName: string, adde
 }
 
 export const deleteAdmin = async (id: number) => {
-    await AdminModel.destroy({
-        where: {
-            externalId: `${id}`
-        }
-    })
+    try {
+        await AdminModel.destroy({
+            where: {
+                externalId: `${id}`
+            }
+        })
+        return true
+    }
+    catch (error) {
+        console.log('Error while deleting admin')
+        console.log(error)
+        return false
+    }
 }
 
 export const getAdmins = async () => {
@@ -132,6 +171,30 @@ export const getAdmins = async () => {
     }
 
     return admins
+}
+
+export const getAdmin = async (id: number | string) => {
+    const adminFromDb = await AdminModel.findOne({
+        where: {
+            externalId: `${id}`
+        }
+    })
+
+    if (!adminFromDb) {
+        return null
+    }
+
+    const admin: Admin = {
+        id: adminFromDb.dataValues.id,
+        name: adminFromDb.dataValues.name,
+        externalId: adminFromDb.dataValues.externalId,
+        addedByName: adminFromDb.dataValues.addedByName,
+        addedByEmail: adminFromDb.dataValues.addedByEmail,
+        createdAt: adminFromDb.dataValues.createdAt,
+        updatedAt: adminFromDb.dataValues.updatedAt
+    }
+
+    return admin
 }
 
 // Admins -----------------------------------------------------------------
@@ -154,11 +217,19 @@ export const createUser = async (data: {name: string, addedByName: string, added
 }
 
 export const deleteUser = async (id: number) => {
-    await UserModel.destroy({
-        where: {
-            externalId: `${id}`
-        }
-    })
+    try {
+        await UserModel.destroy({
+            where: {
+                externalId: `${id}`
+            }
+        })
+        return true
+    }
+    catch (error) {
+        console.log('Error while deleting user')
+        console.log(error)
+        return false
+    }
 }
 
 export const getUsers = async () => {
