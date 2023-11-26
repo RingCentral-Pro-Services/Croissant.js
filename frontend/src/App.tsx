@@ -71,7 +71,8 @@ const lightTheme = createTheme({
 
 export const userAtom = atom({
   name: '',
-  email: ''
+  email: '',
+  isAdmin: false
 })
 
 function App() {
@@ -89,7 +90,8 @@ function App() {
       const user = JSON.parse(storedUser)
       setUser({
         name: user.name,
-        email: user.email
+        email: user.email,
+        isAdmin: user.isAdmin
       })
     }
   }, [])

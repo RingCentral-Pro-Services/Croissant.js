@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { SDK } from '@ringcentral/sdk';
 import { getUserData } from './userService'
 import { isDepartmentWhiteListed, isUserWhiteListed } from '../../access-control/services/accessControlService'
+import { isUserAdmin } from "../../access-control/services/dbService";
 const axios = require('axios').default;
 
 export const processAuth = async (req: Request, res: Response, next: any) => {
@@ -44,8 +45,11 @@ export const processAuth = async (req: Request, res: Response, next: any) => {
         }
     }
 
+    const isAdmin = await isUserAdmin(user.id)
+
     res.cookie('auth_token', accessToken)
     res.cookie('auth_refresh', refreshToken)
+    res.cookie('admin', isAdmin)
     res.redirect(`/token?state=${state}`)
 }
 

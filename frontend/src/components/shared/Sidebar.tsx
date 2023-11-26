@@ -1,8 +1,7 @@
 import { Drawer, Toolbar, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, Collapse, IconButton } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { useNavigate } from 'react-router-dom'
-import { SidebarItem } from "../../models/SidebarItem";
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import LightModeIcon from '@mui/icons-material/LightMode';
@@ -23,6 +22,7 @@ import {
   IconArrowRightCircle,
   IconSettings2,
   IconTransform,
+  IconUserExclamation,
 } from '@tabler/icons-react';
 import { LinksGroup } from "./NavBarLinksGroup";
 import { UserButton } from "./UserButton";
@@ -31,7 +31,30 @@ import { useAtomValue } from 'jotai'
 import { userAtom } from "../../App";
 import Modal from "./Modal";
 
-const mockdata = [
+interface SidebarGroup {
+  label: string
+  icon: any
+  initiallyOpened: boolean
+  links: SidebarLink[]
+}
+
+interface SidebarLink {
+  label: string
+  link: string
+}
+
+const adminLinks: SidebarGroup[] = [
+  {
+    label: 'Admin',
+    icon: IconUserExclamation,
+    initiallyOpened: false,
+    links: [
+      { label: 'Management Console', link: '/management-console' },
+    ],
+  }
+]
+
+const mockdata: SidebarGroup[] = [
   {
     label: 'IVRs',
     icon: IconSitemap,
@@ -167,9 +190,16 @@ const useStyles = createStyles((theme) => ({
 
 function Sidebar({ setColorTheme }: SidebarProps) {
   const { classes } = useStyles();
-  const links = mockdata.map((item) => <LinksGroup {...item} key={item.label} />);
+  const [links, setLinks] = useState<JSX.Element[]>(mockdata.map((item) => <LinksGroup {...item} key={item.label} />))
   const user = useAtomValue(userAtom)
   const [isShowingSignOutModal, setIsShowingSignOutModal] = useState(false)
+
+  useEffect(() => {
+    console.log('user changed')
+    if (user.isAdmin) {
+      setLinks([...adminLinks, ...mockdata].map((item) => <LinksGroup {...item} key={item.label} />))
+    }
+  }, [user])
 
   const handleSignOutButtonClick = () => {
     localStorage.removeItem('rc_access_token')
