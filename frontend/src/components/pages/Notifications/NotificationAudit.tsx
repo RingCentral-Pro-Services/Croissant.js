@@ -20,6 +20,7 @@ import MessagesArea from "../../shared/MessagesArea"
 import useWriteExcelFile from "../../../hooks/useWriteExcelFile"
 import FeedbackForm from "../../shared/FeedbackForm"
 import useSidebar from "../../../hooks/useSidebar"
+import { useAuditTrail } from "../../../hooks/useAuditTrail"
 
 const NotificationAudit = () => {
     const {fireEvent} = useAnalytics()
@@ -43,6 +44,7 @@ const NotificationAudit = () => {
     const [sites, setSites] = useState<string[]>([])
     const [adjustedExtensionList, setAdjustedExtensionList] = useState<RCExtension[]>([])
     const [filteredExtensions, setFilteredExtensions] = useState<RCExtension[]>([])
+    const { reportToAuditTrail } = useAuditTrail()
 
     // Progess bar
     const [progressValue, setProgressValue] = useState(0)
@@ -54,6 +56,11 @@ const NotificationAudit = () => {
     const handleClick = () => {
         setIsPending(true)
         fetchNotificationSettings(filteredExtensions)
+        reportToAuditTrail({
+            action: `Exported notification settings for ${filteredExtensions.length} extensions in account ${targetUID} - ${companyName}`,
+            tool: 'Notifications',
+            type: 'Tool'
+        })
     }
 
     const handleSyncButtonClick = () => {
@@ -62,6 +69,11 @@ const NotificationAudit = () => {
         setProgressValue(0)
         updateNotifications(adjustedNotifications)
         fireEvent('notifications-update')
+        reportToAuditTrail({
+            action: `Updated notification settings for ${adjustedNotifications.length} extensions in account ${targetUID} - ${companyName}`,
+            tool: 'Notifications',
+            type: 'Tool'
+        })
     }
 
     const handleFileSubmit = () => {

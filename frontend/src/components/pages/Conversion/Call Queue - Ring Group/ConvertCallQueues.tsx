@@ -26,6 +26,7 @@ import { useConvertToQueues } from "./hooks/useQueues";
 import useCreateQueue from "../../Migration/Users/hooks/useCreateQueue";
 import useConfigureQueue from "../../Migration/Users/hooks/useConfigureQueue";
 import { useDeleteExtension } from "../../../../rcapi/useDeleteExtension";
+import { useAuditTrail } from "../../../../hooks/useAuditTrail";
 
 export interface ConvertSettings {
     deleteOldExtension: boolean
@@ -65,6 +66,7 @@ export const ConvertCallQueues = () => {
     const {configureQueue} = useConfigureQueue(postMessage, postTimedMessage, postError, '')
     const {deleteExtension} = useDeleteExtension(postMessage, postTimedMessage, postError)
     const {fetchStandardGreetings} = useStandardGreetings()
+    const { reportToAuditTrail } = useAuditTrail()
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -106,6 +108,15 @@ export const ConvertCallQueues = () => {
     const handleSyncClick = async () => {
         setIsSyncing(true)
         setProgressMax(selectedExtensions.length)
+
+        const direction = mode === 'Call Queue → Ring Group' ? 'call queues to ring groups' : 'ring groups to call queues'
+
+        reportToAuditTrail({
+            action: `Converted ${selectedExtensions.length} ${direction} in account ${targetUID} - ${companyName}`,
+            tool: 'Convert Call Queues',
+            type: 'Tool'
+        })
+
         const devices = await fetchAccountDevices()
         const queueGreetings = await fetchStandardGreetings('DepartmentExtensionAnsweringRule')
         const userGreetings = await fetchStandardGreetings('UserExtensionAnsweringRule')

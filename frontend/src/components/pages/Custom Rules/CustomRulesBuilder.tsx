@@ -17,6 +17,7 @@ import UIDInputField from "../../shared/UIDInputField";
 import useCreateCustomRule from "./hooks/useCreateCustomRule";
 import useReadCustomRules from "./hooks/useReadCustomRules";
 import { CustomRuleSchema } from "./models/CustomRuleSchema";
+import { useAuditTrail } from "../../../hooks/useAuditTrail";
 
 const CustomRulesBuilder = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -42,6 +43,7 @@ const CustomRulesBuilder = () => {
     const {readCustomRules, isRuleReadPending, customRules} = useReadCustomRules(postMessage, postError)
     const {createCustomRule} = useCreateCustomRule(postMessage, postTimedMessage, postError, increaseProgress)
     const {writePrettyExcel} = useWritePrettyExcel()
+    const { reportToAuditTrail } = useAuditTrail()
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -80,6 +82,11 @@ const CustomRulesBuilder = () => {
 
     const handleSyncButtonClick = () => {
         setIsSyncing(true)
+        reportToAuditTrail({
+            action: `Created ${customRules.length} extensions in account ${targetUID} - ${companyName}`,
+            tool: 'Extension Audit',
+            type: 'Tool'
+        })
     }
 
     return (

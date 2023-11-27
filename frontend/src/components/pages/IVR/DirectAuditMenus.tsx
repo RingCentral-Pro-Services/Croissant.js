@@ -19,6 +19,7 @@ import RCExtension from "../../../models/RCExtension";
 import AdaptiveFilter from "../../shared/AdaptiveFilter";
 import { sanitize } from "../../../helpers/Sanatize";
 import * as Excel from 'exceljs'
+import { useAuditTrail } from "../../../hooks/useAuditTrail";
 
 const DirectAuditMenus = () => {
     const {fireEvent} = useAnalytics()
@@ -41,11 +42,17 @@ const DirectAuditMenus = () => {
     const {fetchIVRs, ivrsList, isIVRsListPending} = useFetchIVRs(setProgressValue, setMaxProgressValue, postMessage, postTimedMessage, postError, isPaused)
     const {writePrettyExcel} = useWritePrettyExcel()
     const {prettyIVRs, isIVRBeautificationPending} = useBeautifyIVRs(isIVRsListPending, ivrsList, extensionsList, audioPromptList)
+    const { reportToAuditTrail } = useAuditTrail()
 
     const handleClick = () => {
         setIsPending(true)
         fetchIVRs(selectedExtensions)
         fireEvent('update-audit')
+        reportToAuditTrail({
+            action: `Exported ${selectedExtensions.length} IVRs from account ${targetUID} - ${companyName}`,
+            tool: 'Export IVRs',
+            type: 'Tool'
+        })
     }
 
     useEffect(() => {

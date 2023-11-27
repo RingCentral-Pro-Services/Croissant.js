@@ -23,6 +23,7 @@ import AdaptiveFilter from "../../shared/AdaptiveFilter"
 import useAuditCallQueue from "./hooks/useAuditCallQueue"
 import { sanitize } from "../../../helpers/Sanatize"
 import * as Excel from 'exceljs'
+import { useAuditTrail } from "../../../hooks/useAuditTrail"
 
 export interface QueueAuditSettings {
     includeBusinessHours: boolean
@@ -74,11 +75,17 @@ const CallQueues = () => {
     const {auditQueue} = useAuditCallQueue(postMessage, postTimedMessage, postError, increaseProgress)
     let {writeExcel} = useWriteExcelFile()
     const {writePrettyExcel} = useWritePrettyExcel()
+    const { reportToAuditTrail } = useAuditTrail()
 
     const handleClick = () => {
         setisPending(true)
         setIsSyncing(true)
         // fetchQueueMembers(selectedExtensions)
+        reportToAuditTrail({
+            action: `Exported ${selectedExtensions.length} queues from account ${targetUID} - ${companyName}`,
+            tool: 'Audit Call Queues',
+            type: 'Tool'
+        })
         fireEvent('call-queue-audit')
     }
 

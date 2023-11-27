@@ -23,6 +23,7 @@ import useReadDeviceData from "./hooks/useReadDeviceData";
 import useUploadDevice from "./hooks/useUploadDevice";
 import * as Excel from 'exceljs'
 import useCreateUnassignedDevices from "./hooks/useCreateUnassignedDevices";
+import { useAuditTrail } from "../../../hooks/useAuditTrail";
 
 const UploadDevices = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -47,6 +48,7 @@ const UploadDevices = () => {
     const {uploadDevice, uploadUnassignedDevice} = useUploadDevice(postMessage, postTimedMessage, postError)
     const {createDevices} = useCreateUnassignedDevices(postMessage, postTimedMessage, postError)
     const {writePrettyExcel} = useWritePrettyExcel()
+    const { reportToAuditTrail } = useAuditTrail()
 
     const handleFileSelect = () => {
         if (!selectedFile) return
@@ -93,6 +95,12 @@ const UploadDevices = () => {
 
     const handleSyncButtonClick = async () => {
         setIsSyncing(true)
+
+        reportToAuditTrail({
+            action: `Uploaded ${prospectiveDevices.length} devices to account ${targetUID} - ${companyName}`,
+            tool: 'Upload Devices',
+            type: 'Tool'
+        })
 
         const unassignedDevices = prospectiveDevices.filter((device) => device.data.extension.data.name === 'Unassigned')
         const assignedDevices = prospectiveDevices.filter((device) => device.data.extension.data.name !== 'Unassigned')

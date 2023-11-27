@@ -20,6 +20,7 @@ import useExcelToMonitoringGroups from "./hooks/useExcelToMonitoringGroups";
 import useCallMonitoringList from "./hooks/useCallMonitoringList";
 import useWriteExcelFile from "../../../hooks/useWriteExcelFile";
 import { IconExternalLink } from "@tabler/icons-react";
+import { useAuditTrail } from "../../../hooks/useAuditTrail";
 
 const CallMonitoring = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -47,6 +48,7 @@ const CallMonitoring = () => {
     const {createGroups, isGroupCreationPending} = useCreateGroups(setProgressValue, postMessage, postTimedMessage, postError)
     const {adjustedMonitoringGroups: auditedGroups, isGroupAdjustmentPending} = useCallMonitoringList(isAuditPending, setAuditProgress, setAuditProgressMax, postMessage, postTimedMessage, postError)
     const {writeExcel} = useWriteExcelFile()
+    const { reportToAuditTrail } = useAuditTrail()
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -81,6 +83,11 @@ const CallMonitoring = () => {
 
     const handleSync = () => {
         setIsSyncing(true)
+        reportToAuditTrail({
+            action: `Created ${monitoringGroups.length} in account ${targetUID} - ${companyName}`,
+            tool: 'Call Monitoring',
+            type: 'Tool'
+        })
         setProgressMax(monitoringGroups.length * 2)
         createGroups(monitoringGroups)
         fireEvent('call-monitoring')

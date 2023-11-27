@@ -22,6 +22,7 @@ import Header from "../../shared/Header";
 import UIDInputField from "../../shared/UIDInputField";
 import useExcelToIntercom from "./hooks/useExcelToIntercom";
 import useIntercom from "./hooks/useIntercom";
+import { useAuditTrail } from "../../../hooks/useAuditTrail";
 
 const Intercom = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -54,6 +55,7 @@ const Intercom = () => {
     const {writeExcel} = useWriteExcelFile()
     const {readFile, isExcelDataPending, excelData} = useReadExcel()
     const {convert, isConvertPending, intercomData} = useExcelToIntercom()
+    const { reportToAuditTrail } = useAuditTrail()
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -161,6 +163,11 @@ const Intercom = () => {
         setDeviceFetchMax(extensions.length)
         getDeviceMap(extensions)
         fireEvent('intercom-sync')
+        reportToAuditTrail({
+            action: `Changes intercom settings for ${extensions.length} extensions in ${targetUID} - ${companyName}`,
+            tool: 'Intercom',
+            type: 'Tool'
+        })
     }
 
     return (

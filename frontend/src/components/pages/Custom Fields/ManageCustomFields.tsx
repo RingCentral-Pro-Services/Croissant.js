@@ -11,6 +11,7 @@ import { CustomField, CustomFieldData } from "./models/CustomField";
 import { Button, Input, Modal, NativeSelect } from "@mantine/core";
 import { CustomFieldEditor } from "./components/CustomFieldEditor";
 import { useCreateCustomField } from "./hooks/useCreateCustomField";
+import { useAuditTrail } from "../../../hooks/useAuditTrail";
 
 const ManageCustomFields = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -26,6 +27,7 @@ const ManageCustomFields = () => {
     const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError, userName} = useGetAccessToken()
     const {fetchCustomFieldList} = useCustomFieldList()
     const {createCustomField, deleteCustomField} = useCreateCustomField()
+    const { reportToAuditTrail } = useAuditTrail()
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -57,6 +59,13 @@ const ManageCustomFields = () => {
     }
 
     const handleModalSubmit = async (field: CustomFieldData) => {
+
+        reportToAuditTrail({
+            action: `Created custom field ${field.displayName} in account ${targetUID} - ${companyName}`,
+            tool: 'Manage Custom Fields',
+            type: 'Tool'
+        })
+
         await createCustomField(field)
         setIsShowingModal(false)
         setEditedCustomField(undefined)

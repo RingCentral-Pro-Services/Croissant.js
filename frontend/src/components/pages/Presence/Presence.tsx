@@ -16,6 +16,7 @@ import Header from '../../shared/Header'
 import UIDInputField from '../../shared/UIDInputField'
 import useAuditPresence from './hooks/useAuditPresence'
 import { ExtensionPresence } from './models/ExtensionPresence'
+import { useAuditTrail } from "../../../hooks/useAuditTrail";
 
 const Presence = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -41,6 +42,7 @@ const Presence = () => {
     const {fetchExtensions, extensionsList, isExtensionListPending, isMultiSiteEnabled} = useExtensions(postMessage)
     const {auditPresence} = useAuditPresence(postMessage, postTimedMessage, postError, increaseProgress)
     const {writePrettyExcel} = useWritePrettyExcel()
+    const { reportToAuditTrail } = useAuditTrail()
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -85,6 +87,11 @@ const Presence = () => {
     const handleSync = () => {
         setIsSyncing(true)
         fireEvent('presence-audit')
+        reportToAuditTrail({
+            action: `Exported presence settings for ${selectedExtensions.length} extensions in account ${targetUID} - ${companyName}`,
+            tool: 'Extension Audit',
+            type: 'Tool'
+        })
     }
     
     return (

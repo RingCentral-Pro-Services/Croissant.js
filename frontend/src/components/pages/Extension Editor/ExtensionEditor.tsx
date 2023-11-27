@@ -16,6 +16,7 @@ import FeedbackForm from "../../shared/FeedbackForm";
 import Header from "../../shared/Header";
 import SimpleReplacement from "../../shared/SimpleReplacement";
 import UIDInputField from "../../shared/UIDInputField";
+import { useAuditTrail } from "../../../hooks/useAuditTrail";
 
 const ExtensionEditor = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -33,6 +34,7 @@ const ExtensionEditor = () => {
     const {fetchExtensions, extensionsList, isExtensionListPending} = useExtensionList(postMessage)
     const {setOldFirstName, setOldLastName, setOldEmail, setNewFirstName, setNewLastName, setNewEmail, editedExtensions} = useExtensionEditing(extensionsList)
     const {updateExtensions, isExtensionUpdatePending} = useUpdateExtensions(setProgressValue, postMessage, postTimedMessage, postError)
+    const { reportToAuditTrail } = useAuditTrail()
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -52,6 +54,11 @@ const ExtensionEditor = () => {
 
     const handleSyncbuttonClick = () => {
         fireEvent('edit-extensions')
+        reportToAuditTrail({
+            action: `Used Extension Editor tool in account ${targetUID} - ${companyName}`,
+            tool: 'Extension Editor',
+            type: 'Tool'
+        })
         setIsSyncing(true)
         setMaxProgressValue(editedExtensions.length)
         updateExtensions(editedExtensions)

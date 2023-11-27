@@ -18,6 +18,7 @@ import UIDInputField from "../../../shared/UIDInputField";
 import useAssignPhoneNumbers from "./hooks/useAssignPhoneNumbers";
 import useExcelToPhoneNumbers from "./hooks/useExcelToPhoneNumbers";
 import { IconExternalLink } from "@tabler/icons-react";
+import { useAuditTrail } from "../../../../hooks/useAuditTrail";
 
 const BulkAssign = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -40,6 +41,7 @@ const BulkAssign = () => {
     const {getPhoneNumberMap, phoneNumbers, isPhoneNumberMapPending} = usePhoneNumberMap()
     const {convert, isConverPending, phoneNumberPayloads} = useExcelToPhoneNumbers(postMessage, postError)
     const {assignNumbers, isAssignmentPending} = useAssignPhoneNumbers(setProgressValue, postMessage, postTimedMessage, postError)
+    const { reportToAuditTrail } = useAuditTrail()
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -79,6 +81,13 @@ const BulkAssign = () => {
 
     const handleSync = () => {
         setIsSyncing(true)
+
+        reportToAuditTrail({
+            action: `Assigned ${phoneNumberPayloads.length} phone numbers in account ${targetUID} - ${companyName}`,
+            tool: 'Bulk Number Assign',
+            type: 'Tool'
+        })
+
         setProgressMax(phoneNumberPayloads.length)
         assignNumbers(phoneNumberPayloads)
     }

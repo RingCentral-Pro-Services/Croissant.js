@@ -16,6 +16,7 @@ import UIDInputField from "../../shared/UIDInputField";
 import useGetCompanyRules from "./hooks/useGetCompanyRules";
 import useGetCustomRules from "./hooks/useGetCustomRules";
 import { CustomRule } from "./models/CustomRule";
+import { useAuditTrail } from "../../../hooks/useAuditTrail";
 
 const CustomRulesExport = () => {
     const supportedExtensionTypes = ['User', 'Call Queue', 'Site']
@@ -44,6 +45,7 @@ const CustomRulesExport = () => {
     const {fetchCompanyRules, isCompanyRuleListPending, companyRules, maxCompanyRuleProgress, companyRuleProgress} = useGetCompanyRules(postMessage, postTimedMessage, postError)
     const {fetchRules} = useGetCustomRules(postMessage, postTimedMessage, postError, increaseProgress)
     const {writePrettyExcel} = useWritePrettyExcel()
+    const { reportToAuditTrail } = useAuditTrail()
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -114,6 +116,12 @@ const CustomRulesExport = () => {
         else {
             setIsAuditing(true)
         }
+
+        reportToAuditTrail({
+            action: `Exported custom rules from account ${targetUID} - ${companyName}`,
+            tool: 'Custom Rules Export',
+            type: 'Tool'
+        })
     }
 
 

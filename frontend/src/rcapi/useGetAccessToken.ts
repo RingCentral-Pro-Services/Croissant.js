@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { AccountUID } from "../models/AccountUID";
 import useGetCompanyName from "./useGetCompanyName";
 import useGetUserName from "./useGetUserName";
+import { useAuditTrail } from "../hooks/useAuditTrail";
 
 const sign = require('jwt-encode');
 const axios = require('axios').default;
@@ -13,6 +14,7 @@ const useGetAccessToken = () => {
     const {getUserName, isUserNamePending, userName} = useGetUserName()
     const [error, setError] = useState('')
     const [isTokenPending, setIsTokenPending] = useState(false)
+    const { reportToAuditTrail } = useAuditTrail()
 
     const fetchToken = (uid: string) => {
         let rc_access_token = localStorage.getItem('rc_access_token')
@@ -44,6 +46,11 @@ const useGetAccessToken = () => {
             localStorage.setItem('cs_token_expiry', `${date.getTime()}`)
             localStorage.setItem('cs_access_token', res.data['access_token'])
             localStorage.setItem('cs_refresh_token', res.data['refresh_token'])
+            reportToAuditTrail({
+                action: `Accessed account ${uid}`,
+                tool: 'Croissant',
+                type: 'Access'
+            })
             setAccountID(uid)
             getCompanyName()
             setIsTokenPending(false)

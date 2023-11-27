@@ -93,6 +93,7 @@ import useSegregatedLogin from "../../../../rcapi/useSegregatedLogin";
 import { useLocation } from "react-router-dom";
 import useAnalytics from "../../../../hooks/useAnalytics";
 import ImportAccountData from "./components/ImportAccountData";
+import { useAuditTrail } from "../../../../hooks/useAuditTrail";
 const FileSaver = require('file-saver');
 
 
@@ -138,6 +139,7 @@ const MigrateUsers = () => {
     const [targetAccountAreaCodes, setTargetAccountAreaCodes] = useState<string[]>([])
     const [selectedAreaCodes, setSelectedAreaCodes] = useState<string[]>([])
     const [isShowingImportModal, setIsShowingImportModal] = useState(false)
+    const { reportToAuditTrail } = useAuditTrail()
     // const [originalAccountPrompts, setOriginalAccountPrompts] = useState<IVRAudioPrompt[]>([])
     const [settings, setSettings] = useState({
         shouldOverrideSites: false,
@@ -499,6 +501,12 @@ const MigrateUsers = () => {
         setIsPullingData(true)
         fireEvent('migration-phase-1')
 
+        reportToAuditTrail({
+            action: `Began migration phase 1 in account ${originalUID} - ${originalCompanyName}`,
+            tool: 'Auto Migrate',
+            type: 'Tool'
+        })
+
         // Devices
         const devices = await fetchAccountDevices()
         console.log('Devices')
@@ -628,6 +636,13 @@ const MigrateUsers = () => {
         setIsPending(true)
         setIsMigrating(true)
         fireEvent('migration-phase-2')
+
+        reportToAuditTrail({
+            action: `Began migration phase 2 in account ${targetUID} - ${targetCompanyName}`,
+            tool: 'Auto Migrate',
+            type: 'Tool'
+        })
+
         let targetExts = targetExtensionList
         let targetERLs = targetERLList
         let roles: Role[] = []

@@ -17,6 +17,7 @@ import useCreateNetworkLocations from "./hooks/useCreateNetworkLocations";
 import useExcelToNetworkLocations from "./hooks/useExcelToNetworkLocations";
 import useFetchERLs from "./hooks/useFetchERLs";
 import { IconExternalLink } from "@tabler/icons-react";
+import { useAuditTrail } from "../../../hooks/useAuditTrail";
 
 const LocationUpdates = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -38,6 +39,7 @@ const LocationUpdates = () => {
     const {fetchERLs, erls, isERLListPending} = useFetchERLs()
     const {convert, networkLocations, isConvertPending} = useExcelToNetworkLocations()
     const {createNetworkLocations, isCreatePending} = useCreateNetworkLocations(setProgressValue, postMessage, postTimedMessage, postError)
+    const { reportToAuditTrail } = useAuditTrail()
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -73,6 +75,11 @@ const LocationUpdates = () => {
     const handleSync = () => {
         setIsSyncing(true)
         setProgressMax(networkLocations.length)
+        reportToAuditTrail({
+            action: `Added ${networkLocations.length} to ${targetUID} - ${companyName}`,
+            tool: 'Automatic Location Updates',
+            type: 'Tool'
+        })
         createNetworkLocations(networkLocations)
     }
 
