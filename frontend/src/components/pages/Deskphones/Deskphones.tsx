@@ -19,6 +19,7 @@ import FeedbackForm from "../../shared/FeedbackForm";
 import Header from "../../shared/Header";
 import SimpleSelection from "../../shared/SimpleSelection";
 import UIDInputField from "../../shared/UIDInputField";
+import { useAuditTrail } from "../../../hooks/useAuditTrail";
 
 const Deskphones = () => {
     const [filteredExtensions, setFilteredExtensions] = useState<RCExtension[]>([])
@@ -47,6 +48,7 @@ const Deskphones = () => {
     const {fetchExtensions, extensionsList, isMultiSiteEnabled, isExtensionListPending} = useExtensionList(postMessage)
     const {fetchCallForwardingSettings, isCallForwardingSettingsPending, callForwardingSettings: originalForwardingSettings} = useGetCallForwardingSettings(setCallForwardingProgressValue, postMessage, postTimedMessage, postError)
     const {adjustCallForwarding, isCallHandlingSettingsPending} = useAdjustCallForwarding(setCallForwardingUpdateProgress, postMessage, postTimedMessage, postError)
+    const { reportToAuditTrail } = useAuditTrail()
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -125,6 +127,11 @@ const Deskphones = () => {
         setCallForwardingProgressMax(selectedExtensions.length)
         fetchCallForwardingSettings(selectedExtensions)
         fireEvent('deskphones')
+        reportToAuditTrail({
+            action: `Changed deskphone ring time to ${selectedRingTime} for ${selectedExtensions.length} in account ${targetUID} - ${companyName}`,
+            tool: 'Deskphones',
+            type: 'Tool'
+        })
     }
 
     return (

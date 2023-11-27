@@ -16,6 +16,7 @@ import usePhoneNumberMap from '../../../rcapi/usePhoneNumberMap'
 import { Extension } from '../../../models/Extension'
 import { useSetAtom } from 'jotai'
 import { userAtom } from '../../../App'
+import { useAuditTrail } from '../../../hooks/useAuditTrail'
 
 const ExtensionAudit = () => {
     useLogin('accountdump')
@@ -30,10 +31,16 @@ const ExtensionAudit = () => {
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
     const {writeExcel} = useWriteExcelFile()
     const setUser = useSetAtom(userAtom)
+    const { reportToAuditTrail } = useAuditTrail()
 
     const handleClick = () => {
         getPhoneNumberMap()
         fireEvent('extension-audit')
+        reportToAuditTrail({
+            action: `Exported extensions from ${targetUID} - ${companyName}`,
+            tool: 'Extension Audit',
+            type: 'Tool'
+        })
     }
 
     useEffect(() => {

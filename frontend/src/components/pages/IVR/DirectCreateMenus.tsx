@@ -28,6 +28,7 @@ import { IVRTransformer } from "./models/IVRTransformer";
 import { MessageQueue } from "../../../models/Transformer";
 import useWriteExcelFile from "../../../hooks/useWriteExcelFile";
 import { sanitize } from "../../../helpers/Sanatize";
+import { useAuditTrail } from "../../../hooks/useAuditTrail";
 
 const DirectCreateMenus = () => {
     useLogin('create-ivr')
@@ -65,6 +66,7 @@ const DirectCreateMenus = () => {
     const {createMenus, isSyncing} = useCreateIVRs(setProgressValue, postMessage, postTimedMessage, postError, isMultiSiteEnabled)
 
     const {writeExcel} = useWriteExcelFile()
+    const { reportToAuditTrail } = useAuditTrail()
 
     const handleFileSelect = async () => {
         if (!selectedFile) return
@@ -124,6 +126,11 @@ const DirectCreateMenus = () => {
         setMaxProgressValue(filterMenus.length * 2)
         createMenus(filterMenus, extensionsList)
         fireEvent('create-menu')
+        reportToAuditTrail({
+            action: `Created ${filterMenus.length} IVRs in account ${targetUID} - ${companyName}`,
+            tool: 'Export IVRs',
+            type: 'Tool'
+        })
         // createMenus(menus, extensionsList)
     }
 

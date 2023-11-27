@@ -21,6 +21,7 @@ import UIDInputField from "../../shared/UIDInputField";
 import useCreatePagingGroups from "./hooks/useCreatePagingGroups";
 import useExcelToPagingGroups from "./hooks/useExcelToPagingGroups";
 import { IconExternalLink } from "@tabler/icons-react";
+import { useAuditTrail } from "../../../hooks/useAuditTrail";
 
 const PagingGroups = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -47,6 +48,7 @@ const PagingGroups = () => {
     const {validate, validatedData, isDataValidationPending} = useValidateExcelData(pagingGroupSchema, postMessage, postError)
     const {convert, pagingGroups, isConvertPending} = useExcelToPagingGroups(postMessage, postError)
     const {createGroups, isCreationPending} = useCreatePagingGroups(setProgressValue, postMessage, postTimedMessage, postError)
+    const { reportToAuditTrail } = useAuditTrail()
 
 
     useEffect(() => {
@@ -101,6 +103,12 @@ const PagingGroups = () => {
     const handleSync = () => {
         setIsSyncing(true)
         fireEvent('paging-groups')
+
+        reportToAuditTrail({
+            action: `Created ${pagingGroups.length} paging groups in account ${targetUID} - ${companyName}`,
+            tool: 'Paging Groups',
+            type: 'Tool'
+        })
 
         let updatedPagingGroups = pagingGroups
         for (let i = 0; i < updatedPagingGroups.length; i++) {

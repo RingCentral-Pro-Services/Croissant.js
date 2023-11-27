@@ -18,6 +18,7 @@ import Header from "../../shared/Header";
 import UIDInputField from "../../shared/UIDInputField";
 import useManipulateRules from "./hooks/useManipulateRules";
 import useSimpleRuleList from "./hooks/useSimpleRuleList";
+import { useAuditTrail } from "../../../hooks/useAuditTrail";
 
 const ManipulateCustomRules = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -46,6 +47,7 @@ const ManipulateCustomRules = () => {
     const {fetchExtensions, extensionsList, isExtensionListPending, isMultiSiteEnabled} = useExtensionList(postMessage)
     const {fetchRules, isRuleListPending, adjustedExtensions} = useSimpleRuleList(setFetchRulesProgress, postMessage, postTimedMessage, postError)
     const {manipulateRules, isRuleManipulationPending} = useManipulateRules(setManipulateRulesProgress, postMessage, postTimedMessage, postError)
+    const { reportToAuditTrail } = useAuditTrail()
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -100,6 +102,11 @@ const ManipulateCustomRules = () => {
         fetchRules(selectedExtensions)
         setActiveStep(10)
         fireEvent('manipulate_custom_rules')
+        reportToAuditTrail({
+            action: `Manipulated rule ${targetRuleName} for ${selectedExtensions.length} in account ${targetUID} - ${companyName}`,
+            tool: 'Manipulate Custom Rules',
+            type: 'Tool'
+        })
     }
 
     const handleFilterSelection = (selected: DataGridFormattable[]) => {

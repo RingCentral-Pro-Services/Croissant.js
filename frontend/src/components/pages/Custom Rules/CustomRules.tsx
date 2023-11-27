@@ -19,6 +19,7 @@ import FeedbackForm from "../../shared/FeedbackForm";
 import Header from "../../shared/Header";
 import UIDInputField from "../../shared/UIDInputField";
 import useApplyRules from "./hooks/useApplyRules";
+import { useAuditTrail } from "../../../hooks/useAuditTrail";
 
 const CustomRules = () => {
     const [targetUID, setTargetUID] = useState<string>('')
@@ -51,6 +52,7 @@ const CustomRules = () => {
     const {fetchExtensions, extensionsList, isExtensionListPending, isMultiSiteEnabled} = useExtensionList(postMessage)
     const {getCustomRules, customRules, isCustomRulesListPending} = useGetCustomRules()
     const {applyRules} = useApplyRules(postMessage, postTimedMessage, postError, voicemailDestinationOption === 'maintainDestination' ,increaseProgress)
+    const { reportToAuditTrail } = useAuditTrail()
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -110,6 +112,11 @@ const CustomRules = () => {
         setIsSyncing(true)
         setProgressMax(selectedExtensions.length)
         setActiveStep(10)
+        reportToAuditTrail({
+            action: `Copied ${selectedRules.length} custom rules to ${selectedExtensions.length} extensions in account ${targetUID} - ${companyName}`,
+            tool: 'Copy Custom Rules',
+            type: 'Tool'
+        })
         fireEvent('copy-custom-rules')
     }
 

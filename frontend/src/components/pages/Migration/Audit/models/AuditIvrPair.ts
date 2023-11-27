@@ -77,15 +77,15 @@ export class AuditIvrPair implements ExcelFormattable {
 
             this.getActionForKey('0', this.originalIvr),
             this.getActionForKey('0', this.newIvr),
-            this.getActionForKey('0', this.originalIvr) == this.getActionForKey('9', this.newIvr) ? 'TRUE' : 'FALSE',
+            this.getActionForKey('0', this.originalIvr) == this.getActionForKey('0', this.newIvr) ? 'TRUE' : 'FALSE',
+
+            this.getActionForKey('Hash', this.originalIvr),
+            this.getActionForKey('Hash', this.newIvr),
+            this.getActionForKey('Hash', this.originalIvr) == this.getActionForKey('Hash', this.newIvr) ? 'TRUE' : 'FALSE',
 
             this.getActionForKey('Star', this.originalIvr),
             this.getActionForKey('Star', this.newIvr),
             this.getActionForKey('Star', this.originalIvr) == this.getActionForKey('Star', this.newIvr) ? 'TRUE' : 'FALSE',
-
-            this.getActionForKey('Hash', this.originalIvr),
-            this.getActionForKey('Hash', this.newIvr),
-            this.getActionForKey('Hash', this.originalIvr) == this.getActionForKey('Pound', this.newIvr) ? 'TRUE' : 'FALSE',
         ]
     }
 

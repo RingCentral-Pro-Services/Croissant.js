@@ -17,6 +17,7 @@ import useCreateUserGroup from "./hooks/useCreateUserGroup";
 import useReadUserGroups from "./hooks/useReadUserGroups";
 import useUserGroupsList from "./hooks/useUserGroupsList";
 import { UserGroupSchema } from "./models/schema";
+import { useAuditTrail } from "../../../hooks/useAuditTrail";
 
 const UserGroups = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -43,6 +44,7 @@ const UserGroups = () => {
     const {readGroups, groups, isGroupReadPending} = useReadUserGroups(postMessage, postError)
     const {createUserGroup} = useCreateUserGroup(postMessage, postTimedMessage, postError, increaseProgress)
     const {writeExcel} = useWriteExcelFile()
+    const { reportToAuditTrail } = useAuditTrail()
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -78,7 +80,21 @@ const UserGroups = () => {
 
     const handleAuditButtonClick = () => {
         setIsAuditing(true)
+        reportToAuditTrail({
+            action: `Exported user groups from account ${targetUID} - ${companyName}`,
+            tool: 'User Groups',
+            type: 'Tool'
+        })
         fetchUserGroups()
+    }
+
+    const handleSyncClick = () => {
+        setIsSyncing(true)
+        reportToAuditTrail({
+            action: `Created ${userGroups.length} user groups in account ${targetUID} - ${companyName}`,
+            tool: 'User Groups',
+            type: 'Tool'
+        })
     }
 
     const handleFileSelect = () => {
@@ -93,7 +109,7 @@ const UserGroups = () => {
                 <h2>User Groups</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                 <FileSelect enabled={!isSyncing || !isExtensionListPending} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
-                <Button className='healthy-margin-right' variant='filled' onClick={() => setIsSyncing(true)} disabled={!hasCustomerToken || isSyncing || isAuditing || isExtensionListPending || groups.length === 0}>Sync</Button>
+                <Button className='healthy-margin-right' variant='filled' onClick={handleSyncClick} disabled={!hasCustomerToken || isSyncing || isAuditing || isExtensionListPending || groups.length === 0}>Sync</Button>
                 <Button variant='filled' onClick={handleAuditButtonClick} disabled={!hasCustomerToken || isAuditing || isSyncing || isExtensionListPending}>Audit</Button>
                 {isAuditing ? <progress value={completedUserGroups.length} max={userGroups.length} /> : <></>}
                 {isSyncing ? <progress value={currentExtensionIndex} max={groups.length} /> : <></>}

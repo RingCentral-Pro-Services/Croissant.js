@@ -18,6 +18,7 @@ import UIDInputField from "../../shared/UIDInputField";
 import useCreateERLs from "./hooks/useCreateERLs";
 import useCreateSites from "./hooks/useCreateSites";
 import useExcelToSites from "./hooks/useExcelToSites";
+import { useAuditTrail } from "../../../hooks/useAuditTrail";
 
 const Sites = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -43,6 +44,7 @@ const Sites = () => {
     const {convert, sites, isConvertPending} = useExcelToSites(regionalFormats)
     const {createSites, isCreatePending, createdSites} = useCreateSites(setProgressValue, postMessage, postTimedMessage, postError)
     const {createERLs, isERLCreationPending} = useCreateERLs(setErlProgressValue, postMessage, postTimedMessage, postError)
+    const { reportToAuditTrail } = useAuditTrail()
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -83,6 +85,11 @@ const Sites = () => {
 
     const handleSync = () => {
         setIsSyncing(true)
+        reportToAuditTrail({
+            action: `Created ${sites.length} sites in account ${targetUID} - ${companyName}`,
+            tool: 'Sites',
+            type: 'Tool'
+        })
         setProgressMax(sites.length)
         createSites(sites)
     }

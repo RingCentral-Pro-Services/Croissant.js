@@ -105,6 +105,9 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
     }
 
     const setManagers = async (bundle: CallQueueDataBundle, originalExtensions: Extension[], targetExtensions: Extension[], token: string) => {
+
+        if (!bundle.extendedData?.managers || bundle.extendedData.managers.length == 0) return
+
         try {
             const headers = {
                 "Accept": "application/json",
@@ -460,6 +463,8 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
     }
 
     const setOtherSettings = async (bundle: CallQueueDataBundle, token: string) => {
+        if (!bundle.extendedData?.otherSettings) return
+
         try {
             const headers = {
                 "Accept": "application/json",
@@ -544,6 +549,13 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
     }
 
     const setMemberPresenseStatus = async (bundle: CallQueueDataBundle, originalExtensions: Extension[], targetExtensions: Extension[], token: string) => {
+        if (!bundle.extendedData?.memberPresense || bundle.extendedData.memberPresense.length === 0) {
+            console.log('No member presence to set')
+            return
+        }
+
+        console.log('Setting member presence')
+
         try {
             const headers = {
                 "Accept": "application/json",

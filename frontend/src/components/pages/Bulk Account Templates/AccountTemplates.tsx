@@ -19,6 +19,7 @@ import useReadCallQueues from "./hooks/useReadCallQueues";
 import useReadIVRs from "./hooks/useReadIVRs";
 import useRegionalFormats from "./hooks/useRegionalFormats";
 import { TemplateData, TemplateEngine } from "./TemplateEngine";
+import { useAuditTrail } from "../../../hooks/useAuditTrail";
 
 const AccountTemplates = () => {
     const [isSyncing, setIsSyncing] = useState(false)
@@ -44,6 +45,7 @@ const AccountTemplates = () => {
     const {convertExcelToExtensions} = useExcelToExtensions(false, postMessage, postError, false)
     const {convert: readQueues} = useReadCallQueues(postMessage, postError)
     const {converToMenus} = useReadIVRs(postMessage, postError)
+    const { reportToAuditTrail } = useAuditTrail()
 
     const handleFileSelect = async () => {
         if (!selectedFile) return
@@ -112,6 +114,13 @@ const AccountTemplates = () => {
     const handleSyncButtonClick = async () => {
         setIsSyncing(true)
         fireEvent('bulk-account-templates')
+
+        reportToAuditTrail({
+            action: `Applied template to ${accountIDs.length} accounts`,
+            tool: 'Bulk Account Templates',
+            type: 'Tool'
+        })
+
         for (const accountID of accountIDs) {
             const res = await fetchToken(accountID)
             const regionalFormats = await fetchRegionalFormats()

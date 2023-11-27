@@ -44,7 +44,11 @@ import UploadDevices from './components/pages/Device Upload/UploadDevices';
 import ManageCustomFields from './components/pages/Custom Fields/ManageCustomFields';
 import { AssignCustomFields } from './components/pages/Custom Fields/AssignCustomFields';
 import { CustomFields } from './components/pages/Custom Fields/CustomFields';
-import { ConvertCallQueues } from './components/pages/Convertion/Call Queue - Ring Group/ConvertCallQueues';
+import { ConvertCallQueues } from './components/pages/Conversion/Call Queue - Ring Group/ConvertCallQueues';
+import { ConvertUsers } from './components/pages/Conversion/User - Limited Extension/ConvertUsers';
+import { AccessDenied } from './components/pages/Access Denied/AccessDenied';
+import { ManagementConsole } from './components/pages/Management Console/ManagementConsole';
+import { AuditTrail } from './components/pages/Audit Trail/AuditTrail';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -68,7 +72,8 @@ const lightTheme = createTheme({
 
 export const userAtom = atom({
   name: '',
-  email: ''
+  email: '',
+  isAdmin: false
 })
 
 function App() {
@@ -86,7 +91,8 @@ function App() {
       const user = JSON.parse(storedUser)
       setUser({
         name: user.name,
-        email: user.email
+        email: user.email,
+        isAdmin: user.isAdmin
       })
     }
   }, [])
@@ -108,6 +114,9 @@ function App() {
           <ErrorBoundary fallback={<FatalError />}>
             <Suspense fallback={<Loading/>}>
               <Routes>
+                <Route path='/access-denied' element={<AccessDenied />} />
+                <Route path='/management-console' element={<ManagementConsole />} />
+                <Route path='/audit-trail' element={<AuditTrail />} />
                 <Route path='/token' element={<Token />} />
                 <Route path='/biztoken' element={<BizToken />} />
                 <Route path='/' element={<CreateMenus />} />
@@ -150,7 +159,8 @@ function App() {
                 <Route path='/autoaudit' element={<AutoAudit />} />
                 <Route path='/uploaddevices' element={<UploadDevices />} />
                 <Route path='/customfields' element={<CustomFields />} />
-                <Route path='/convertcallqueues' element={<ConvertCallQueues />} />
+                <Route path='/convert-call-queues' element={<ConvertCallQueues />} />
+                <Route path='/convert-users' element={<ConvertUsers />} />
               </Routes>
             </Suspense>
           </ErrorBoundary>

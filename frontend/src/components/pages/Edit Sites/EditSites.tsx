@@ -19,6 +19,7 @@ import FeedbackForm from "../../shared/FeedbackForm";
 import FileSelect from "../../shared/FileSelect";
 import Header from "../../shared/Header";
 import UIDInputField from "../../shared/UIDInputField";
+import { useAuditTrail } from "../../../hooks/useAuditTrail";
 
 const EditSites = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -43,6 +44,7 @@ const EditSites = () => {
     const {validate, validatedData, isDataValidationPending} = useValidateExcelData(siteSchema, postMessage, postError)
     const {updateSites, isSiteUpdatePending} = useEditSites(postMessage, postTimedMessage, setProgressValue, setMaxProgressValue, postError)
     const {writeExcel} = useWriteExcelFile()
+    const { reportToAuditTrail } = useAuditTrail()
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -98,6 +100,11 @@ const EditSites = () => {
     const handleSyncButtonClick = () => {
         setIsSyncing(true)
         fireEvent('edit-sites')
+        reportToAuditTrail({
+            action: `Edited ${validatedSites.length} in account ${targetUID} - ${companyName}`,
+            tool: 'Edit Sites',
+            type: 'Tool'
+        })
         updateSites(validatedSites)
     }
 

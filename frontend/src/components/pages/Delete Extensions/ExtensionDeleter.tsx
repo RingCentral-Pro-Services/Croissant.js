@@ -25,6 +25,7 @@ import useValidateExcelData from "../../../hooks/useValidateExcelData"
 import { DeleteExtensionsSchema } from "./models/model"
 import useReadFromFile from "./hooks/useReadFromFile"
 import FileSelect from "../../shared/FileSelect"
+import { useAuditTrail } from "../../../hooks/useAuditTrail"
 
 const ExtensionDeleter = () => {
     const {fireEvent} = useAnalytics()
@@ -60,6 +61,7 @@ const ExtensionDeleter = () => {
     const {readFile, isExcelDataPending, excelData} = useReadExcel()
     const {validate, validatedData, isDataValidationPending} = useValidateExcelData(DeleteExtensionsSchema, postMessage, postError)
     const {readFromFile, isFileReadPending, extensionList: extensionsReadFromFile} = useReadFromFile(postMessage, postTimedMessage, postError)
+    const { reportToAuditTrail } = useAuditTrail()
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -162,6 +164,11 @@ const ExtensionDeleter = () => {
 
     const handleModalAcceptance = () => {
         setIsPending(true)
+        reportToAuditTrail({
+            action: `Deleted ${selectedExtensions.length} extensions from account ${targetUID} - ${companyName}`,
+            tool: 'Delete Extensions',
+            type: 'Tool'
+        })
         deleteExtensions(selectedExtensions)
         fireEvent('delete-extensions')
     }

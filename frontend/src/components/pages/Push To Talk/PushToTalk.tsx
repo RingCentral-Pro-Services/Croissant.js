@@ -20,6 +20,7 @@ import useFetchPTTChannels from "./hooks/useFetchPTTChannels";
 import useReadPTTChannels from "./hooks/useReadPTTChannels";
 import { PTTChannel } from "./models/PTTChannel";
 import { PTTSchema } from "./models/schemas";
+import { useAuditTrail } from "../../../hooks/useAuditTrail";
 
 const PushToTalk = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -31,6 +32,7 @@ const PushToTalk = () => {
     const [isAuditing, setIsAuditing] = useState(false)
     const [isSyncing, setIsSyncing] = useState(false)
     const [isDoneProcessing, setIsDoneProcessing] = useState(false)
+    const { reportToAuditTrail } = useAuditTrail()
     const defaultSheet = 'Push to Talk'
 
     const handleFetchCompletion = (channels: PTTChannel[]) => {
@@ -106,10 +108,20 @@ const PushToTalk = () => {
 
     const handleExportButtonClick = () => {
         fetchChannels()
+        reportToAuditTrail({
+            action: `Exported Push-to-Talk channels from account ${targetUID} - ${companyName}`,
+            tool: 'Push-to-Talk',
+            type: 'Tool'
+        })
     }
 
     const handleSyncButtonClick = () => {
         setIsSyncing(true)
+        reportToAuditTrail({
+            action: `Created Push-to-Talk channels in account ${targetUID} - ${companyName}`,
+            tool: 'Extension Audit',
+            type: 'Tool'
+        })
     }
 
     const handleFileSelect = () => {

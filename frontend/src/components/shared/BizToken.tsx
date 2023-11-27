@@ -46,11 +46,13 @@ const BizToken = () => {
         if (!currentUser) return
         setUser({
             name: currentUser.data.name,
-            email: currentUser.data.contact.email
+            email: currentUser.data.contact.email,
+            isAdmin: false
         })
         localStorage.setItem('currentUser', JSON.stringify({
             name: currentUser.data.name,
-            email: currentUser.data.contact.email
+            email: currentUser.data.contact.email,
+            isAdmin: false
         }))
     }
     

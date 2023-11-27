@@ -35,6 +35,7 @@ import { DataGridFormattable } from "../../../models/DataGridFormattable";
 import FeedbackForm from "../../shared/FeedbackForm";
 import useSidebar from "../../../hooks/useSidebar";
 import useSetMemberStatus from "./hooks/useSetMemberStatus";
+import { useAuditTrail } from "../../../hooks/useAuditTrail";
 
 const CallQueueTemplates = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -83,6 +84,7 @@ const CallQueueTemplates = () => {
     const {setIntroGreetingFile, setConnectingGreetingFile, setIntterruptGreetingFile, setOnHoldGreetingFile, setVoicemailGreetingFile, setAfterHoursVoicemailGreetingFile, introGreetingPayload, connectingGreetingPayload, onHoldGreetingPayload, intterruptGreetingPayload, voicemailGreetingPayload, afterHoursVoicemailGreetingPayload, progressMultiplier} = useBuildCustomGreetings()
     const {uploadGreetings, isGreetingsUploadPending} = useUploadCustomGreetings(setGreetingUploadProgress, postMessage, postTimedMessage, postError)
     const {editMemberStatus, isMemberStatusPending} = useSetMemberStatus(setMemberStatusProgress, postMessage, postTimedMessage, postError)
+    const { reportToAuditTrail } = useAuditTrail()
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -159,6 +161,13 @@ const CallQueueTemplates = () => {
 
     const handleSyncButtonClick = () => {
         if (selectedExtensions.length === 0) return
+
+        reportToAuditTrail({
+            action: `Applied template to ${selectedExtensions.length} queues in account ${targetUID} - ${companyName}`,
+            tool: 'Call Queue Templates',
+            type: 'Tool'
+        })
+
         // Filtering stuff
         setRegionalSettingsMaxProgress(selectedExtensions.length)
         setCallHandlingSettingsMaxProgress(afterHoursGreetings.length === 0 ? selectedExtensions.length : selectedExtensions.length * 2)

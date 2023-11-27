@@ -14,6 +14,7 @@ import Header from "../../shared/Header";
 import UIDInputField from "../../shared/UIDInputField";
 import useAuditParkLocation from "./hooks/useAuditParkLocation";
 import { ParkLocation } from "./models/ParkLocation";
+import { useAuditTrail } from "../../../hooks/useAuditTrail";
 
 const ParkLocations = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -36,6 +37,7 @@ const ParkLocations = () => {
     const {fetchExtensions, extensionsList, isExtensionListPending} = useExtensions(postMessage)
     const {auditParkLocation} = useAuditParkLocation(postMessage, postTimedMessage, postError, increaseProgress)
     const {writeExcel} = useWriteExcelFile()
+    const { reportToAuditTrail } = useAuditTrail()
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -72,6 +74,11 @@ const ParkLocations = () => {
     
     const handleAuditButtonClick = () => {
         setIsSyncing(true)
+        reportToAuditTrail({
+            action: `Exported ${parkLocationExtensions.length} park locations from account ${targetUID} - ${companyName}`,
+            tool: 'Park Locations',
+            type: 'Tool'
+        })
         console.log(`Park Location Extensions: ${parkLocationExtensions.length}`)
     }
 

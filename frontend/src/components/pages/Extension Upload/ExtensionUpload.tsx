@@ -24,6 +24,7 @@ import useExtension from "./hooks/useExtension";
 import useFetchRoles from "./hooks/useFetchRoles";
 import useDeviceDictionary from "./hooks/useDeviceDictionary";
 import { Device } from "../Migration/User Data Download/models/UserDataBundle";
+import { useAuditTrail } from "../../../hooks/useAuditTrail";
 
 const ExtensionUpload = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -64,6 +65,7 @@ const ExtensionUpload = () => {
     const {convertExcelToExtensions, isExtensionConverPending, extensions} = useExcelToExtensions(shouldAlterEmails, postMessage, postError)
     const {fetchRoles, roles} = useFetchRoles(postMessage, postTimedMessage, postError)
     const {createExtension} = useExtension(postMessage, postTimedMessage, postError, isMultiSiteEnabled, increaseProgress)
+    const { reportToAuditTrail } = useAuditTrail()
 
     const setup = async () => {
         await fetchExtensions()
@@ -175,6 +177,11 @@ const ExtensionUpload = () => {
     const handleSyncButtonClick = () => {
         setIsSyncing(true)
         fireEvent('extension-upload')
+        reportToAuditTrail({
+            action: `Uploaded ${extensions.length} extensions to account ${targetUID} - ${companyName}`,
+            tool: 'Extension Upload',
+            type: 'Tool'
+        })
     }
 
     return (

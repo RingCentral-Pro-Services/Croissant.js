@@ -1,8 +1,7 @@
 import { Drawer, Toolbar, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, Collapse, IconButton } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { useNavigate } from 'react-router-dom'
-import { SidebarItem } from "../../models/SidebarItem";
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import LightModeIcon from '@mui/icons-material/LightMode';
@@ -23,6 +22,7 @@ import {
   IconArrowRightCircle,
   IconSettings2,
   IconTransform,
+  IconUserExclamation,
 } from '@tabler/icons-react';
 import { LinksGroup } from "./NavBarLinksGroup";
 import { UserButton } from "./UserButton";
@@ -31,7 +31,31 @@ import { useAtomValue } from 'jotai'
 import { userAtom } from "../../App";
 import Modal from "./Modal";
 
-const mockdata = [
+interface SidebarGroup {
+  label: string
+  icon: any
+  initiallyOpened: boolean
+  links: SidebarLink[]
+}
+
+interface SidebarLink {
+  label: string
+  link: string
+}
+
+const adminLinks: SidebarGroup[] = [
+  {
+    label: 'Admin',
+    icon: IconUserExclamation,
+    initiallyOpened: false,
+    links: [
+      { label: 'Management Console', link: '/management-console' },
+      { label: 'Audit Trail', link: '/audit-trail' },
+    ],
+  }
+]
+
+const mockdata: SidebarGroup[] = [
   {
     label: 'IVRs',
     icon: IconSitemap,
@@ -112,7 +136,8 @@ const mockdata = [
   //   icon: IconTransform,
   //   initiallyOpened: false,
   //   links: [
-  //     { label: 'Call Queue → Ring Group', link: '/convertcallqueues' },
+  //     { label: 'Call Queue → Ring Group', link: '/convert-call-queues' },
+  //     { label: 'User → Limited Extensino', link: '/convert-users' },
   //   ],
   // },
   {
@@ -166,9 +191,16 @@ const useStyles = createStyles((theme) => ({
 
 function Sidebar({ setColorTheme }: SidebarProps) {
   const { classes } = useStyles();
-  const links = mockdata.map((item) => <LinksGroup {...item} key={item.label} />);
+  const [links, setLinks] = useState<JSX.Element[]>(mockdata.map((item) => <LinksGroup {...item} key={item.label} />))
   const user = useAtomValue(userAtom)
   const [isShowingSignOutModal, setIsShowingSignOutModal] = useState(false)
+
+  useEffect(() => {
+    console.log('user changed')
+    if (user.isAdmin) {
+      setLinks([...adminLinks, ...mockdata].map((item) => <LinksGroup {...item} key={item.label} />))
+    }
+  }, [user])
 
   const handleSignOutButtonClick = () => {
     localStorage.removeItem('rc_access_token')
@@ -179,14 +211,14 @@ function Sidebar({ setColorTheme }: SidebarProps) {
   }
 
   return (
-    <>
+    <div className="navigation-bar">
       <Modal open={isShowingSignOutModal} setOpen={setIsShowingSignOutModal} handleAccept={handleSignOutButtonClick} title='Sign out?' body='Do you want to sign out and be redirected to the login page?' rejectLabel='No, go back' acceptLabel='Yes, sign out' />
 
       <Navbar sx={{ position: 'fixed', zIndex: 1 }} width={{ sm: 250 }} p="md" className={classes.navbar}>
         <Navbar.Section className={classes.header}>
           <Group position="apart">
             {/* <Logo width={rem(120)} /> */}
-            <Code sx={{ fontWeight: 700 }}>Croissant v3.2.0</Code>
+            <Code sx={{ fontWeight: 700 }}>Croissant v3.3.0</Code>
           </Group>
         </Navbar.Section>
 
@@ -203,7 +235,7 @@ function Sidebar({ setColorTheme }: SidebarProps) {
           />
         </Navbar.Section>
       </Navbar>
-    </>
+    </div>
   );
 }
 

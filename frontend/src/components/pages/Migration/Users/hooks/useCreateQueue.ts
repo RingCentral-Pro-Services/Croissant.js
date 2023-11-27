@@ -50,7 +50,7 @@ const useCreateQueue = (postMessage: (message: Message) => void, postTimedMessag
             // console.log(e)
             // postMessage(new Message(`Failed to create call queue ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
             // postError(new SyncError('', 0, ['Failed to create call queue', bundle.extension.data.name], e.error ?? ''))
-            retyExtension(bundle, token)
+            await retyExtension(bundle, token)
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }

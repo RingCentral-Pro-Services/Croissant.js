@@ -21,6 +21,7 @@ import { useUpdateCustomFieldValue } from "./hooks/useUpdateCustomFieldValue";
 import useLogin from "../../../hooks/useLogin";
 import ProgressBar from "../../shared/ProgressBar";
 import useWriteExcelFile from "../../../hooks/useWriteExcelFile";
+import { useAuditTrail } from "../../../hooks/useAuditTrail";
 
 export const AssignCustomFields = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -45,6 +46,7 @@ export const AssignCustomFields = () => {
     const {readCustomFields} = useReadCustomFields(postMessage, postError)
     const {updateCustomFieldValue} = useUpdateCustomFieldValue(postMessage, postTimedMessage, postError)
     const {writeExcel} = useWriteExcelFile()
+    const { reportToAuditTrail } = useAuditTrail()
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -81,6 +83,13 @@ export const AssignCustomFields = () => {
         if (isSyncing) return
 
         fireEvent('assign-custom-fields')
+
+        reportToAuditTrail({
+            action: `Assigned custom field values for ${customFieldAssignments.length} users in account ${targetUID} - ${companyName}`,
+            tool: 'Convert Call Queues',
+            type: 'Tool'
+        })
+
         setIsSyncing(true)
         setProgressMax(customFieldAssignments.length)
         for (const assignment of customFieldAssignments) {

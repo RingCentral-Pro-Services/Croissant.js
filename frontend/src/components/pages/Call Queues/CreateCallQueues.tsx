@@ -23,6 +23,7 @@ import { IconExternalLink } from "@tabler/icons-react"
 import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel"
 import CallQueue from "../../../models/CallQueue"
 import { sanitize } from "../../../helpers/Sanatize"
+import { useAuditTrail } from "../../../hooks/useAuditTrail"
 
 const CreateCallQueues = () => {
     let [isPending, setIsPending] = useState(true)
@@ -46,6 +47,7 @@ const CreateCallQueues = () => {
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
     const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending, userName} = useGetAccessToken()
     const {writePrettyExcel} = useWritePrettyExcel()
+    const { reportToAuditTrail } = useAuditTrail()
 
     const increaseProgress = () => {
         setCurrentExtensionIndex( prev => prev + 1)
@@ -64,6 +66,11 @@ const CreateCallQueues = () => {
     const handleSyncButtonClick = () => {
         setIsSyncing(true)
         fireEvent('create-call-queues')
+        reportToAuditTrail({
+            action: `Created ${queues.length} queues in account ${targetUID} - ${companyName}`,
+            tool: 'Create Call Queues',
+            type: 'Tool'
+        })
     }
 
     useEffect(() => {
