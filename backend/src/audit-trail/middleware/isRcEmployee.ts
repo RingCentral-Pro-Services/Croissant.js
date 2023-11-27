@@ -16,7 +16,7 @@ export const isRcEmployee = async (req: Request, res: Response, next: NextFuncti
         return
     }
 
-    if (userData.account.id !== process.env.RC_CORORATE_ACCOUNT_ID) {
+    if (userData.account.id !== process.env.RC_CORPORATE_ACCOUNT_ID) {
         res.status(401).send()
         return
     }
