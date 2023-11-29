@@ -32,7 +32,7 @@ export const processCreateDepartmentRequest = async (req: Request, res: Response
         action: `Added ${name} to the department whitelist`,
         initiator: addedByName,
         tool: 'Management Console',
-        type: 'access'
+        type: 'Admin'
     }
     addAuditTrailItem(auditItem)
 
@@ -67,7 +67,7 @@ export const processDeleteDepartmentRequest = async (req: Request, res: Response
         action: `Removed ${department.name} from the department whitelist`,
         initiator: `${addedByName}`,
         tool: 'Management Console',
-        type: 'access'
+        type: 'Admin'
     }
     addAuditTrailItem(auditItem)
 
@@ -113,7 +113,7 @@ export const processCreateAdminRequest = async (req: Request, res: Response) => 
         action: `Added ${userData.name} as an admin`,
         initiator: addedByName,
         tool: 'Management Console',
-        type: 'access'
+        type: 'Admin'
     }
     addAuditTrailItem(auditItem)
 
@@ -147,7 +147,7 @@ export const processDeleteAdminRequest = async (req: Request, res: Response) => 
         action: `Removed ${admin.name} as an admin`,
         initiator: `${addedByName}`,
         tool: 'Management Console',
-        type: 'access'
+        type: 'Admin'
     }
     addAuditTrailItem(auditItem)
 
@@ -190,7 +190,7 @@ export const processCreateUserRequest = async (req: Request, res: Response) => {
         action: `Added ${userData.name} to the user whitelist`,
         initiator: addedByName,
         tool: 'Management Console',
-        type: 'access'
+        type: 'Admin'
     }
     addAuditTrailItem(auditItem)
 
@@ -224,7 +224,7 @@ export const processDeleteUserRequest = async (req: Request, res: Response) => {
         action: `Removed ${user.name} from the user whitelist`,
         initiator: `${addedByName}`,
         tool: 'Management Console',
-        type: 'access'
+        type: 'Admin'
     }
     addAuditTrailItem(auditItem)
 

@@ -46,7 +46,7 @@ export const processAuth = async (req: Request, res: Response, next: any) => {
                 action: 'Failed login attempt (Not whitelisted)',
                 initiator: user.name,
                 tool: 'Auth',
-                type: 'login'
+                type: 'Login'
             }
             addAuditTrailItem(auditItem)
             res.redirect(`/access-denied`)
@@ -58,7 +58,7 @@ export const processAuth = async (req: Request, res: Response, next: any) => {
         action: 'Successfully logged in',
         initiator: user.name,
         tool: 'Auth',
-        type: 'login'
+        type: 'Login'
     }
     addAuditTrailItem(auditItem)
 
