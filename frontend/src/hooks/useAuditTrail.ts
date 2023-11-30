@@ -2,7 +2,7 @@ import { RestCentral } from "../rcapi/RestCentral"
 
 export const useAuditTrail = () => {
 
-    const reportToAuditTrail = async (data: {action: string, tool: string, type: 'Tool' | 'Access' | 'Admin'}) => {
+    const reportToAuditTrail = async (data: {action: string, tool: string, uid: string, type: 'Tool' | 'Access' | 'Admin'}) => {
         const token = localStorage.getItem('rc_access_token')
         if (!token) {
             return
@@ -15,7 +15,8 @@ export const useAuditTrail = () => {
             const body = {
                 action: data.action,
                 tool: data.tool,
-                type: data.type
+                type: data.type,
+                uid: data.uid
             }
 
             RestCentral.post('/api/audit', headers, body)

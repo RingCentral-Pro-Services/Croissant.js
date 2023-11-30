@@ -164,9 +164,10 @@ const Intercom = () => {
         getDeviceMap(extensions)
         fireEvent('intercom-sync')
         reportToAuditTrail({
-            action: `Changes intercom settings for ${extensions.length} extensions in ${targetUID} - ${companyName}`,
+            action: `Changes intercom settings for ${extensions.length} extensions`,
             tool: 'Intercom',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
     }
 

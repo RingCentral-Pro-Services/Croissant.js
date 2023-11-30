@@ -37,9 +37,10 @@ const ExtensionAudit = () => {
         getPhoneNumberMap()
         fireEvent('extension-audit')
         reportToAuditTrail({
-            action: `Exported extensions from ${targetUID} - ${companyName}`,
+            action: `Exported extensions`,
             tool: 'Extension Audit',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
     }
 

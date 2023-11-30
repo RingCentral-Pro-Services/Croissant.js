@@ -112,9 +112,10 @@ export const ConvertCallQueues = () => {
         const direction = mode === 'Call Queue → Ring Group' ? 'call queues to ring groups' : 'ring groups to call queues'
 
         reportToAuditTrail({
-            action: `Converted ${selectedExtensions.length} ${direction} in account ${targetUID} - ${companyName}`,
+            action: `Converted ${selectedExtensions.length} ${direction}`,
             tool: 'Convert Call Queues',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
 
         const devices = await fetchAccountDevices()

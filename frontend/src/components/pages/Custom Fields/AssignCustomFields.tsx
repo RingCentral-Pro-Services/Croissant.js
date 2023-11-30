@@ -85,9 +85,10 @@ export const AssignCustomFields = () => {
         fireEvent('assign-custom-fields')
 
         reportToAuditTrail({
-            action: `Assigned custom field values for ${customFieldAssignments.length} users in account ${targetUID} - ${companyName}`,
+            action: `Assigned custom field values for ${customFieldAssignments.length} users`,
             tool: 'Convert Call Queues',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
 
         setIsSyncing(true)

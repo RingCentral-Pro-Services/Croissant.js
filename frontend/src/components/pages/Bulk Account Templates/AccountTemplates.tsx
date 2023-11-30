@@ -118,7 +118,8 @@ const AccountTemplates = () => {
         reportToAuditTrail({
             action: `Applied template to ${accountIDs.length} accounts`,
             tool: 'Bulk Account Templates',
-            type: 'Tool'
+            type: 'Tool',
+            uid: 'N/A'
         })
 
         for (const accountID of accountIDs) {

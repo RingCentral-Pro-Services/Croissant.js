@@ -128,9 +128,10 @@ const Deskphones = () => {
         fetchCallForwardingSettings(selectedExtensions)
         fireEvent('deskphones')
         reportToAuditTrail({
-            action: `Changed deskphone ring time to ${selectedRingTime} for ${selectedExtensions.length} in account ${targetUID} - ${companyName}`,
+            action: `Changed deskphone ring time to ${selectedRingTime} for ${selectedExtensions.length} extensions`,
             tool: 'Deskphones',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
     }
 

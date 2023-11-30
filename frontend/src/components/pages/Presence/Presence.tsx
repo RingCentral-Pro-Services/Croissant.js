@@ -88,9 +88,10 @@ const Presence = () => {
         setIsSyncing(true)
         fireEvent('presence-audit')
         reportToAuditTrail({
-            action: `Exported presence settings for ${selectedExtensions.length} extensions in account ${targetUID} - ${companyName}`,
+            action: `Exported presence settings for ${selectedExtensions.length} extensions`,
             tool: 'Extension Audit',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
     }
     

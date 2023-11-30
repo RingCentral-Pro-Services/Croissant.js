@@ -502,9 +502,10 @@ const MigrateUsers = () => {
         fireEvent('migration-phase-1')
 
         reportToAuditTrail({
-            action: `Began migration phase 1 in account ${originalUID} - ${originalCompanyName}`,
+            action: `Began migration phase 1`,
             tool: 'Auto Migrate',
-            type: 'Tool'
+            type: 'Tool',
+            uid: originalUID
         })
 
         // Devices
@@ -638,9 +639,10 @@ const MigrateUsers = () => {
         fireEvent('migration-phase-2')
 
         reportToAuditTrail({
-            action: `Began migration phase 2 in account ${targetUID} - ${targetCompanyName}`,
+            action: `Began migration phase 2`,
             tool: 'Auto Migrate',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
 
         let targetExts = targetExtensionList

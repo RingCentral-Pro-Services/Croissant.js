@@ -163,9 +163,10 @@ const CallQueueTemplates = () => {
         if (selectedExtensions.length === 0) return
 
         reportToAuditTrail({
-            action: `Applied template to ${selectedExtensions.length} queues in account ${targetUID} - ${companyName}`,
+            action: `Applied template to ${selectedExtensions.length} call queues`,
             tool: 'Call Queue Templates',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
 
         // Filtering stuff

@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../../database/Sequelize';
 
-export const AuditItemModel = sequelize.define('Audit', {
+export const AuditItemModel = sequelize.define('AuditItem', {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -12,6 +12,10 @@ export const AuditItemModel = sequelize.define('Audit', {
         allowNull: false,
     },
     initiator: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+    },
+    uid: {
         type: DataTypes.TEXT,
         allowNull: false,
     },

@@ -5,8 +5,9 @@ import { AuditTrailItem, AuditTrailItemData } from "./models/AuditTrailItem";
 import useLogin from "../../../hooks/useLogin";
 import { RestCentral } from "../../../rcapi/RestCentral";
 import FilterArea from "../../shared/FilterArea";
-import AdaptiveFilter from "../../shared/AdaptiveFilter";
 import { AuditTrailFilters } from "./components/AuditTrailFilters";
+import { Button } from "@mantine/core";
+import useExportToExcel from "../../../hooks/useExportToExcel";
 
 export const AuditTrail = () => {
     const [auditItems, setAuditItems] = useState<AuditTrailItem[]>([])
@@ -15,6 +16,7 @@ export const AuditTrail = () => {
     const [toolFilter, setToolFilter] = useState<string[]>([])
     const [typeFilter, setTypeFilter] = useState<string[]>([])
     const [selectedYear, setSelectedYear] = useState(`${new Date().getFullYear()}`)
+    const {exportToExcel} = useExportToExcel()
 
     useLogin('audit-trail')
 
@@ -62,11 +64,20 @@ export const AuditTrail = () => {
         }
     }
 
+    const handleDownloadButtonClick = () => {
+        exportToExcel([{
+            sheetName: 'Audit Trail',
+            headers: ['Initiator', 'Action', 'Account ID', 'Tool', 'Type', 'Date'],
+            data: filteredAuditItems
+        }], 'audit-trail.xlsx')
+    }
+
     return (
         <>
             <Header title="Audit Trail" body="" />
             <ToolCard>
                 {auditItems.length > 0 ? <AuditTrailFilters auditItems={auditItems} onInitiatorFilterChange={setInitiatorFilter} onToolFilterChange={setToolFilter} onTypeFilterChange={setTypeFilter} /> : <></>}
+                {filteredAuditItems.length > 0 ? <Button onClick={handleDownloadButtonClick}>Export</Button> : <></>}
                 <FilterArea
                 items={filteredAuditItems}
                 showSiteFilter={false}

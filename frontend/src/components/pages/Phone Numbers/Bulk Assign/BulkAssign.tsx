@@ -83,9 +83,10 @@ const BulkAssign = () => {
         setIsSyncing(true)
 
         reportToAuditTrail({
-            action: `Assigned ${phoneNumberPayloads.length} phone numbers in account ${targetUID} - ${companyName}`,
+            action: `Assigned ${phoneNumberPayloads.length} phone numbers`,
             tool: 'Bulk Number Assign',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
 
         setProgressMax(phoneNumberPayloads.length)

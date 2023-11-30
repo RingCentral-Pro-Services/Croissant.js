@@ -67,9 +67,10 @@ const CreateCallQueues = () => {
         setIsSyncing(true)
         fireEvent('create-call-queues')
         reportToAuditTrail({
-            action: `Created ${queues.length} queues in account ${targetUID} - ${companyName}`,
+            action: `Created ${queues.length} call queues`,
             tool: 'Create Call Queues',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
     }
 

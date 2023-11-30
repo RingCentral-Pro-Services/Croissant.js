@@ -76,9 +76,10 @@ const LocationUpdates = () => {
         setIsSyncing(true)
         setProgressMax(networkLocations.length)
         reportToAuditTrail({
-            action: `Added ${networkLocations.length} to ${targetUID} - ${companyName}`,
+            action: `Added ${networkLocations.length} network locations`,
             tool: 'Automatic Location Updates',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
         createNetworkLocations(networkLocations)
     }

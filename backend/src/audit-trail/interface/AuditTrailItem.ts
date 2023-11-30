@@ -4,6 +4,7 @@ export interface AuditTrailItem {
     initiator: string;
     tool: string;
     type: string
+    uid: string
     createdAt?: Date;
     updatedAt?: Date;
 }

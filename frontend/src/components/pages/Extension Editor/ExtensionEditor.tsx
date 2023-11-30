@@ -55,9 +55,10 @@ const ExtensionEditor = () => {
     const handleSyncbuttonClick = () => {
         fireEvent('edit-extensions')
         reportToAuditTrail({
-            action: `Used Extension Editor tool in account ${targetUID} - ${companyName}`,
+            action: `Used Extension Editor tool`,
             tool: 'Extension Editor',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
         setIsSyncing(true)
         setMaxProgressValue(editedExtensions.length)

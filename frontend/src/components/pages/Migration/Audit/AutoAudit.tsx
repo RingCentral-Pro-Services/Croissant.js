@@ -32,6 +32,7 @@ import { AuditUserGroupPair } from "./models/AuditUserGroupPair";
 import { AuditPromptPair } from "./models/AuditPromptPair";
 import { AuditCallRecordingPair } from "./models/AuditCallRecordingPair";
 import { AuditUserRowPair } from "./models/AuditUserRowPair";
+import { useAuditTrail } from "../../../../hooks/useAuditTrail";
 
 export interface AuditSettings {
     shouldOverrideSites: boolean,
@@ -59,6 +60,7 @@ const AutoAudit = () => {
     const [isDoneFetchingSites, setIsDoneFetchingSites] = useState(false)
     const [isDoneFetchingTargetSites, setIsDoneFetchingTargetSites] = useState(false)
     const [shouldShowSiteFilter, setShouldShowSiteFilter] = useState(false)
+    const { reportToAuditTrail } = useAuditTrail()
     const supportedExtensionTypes = ['ERLs', 'Call Recording Settings', 'User', 'Limited Extension', 'Call Queue', 'IVR Menu', 'Prompt Library', 'Message-Only', 'Announcement-Only', 'Call Monitoring Groups', 'Park Location', 'User Group']
     const [settings, setSettings] = useState<AuditSettings>({
         shouldOverrideSites: false,
@@ -153,6 +155,14 @@ const AutoAudit = () => {
 
     async function handleAuditButtonClick() {
         setIsPullingData(true)
+
+        reportToAuditTrail({
+            action: `Started auto-audit (Old: ${originalAccountUID} (New ${newAccountUID}))`,
+            tool: 'Auto Audit',
+            type: 'Tool',
+            uid: newAccountUID
+        })
+
         const originalSelected = originalExtensionList.filter((ext) => ext.data.status !== 'Unassigned' && selectedExtensionTypes.includes(ext.prettyType()) && selectedSiteNames.includes(ext.data.site?.name ?? ''))
         const originalAccountData = await fetchAccountData(sites, originalExtensionList, filteredExtensions)
         setOriginalAccountData(originalAccountData)

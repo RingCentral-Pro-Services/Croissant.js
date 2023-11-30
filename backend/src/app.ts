@@ -18,7 +18,7 @@ app.use(feedbackRouter)
 app.use(accessControlRouter)
 app.use(auditTrailRouter)
 
-sequelize.sync().then(() => {
+sequelize.sync({ alter: false }).then(() => {
   console.log('Database & tables created!')
 }).catch((err) => {
   console.log('Error while creating tables')

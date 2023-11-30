@@ -97,9 +97,10 @@ const UploadDevices = () => {
         setIsSyncing(true)
 
         reportToAuditTrail({
-            action: `Uploaded ${prospectiveDevices.length} devices to account ${targetUID} - ${companyName}`,
+            action: `Uploaded ${prospectiveDevices.length} devices`,
             tool: 'Upload Devices',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
 
         const unassignedDevices = prospectiveDevices.filter((device) => device.data.extension.data.name === 'Unassigned')
