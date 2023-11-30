@@ -77,7 +77,7 @@ export const UserUsage = () => {
 
     return (
         <>
-            <Header title="Usage by user" body="" />
+            <Header title="Usage by User" body="" />
             <ToolCard>
                 <Button
                     className="healthy-margin-bottom"

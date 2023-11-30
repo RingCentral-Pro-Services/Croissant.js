@@ -7,6 +7,7 @@ import { UsageCard } from "./components/UsageCard";
 import { UsageItem } from "./UsageItem";
 import useExportToExcel from "../../../hooks/useExportToExcel";
 import { Button } from "@mantine/core";
+import FilterArea from "../../shared/FilterArea";
 
 export const UsageReports = () => {
     const [auditItems, setAuditItems] = useState<AuditTrailItem[]>([])
@@ -73,22 +74,18 @@ export const UsageReports = () => {
 
     return (
         <>
-            <Header title="Usage" body="" />
+            <Header title="Usage by Tool" body="" />
             <ToolCard>
                 <Button
-                    className="healthy-margin-bottom mega-margin-left"
-                    variant='light'
+                    className="healthy-margin-bottom"
+                    variant='filled'
                     onClick={handleExportClick}
                 >Export</Button>
-                <div>
-                    {usageItems.map((item) => (
-                        <UsageCard
-                            title={item.data.title}
-                            body={`Used ${item.data.count} ${item.data.count === 1 ? 'time' : 'times'} this year`}
-                            key={item.data.title}
-                        />
-                    ))}
-                </div>
+                <FilterArea
+                    items={usageItems}
+                    showSiteFilter={false}
+                    defaultSelected={[]}
+                />
             </ToolCard>
         </>
     )
