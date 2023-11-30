@@ -57,9 +57,10 @@ const NotificationAudit = () => {
         setIsPending(true)
         fetchNotificationSettings(filteredExtensions)
         reportToAuditTrail({
-            action: `Exported notification settings for ${filteredExtensions.length} extensions in account ${targetUID} - ${companyName}`,
+            action: `Exported notification settings for ${filteredExtensions.length} extensions`,
             tool: 'Notifications',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
     }
 
@@ -70,9 +71,10 @@ const NotificationAudit = () => {
         updateNotifications(adjustedNotifications)
         fireEvent('notifications-update')
         reportToAuditTrail({
-            action: `Updated notification settings for ${adjustedNotifications.length} extensions in account ${targetUID} - ${companyName}`,
+            action: `Updated notification settings for ${adjustedNotifications.length} extensions`,
             tool: 'Notifications',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
     }
 

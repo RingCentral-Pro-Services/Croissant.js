@@ -61,9 +61,10 @@ const ManageCustomFields = () => {
     const handleModalSubmit = async (field: CustomFieldData) => {
 
         reportToAuditTrail({
-            action: `Created custom field ${field.displayName} in account ${targetUID} - ${companyName}`,
+            action: `Created custom field ${field.displayName}`,
             tool: 'Manage Custom Fields',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
 
         await createCustomField(field)

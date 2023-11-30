@@ -83,9 +83,10 @@ const CustomRulesBuilder = () => {
     const handleSyncButtonClick = () => {
         setIsSyncing(true)
         reportToAuditTrail({
-            action: `Created ${customRules.length} extensions in account ${targetUID} - ${companyName}`,
-            tool: 'Extension Audit',
-            type: 'Tool'
+            action: `Created ${customRules.length} custom rules`,
+            tool: 'Custom Rules',
+            type: 'Tool',
+            uid: targetUID
         })
     }
 

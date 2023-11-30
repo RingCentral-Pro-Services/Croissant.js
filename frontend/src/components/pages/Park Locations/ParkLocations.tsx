@@ -75,9 +75,10 @@ const ParkLocations = () => {
     const handleAuditButtonClick = () => {
         setIsSyncing(true)
         reportToAuditTrail({
-            action: `Exported ${parkLocationExtensions.length} park locations from account ${targetUID} - ${companyName}`,
+            action: `Exported ${parkLocationExtensions.length} park locations`,
             tool: 'Park Locations',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
         console.log(`Park Location Extensions: ${parkLocationExtensions.length}`)
     }

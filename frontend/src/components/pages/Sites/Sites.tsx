@@ -86,9 +86,10 @@ const Sites = () => {
     const handleSync = () => {
         setIsSyncing(true)
         reportToAuditTrail({
-            action: `Created ${sites.length} sites in account ${targetUID} - ${companyName}`,
+            action: `Created ${sites.length} sites`,
             tool: 'Sites',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
         setProgressMax(sites.length)
         createSites(sites)

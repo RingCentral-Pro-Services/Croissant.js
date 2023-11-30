@@ -81,9 +81,10 @@ const UserGroups = () => {
     const handleAuditButtonClick = () => {
         setIsAuditing(true)
         reportToAuditTrail({
-            action: `Exported user groups from account ${targetUID} - ${companyName}`,
+            action: `Exported user groups`,
             tool: 'User Groups',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
         fetchUserGroups()
     }
@@ -91,9 +92,10 @@ const UserGroups = () => {
     const handleSyncClick = () => {
         setIsSyncing(true)
         reportToAuditTrail({
-            action: `Created ${userGroups.length} user groups in account ${targetUID} - ${companyName}`,
+            action: `Created ${userGroups.length} user groups`,
             tool: 'User Groups',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
     }
 

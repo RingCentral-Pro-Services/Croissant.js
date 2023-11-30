@@ -113,9 +113,10 @@ const CustomRules = () => {
         setProgressMax(selectedExtensions.length)
         setActiveStep(10)
         reportToAuditTrail({
-            action: `Copied ${selectedRules.length} custom rules to ${selectedExtensions.length} extensions in account ${targetUID} - ${companyName}`,
+            action: `Copied ${selectedRules.length} custom rules to ${selectedExtensions.length} extensions`,
             tool: 'Copy Custom Rules',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
         fireEvent('copy-custom-rules')
     }

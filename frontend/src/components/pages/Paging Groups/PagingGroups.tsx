@@ -105,9 +105,10 @@ const PagingGroups = () => {
         fireEvent('paging-groups')
 
         reportToAuditTrail({
-            action: `Created ${pagingGroups.length} paging groups in account ${targetUID} - ${companyName}`,
+            action: `Created ${pagingGroups.length} paging groups`,
             tool: 'Paging Groups',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
 
         let updatedPagingGroups = pagingGroups

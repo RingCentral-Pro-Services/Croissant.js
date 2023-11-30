@@ -49,9 +49,10 @@ const DirectAuditMenus = () => {
         fetchIVRs(selectedExtensions)
         fireEvent('update-audit')
         reportToAuditTrail({
-            action: `Exported ${selectedExtensions.length} IVRs from account ${targetUID} - ${companyName}`,
+            action: `Exported ${selectedExtensions.length} IVRs`,
             tool: 'Export IVRs',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
     }
 

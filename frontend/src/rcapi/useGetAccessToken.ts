@@ -47,9 +47,10 @@ const useGetAccessToken = () => {
             localStorage.setItem('cs_access_token', res.data['access_token'])
             localStorage.setItem('cs_refresh_token', res.data['refresh_token'])
             reportToAuditTrail({
-                action: `Accessed account ${uid}`,
+                action: `Accessed account`,
                 tool: 'Croissant',
-                type: 'Access'
+                type: 'Access',
+                uid: uid
             })
             setAccountID(uid)
             getCompanyName()

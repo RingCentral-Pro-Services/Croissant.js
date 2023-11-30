@@ -6,7 +6,7 @@ export const AuditTrailFilters = (props: { auditItems: AuditTrailItem[], onIniti
     const { auditItems, onInitiatorFilterChange, onToolFilterChange, onTypeFilterChange } = props
 
     return (
-        <div className="healthy-margin-bottom">
+        <div className="healthy-margin-bottom inline">
             <p>Filters</p>
             <AdaptiveFilter
                 options={Array.from(new Set(auditItems.map((item) => item.data.initiator)))}

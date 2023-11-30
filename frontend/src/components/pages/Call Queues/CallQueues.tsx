@@ -82,9 +82,10 @@ const CallQueues = () => {
         setIsSyncing(true)
         // fetchQueueMembers(selectedExtensions)
         reportToAuditTrail({
-            action: `Exported ${selectedExtensions.length} queues from account ${targetUID} - ${companyName}`,
+            action: `Exported ${selectedExtensions.length} call queues`,
             tool: 'Audit Call Queues',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
         fireEvent('call-queue-audit')
     }

@@ -7,7 +7,8 @@ export const addAuditTrailItem = async (item: AuditTrailItem) => {
             action: item.action,
             initiator: item.initiator,
             tool: item.tool,
-            type: item.type
+            type: item.type,
+            uid: item.uid
         })
         return true
     }
@@ -30,6 +31,7 @@ export const getAuditTrailItems = async () => {
                 initiator: item.initiator,
                 tool: item.tool,
                 type: item.type,
+                uid: item.uid,
                 createdAt: item.createdAt,
                 updatedAt: item.updatedAt
             })

@@ -101,9 +101,10 @@ const EditSites = () => {
         setIsSyncing(true)
         fireEvent('edit-sites')
         reportToAuditTrail({
-            action: `Edited ${validatedSites.length} in account ${targetUID} - ${companyName}`,
+            action: `Edited ${validatedSites.length} sites`,
             tool: 'Edit Sites',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
         updateSites(validatedSites)
     }

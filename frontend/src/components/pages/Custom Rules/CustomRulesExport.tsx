@@ -118,9 +118,10 @@ const CustomRulesExport = () => {
         }
 
         reportToAuditTrail({
-            action: `Exported custom rules from account ${targetUID} - ${companyName}`,
+            action: `Exported custom rules`,
             tool: 'Custom Rules Export',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
     }
 

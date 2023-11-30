@@ -103,9 +103,10 @@ const ManipulateCustomRules = () => {
         setActiveStep(10)
         fireEvent('manipulate_custom_rules')
         reportToAuditTrail({
-            action: `Manipulated rule ${targetRuleName} for ${selectedExtensions.length} in account ${targetUID} - ${companyName}`,
+            action: `Manipulated rule ${targetRuleName} for ${selectedExtensions.length} extensions`,
             tool: 'Manipulate Custom Rules',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
     }
 

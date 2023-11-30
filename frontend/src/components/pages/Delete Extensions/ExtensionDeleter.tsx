@@ -165,9 +165,10 @@ const ExtensionDeleter = () => {
     const handleModalAcceptance = () => {
         setIsPending(true)
         reportToAuditTrail({
-            action: `Deleted ${selectedExtensions.length} extensions from account ${targetUID} - ${companyName}`,
+            action: `Deleted ${selectedExtensions.length} extensions`,
             tool: 'Delete Extensions',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
         deleteExtensions(selectedExtensions)
         fireEvent('delete-extensions')

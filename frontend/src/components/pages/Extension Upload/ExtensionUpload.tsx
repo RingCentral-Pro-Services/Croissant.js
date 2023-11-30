@@ -178,9 +178,10 @@ const ExtensionUpload = () => {
         setIsSyncing(true)
         fireEvent('extension-upload')
         reportToAuditTrail({
-            action: `Uploaded ${extensions.length} extensions to account ${targetUID} - ${companyName}`,
+            action: `Uploaded ${extensions.length} extensions`,
             tool: 'Extension Upload',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
     }
 

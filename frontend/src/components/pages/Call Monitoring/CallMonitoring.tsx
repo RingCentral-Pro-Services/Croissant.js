@@ -84,9 +84,10 @@ const CallMonitoring = () => {
     const handleSync = () => {
         setIsSyncing(true)
         reportToAuditTrail({
-            action: `Created ${monitoringGroups.length} in account ${targetUID} - ${companyName}`,
+            action: `Created ${monitoringGroups.length} call monitoring groups`,
             tool: 'Call Monitoring',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
         setProgressMax(monitoringGroups.length * 2)
         createGroups(monitoringGroups)

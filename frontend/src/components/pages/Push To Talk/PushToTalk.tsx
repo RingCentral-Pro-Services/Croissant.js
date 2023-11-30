@@ -109,18 +109,20 @@ const PushToTalk = () => {
     const handleExportButtonClick = () => {
         fetchChannels()
         reportToAuditTrail({
-            action: `Exported Push-to-Talk channels from account ${targetUID} - ${companyName}`,
+            action: `Exported Push-to-Talk channels`,
             tool: 'Push-to-Talk',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
     }
 
     const handleSyncButtonClick = () => {
         setIsSyncing(true)
         reportToAuditTrail({
-            action: `Created Push-to-Talk channels in account ${targetUID} - ${companyName}`,
+            action: `Created ${channels.length} Push-to-Talk channels`,
             tool: 'Extension Audit',
-            type: 'Tool'
+            type: 'Tool',
+            uid: targetUID
         })
     }
 
