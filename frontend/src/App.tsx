@@ -49,6 +49,7 @@ import { ConvertUsers } from './components/pages/Conversion/User - Limited Exten
 import { AccessDenied } from './components/pages/Access Denied/AccessDenied';
 import { ManagementConsole } from './components/pages/Management Console/ManagementConsole';
 import { AuditTrail } from './components/pages/Audit Trail/AuditTrail';
+import { UsageReports } from './components/pages/Usage Reports/UsageReports';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -117,6 +118,7 @@ function App() {
                 <Route path='/access-denied' element={<AccessDenied />} />
                 <Route path='/management-console' element={<ManagementConsole />} />
                 <Route path='/audit-trail' element={<AuditTrail />} />
+                <Route path='/usage' element={<UsageReports />} />
                 <Route path='/token' element={<Token />} />
                 <Route path='/biztoken' element={<BizToken />} />
                 <Route path='/' element={<CreateMenus />} />

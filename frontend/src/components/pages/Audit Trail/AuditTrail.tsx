@@ -16,7 +16,7 @@ export const AuditTrail = () => {
     const [toolFilter, setToolFilter] = useState<string[]>([])
     const [typeFilter, setTypeFilter] = useState<string[]>([])
     const [selectedYear, setSelectedYear] = useState(`${new Date().getFullYear()}`)
-    const {exportToExcel} = useExportToExcel()
+    const { exportToExcel } = useExportToExcel()
 
     useLogin('audit-trail')
 
@@ -79,11 +79,11 @@ export const AuditTrail = () => {
                 {auditItems.length > 0 ? <AuditTrailFilters auditItems={auditItems} onInitiatorFilterChange={setInitiatorFilter} onToolFilterChange={setToolFilter} onTypeFilterChange={setTypeFilter} /> : <></>}
                 {filteredAuditItems.length > 0 ? <Button onClick={handleDownloadButtonClick}>Export</Button> : <></>}
                 <FilterArea
-                items={filteredAuditItems}
-                showSiteFilter={false}
-                additive
-                defaultSelected={[]}
-            />
+                    items={filteredAuditItems}
+                    showSiteFilter={false}
+                    additive
+                    defaultSelected={[]}
+                />
             </ToolCard>
         </>
     )
