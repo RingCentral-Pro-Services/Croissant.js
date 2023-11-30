@@ -36,22 +36,24 @@ export const processAuth = async (req: Request, res: Response, next: any) => {
         return
     }
 
-    const departmentWhitelisted = await isDepartmentWhiteListed(user.contact.department)
+    if (process.env.DISABLE_WHITELIST_CHECK !== 'true') {
+        const departmentWhitelisted = await isDepartmentWhiteListed(user.contact.department)
 
-    if (!departmentWhitelisted) {
-        const userWhiteListed = await isUserWhiteListed(user.id)
+        if (!departmentWhitelisted) {
+            const userWhiteListed = await isUserWhiteListed(user.id)
 
-        if (!userWhiteListed) {
-            const auditItem: AuditTrailItem = {
-                action: 'Failed login attempt (Not whitelisted)',
-                initiator: user.name,
-                tool: 'Auth',
-                type: 'Login',
-                uid: 'N/A'
+            if (!userWhiteListed) {
+                const auditItem: AuditTrailItem = {
+                    action: 'Failed login attempt (Not whitelisted)',
+                    initiator: user.name,
+                    tool: 'Auth',
+                    type: 'Login',
+                    uid: 'N/A'
+                }
+                addAuditTrailItem(auditItem)
+                res.redirect(`/access-denied`)
+                return
             }
-            addAuditTrailItem(auditItem)
-            res.redirect(`/access-denied`)
-            return
         }
     }
 
