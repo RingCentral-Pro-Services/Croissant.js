@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from "react";
 import Header from "../../shared/Header";
 import ToolCard from "../../shared/ToolCard";
+import useExportToExcel from "../../../hooks/useExportToExcel";
 import { AuditTrailItem, AuditTrailItemData } from "../Audit Trail/models/AuditTrailItem";
 import { RestCentral } from "../../../rcapi/RestCentral";
-import { UsageCard } from "./components/UsageCard";
-import { UsageItem } from "./UsageItem";
-import useExportToExcel from "../../../hooks/useExportToExcel";
-import { Button } from "@mantine/core";
 import FilterArea from "../../shared/FilterArea";
+import { UsageItem } from "./UsageItem";
+import { Button } from "@mantine/core";
 
-export const UsageReports = () => {
+export const UserUsage = () => {
     const [auditItems, setAuditItems] = useState<AuditTrailItem[]>([])
-    const [usageItems, setUsageItems] = useState<UsageItem[]>([])
     const [selectedYear, setSelectedYear] = useState(`${new Date().getFullYear()}`)
-    const {exportToExcel} = useExportToExcel()
+    const [usageItems, setUsageItems] = useState<UsageItem[]>([])
+    const { exportToExcel } = useExportToExcel()
 
     useEffect(() => {
         fetchAuditTrail()
@@ -39,10 +38,14 @@ export const UsageReports = () => {
             const usage: UsageItem[] = []
 
             for (const item of itemsFormatted) {
-                let existingItem = usage.find((currentItem) => currentItem.data.title === item.data.tool)
+                if (['Account Access', 'Croissant', 'Auth'].includes(item.data.tool)) {
+                    continue
+                }
+
+                let existingItem = usage.find((currentItem) => currentItem.data.title === item.data.initiator)
                 
                 if (!existingItem) {
-                    const newItem = new UsageItem({title: item.data.tool, count: 1})
+                    const newItem = new UsageItem({title: item.data.initiator, count: 1})
                     usage.push(newItem)
                     continue
                 }
@@ -67,19 +70,19 @@ export const UsageReports = () => {
     const handleExportClick = () => {
         exportToExcel([{
             sheetName: 'Usage',
-            headers: ['Tool', 'Usage Count'],
+            headers: ['Name', 'Usage Count'],
             data: usageItems
-        }], 'croissant-usage-by-tool.xlsx')
+        }], 'croissant-usage-by-user.xlsx')
     }
 
     return (
         <>
-            <Header title="Usage by Tool" body="" />
+            <Header title="Usage by User" body="" />
             <ToolCard>
                 <Button
                     className="healthy-margin-bottom"
-                    variant='filled'
                     onClick={handleExportClick}
+                    variant='filled'
                 >Export</Button>
                 <FilterArea
                     items={usageItems}
