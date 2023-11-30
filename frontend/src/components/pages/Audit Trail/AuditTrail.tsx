@@ -14,6 +14,7 @@ export const AuditTrail = () => {
     const [initiatorFilter, setInitiatorFilter] = useState<string[]>([])
     const [toolFilter, setToolFilter] = useState<string[]>([])
     const [typeFilter, setTypeFilter] = useState<string[]>([])
+    const [selectedYear, setSelectedYear] = useState(`${new Date().getFullYear()}`)
 
     useLogin('audit-trail')
 
@@ -44,7 +45,7 @@ export const AuditTrail = () => {
             const headers = {
                 'Authorization': token
             }
-            const res = await RestCentral.get('/api/audit', headers)
+            const res = await RestCentral.get(`/api/audit?year=${selectedYear}`, headers)
             const items: AuditTrailItemData[] = res.data.items
 
             items.sort((a, b) => {
