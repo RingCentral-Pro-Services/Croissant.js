@@ -1,4 +1,4 @@
-import { Button } from "@mantine/core";
+import { Accordion, Button } from "@mantine/core";
 import { IconDownload } from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
 import useExportPrettyExcel from "../../../../hooks/useExportPrettyExcel";
@@ -88,25 +88,25 @@ const AutoAudit = () => {
     }
 
     useLogin('autoaudit', isPullingData)
-    const {postMessage, postNotification, postError, messages, errors, notifications} = useMessageQueue()
-    const {timedMessages, postTimedMessage} = usePostTimedMessage()
-    const {fetchSites, isFetchingSites} = useSiteList(postMessage, postTimedMessage, postError, handleSiteFetchCompletion)
-    const {fetchSites: fetchTargetSites, isFetchingSites: isFetchingTargetSites} = useSiteList(postMessage, postTimedMessage, postError, handleTargetSiteFetchCompletion)
-    const {extensionsList: originalExtensionList, fetchExtensions: fetchOriginalExtensions, isExtensionListPending: isOriginalExtensionListPending, isMultiSiteEnabled} = useExtensions(postMessage)
-    const {extensionsList: targetExtensionList, fetchExtensions: fetchTargetExtensions, isExtensionListPending: isTargetListPending} = useExtensions(postMessage)
-    const {fetchToken: fetchTargetToken} = useJWKS()
-    const {exportPrettyExcel} = useExportPrettyExcel()
-    
-    const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError, userName} = useGetAccessToken()
-    const {fetchToken: fetchNewAccountToken, hasCustomerToken: hasNewAccountToken, companyName: newCompanyName, isTokenPending: isNewAccountTokenPending, error: newAccountTokenError, userName: newAccountUserName} = useGetAccessToken()
-    const {fetchAccountData, step, progressLabel, progressValue, maxProgress} = useAccountData(settings, selectedExtensionTypes, selectedSiteNames, selectedExtensions, postMessage, postTimedMessage, postError)
-    const {fetchAccountData: fetchNewAccountData, step: newAccountStep, progressLabel: newAccountProgressLabel, progressValue: newAccountProgressValue, maxProgress: newAccountMaxProgress} = useAccountData(settings, selectedExtensionTypes, selectedSiteNames, selectedExtensions, postMessage, postTimedMessage, postError)
+    const { postMessage, postNotification, postError, messages, errors, notifications } = useMessageQueue()
+    const { timedMessages, postTimedMessage } = usePostTimedMessage()
+    const { fetchSites, isFetchingSites } = useSiteList(postMessage, postTimedMessage, postError, handleSiteFetchCompletion)
+    const { fetchSites: fetchTargetSites, isFetchingSites: isFetchingTargetSites } = useSiteList(postMessage, postTimedMessage, postError, handleTargetSiteFetchCompletion)
+    const { extensionsList: originalExtensionList, fetchExtensions: fetchOriginalExtensions, isExtensionListPending: isOriginalExtensionListPending, isMultiSiteEnabled } = useExtensions(postMessage)
+    const { extensionsList: targetExtensionList, fetchExtensions: fetchTargetExtensions, isExtensionListPending: isTargetListPending } = useExtensions(postMessage)
+    const { fetchToken: fetchTargetToken } = useJWKS()
+    const { exportPrettyExcel } = useExportPrettyExcel()
+
+    const { fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError, userName } = useGetAccessToken()
+    const { fetchToken: fetchNewAccountToken, hasCustomerToken: hasNewAccountToken, companyName: newCompanyName, isTokenPending: isNewAccountTokenPending, error: newAccountTokenError, userName: newAccountUserName } = useGetAccessToken()
+    const { fetchAccountData, step, progressLabel, progressValue, maxProgress } = useAccountData(settings, selectedExtensionTypes, selectedSiteNames, selectedExtensions, postMessage, postTimedMessage, postError)
+    const { fetchAccountData: fetchNewAccountData, step: newAccountStep, progressLabel: newAccountProgressLabel, progressValue: newAccountProgressValue, maxProgress: newAccountMaxProgress } = useAccountData(settings, selectedExtensionTypes, selectedSiteNames, selectedExtensions, postMessage, postTimedMessage, postError)
 
     useEffect(() => {
         if (originalAccountUID.length < 5) return
         localStorage.setItem('target_uid', originalAccountUID)
         fetchToken(originalAccountUID)
-    },[originalAccountUID])
+    }, [originalAccountUID])
 
     // useEffect(() => {
     //     if (newAccountUID.length < 5) return
@@ -129,7 +129,7 @@ const AutoAudit = () => {
         if (isOriginalExtensionListPending) return
 
         if (!isMultiSiteEnabled) {
-            setSettings({...settings, shouldMigrateSites: false})
+            setSettings({ ...settings, shouldMigrateSites: false })
             setSelectedSiteNames(['Main Site'])
             return
         }
@@ -171,7 +171,7 @@ const AutoAudit = () => {
         await fetchTargetToken(newAccountUID)
         const targetSites = await fetchSites()
         const newExtensions = await fetchTargetExtensions()
-        
+
         const newTargetSelected: Extension[] = []
         for (const extension of filteredExtensions) {
             let targetExtension = null
@@ -480,7 +480,44 @@ const AutoAudit = () => {
                     <li>Putting the old account and new account IDs in the wrong field will yield incorrect audit results</li>
                     <li>The tool will omit the .ps.ringcentral.com from email addresses so they match in the generated sheet</li>
                     <li>The tool will omit the leading N from device serial numbers so they match in the generated sheet</li>
+                    <li>Some settings can't be audited by the tool. Check the section below for a list</li>
                 </ol>
+
+            </ToolCard>
+
+            <ToolCard>
+                <Accordion defaultValue="">
+                    <Accordion.Item value="customization">
+                        <Accordion.Control>Items not covered</Accordion.Control>
+                        <Accordion.Panel>
+                            <p>Users</p>
+                            <ol>
+                                <li>Default Area Code</li>
+                                <li>Device lock status</li>
+                                <li>WMI</li>
+                                <li>Personal Meeting ID</li>
+                                <li>Robocall Settings</li>
+                            </ol>
+
+                            <p>Sites</p>
+                            <ol>
+                                <li>Zero Dialing Settings</li>
+                                <li>SMS/Fax Recipient</li>
+                            </ol>
+
+                            <p>Call Queues</p>
+                            <ol>
+                                <li>Inbound Caller ID Display</li>
+                            </ol>
+
+                            <p>Limited Extensions</p>
+                            <ol>
+                                <li>Device Lock Status</li>
+                                <li>WMI</li>
+                            </ol>
+                        </Accordion.Panel>
+                    </Accordion.Item>
+                </Accordion>
             </ToolCard>
 
             <ToolCard>
