@@ -133,15 +133,15 @@ const mockdata: SidebarGroup[] = [
       { label: 'Automatic Location Updates', link: '/locationupdates' },
     ],
   },
-  // {
-  //   label: 'Conversion',
-  //   icon: IconTransform,
-  //   initiallyOpened: false,
-  //   links: [
-  //     { label: 'Call Queue → Ring Group', link: '/convert-call-queues' },
-  //     { label: 'User → Limited Extensino', link: '/convert-users' },
-  //   ],
-  // },
+  {
+    label: 'Conversion',
+    icon: IconTransform,
+    initiallyOpened: false,
+    links: [
+      { label: 'Call Queue → Ring Group', link: '/convert-call-queues' },
+      // { label: 'User → Limited Extensino', link: '/convert-users' },
+    ],
+  },
   {
     label: 'Groups',
     icon: IconSettings2,
