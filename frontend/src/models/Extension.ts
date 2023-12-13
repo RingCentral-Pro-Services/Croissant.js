@@ -10,6 +10,11 @@ export class Extension implements ExcelFormattable, DataGridFormattable {
                 name: 'Main Site'
             }
         }
+
+        if (this.data.site.name === 'Main site') {
+            this.data.site.name = 'Main Site'
+        }
+
         if (this.data.type === 'Limited') {
             // Set the pin to a random 6-digit number
             this.data.ivrPin = this.generatePIN()
