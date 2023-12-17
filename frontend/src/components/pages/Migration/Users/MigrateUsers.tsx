@@ -94,6 +94,7 @@ import { useLocation } from "react-router-dom";
 import useAnalytics from "../../../../hooks/useAnalytics";
 import ImportAccountData from "./components/ImportAccountData";
 import { useAuditTrail } from "../../../../hooks/useAuditTrail";
+import { useUploadUnassignedDevices } from "./hooks/useUploadUnassignedDevices";
 const FileSaver = require('file-saver');
 
 
@@ -116,7 +117,7 @@ const MigrateUsers = () => {
     const [isShowingModal, setIsShowingModal] = useState(false)
     const [isShowingSegregatedModal, setIsShowingSegregatedModal] = useState(false)
     const currentUser = useAtomValue(userAtom)
-    const supportedExtensionTypes = ['ERLs', 'Custom Roles', 'Call Recording Settings', 'Cost Centers', 'User', 'Limited Extension', 'Call Queue', 'IVR Menu', 'Prompt Library', 'Message-Only', 'Announcement-Only', 'Call Monitoring Groups', 'Park Location', 'User Group']
+    const supportedExtensionTypes = ['ERLs', 'Custom Roles', 'Call Recording Settings', 'Cost Centers', 'User', 'Limited Extension', 'Call Queue', 'IVR Menu', 'Prompt Library', 'Message-Only', 'Announcement-Only', 'Call Monitoring Groups', 'Park Location', 'User Group', 'Unassigned Devices']
 
     const [sites, setSites] = useState<SiteData[]>([])
     const [customRoles, setCustomRoles] = useState<Role[]>([])
@@ -217,6 +218,7 @@ const MigrateUsers = () => {
     const {configureSites, progressValue: configureSitesProgress, maxProgress: maxConfigureSitesProgress} = useConfigureSites(postMessage, postTimedMessage, postError)
     const {createCostCenters, progressValue: createCostCentersProgress, maxProgress: maxCreateCostCentersProgress} = useCreateCostCenters(postMessage, postTimedMessage, postError)
     const {setCallRecordingSettings: setRecordingSettings} = useSetCallRecordingSettings(postMessage, postTimedMessage, postError)
+    const { uploadUnassignedDevices, progressValue: deviceUploadProgress, progressMax: deviceUploadProgressMax } = useUploadUnassignedDevices(postMessage, postTimedMessage, postError)
     const {writeExcel} = useWriteExcelFile()
     const {exportToExcel} = useExportToExcel()
     const {exportPrettyExcel} = useExportPrettyExcel()
@@ -723,6 +725,32 @@ const MigrateUsers = () => {
             }
         }
 
+        // Unassigned devices
+        if (selectedExtensionTypes.includes('Unassigned Devices')) {
+            const unassignedDevices = originalAccountDevices.filter((device) => !device.extension)
+            const selectedDevices = unassignedDevices.filter((device) => selectedSiteNames.includes(device.site?.name ?? ''))
+            const newSites = targetExtensionList.filter((ext) => ext.prettyType() === 'Site')
+
+            if (settings.shouldOverrideSites) {
+                for (let i = 0; i < selectedDevices.length; i++) {
+                    selectedDevices[i].site = {
+                        name: settings.targetSiteName,
+                        id: ''
+                    }
+                }
+            }
+
+            if (settings.shouldRemoveSites) {
+                for (let i = 0; i < selectedDevices.length; i++) {
+                    delete selectedDevices[i].site
+                }
+            }
+
+            console.log('Unassigned devices')
+            console.log(selectedDevices)
+            await uploadUnassignedDevices(selectedDevices, newSites)
+        }
+
         // Cost centers
         const targetAccountCostCenters = await fetchCostCenters()
         const topLevelCostCenter = targetAccountCostCenters.find((costCenter) => !costCenter.parentId)
@@ -1129,6 +1157,7 @@ const MigrateUsers = () => {
                     <li>The next available extension will be used if the original extension number length exceeds the max length in the new account</li>
                     <li>ATT/Verizon accounts are only supported as the original account. You cannot migrate <em>to</em> one of these accounts</li>
                     <li>For ATT/Verizon accounts, you will need to click the segregated login button below and login as the customer</li>
+                    <li>Only unassigned devices with serial numbers will be migrated</li>
                 </ol>
             </ToolCard>
             <ToolCard>
@@ -1226,6 +1255,7 @@ const MigrateUsers = () => {
                 <Button className='healthy-margin-left' sx={{top: 7}} variant='subtle' color='dark' leftIcon={<IconDownload />} onClick={handleDownloadNumberMapClick} >Number Map</Button>
                 <ProgressBar label='Main Site' value={assignMainSiteNumbersProgress} max={maxAssignMainSiteNumbersProgress} />
                 <ProgressBar label='Create Sites' value={siteMigrationProgress} max={maxSiteProgress} />
+                <ProgressBar label='Unassigned Devices' value={deviceUploadProgress} max={deviceUploadProgressMax} />
                 <ProgressBar label='Cost Centers' value={createCostCentersProgress} max={maxCreateCostCentersProgress} />
                 <ProgressBar label='ERLs' value={erlProgress} max={maxERLProgress} />
                 <ProgressBar label='Custom Roles' value={customRoleProgress} max={maxCustomRoleProgress} />
