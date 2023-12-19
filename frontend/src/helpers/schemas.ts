@@ -250,7 +250,8 @@ export const createSiteSchema = z.object({
     'City': z.string({
         required_error: 'Missing city',
         invalid_type_error: 'City data type invalid'
-    }),
+    }).optional(),
+    'Suburb': z.coerce.string().optional(),
     'State': z.string({
         required_error: 'Missing state',
         invalid_type_error: 'State data type invalid'
