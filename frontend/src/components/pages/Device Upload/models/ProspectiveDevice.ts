@@ -7,6 +7,7 @@ export interface ProspectiveDeviceData {
     modelName: string,
     name: string
     extension: Extension
+    siteID?: string
 }
 
 export class ProspectiveDevice implements DataGridFormattable {

@@ -27,6 +27,7 @@ import useCreateQueue from "../../Migration/Users/hooks/useCreateQueue";
 import useConfigureQueue from "../../Migration/Users/hooks/useConfigureQueue";
 import { useDeleteExtension } from "../../../../rcapi/useDeleteExtension";
 import { useAuditTrail } from "../../../../hooks/useAuditTrail";
+import { SystemNotifications } from "../../../shared/SystemNotifications";
 
 export interface ConvertSettings {
     deleteOldExtension: boolean
@@ -168,6 +169,7 @@ export const ConvertCallQueues = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Convert Call Queues" />
             <Modal opened={isShowingConfirmation} onClose={() => setIsShowingConfirmation(false)} withCloseButton={false} centered>
                 <h3>Confirm</h3>
                 <p>You're about to convert {selectedExtensions.length} {mode === 'Call Queue → Ring Group' ? 'call queues' : 'ring groups'} to {mode === 'Call Queue → Ring Group' ? 'ring groups' : 'call queues'}</p>

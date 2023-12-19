@@ -18,6 +18,7 @@ import useCreateCustomRule from "./hooks/useCreateCustomRule";
 import useReadCustomRules from "./hooks/useReadCustomRules";
 import { CustomRuleSchema } from "./models/CustomRuleSchema";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
+import { SystemNotifications } from "../../shared/SystemNotifications";
 
 const CustomRulesBuilder = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -92,6 +93,7 @@ const CustomRulesBuilder = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Build Custom Rules" />
             <Header title='Build Custom Rules' body='Build and update custom rules using a simple Excel spreadsheet' documentationURL="https://dqgriffin.com/blog/PC9PLU3H4ZIJZZIfv6Oy">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>

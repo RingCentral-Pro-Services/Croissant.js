@@ -20,6 +20,7 @@ import useReadIVRs from "./hooks/useReadIVRs";
 import useRegionalFormats from "./hooks/useRegionalFormats";
 import { TemplateData, TemplateEngine } from "./TemplateEngine";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
+import { SystemNotifications } from "../../shared/SystemNotifications";
 
 const AccountTemplates = () => {
     const [isSyncing, setIsSyncing] = useState(false)
@@ -134,6 +135,7 @@ const AccountTemplates = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Account Templates" />
             <Header title="Bulk Account Templates" body="Bootstrap many accounts using a template" />
             <ToolCard>
                 <h2>Account Templates</h2>

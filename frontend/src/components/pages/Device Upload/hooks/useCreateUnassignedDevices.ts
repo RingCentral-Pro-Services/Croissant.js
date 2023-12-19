@@ -8,7 +8,7 @@ const useCreateUnassignedDevices = (postMessage: (message: Message) => void, pos
     const baseWaitingPeriod = 250
     const MAX_BATCH_SIZE = 50
 
-    const createDevices = async (total: number) => {
+    const createDevices = async (total: number, siteID?: string) => {
         const accessToken = localStorage.getItem('cs_access_token')
         if (!accessToken) {
             throw new Error('No access token')
@@ -19,7 +19,7 @@ const useCreateUnassignedDevices = (postMessage: (message: Message) => void, pos
 
         while (remaining > 0) {
             const batchSize = Math.min(MAX_BATCH_SIZE, remaining)
-            const batchIDs = await batchCreateDevices(batchSize, accessToken)
+            const batchIDs = await batchCreateDevices(batchSize, accessToken, siteID)
             deviceIDs.push(...batchIDs)
             remaining -= batchSize
         }
@@ -27,7 +27,7 @@ const useCreateUnassignedDevices = (postMessage: (message: Message) => void, pos
         return deviceIDs
     }
 
-    const batchCreateDevices = async (count: number, token: string) => {
+    const batchCreateDevices = async (count: number, token: string, siteID?: string) => {
 
         if (count > MAX_BATCH_SIZE) {
             throw new Error('Batch size too large')
@@ -42,7 +42,8 @@ const useCreateUnassignedDevices = (postMessage: (message: Message) => void, pos
 
             const body = {
                 type: 'OtherPhone',
-                quantity: count
+                quantity: count,
+                ...(siteID && (siteID !== 'Undefined') && (siteID !== 'undefined') && {site: {id: siteID}})
             }
 
             const response = await RestCentral.post(url, headers, body)

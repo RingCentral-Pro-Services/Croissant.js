@@ -36,6 +36,7 @@ import FeedbackForm from "../../shared/FeedbackForm";
 import useSidebar from "../../../hooks/useSidebar";
 import useSetMemberStatus from "./hooks/useSetMemberStatus";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
+import { SystemNotifications } from "../../shared/SystemNotifications";
 
 const CallQueueTemplates = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -221,6 +222,7 @@ const CallQueueTemplates = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Call Queue Templates" />
             <Header  title="Call Queue Templates" body="Apply settings to call queues in bulk" documentationURL="https://dqgriffin.com/blog/E8pFhINKe0fKmW2YGsT7">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>

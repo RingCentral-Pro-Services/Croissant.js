@@ -5,11 +5,13 @@ import { router as authrouter } from './auth/routes/index';
 import { router as feedbackRouter } from './feedback/routes/index'
 import { router as accessControlRouter } from './access-control/routes/index'
 import { router as auditTrailRouter } from './audit-trail/routes/index'
+import { router as notificationRouter } from './notifications/routes/index'
 import { sequelize } from './database/Sequelize';
 import { DepartmentModel } from './access-control/models/DepartmentModel'
 import { AdminModel } from  './access-control/models/AdminModel'
 import { UserModel } from './access-control/models/UserModel'
 import { AuditItemModel } from './audit-trail/models/AuditItemModel'
+import { NotificationModel } from './notifications/models/NotificationModel';
 
 const app = express();
 app.use(express.json())
@@ -17,6 +19,7 @@ app.use(authrouter)
 app.use(feedbackRouter)
 app.use(accessControlRouter)
 app.use(auditTrailRouter)
+app.use(notificationRouter)
 
 sequelize.sync({ alter: false }).then(() => {
   console.log('Database & tables created!')

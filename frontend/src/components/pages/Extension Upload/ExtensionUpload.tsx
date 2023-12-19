@@ -25,6 +25,7 @@ import useFetchRoles from "./hooks/useFetchRoles";
 import useDeviceDictionary from "./hooks/useDeviceDictionary";
 import { Device } from "../Migration/User Data Download/models/UserDataBundle";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
+import { SystemNotifications } from "../../shared/SystemNotifications";
 
 const ExtensionUpload = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -187,6 +188,7 @@ const ExtensionUpload = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Extension Upload" />
             <Header title='Extension Upload' body={`Create extensions using the BRD's users tab`} documentationURL="https://dqgriffin.com/blog/rgOq6D6cGUzNteQkEXE4">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>

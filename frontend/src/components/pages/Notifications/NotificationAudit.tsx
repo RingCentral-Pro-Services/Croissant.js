@@ -21,6 +21,7 @@ import useWriteExcelFile from "../../../hooks/useWriteExcelFile"
 import FeedbackForm from "../../shared/FeedbackForm"
 import useSidebar from "../../../hooks/useSidebar"
 import { useAuditTrail } from "../../../hooks/useAuditTrail"
+import { SystemNotifications } from "../../shared/SystemNotifications"
 
 const NotificationAudit = () => {
     const {fireEvent} = useAnalytics()
@@ -149,6 +150,7 @@ const NotificationAudit = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Notifications" />
             <Header title="Notifications" body="Audit and update notification emails" documentationURL="https://dqgriffin.com/blog/LbdYZP9HvJYrBrZGqFjh">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>

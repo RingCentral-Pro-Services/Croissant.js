@@ -22,6 +22,7 @@ import useLogin from "../../../hooks/useLogin";
 import ProgressBar from "../../shared/ProgressBar";
 import useWriteExcelFile from "../../../hooks/useWriteExcelFile";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
+import { SystemNotifications } from "../../shared/SystemNotifications";
 
 export const AssignCustomFields = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -105,6 +106,7 @@ export const AssignCustomFields = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Assign Custom Fields" />
             <ToolCard>
                 <h2>Assign Custom Fields</h2>
                 <UIDInputField 

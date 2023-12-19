@@ -17,6 +17,7 @@ import { Extension } from '../../../models/Extension'
 import { useSetAtom } from 'jotai'
 import { userAtom } from '../../../App'
 import { useAuditTrail } from '../../../hooks/useAuditTrail'
+import { SystemNotifications } from '../../shared/SystemNotifications'
 
 const ExtensionAudit = () => {
     useLogin('accountdump')
@@ -71,6 +72,7 @@ const ExtensionAudit = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Account Dump" />
             <Header title='Account Dump' body='This tool generatates a list of all extensions in an account' documentationURL='https://dqgriffin.com/blog/2rchSy0wVOH7oiBCUeOZ'>
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>

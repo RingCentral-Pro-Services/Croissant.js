@@ -19,6 +19,7 @@ import useCreateERLs from "./hooks/useCreateERLs";
 import useCreateSites from "./hooks/useCreateSites";
 import useExcelToSites from "./hooks/useExcelToSites";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
+import { SystemNotifications } from "../../shared/SystemNotifications";
 
 const Sites = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -98,6 +99,7 @@ const Sites = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Create Sites" />
             <Header title="Create Sites" body="Build sites in bulk" documentationURL="https://dqgriffin.com/blog/KkZuGBUv3C7BabG7PdPA">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>

@@ -53,6 +53,7 @@ const adminLinks: SidebarGroup[] = [
       { label: 'Audit Trail', link: '/audit-trail' },
       { label: 'Usage by Tool', link: '/usage' },
       { label: 'Usage by User', link: '/user-usage' },
+      { label: 'Alert Center', link: '/alert-center' },
     ],
   }
 ]

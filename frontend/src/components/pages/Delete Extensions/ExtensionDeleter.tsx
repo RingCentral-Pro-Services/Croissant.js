@@ -26,6 +26,7 @@ import { DeleteExtensionsSchema } from "./models/model"
 import useReadFromFile from "./hooks/useReadFromFile"
 import FileSelect from "../../shared/FileSelect"
 import { useAuditTrail } from "../../../hooks/useAuditTrail"
+import { SystemNotifications } from "../../shared/SystemNotifications"
 
 const ExtensionDeleter = () => {
     const {fireEvent} = useAnalytics()
@@ -234,6 +235,7 @@ const ExtensionDeleter = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Delete Extensions" />
             <Header title="Delete Extensions" body="Delete extensions in bulk" documentationURL="https://dqgriffin.com/blog/LbdYZP9HvJYrBrZGqFjh">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>

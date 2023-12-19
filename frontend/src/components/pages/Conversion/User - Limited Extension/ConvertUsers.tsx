@@ -9,6 +9,7 @@ import useExtensions from "../../../../rcapi/useExtensions";
 import { Accordion, SegmentedControl } from "@mantine/core";
 import SettingToggle from "../../../shared/Settings Components/SettingToggle";
 import UIDInputField from "../../../shared/UIDInputField";
+import { SystemNotifications } from "../../../shared/SystemNotifications";
 
 export interface UserConvertSettings {
     deleteOldExtension: boolean
@@ -44,6 +45,7 @@ export const ConvertUsers = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Convert Users" />
             <Header title="Users → Limited Extensions" body="" />
             <ToolCard>
                 <h2>Things to know</h2>

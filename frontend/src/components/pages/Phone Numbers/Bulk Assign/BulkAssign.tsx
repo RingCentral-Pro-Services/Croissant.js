@@ -19,6 +19,7 @@ import useAssignPhoneNumbers from "./hooks/useAssignPhoneNumbers";
 import useExcelToPhoneNumbers from "./hooks/useExcelToPhoneNumbers";
 import { IconExternalLink } from "@tabler/icons-react";
 import { useAuditTrail } from "../../../../hooks/useAuditTrail";
+import { SystemNotifications } from "../../../shared/SystemNotifications";
 
 const BulkAssign = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -95,6 +96,7 @@ const BulkAssign = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Bulk Number Assign" />
             <Header title="Bulk Number Assign" body="Assign phone numbers in bulk" documentationURL="https://dqgriffin.com/blog/jgEcv35VZJZlVnmcHZ2U">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>

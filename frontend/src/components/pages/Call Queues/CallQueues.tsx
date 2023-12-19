@@ -24,6 +24,7 @@ import useAuditCallQueue from "./hooks/useAuditCallQueue"
 import { sanitize } from "../../../helpers/Sanatize"
 import * as Excel from 'exceljs'
 import { useAuditTrail } from "../../../hooks/useAuditTrail"
+import { SystemNotifications } from "../../shared/SystemNotifications"
 
 export interface QueueAuditSettings {
     includeBusinessHours: boolean
@@ -206,6 +207,7 @@ const CallQueues = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Audit Call Queues" />
             <Header title='Audit Call Queues' body='Export a spreadsheet of all queues in an account' documentationURL='https://dqgriffin.com/blog/3IfuqLAoOfN2fPXXFh19'>
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>

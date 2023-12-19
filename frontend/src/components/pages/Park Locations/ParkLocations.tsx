@@ -15,6 +15,7 @@ import UIDInputField from "../../shared/UIDInputField";
 import useAuditParkLocation from "./hooks/useAuditParkLocation";
 import { ParkLocation } from "./models/ParkLocation";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
+import { SystemNotifications } from "../../shared/SystemNotifications";
 
 const ParkLocations = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -85,6 +86,7 @@ const ParkLocations = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Park Locations" />
             <Header title='Park Locations' body='Audit Park Locations' />
             <div className="tool-card">
                 <h2>Park Locations</h2>

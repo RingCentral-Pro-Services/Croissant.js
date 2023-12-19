@@ -19,6 +19,7 @@ import UIDInputField from "../../shared/UIDInputField";
 import useManipulateRules from "./hooks/useManipulateRules";
 import useSimpleRuleList from "./hooks/useSimpleRuleList";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
+import { SystemNotifications } from "../../shared/SystemNotifications";
 
 const ManipulateCustomRules = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -118,6 +119,7 @@ const ManipulateCustomRules = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Delete Custom Rule" />
             <Header title="Enable / Disable Custom Rules" body="Enable, disable, an delete custom rules in bulk" documentationURL="https://dqgriffin.com/blog/UxKvg9LxHgN8A8qlusBV">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>

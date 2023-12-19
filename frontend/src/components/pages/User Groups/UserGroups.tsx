@@ -18,6 +18,7 @@ import useReadUserGroups from "./hooks/useReadUserGroups";
 import useUserGroupsList from "./hooks/useUserGroupsList";
 import { UserGroupSchema } from "./models/schema";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
+import { SystemNotifications } from "../../shared/SystemNotifications";
 
 const UserGroups = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -106,6 +107,7 @@ const UserGroups = () => {
 
     return (
         <>
+            <SystemNotifications toolName="User Groups" />
             <Header title='User Groups' body='Create, update, and audit user groups' documentationURL="https://dqgriffin.com/blog/i2WLGk4HTAMiGiit4Xsy" />
             <div className="tool-card">
                 <h2>User Groups</h2>

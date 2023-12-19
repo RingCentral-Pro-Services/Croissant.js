@@ -18,6 +18,7 @@ import useExcelToNetworkLocations from "./hooks/useExcelToNetworkLocations";
 import useFetchERLs from "./hooks/useFetchERLs";
 import { IconExternalLink } from "@tabler/icons-react";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
+import { SystemNotifications } from "../../shared/SystemNotifications";
 
 const LocationUpdates = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -86,6 +87,7 @@ const LocationUpdates = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Automatic Location Updates" />
             <Header title="Automatic Location Updates" body="Create wireless access point maps and switch maps to facilitate automatic location updates" />
             <div className="tool-card">
                 <h2>Automatic Location Updates</h2>
