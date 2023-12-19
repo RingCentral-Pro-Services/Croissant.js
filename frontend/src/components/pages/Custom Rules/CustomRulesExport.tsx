@@ -17,6 +17,7 @@ import useGetCompanyRules from "./hooks/useGetCompanyRules";
 import useGetCustomRules from "./hooks/useGetCustomRules";
 import { CustomRule } from "./models/CustomRule";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
+import { SystemNotifications } from "../../shared/SystemNotifications";
 
 const CustomRulesExport = () => {
     const supportedExtensionTypes = ['User', 'Call Queue', 'Site']
@@ -128,6 +129,7 @@ const CustomRulesExport = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Export Custom Rules" />
             <Header title="Export Custom Rules" body="Generate a spreadsheet with all custom rules assigned to extensions" />
             <div className="tool-card">
                 <h2>Export Custom Rules</h2>

@@ -20,6 +20,7 @@ import AdaptiveFilter from "../../shared/AdaptiveFilter";
 import { sanitize } from "../../../helpers/Sanatize";
 import * as Excel from 'exceljs'
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
+import { SystemNotifications } from "../../shared/SystemNotifications";
 
 const DirectAuditMenus = () => {
     const {fireEvent} = useAnalytics()
@@ -121,6 +122,7 @@ const DirectAuditMenus = () => {
     
     return (
         <div className="main-content">
+            <SystemNotifications toolName="Audit IVRs" />
             <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
             {!isPhoneNumberMapPending && isMultiSiteEnabled ? <AdaptiveFilter options={siteNames} defaultSelected={siteNames} title='Sites' placeholder='Search...' setSelected={setSelectedSiteNames} />  : <></>}
             <Button className='healthy-margin-right' disabled={!hasCustomerToken || isPhoneNumberMapPending || isPending} variant="filled" onClick={handleClick}>Go</Button>

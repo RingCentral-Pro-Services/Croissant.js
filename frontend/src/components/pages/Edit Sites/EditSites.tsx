@@ -20,6 +20,7 @@ import FileSelect from "../../shared/FileSelect";
 import Header from "../../shared/Header";
 import UIDInputField from "../../shared/UIDInputField";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
+import { SystemNotifications } from "../../shared/SystemNotifications";
 
 const EditSites = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -116,6 +117,7 @@ const EditSites = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Edit Sites" />
             <Header title='Edit Sites' body='Edit site names and extension numbers in bulk' documentationURL="https://dqgriffin.com/blog/so8Z5rWf9Z4lWXRXqxK4">
                 <Button variant='subtle' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>

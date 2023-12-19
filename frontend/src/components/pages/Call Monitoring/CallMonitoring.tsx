@@ -21,6 +21,7 @@ import useCallMonitoringList from "./hooks/useCallMonitoringList";
 import useWriteExcelFile from "../../../hooks/useWriteExcelFile";
 import { IconExternalLink } from "@tabler/icons-react";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
+import { SystemNotifications } from "../../shared/SystemNotifications";
 
 const CallMonitoring = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -96,6 +97,7 @@ const CallMonitoring = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Call Monitoring" />
             <Header title='Call Monitoring' body='Create call monitoring groups in bulk. Note that this tool is not for updating existing groups. If you try it, duplicate groups will be created.' documentationURL="https://dqgriffin.com/blog/17i7vnnbekmjJNxzWBZs">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>

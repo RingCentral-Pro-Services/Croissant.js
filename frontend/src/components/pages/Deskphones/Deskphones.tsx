@@ -20,6 +20,7 @@ import Header from "../../shared/Header";
 import SimpleSelection from "../../shared/SimpleSelection";
 import UIDInputField from "../../shared/UIDInputField";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
+import { SystemNotifications } from "../../shared/SystemNotifications";
 
 const Deskphones = () => {
     const [filteredExtensions, setFilteredExtensions] = useState<RCExtension[]>([])
@@ -137,6 +138,7 @@ const Deskphones = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Desk Phones" />
             <Header title="Desk Phones" body="Set ring time for physical phones in bulk" documentationURL="https://dqgriffin.com/blog/E56ORu2TkiCB4CviXQNJ">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>

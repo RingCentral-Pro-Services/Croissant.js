@@ -51,6 +51,7 @@ import { ManagementConsole } from './components/pages/Management Console/Managem
 import { AuditTrail } from './components/pages/Audit Trail/AuditTrail';
 import { UsageReports } from './components/pages/Usage Reports/UsageReports';
 import { UserUsage } from './components/pages/Usage Reports/UserUsage';
+import { AlertCenter } from './components/pages/Alert Center/AlertCenter';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -119,6 +120,7 @@ function App() {
                 <Route path='/access-denied' element={<AccessDenied />} />
                 <Route path='/management-console' element={<ManagementConsole />} />
                 <Route path='/audit-trail' element={<AuditTrail />} />
+                <Route path='/alert-center' element={<AlertCenter />} />
                 <Route path='/usage' element={<UsageReports />} />
                 <Route path='/user-usage' element={<UserUsage />} />
                 <Route path='/token' element={<Token />} />

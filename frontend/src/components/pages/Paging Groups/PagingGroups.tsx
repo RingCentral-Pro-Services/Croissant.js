@@ -22,6 +22,7 @@ import useCreatePagingGroups from "./hooks/useCreatePagingGroups";
 import useExcelToPagingGroups from "./hooks/useExcelToPagingGroups";
 import { IconExternalLink } from "@tabler/icons-react";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
+import { SystemNotifications } from "../../shared/SystemNotifications";
 
 const PagingGroups = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -132,6 +133,7 @@ const PagingGroups = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Paging Groups" />
             <Header title="Paging Groups" body="Create and audit paging groups">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>

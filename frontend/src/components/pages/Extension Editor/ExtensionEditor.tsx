@@ -17,6 +17,7 @@ import Header from "../../shared/Header";
 import SimpleReplacement from "../../shared/SimpleReplacement";
 import UIDInputField from "../../shared/UIDInputField";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
+import { SystemNotifications } from "../../shared/SystemNotifications";
 
 const ExtensionEditor = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -67,6 +68,7 @@ const ExtensionEditor = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Edit Extensions" />
             <Header title="Edit Extensions" body="Find & replace in extension names and email addresses" documentationURL="https://dqgriffin.com/blog/3iskKnldBEh01MoOYvje">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>

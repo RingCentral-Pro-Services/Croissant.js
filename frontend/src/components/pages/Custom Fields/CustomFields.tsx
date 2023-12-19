@@ -4,12 +4,14 @@ import { Tabs } from "@mantine/core";
 import ManageCustomFields from "./ManageCustomFields";
 import { AssignCustomFields } from "./AssignCustomFields";
 import useLogin from "../../../hooks/useLogin";
+import { SystemNotifications } from "../../shared/SystemNotifications";
 
 export const CustomFields = () => {
     const [selectedTab, setSelectedTab] = useState('manage')
 
     return (
         <>
+            <SystemNotifications toolName="Custom Fields" />
             <Header title="Custom Fields" body="" />
             <Tabs className="healthy-margin-top" defaultValue="manage">
                 <Tabs.List position='center'>

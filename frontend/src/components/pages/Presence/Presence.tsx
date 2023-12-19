@@ -17,6 +17,7 @@ import UIDInputField from '../../shared/UIDInputField'
 import useAuditPresence from './hooks/useAuditPresence'
 import { ExtensionPresence } from './models/ExtensionPresence'
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
+import { SystemNotifications } from "../../shared/SystemNotifications";
 
 const Presence = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -97,6 +98,7 @@ const Presence = () => {
     
     return (
         <>
+            <SystemNotifications toolName="Presence" />
             <Header title='Presence' body='Export user presence settings' documentationURL='https://dqgriffin.com/blog/3iskKnldBEh01MoOYvje'/>
             <div className="tool-card">
                 <h2>Presence</h2>

@@ -20,6 +20,7 @@ import Header from "../../shared/Header";
 import UIDInputField from "../../shared/UIDInputField";
 import useApplyRules from "./hooks/useApplyRules";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
+import { SystemNotifications } from "../../shared/SystemNotifications";
 
 const CustomRules = () => {
     const [targetUID, setTargetUID] = useState<string>('')
@@ -140,6 +141,7 @@ const CustomRules = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Copy Custom Rules" />
             <Header title="Copy Custom Rules" body="Copy custom rules to other extensions" documentationURL="https://dqgriffin.com/blog/jrbhwHRfEahVdJzUeJdG">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>

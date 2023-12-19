@@ -24,6 +24,7 @@ import useUploadDevice from "./hooks/useUploadDevice";
 import * as Excel from 'exceljs'
 import useCreateUnassignedDevices from "./hooks/useCreateUnassignedDevices";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
+import { SystemNotifications } from "../../shared/SystemNotifications";
 
 const UploadDevices = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -140,6 +141,7 @@ const UploadDevices = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Upload Devices" />
             <Header title="Upload Devices" body="Upload devices in bulk" />
             <ToolCard>
                 <p>Things to know</p>

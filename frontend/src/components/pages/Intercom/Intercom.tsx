@@ -23,6 +23,7 @@ import UIDInputField from "../../shared/UIDInputField";
 import useExcelToIntercom from "./hooks/useExcelToIntercom";
 import useIntercom from "./hooks/useIntercom";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
+import { SystemNotifications } from "../../shared/SystemNotifications";
 
 const Intercom = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -173,6 +174,7 @@ const Intercom = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Intercom" />
             <Header title='Intercom' body='Enable, disable, and audit intercom' documentationURL="https://dqgriffin.com/blog/oss6kFK8brP8o8gCWflc">
                 <Button variant='subtle' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>

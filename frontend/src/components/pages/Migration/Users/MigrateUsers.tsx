@@ -95,6 +95,7 @@ import useAnalytics from "../../../../hooks/useAnalytics";
 import ImportAccountData from "./components/ImportAccountData";
 import { useAuditTrail } from "../../../../hooks/useAuditTrail";
 import { useUploadUnassignedDevices } from "./hooks/useUploadUnassignedDevices";
+import { SystemNotifications } from "../../../shared/SystemNotifications";
 const FileSaver = require('file-saver');
 
 
@@ -1134,6 +1135,7 @@ const MigrateUsers = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Auto Migrate" />
             <Modal 
                 open={isShowingSegregatedModal}
                 setOpen={setIsShowingSegregatedModal}

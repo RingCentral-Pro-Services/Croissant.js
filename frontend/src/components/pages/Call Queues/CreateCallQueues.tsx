@@ -24,6 +24,7 @@ import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel"
 import CallQueue from "../../../models/CallQueue"
 import { sanitize } from "../../../helpers/Sanatize"
 import { useAuditTrail } from "../../../hooks/useAuditTrail"
+import { SystemNotifications } from "../../shared/SystemNotifications"
 
 const CreateCallQueues = () => {
     let [isPending, setIsPending] = useState(true)
@@ -147,6 +148,7 @@ const CreateCallQueues = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Create Call Queues" />
             <Modal opened={isShowingWarningModal} onClose={ () => setIsShowingWarningModal(false)} title="Overlapping Queues " closeOnClickOutside={false}>
                 <p>Warning! Due to overlapping extension numbers, uploading this file will overwrite {existingQueues.length} Queues that already exist in the account. Please review your file carefully to prevent any unintended changes.</p>
                 <p>Overlapping IVRs:</p>

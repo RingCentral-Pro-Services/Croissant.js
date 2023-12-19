@@ -21,6 +21,7 @@ import useReadPTTChannels from "./hooks/useReadPTTChannels";
 import { PTTChannel } from "./models/PTTChannel";
 import { PTTSchema } from "./models/schemas";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
+import { SystemNotifications } from "../../shared/SystemNotifications";
 
 const PushToTalk = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -133,6 +134,7 @@ const PushToTalk = () => {
     
     return (
         <>
+            <SystemNotifications toolName="Push To Talk" />
             <Header title="Push To Talk" body="Create, update, and export Push-to-talk channels" documentationURL="https://dqgriffin.com/blog/MoMTlQc0JRL1kwL7PITs" />
             <div className="tool-card">
                 <h2>Push to Talk</h2>

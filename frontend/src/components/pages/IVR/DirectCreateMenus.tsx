@@ -29,6 +29,7 @@ import { MessageQueue } from "../../../models/Transformer";
 import useWriteExcelFile from "../../../hooks/useWriteExcelFile";
 import { sanitize } from "../../../helpers/Sanatize";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
+import { SystemNotifications } from "../../shared/SystemNotifications";
 
 const DirectCreateMenus = () => {
     useLogin('create-ivr')
@@ -222,6 +223,7 @@ const DirectCreateMenus = () => {
     
     return (
         <div>
+            <SystemNotifications toolName="Create IVRs" />
             <Modal opened={isShowingWarningModal} onClose={ () => setIsShowingWarningModal(false)} title="Overlapping IVRs " closeOnClickOutside={false}>
                 <p>Warning! Due to overlapping extension numbers, uploading this file will overwrite {existingMenus.length} IVRs that already exist in the account. Please review your file carefully to prevent any unintended changes.</p>
                 <p>Overlapping IVRs:</p>
