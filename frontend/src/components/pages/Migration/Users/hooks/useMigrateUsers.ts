@@ -10,7 +10,7 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
     const [maxProgress, setMaxProgress] = useState(2)
     const {migrateUser} = useMigrateUser(postMessage, postTimedMessage, postError)
 
-    const migrateUsers = async (phoneNumbers: PhoneNumber[], dataBundles: UserDataBundle[], unassignedExtensions: Extension[], extensions: Extension[], emailSuffix: string) => {
+    const migrateUsers = async (availablePhoneNumbers: PhoneNumber[], availableTollFreeNumbers: PhoneNumber[], dataBundles: UserDataBundle[], unassignedExtensions: Extension[], extensions: Extension[], emailSuffix: string) => {
         const accessToken = localStorage.getItem('cs_access_token')
         if (!accessToken) {
             throw new Error('No access token')
@@ -38,12 +38,29 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
 
             if (bundle.extendedData?.directNumbers) {
                 for (let i = 0; i < bundle.extendedData!.directNumbers!.length; i++) {
-                    if (phoneNumbers.length !== 0) {
-                        const tempNumber = phoneNumbers.pop()!
-                        const originalNumber = bundle.extendedData.directNumbers[i]
-                        bundle.phoneNumberMap.set(originalNumber.phoneNumber, tempNumber)
-                        phoneNumberBundle.push(tempNumber)
+                    const number = bundle.extendedData!.directNumbers![i]
+                    if ((number.tollType === 'Toll' || number.paymentType === 'Local') && availablePhoneNumbers.length === 0) {
+                        postMessage(new Message(`Ran out of phone numbers`, 'error'))
+                        continue
                     }
+        
+                    if ((number.tollType === 'TollFree' || number.paymentType === 'TollFree') && availableTollFreeNumbers.length === 0) {
+                        postMessage(new Message(`Ran out of toll free numbers`, 'error'))
+                        continue
+                    }
+        
+                    let tempNumber: PhoneNumber
+        
+                    if ((number.tollType === 'Toll') || (number.paymentType === 'Local')) {
+                        tempNumber = availablePhoneNumbers.pop()!
+                    }
+                    else {
+                        tempNumber = availableTollFreeNumbers.pop()!
+                    }
+        
+                    // const tempNumber = availablePhoneNumbers.pop()!
+                    bundle.phoneNumberMap.set(number.phoneNumber, tempNumber)
+                    phoneNumberBundle.push(tempNumber)
                 }
             }
 

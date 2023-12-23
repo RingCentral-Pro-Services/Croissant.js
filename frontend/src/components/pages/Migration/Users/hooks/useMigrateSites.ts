@@ -14,7 +14,7 @@ const useMigrateSites = (postMessage: (message: Message) => void, postTimedMessa
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgress, setMaxProgress] = useState(2)
 
-    const migrateSites = async (sites: SiteDataBundle[], availablePhoneNumbers: PhoneNumber[], alreadyExists: boolean = false) => {
+    const migrateSites = async (sites: SiteDataBundle[], availablePhoneNumbers: PhoneNumber[], availableTollFreeNumbers: PhoneNumber[], alreadyExists: boolean = false) => {
         const accessToken = localStorage.getItem('cs_access_token')
         if (!accessToken) {
             throw new Error('No access token')
@@ -29,12 +29,26 @@ const useMigrateSites = (postMessage: (message: Message) => void, postTimedMessa
             site.phoneNumberMap = new Map<string, PhoneNumber>()
 
             for (const number of site.extendedData!.directNumbers!) {
-                if (availablePhoneNumbers.length === 0) {
+                if ((number.tollType === 'Toll' || number.paymentType === 'Local') && availablePhoneNumbers.length === 0) {
                     postMessage(new Message(`Ran out of phone numbers`, 'error'))
                     continue
                 }
-
-                const tempNumber = availablePhoneNumbers.pop()!
+    
+                if ((number.tollType === 'TollFree' || number.paymentType === 'TollFree') && availableTollFreeNumbers.length === 0) {
+                    postMessage(new Message(`Ran out of toll free numbers`, 'error'))
+                    continue
+                }
+    
+                let tempNumber: PhoneNumber
+    
+                if ((number.tollType === 'Toll') || (number.paymentType === 'Local')) {
+                    tempNumber = availablePhoneNumbers.pop()!
+                }
+                else {
+                    tempNumber = availableTollFreeNumbers.pop()!
+                }
+    
+                // const tempNumber = availablePhoneNumbers.pop()!
                 site.phoneNumberMap.set(number.phoneNumber, tempNumber)
 
                 await assignPhoneNumber(site, tempNumber.id, accessToken)
