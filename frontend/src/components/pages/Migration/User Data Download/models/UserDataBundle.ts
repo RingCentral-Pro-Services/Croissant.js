@@ -540,6 +540,8 @@ export interface PhoneNumber {
     label: string
     location: string
     type: string
+    tollType: string
+    paymentType: string
     contactCenterProvider: string
     vanityPattern: string
     site?: {

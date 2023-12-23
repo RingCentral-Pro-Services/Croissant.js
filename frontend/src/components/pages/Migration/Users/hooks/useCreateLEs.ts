@@ -13,7 +13,7 @@ const useCreateLEs = (postMessage: (message: Message) => void, postTimedMessage:
     const [maxProgress, setMaxProgress] = useState(2)
     const {createLE} = useCreateLE(postMessage, postTimedMessage, postError)
 
-    const createLEs = async (bundles: LimitedExtensionDataBundle[], unassignedExtensions: Extension[], erls: ERL[], targetExtensions: Extension[], availablePhoneNumbers: PhoneNumber[]) => {
+    const createLEs = async (bundles: LimitedExtensionDataBundle[], unassignedExtensions: Extension[], erls: ERL[], targetExtensions: Extension[], availablePhoneNumbers: PhoneNumber[], availableTollFreeNumbers: PhoneNumber[]) => {
         const accessToken = localStorage.getItem('cs_access_token')
         if (!accessToken) {
             throw new Error('No access token')
@@ -46,11 +46,28 @@ const useCreateLEs = (postMessage: (message: Message) => void, postTimedMessage:
 
             const numbers: PhoneNumber[] = []
             for (const number of bundle.extendedData!.directNumbers!) {
-                if (availablePhoneNumbers.length > 0) {
-                    const tempNumber = availablePhoneNumbers.pop()!
-                    bundle.phoneNumberMap.set(number.phoneNumber, tempNumber)
-                    numbers.push(tempNumber)
+                if ((number.tollType === 'Toll' || number.paymentType === 'Local') && availablePhoneNumbers.length === 0) {
+                    postMessage(new Message(`Ran out of phone numbers`, 'error'))
+                    continue
                 }
+    
+                if ((number.tollType === 'TollFree' || number.paymentType === 'TollFree') && availableTollFreeNumbers.length === 0) {
+                    postMessage(new Message(`Ran out of toll free numbers`, 'error'))
+                    continue
+                }
+    
+                let tempNumber: PhoneNumber
+    
+                if ((number.tollType === 'Toll') || (number.paymentType === 'Local')) {
+                    tempNumber = availablePhoneNumbers.pop()!
+                }
+                else {
+                    tempNumber = availableTollFreeNumbers.pop()!
+                }
+    
+                // const tempNumber = availablePhoneNumbers.pop()!
+                bundle.phoneNumberMap.set(number.phoneNumber, tempNumber)
+                numbers.push(tempNumber)
             }
 
             const unassignedExt = unassignedExtensions.pop()!

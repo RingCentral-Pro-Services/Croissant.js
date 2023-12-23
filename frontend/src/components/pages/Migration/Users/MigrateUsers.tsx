@@ -652,6 +652,7 @@ const MigrateUsers = () => {
         let targetERLs = targetERLList
         let roles: Role[] = []
         let availablePhoneNumbers: PhoneNumber[] = []
+        let availableTollFreeNumbers: PhoneNumber[] = []
         let prompts: IVRAudioPrompt[] = []
         let targetSiteBundle = getTargetSiteBundle()
 
@@ -685,6 +686,15 @@ const MigrateUsers = () => {
             postMessage(new Message(`Discovered ${availablePhoneNumbers.length} numbers on extension ${settings.specificExtension}`, 'info'))
         }
 
+        availableTollFreeNumbers = availablePhoneNumbers.filter((number) => number.tollType === 'TollFree')
+        availablePhoneNumbers = availablePhoneNumbers.filter((number) => number.tollType !== 'TollFree')
+
+        console.log('Toll Free Numbers')
+        console.log(availableTollFreeNumbers)
+
+        console.log('Available Numbers')
+        console.log(availablePhoneNumbers)
+
         if (settings.shouldMigrateSites && !settings.shouldOverrideSites && mainSiteBundle) {
 
             // If sites are being removed, add direct numbers and custom rules of other sites to the main site
@@ -702,7 +712,7 @@ const MigrateUsers = () => {
                 }
             }
 
-            await assignMainSiteNumbers(mainSiteBundle, availablePhoneNumbers)
+            await assignMainSiteNumbers(mainSiteBundle, availablePhoneNumbers, availableTollFreeNumbers)
         }
 
         // Migrate sites
@@ -714,13 +724,13 @@ const MigrateUsers = () => {
                     return
                 }
                 
-                const extension = await migrateSites([targetSiteBundle], availablePhoneNumbers, true)
+                const extension = await migrateSites([targetSiteBundle], availablePhoneNumbers, availableTollFreeNumbers, true)
                 setOverridenSiteBundle(targetSiteBundle)
                 targetExts = [...targetExts, ...extension]
             }
             else {
                 const selectedSites = sites.filter((site) => selectedSiteNames.includes(`${site.name}`))
-                const siteExtensions = await migrateSites(siteBundles, availablePhoneNumbers)
+                const siteExtensions = await migrateSites(siteBundles, availablePhoneNumbers, availableTollFreeNumbers)
     
                 targetExts = [...targetExts, ...siteExtensions]
             }
@@ -773,15 +783,15 @@ const MigrateUsers = () => {
         }
 
         // Message only extensions
-        const createdMOs = await createMOs(messageOnlyBundles, targetExts, availablePhoneNumbers)
+        const createdMOs = await createMOs(messageOnlyBundles, targetExts, availablePhoneNumbers, availableTollFreeNumbers)
         targetExts = [...targetExts, ...createdMOs]
 
         // Create queues
-        const createdQueues = await createQueues(callQueueBundles, targetExts, availablePhoneNumbers)
+        const createdQueues = await createQueues(callQueueBundles, targetExts, availablePhoneNumbers, availableTollFreeNumbers)
         targetExts = [...targetExts, ...createdQueues]
 
         // Create IVRs
-        const createdIVRs = await createIVRs(ivrBundles, targetExts, availablePhoneNumbers)
+        const createdIVRs = await createIVRs(ivrBundles, targetExts, availablePhoneNumbers, availableTollFreeNumbers)
         targetExts = [...targetExts, ...createdIVRs]
 
         // Create LEs
@@ -796,7 +806,7 @@ const MigrateUsers = () => {
             unassignedLEExtensions = unassignedLEExtensions.filter((extension) => selectedAreaCodes.includes(extension.data.phoneNumbers![0].phoneNumber.substring(0, 5)))
         }
 
-        const createdLEs = await createLEs(leBundles, unassignedLEExtensions, targetERLs, targetExts, availablePhoneNumbers)
+        const createdLEs = await createLEs(leBundles, unassignedLEExtensions, targetERLs, targetExts, availablePhoneNumbers, availableTollFreeNumbers)
         targetExts = [...targetExts, ...createdLEs]
 
         // Fetch prompts
@@ -837,7 +847,7 @@ const MigrateUsers = () => {
 
         console.log(`Migrating ${userDataBundles.length} users`)
         console.log(userDataBundles)
-        await migrateUsers(availablePhoneNumbers, userDataBundles, unassignedExtensions, targetExts, settings.emailSuffix)
+        await migrateUsers(availablePhoneNumbers, availableTollFreeNumbers, userDataBundles, unassignedExtensions, targetExts, settings.emailSuffix)
 
         const migratedUsers = userDataBundles.map((bundle) => bundle.extension)
         targetExts = [...targetExts, ...migratedUsers]

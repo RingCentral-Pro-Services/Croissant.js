@@ -102,31 +102,38 @@ export const processBizAuth = async (req: Request, res: Response, next: any) => 
 }
 
 export const refreshToken = async (req: Request, res: Response, next: any) => {
-    const refreshToken = req.query.refresh_token
+    try {
+        const refreshToken = req.query.refresh_token
 
-    if (!refreshToken || typeof refreshToken !== 'string') {
-        res.status(400).send({ message: 'Invalid refresh token' })
-        return
+        if (!refreshToken || typeof refreshToken !== 'string') {
+            res.status(400).send({ message: 'Invalid refresh token' })
+            return
+        }
+
+        const headers = {
+            "Content-type": "application/x-www-form-urlencoded",
+            "Authorization": "Basic " + Buffer.from(process.env.RC_CLIENT_ID + ":" + process.env.RC_CLIENT_SECRET).toString('base64')
+        }
+
+        const response = await axios.post(`${process.env.RC_PLATFORM_URL}/restapi/oauth/token`, `grant_type=refresh_token&refresh_token=${refreshToken}&client_id=${process.env.RC_CLIENT_ID}`, { headers: headers })
+        const accessToken = response.data.access_token
+        const newRefreshToken = response.data.refresh_token
+
+        if (!accessToken || !newRefreshToken) {
+            res.status(500).send({ message: 'Internal server error' })
+            return
+        }
+
+        const body = {
+            "access_token": accessToken,
+            "refresh_token": newRefreshToken
+        }
+
+        res.send(body)
     }
-
-    const headers = {
-        "Content-type": "application/x-www-form-urlencoded",
-        "Authorization": "Basic " + Buffer.from(process.env.RC_CLIENT_ID + ":" + process.env.RC_CLIENT_SECRET).toString('base64')
-    }
-
-    const response = await axios.post(`${process.env.RC_PLATFORM_URL}/restapi/oauth/token`, `grant_type=refresh_token&refresh_token=${refreshToken}&client_id=${process.env.RC_CLIENT_ID}`, { headers: headers })
-    const accessToken = response.data.access_token
-    const newRefreshToken = response.data.refresh_token
-
-    if (!accessToken || !newRefreshToken) {
+    catch (e) {
+        console.log('Failed to refresh token')
+        console.log(e)
         res.status(500).send({ message: 'Internal server error' })
-        return
     }
-
-    const body = {
-        "access_token": accessToken,
-        "refresh_token": newRefreshToken
-    }
-
-    res.send(body)
 }

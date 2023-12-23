@@ -12,6 +12,8 @@ export interface PhoneNumber {
     phoneNumber: string
     type: string
     usageType: string
+    tollType: string
+    paymentType: string
     contactCenterProvider: string
     vanityPattern: string
 }

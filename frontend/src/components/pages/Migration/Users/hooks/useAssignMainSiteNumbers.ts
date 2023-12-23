@@ -12,7 +12,7 @@ const useAssignMainSiteNumbers = (postMessage: (message: Message) => void, postT
     const baseNumberAssignURL = 'https://platform.ringcentral.com/restapi/v2/accounts/~/phone-numbers/phoneNumberId'
     const baseWaitingPeriod = 250
     
-    const assignMainSiteNumbers = async (bundle: SiteDataBundle, availablePhoneNumbers: PhoneNumber[]) => {
+    const assignMainSiteNumbers = async (bundle: SiteDataBundle, availablePhoneNumbers: PhoneNumber[], availableTollFreeNumbers: PhoneNumber[]) => {
         const accessToken = localStorage.getItem('cs_access_token')
         if (!accessToken) {
             throw new Error('No access token')
@@ -22,12 +22,26 @@ const useAssignMainSiteNumbers = (postMessage: (message: Message) => void, postT
         bundle.phoneNumberMap = new Map<string, PhoneNumber>()
 
         for (const number of bundle.extendedData!.directNumbers!) {
-            if (availablePhoneNumbers.length === 0) {
+            if ((number.tollType === 'Toll' || number.paymentType === 'Local') && availablePhoneNumbers.length === 0) {
                 postMessage(new Message(`Ran out of phone numbers`, 'error'))
                 continue
             }
 
-            const tempNumber = availablePhoneNumbers.pop()!
+            if ((number.tollType === 'TollFree' || number.paymentType === 'TollFree') && availableTollFreeNumbers.length === 0) {
+                postMessage(new Message(`Ran out of toll free numbers`, 'error'))
+                continue
+            }
+
+            let tempNumber: PhoneNumber
+
+            if ((number.tollType === 'Toll') || (number.paymentType === 'Local')) {
+                tempNumber = availablePhoneNumbers.pop()!
+            }
+            else {
+                tempNumber = availableTollFreeNumbers.pop()!
+            }
+
+            // const tempNumber = availablePhoneNumbers.pop()!
             bundle.phoneNumberMap.set(number.phoneNumber, tempNumber)
 
             await assignPhoneNumber(bundle, tempNumber.id, accessToken)
