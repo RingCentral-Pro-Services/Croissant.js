@@ -740,7 +740,7 @@ const MigrateUsers = () => {
         if (selectedExtensionTypes.includes('Unassigned Devices')) {
             const unassignedDevices = originalAccountDevices.filter((device) => !device.extension)
             const selectedDevices = unassignedDevices.filter((device) => selectedSiteNames.includes(device.site?.name ?? ''))
-            const newSites = targetExtensionList.filter((ext) => ext.prettyType() === 'Site')
+            const newSites = targetExts.filter((ext) => ext.prettyType() === 'Site')
 
             if (settings.shouldOverrideSites) {
                 for (let i = 0; i < selectedDevices.length; i++) {
