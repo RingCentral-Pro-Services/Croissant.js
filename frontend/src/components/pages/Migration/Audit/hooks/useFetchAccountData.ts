@@ -59,7 +59,7 @@ export interface AccountData {
     erls: ERL[]
 }
 
-const useAccountData = (settings: AuditSettings, selectedExtensionTypes: string[], selectedSiteNames: string[], selectedExtensions: Extension[], postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
+const useAccountData = (settings: AuditSettings, selectedExtensionTypes: string[], selectedExtensions: Extension[], postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
     const [step, setStep] = useState(1)
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgress, setMaxProgress] = useState(0)
@@ -177,7 +177,7 @@ const useAccountData = (settings: AuditSettings, selectedExtensionTypes: string[
     }, [maxFetchMainSiteProgress])
  
 
-    async function fetchAccountData(sites: SiteData[], originalExtensionList: Extension[], selectedExtensions: Extension[]) {
+    async function fetchAccountData(sites: SiteData[], selectedSiteNames: string[], originalExtensionList: Extension[], selectedExtensions: Extension[]) {
         const accountData: AccountData = {
             devices: [],
             sites: [],

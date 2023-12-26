@@ -33,6 +33,7 @@ import { AuditPromptPair } from "./models/AuditPromptPair";
 import { AuditCallRecordingPair } from "./models/AuditCallRecordingPair";
 import { AuditUserRowPair } from "./models/AuditUserRowPair";
 import { useAuditTrail } from "../../../../hooks/useAuditTrail";
+import SettingToggle from "../../../shared/Settings Components/SettingToggle";
 
 export interface AuditSettings {
     shouldOverrideSites: boolean,
@@ -43,7 +44,8 @@ export interface AuditSettings {
     targetSiteName: string,
     shouldAddEmailSuffix: boolean,
     emailSuffix: string,
-    shouldRestrictAreaCodes: boolean
+    shouldRestrictAreaCodes: boolean,
+    exhaustiveAudit: boolean
 }
 
 const AutoAudit = () => {
@@ -71,7 +73,8 @@ const AutoAudit = () => {
         targetSiteName: '',
         shouldAddEmailSuffix: true,
         emailSuffix: '.ps.ringcentral.com',
-        shouldRestrictAreaCodes: false
+        shouldRestrictAreaCodes: false,
+        exhaustiveAudit: false
     })
 
     const [sites, setSites] = useState<SiteData[]>([])
@@ -99,8 +102,8 @@ const AutoAudit = () => {
 
     const { fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError, userName } = useGetAccessToken()
     const { fetchToken: fetchNewAccountToken, hasCustomerToken: hasNewAccountToken, companyName: newCompanyName, isTokenPending: isNewAccountTokenPending, error: newAccountTokenError, userName: newAccountUserName } = useGetAccessToken()
-    const { fetchAccountData, step, progressLabel, progressValue, maxProgress } = useAccountData(settings, selectedExtensionTypes, selectedSiteNames, selectedExtensions, postMessage, postTimedMessage, postError)
-    const { fetchAccountData: fetchNewAccountData, step: newAccountStep, progressLabel: newAccountProgressLabel, progressValue: newAccountProgressValue, maxProgress: newAccountMaxProgress } = useAccountData(settings, selectedExtensionTypes, selectedSiteNames, selectedExtensions, postMessage, postTimedMessage, postError)
+    const { fetchAccountData, step, progressLabel, progressValue, maxProgress } = useAccountData(settings, selectedExtensionTypes, selectedExtensions, postMessage, postTimedMessage, postError)
+    const { fetchAccountData: fetchNewAccountData, step: newAccountStep, progressLabel: newAccountProgressLabel, progressValue: newAccountProgressValue, maxProgress: newAccountMaxProgress } = useAccountData(settings, selectedExtensionTypes, selectedExtensions, postMessage, postTimedMessage, postError)
 
     useEffect(() => {
         if (originalAccountUID.length < 5) return
@@ -164,7 +167,7 @@ const AutoAudit = () => {
         })
 
         const originalSelected = originalExtensionList.filter((ext) => ext.data.status !== 'Unassigned' && selectedExtensionTypes.includes(ext.prettyType()) && selectedSiteNames.includes(ext.data.site?.name ?? ''))
-        const originalAccountData = await fetchAccountData(sites, originalExtensionList, filteredExtensions)
+        const originalAccountData = await fetchAccountData(sites, selectedSiteNames, originalExtensionList, filteredExtensions)
         setOriginalAccountData(originalAccountData)
         console.log('Old Account Data')
         console.log(originalAccountData)
@@ -176,7 +179,7 @@ const AutoAudit = () => {
         for (const extension of filteredExtensions) {
             let targetExtension = null
 
-            if (isMultiSiteEnabled) {
+            if (!settings.exhaustiveAudit && isMultiSiteEnabled) {
                 targetExtension = newExtensions.find((newExtension) => newExtension.data.name === extension.data.name && newExtension.data.type === extension.data.type && newExtension.data.site?.name === extension.data.site?.name)
             }
             else {
@@ -189,7 +192,7 @@ const AutoAudit = () => {
         }
 
         const targetSelected = newExtensions.filter((ext) => ext.data.status !== 'Unassigned' && selectedExtensionTypes.includes(ext.prettyType()) && selectedSiteNames.includes(ext.data.site?.name ?? ''))
-        const newAccountData = await fetchNewAccountData(targetSites, newExtensions, newTargetSelected)
+        const newAccountData = await fetchNewAccountData(targetSites, settings.exhaustiveAudit ? targetSites.map((site) => site.name) : selectedSiteNames, newExtensions, newTargetSelected)
         setNewAccountData(newAccountData)
         console.log('New Account Data')
         console.log(newAccountData)
@@ -515,6 +518,22 @@ const AutoAudit = () => {
                                 <li>Device Lock Status</li>
                                 <li>WMI</li>
                             </ol>
+                        </Accordion.Panel>
+                    </Accordion.Item>
+                </Accordion>
+            </ToolCard>
+
+            <ToolCard>
+                <Accordion defaultValue="">
+                    <Accordion.Item value="customization">
+                        <Accordion.Control>Settings</Accordion.Control>
+                        <Accordion.Panel>
+                            <SettingToggle
+                                title="Exhaustive audit"
+                                description="Pull data for all sites, not just the selected ones. Use this if you've migrated extensions to a different site than the one they were originally at."
+                                checked={settings.exhaustiveAudit}
+                                onChange={(value) => setSettings({...settings, exhaustiveAudit: value})}
+                            />
                         </Accordion.Panel>
                     </Accordion.Item>
                 </Accordion>
