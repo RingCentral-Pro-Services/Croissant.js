@@ -1,3 +1,4 @@
+import { randomNumberBetween } from "../../../../../helpers/utils"
 import { Message } from "../../../../../models/Message"
 import { SyncError } from "../../../../../models/SyncError"
 import { Device } from "../../../Migration/User Data Download/models/UserDataBundle"
@@ -13,7 +14,7 @@ export const useConvertToRingGroup = (postMessage: (message: Message) => void, p
                 extensionNumber: queue.extension.data.extensionNumber,
                 originalExtensionId: `${queue.extension.data.id}`,
                 name: queue.extension.data.name,
-                email: queue.extension.data.contact?.email ?? 'sample-queue@dqgriffin.com',
+                email: queue.extension.data.contact?.email ?? `queue${randomNumberBetween(11111, 99999)}@psi.com`,
                 regionalSettings: queue.extension.data.regionalSettings!,
                 businessHours: queue.extendedData?.businessHours,
                 businessHoursCallHandling: queue.extendedData?.businessHoursCallHandling,
