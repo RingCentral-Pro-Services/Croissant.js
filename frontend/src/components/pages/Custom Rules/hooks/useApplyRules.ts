@@ -32,6 +32,14 @@ const useApplyRules = (postMessage: (message: Message) => void, postTimedMessage
             if (!maintainVoicemailDestination) payload!.voicemail!.recipient.id = extension.id
             if (payload?.callHandlingAction !== 'TakeMessagesOnly') delete payload?.voicemail
             if (payload?.callHandlingAction !== 'TransferToExtension') delete payload?.transfer
+            if (payload.callHandlingAction === 'PlayAnnouncementOnly') {
+                payload.voicemail = {
+                    enabled: false,
+                    recipient: {
+                        id: extension.id
+                    }
+                }
+            }
             delete payload?.forwarding
             delete payload?.transfer?.uri
             delete payload?.id
