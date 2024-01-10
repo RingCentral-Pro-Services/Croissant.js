@@ -6,10 +6,10 @@ import { PhoneNumber } from "../../User Data Download/models/UserDataBundle";
 import { MessageOnlyDataBundle } from "../models/MessageOnlyDataBundle";
 import useCreateMO from "./useCreateMO";
 
-const useCreateMOs = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void, emailSuffix: string) => {
+const useCreateMOs = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void, emailSuffix: string, isCrossRegion: boolean) => {
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgress, setMaxProgress] = useState(2)
-    const {createMO} = useCreateMO(postMessage, postTimedMessage, postError)
+    const {createMO} = useCreateMO(postMessage, postTimedMessage, postError, isCrossRegion)
 
     const createMOs = async (bundles: MessageOnlyDataBundle[], targetExtensions: Extension[], availablePhoneNumbers: PhoneNumber[], availableTollFreeNumbers: PhoneNumber[]) => {
         const accessToken = localStorage.getItem('cs_access_token')
