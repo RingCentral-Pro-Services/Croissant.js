@@ -63,7 +63,7 @@ export const ConvertCallQueues = () => {
     const {convertToRingGroup} = useConvertToRingGroup(postMessage, postTimedMessage, postError)
     const {convertToQueues} = useConvertToQueues(postMessage, postTimedMessage, postError)
     const {createRingGroup} = useCreateRingGroup(postMessage, postTimedMessage, postError)
-    const {createQueue} = useCreateQueue(postMessage, postTimedMessage, postError)
+    const {createQueue} = useCreateQueue(postMessage, postTimedMessage, postError, false)
     const {configureQueue} = useConfigureQueue(postMessage, postTimedMessage, postError, '')
     const {deleteExtension} = useDeleteExtension(postMessage, postTimedMessage, postError)
     const {fetchStandardGreetings} = useStandardGreetings()
