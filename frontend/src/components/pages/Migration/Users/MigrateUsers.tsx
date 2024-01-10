@@ -152,7 +152,8 @@ const MigrateUsers = () => {
         targetSiteName: '',
         shouldAddEmailSuffix: true,
         emailSuffix: '.ps.ringcentral.com',
-        shouldRestrictAreaCodes: false
+        shouldRestrictAreaCodes: false,
+        isCrossRegional: false,
     })
 
     const handleSiteFetchCompletion = (sites: SiteData[]) => {
@@ -202,7 +203,7 @@ const MigrateUsers = () => {
     const {migrateSites, maxProgress: maxSiteProgress, progressValue: siteMigrationProgress} = useMigrateSites(postMessage, postTimedMessage, postError)
     const {migrateCustomRoles, progressValue: customRoleProgress, maxProgress: maxCustomRoleProgress} = useMigrateCustomRoles(postMessage, postTimedMessage, postError)
     const {migrateERLs, progressValue: erlProgress, maxProgress: maxERLProgress} = useMigrateERLs(postMessage, postTimedMessage, postError)
-    const {migrateUsers, progressValue: createUsersProgress, maxProgress: maxCreateUsersProgress} = useMigrateUsers(postMessage, postTimedMessage, postError)
+    const {migrateUsers, progressValue: createUsersProgress, maxProgress: maxCreateUsersProgress} = useMigrateUsers(postMessage, postTimedMessage, postError, settings.isCrossRegional)
     const {configureUsers, progressValue: configureUsersProgress, maxProgress: maxConfigureUsersProgress} = useConfigureUsers(postMessage, postTimedMessage, postError)
     const {createMOs, progressValue: createMOsProgress, maxProgress: maxCreateMOsProgress} = useCreateMOs(postMessage, postTimedMessage, postError, settings.emailSuffix)
     const {configureMOs} = useConfigureMOs(postMessage, postTimedMessage, postError, settings.emailSuffix)
@@ -1207,6 +1208,14 @@ const MigrateUsers = () => {
                             >
                                 <Input disabled={!settings.shouldAddEmailSuffix} sx={{width: 250}} placeholder='Email suffix' value={settings.emailSuffix} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSettings({...settings, emailSuffix: e.target.value.trim()})} />
                             </SettingToggle>
+
+                            <SettingToggle
+                                title="Cross Regional"
+                                description="Enable this when new and old accounts are from different countries"
+                                checked={settings.isCrossRegional}
+                                onChange={(value) => setSettings({...settings, isCrossRegional: value})}
+                            />
+                            
 
                             <SettingToggle
                                 title="Restrict unassigned extension area codes"

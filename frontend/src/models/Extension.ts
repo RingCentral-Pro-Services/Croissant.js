@@ -149,7 +149,7 @@ export class Extension implements ExcelFormattable, DataGridFormattable {
         return this.data.status
     }
 
-    payload(isMultiSiteEnable: boolean): any {
+    payload(isMultiSiteEnable: boolean, includeRegionalSettings = true): any {
         return {
             contact: {
                 ...((this.data.type === 'User' || this.data.type == 'VirtualUser') && {firstName: this.data.contact?.firstName}),
@@ -170,12 +170,12 @@ export class Extension implements ExcelFormattable, DataGridFormattable {
             ...((isMultiSiteEnable && this.data.site?.id !== 'main-site') && { site: { id: this.data.site?.id } }),
             ...((this.data.ivrPin && this.data.ivrPin != '') && {ivrPin: this.data.ivrPin}),
             ...((this.data.password && this.data.password != '') && {password: this.data.password}),
-            ...(this.data.regionalSettings && {regionalSettings: this.data.regionalSettings}),
+            ...(includeRegionalSettings && this.data.regionalSettings && {regionalSettings: this.data.regionalSettings}),
             ...(this.data.hidden !== undefined && {hidden: this.data.hidden})
         }
     }
 
-    payloadWithoutExtension(isMultiSiteEnable: boolean): any {
+    payloadWithoutExtension(isMultiSiteEnable: boolean, includeRegionalSettings = true): any {
         return {
             contact: {
                 ...((this.data.type === 'User' || this.data.type == 'VirtualUser') && {firstName: this.data.contact?.firstName}),
@@ -194,7 +194,7 @@ export class Extension implements ExcelFormattable, DataGridFormattable {
             ...((isMultiSiteEnable && this.data.site?.id !== 'main-site') && { site: { id: this.data.site?.id } }),
             ...((this.data.ivrPin && this.data.ivrPin != '') && {ivrPin: this.data.ivrPin}),
             ...((this.data.password && this.data.password != '') && {password: this.data.password}),
-            ...(this.data.regionalSettings && {regionalSettings: this.data.regionalSettings}),
+            ...(includeRegionalSettings && this.data.regionalSettings && {regionalSettings: this.data.regionalSettings}),
             ...(this.data.hidden !== undefined && {hidden: this.data.hidden})
         }
     }

@@ -3,7 +3,7 @@ import { SyncError } from "../../../../../models/SyncError";
 import { RestCentral } from "../../../../../rcapi/RestCentral";
 import { PhoneNumber, UserDataBundle } from "../../User Data Download/models/UserDataBundle";
 
-const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
+const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void, isCrossRegion: boolean) => {
     const baseUpdateURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId'
     const baseVirtualUserURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension'
     const basePhoneNumbersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/phone-number'
@@ -50,7 +50,7 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
                 postMessage(new Message(`Next available extension used for ${bundle.extension.data.name} because zero cannot be used`, 'warning'))
                 postError(new SyncError(bundle.extension.data.name, '0', ['Extension number changed', '']))
             }
-            const response = await RestCentral.post(baseVirtualUserURL, headers, bundle.extension.payload(true))
+            const response = await RestCentral.post(baseVirtualUserURL, headers, bundle.extension.payload(true, !isCrossRegion))
             bundle.extension.data.id = response.data.id
 
             if (response.rateLimitInterval > 0) {
@@ -85,7 +85,7 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
                 postMessage(new Message(`Next available extension used for ${bundle.extension.data.name} because zero cannot be used`, 'warning'))
                 postError(new SyncError(bundle.extension.data.name, '0', ['Extension number changed', '']))
             }
-            const response = await RestCentral.post(baseVirtualUserURL, headers, bundle.extension.payloadWithoutExtension(true))
+            const response = await RestCentral.post(baseVirtualUserURL, headers, bundle.extension.payloadWithoutExtension(true, !isCrossRegion))
             bundle.extension.data.id = response.data.id
             bundle.tempExtension = response.data.extensionNumber
 
@@ -118,7 +118,7 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             }
-            const response = await RestCentral.put(baseUpdateURL.replace('extensionId', id), headers, bundle.extension.payload(true))
+            const response = await RestCentral.put(baseUpdateURL.replace('extensionId', id), headers, bundle.extension.payload(true, !isCrossRegion))
             bundle.extension.data.id = response.data.id
 
             if (response.rateLimitInterval > 0) {
@@ -146,7 +146,7 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             }
-            const response = await RestCentral.put(baseUpdateURL.replace('extensionId', id), headers, bundle.extension.payloadWithoutExtension(true))
+            const response = await RestCentral.put(baseUpdateURL.replace('extensionId', id), headers, bundle.extension.payloadWithoutExtension(true, !isCrossRegion))
             bundle.extension.data.id = response.data.id
             bundle.tempExtension = response.data.extensionNumber
             

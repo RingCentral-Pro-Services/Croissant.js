@@ -5,10 +5,10 @@ import { SyncError } from "../../../../../models/SyncError";
 import { Device, PhoneNumber, UserDataBundle } from "../../User Data Download/models/UserDataBundle";
 import useMigrateUser from "./useMigrateUser";
 
-const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
+const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void, isCrossRegion: boolean) => {
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgress, setMaxProgress] = useState(2)
-    const {migrateUser} = useMigrateUser(postMessage, postTimedMessage, postError)
+    const {migrateUser} = useMigrateUser(postMessage, postTimedMessage, postError, isCrossRegion)
 
     const migrateUsers = async (availablePhoneNumbers: PhoneNumber[], availableTollFreeNumbers: PhoneNumber[], dataBundles: UserDataBundle[], unassignedExtensions: Extension[], extensions: Extension[], emailSuffix: string) => {
         const accessToken = localStorage.getItem('cs_access_token')
