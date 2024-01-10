@@ -20,7 +20,7 @@ export const useUploadUnassignedDevices = (postMessage: (message: Message) => vo
             return
         }
 
-        const validDevices = devices.filter((device) => device.serial && device.model.id && device.model.name)
+        const validDevices = devices.filter((device) => device.model && device.serial && device.model.id && device.model.name)
 
         setProgressMax(validDevices.length)
         const prospectiveDevices = getProspectiveDevices(validDevices, newSites)
