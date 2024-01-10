@@ -8,10 +8,10 @@ import { LimitedExtensionDataBundle } from "../models/LimitedExtensionDataBundle
 import useCreateLE from "./useCreateLE";
 import useCreateMO from "./useCreateMO";
 
-const useCreateLEs = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void, emailSuffix: string) => {
+const useCreateLEs = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void, emailSuffix: string, isCrossRegion: boolean) => {
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgress, setMaxProgress] = useState(2)
-    const {createLE} = useCreateLE(postMessage, postTimedMessage, postError)
+    const {createLE} = useCreateLE(postMessage, postTimedMessage, postError, isCrossRegion)
 
     const createLEs = async (bundles: LimitedExtensionDataBundle[], unassignedExtensions: Extension[], erls: ERL[], targetExtensions: Extension[], availablePhoneNumbers: PhoneNumber[], availableTollFreeNumbers: PhoneNumber[]) => {
         const accessToken = localStorage.getItem('cs_access_token')

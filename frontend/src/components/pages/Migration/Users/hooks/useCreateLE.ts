@@ -20,7 +20,7 @@ interface DeviceModelPayload {
     serial: string
 }
 
-const useCreateLE = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
+const useCreateLE = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void, isCrossRegion: boolean) => {
     const baseVirtualUserURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId'
     const baseNumberAssignURL = 'https://platform.ringcentral.com/restapi/v2/accounts/~/phone-numbers/phoneNumberId'
     const basePERLURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/emergency-locations'
@@ -81,7 +81,7 @@ const useCreateLE = (postMessage: (message: Message) => void, postTimedMessage: 
             // The API doesn't let you set hidden field and will emit an error if you try
             delete bundle.extension.data.hidden
 
-            const response = await RestCentral.put(baseVirtualUserURL.replace('extensionId', extensionID), headers, bundle.extension.payload(true))
+            const response = await RestCentral.put(baseVirtualUserURL.replace('extensionId', extensionID), headers, bundle.extension.payload(true, !isCrossRegion))
             bundle.extension.data.id = response.data.id
 
             if (response.rateLimitInterval > 0) {
@@ -110,7 +110,7 @@ const useCreateLE = (postMessage: (message: Message) => void, postTimedMessage: 
             // The API doesn't let you set hidden field and will emit an error if you try
             delete bundle.extension.data.hidden
 
-            const response = await RestCentral.put(baseVirtualUserURL.replace('extensionId', extensionID), headers, bundle.extension.payloadWithoutExtension(true))
+            const response = await RestCentral.put(baseVirtualUserURL.replace('extensionId', extensionID), headers, bundle.extension.payloadWithoutExtension(true, !isCrossRegion))
             bundle.extension.data.id = response.data.id
             bundle.tempExtension = response.data.extensionNumber
 

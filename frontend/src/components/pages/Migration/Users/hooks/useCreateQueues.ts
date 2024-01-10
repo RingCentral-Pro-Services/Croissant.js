@@ -6,10 +6,10 @@ import { PhoneNumber } from "../../User Data Download/models/UserDataBundle";
 import { CallQueueDataBundle } from "../models/CallQueueDataBundle";
 import useCreateQueue from "./useCreateQueue";
 
-const useCreateQueues = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
+const useCreateQueues = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void, isCrossRegion: boolean) => {
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgress, setMaxProgress] = useState(2)
-    const {createQueue} = useCreateQueue(postMessage, postTimedMessage, postError)
+    const {createQueue} = useCreateQueue(postMessage, postTimedMessage, postError, isCrossRegion)
 
     const createQueues = async (bundles: CallQueueDataBundle[], targetExtensions: Extension[], availablePhoneNumbers: PhoneNumber[], availableTollFreeNumbers: PhoneNumber[]) => {
         const accessToken = localStorage.getItem('cs_access_token')

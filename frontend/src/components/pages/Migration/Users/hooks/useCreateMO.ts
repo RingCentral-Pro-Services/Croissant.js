@@ -4,7 +4,7 @@ import { RestCentral } from "../../../../../rcapi/RestCentral";
 import { PhoneNumber } from "../../User Data Download/models/UserDataBundle";
 import { MessageOnlyDataBundle } from "../models/MessageOnlyDataBundle";
 
-const useCreateMO = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
+const useCreateMO = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void, isCrossRegion: boolean) => {
     const baseVirtualUserURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension'
     const baseNumberAssignURL = 'https://platform.ringcentral.com/restapi/v2/accounts/~/phone-numbers/phoneNumberId'
     const baseWaitingPeriod = 250
@@ -35,7 +35,7 @@ const useCreateMO = (postMessage: (message: Message) => void, postTimedMessage: 
             // The API doesn't let you set hidden field and will emit an error if you try
             delete bundle.extension.data.hidden
 
-            const response = await RestCentral.post(baseVirtualUserURL, headers, bundle.extension.payload(true))
+            const response = await RestCentral.post(baseVirtualUserURL, headers, bundle.extension.payload(true, !isCrossRegion))
             bundle.extension.data.id = response.data.id
 
             if (response.rateLimitInterval > 0) {
@@ -69,7 +69,7 @@ const useCreateMO = (postMessage: (message: Message) => void, postTimedMessage: 
             // The API doesn't let you set hidden field and will emit an error if you try
             delete bundle.extension.data.hidden
 
-            const response = await RestCentral.post(baseVirtualUserURL, headers, bundle.extension.payloadWithoutExtension(true))
+            const response = await RestCentral.post(baseVirtualUserURL, headers, bundle.extension.payloadWithoutExtension(true, !isCrossRegion))
             bundle.extension.data.id = response.data.id
             bundle.tempExtension = response.data.extensionNumber
 
