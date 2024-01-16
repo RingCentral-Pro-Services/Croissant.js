@@ -52,6 +52,7 @@ import { AuditTrail } from './components/pages/Audit Trail/AuditTrail';
 import { UsageReports } from './components/pages/Usage Reports/UsageReports';
 import { UserUsage } from './components/pages/Usage Reports/UserUsage';
 import { AlertCenter } from './components/pages/Alert Center/AlertCenter';
+import Credentials from './components/pages/Credentials/Credentials';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -167,6 +168,7 @@ function App() {
                 <Route path='/customfields' element={<CustomFields />} />
                 <Route path='/convert-call-queues' element={<ConvertCallQueues />} />
                 <Route path='/convert-users' element={<ConvertUsers />} />
+                <Route path='/credentials' element={<Credentials />} />
               </Routes>
             </Suspense>
           </ErrorBoundary>

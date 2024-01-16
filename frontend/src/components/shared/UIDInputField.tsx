@@ -4,6 +4,7 @@ import { Autocomplete, createStyles, Loader, rem, TextInput } from '@mantine/cor
 import { AccountUID } from "../../models/AccountUID";
 
 interface UIDInputFieldProps {
+    className?: string
     setTargetUID: (value: string) => void
     disabled: boolean
     disabledText: string
@@ -48,7 +49,7 @@ const useStyles = createStyles((theme, { floating }: { floating: boolean }) => (
     },
   }));
 
-const UIDInputField: React.FC<UIDInputFieldProps> = ({setTargetUID, disabled, disabledText, error = '', loading = true}) => {
+const UIDInputField: React.FC<UIDInputFieldProps> = ({setTargetUID, disabled, disabledText, error = '', loading = true, className = ''}) => {
     const [focused, setFocused] = useState(false);
     const [accounts, setAccounts] = useState<AccountUID[]>([])
     const { classes } = useStyles({ floating: disabledText.trim().length !== 0 || focused });
@@ -82,7 +83,7 @@ const UIDInputField: React.FC<UIDInputFieldProps> = ({setTargetUID, disabled, di
     if (disabled) {
         return (
             <TextInput
-                className="healthy-margin-right"
+                className={`${className} healthy-margin-right`}
                 placeholder=""
                 required
                 classNames={classes}
@@ -98,7 +99,7 @@ const UIDInputField: React.FC<UIDInputFieldProps> = ({setTargetUID, disabled, di
             <>
                 <div style={{display: 'inline-table'}} >
                 <Autocomplete
-                    className="healthy-margin-right"
+                    className={`${className} healthy-margin-right`}
                     sx={{width: 200, display: 'inline-block'}}
                     data={accounts.map((account) => account.name)}
                     onChange={handleInput}
