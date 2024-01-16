@@ -121,6 +121,7 @@ const mockdata: SidebarGroup[] = [
     initiallyOpened: false,
     links: [
       { label: 'Account Dump', link: '/accountdump' },
+      { label: 'Credentials', link: '/credentials' },
       { label: 'Upload Devices', link: '/uploaddevices' },
       { label: 'Account Templates', link: '/accounttemplates' },
       { label: 'Extension Upload', link: '/extensionupload' },

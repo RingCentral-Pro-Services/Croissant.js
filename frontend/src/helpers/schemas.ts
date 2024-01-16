@@ -359,3 +359,14 @@ export const customFieldSchema = z.object({
         invalid_type_error: 'Value data type invalid'
     })
 })
+
+export const credentialsSchema = z.object({
+    'Extension Number': z.coerce.string({
+        required_error: 'Missing extension number',
+        invalid_type_error: 'Extension number data type invalid'
+    }),
+    'Password': z.coerce.string().min(8, 'Password is too short').optional(),
+    'PIN': z.coerce.string().min(6, 'PIN is too short').optional(),
+    'Security Question': z.coerce.string().min(1, 'Securtity question is too short').optional(),
+    'Security Question Answer': z.coerce.string().min(5, 'Security question answer is too short').optional()
+})
