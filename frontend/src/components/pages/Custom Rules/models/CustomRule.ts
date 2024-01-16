@@ -78,7 +78,7 @@ export class CustomRule implements DataGridFormattable, ExcelFormattable {
             { field: "specificDates", headerName: "Specific Date", width: 200 },
             { field: "action", headerName: "Action", width: 200 },
             { field: "transferExtension", headerName: "Transfer Extension", width: 200 },
-            { field: "externalNumber", headerName: "Transfer Extension", width: 200 },
+            { field: "externalNumber", headerName: "External Number", width: 200 },
             { field: "voicemailRecipient", headerName: "Voicemail Recipient", width: 200 },
         ]
     }
