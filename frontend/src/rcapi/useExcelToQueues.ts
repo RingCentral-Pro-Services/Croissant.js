@@ -40,7 +40,6 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
                 return isValidQueueMember(extension.trim(), extensionsList)
             })
 
-
             for (let memberIndex = 0; memberIndex < membersExtensions.length; memberIndex++) {
                 members.push(`${idForExtension(membersExtensions[memberIndex].trim(), extensionsList)}`)
             }

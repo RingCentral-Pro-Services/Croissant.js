@@ -61,6 +61,9 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
         await setMemberStatus(queue, accessToken)
         await addQueueMembers(queue, accessToken)
         await setCallHandling(queue, accessToken)
+        if (queue.handlingRules?.transferMode === 'FixedOrder') {
+            await setFixedOrderMembers(queue, accessToken)
+        }
         await disableConnectingMessage(queue, accessToken)
         await setNotificationSettings(queue, accessToken)
         if (queue.afterHoursAction && queue.afterHoursAction !== '') {
@@ -213,6 +216,55 @@ const useCallQueue = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(e)
             postMessage(new Message(`Failed to set call handling ${queue.extension.name}. ${e.error ?? ''}`, 'error'))
             postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set call handling', ''], e.error ?? '', queue))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const setFixedOrderMembers = async (queue: CallQueue, token: string) => {
+        if (!queue.extension.id) return
+
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+
+            const url = baseCallHandlingURL.replace('extensionId', `${queue.extension.id}`)
+
+            const agents = []
+            for (const member of queue.members) {
+                agents.push({
+                    extension: {
+                        id: member
+                    },
+                    index: queue.members.indexOf(member) + 1
+                })
+            }
+
+            const body = {
+                queue: {
+                    fixedOrderAgents: agents
+                }
+            }
+
+            const response = await RestCentral.put(url, headers, body)
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+
+            console.log(`Failed to set fixed order members ${queue.extension.name}`)
+            console.log(e)
+            postMessage(new Message(`Failed to set fixed order members ${queue.extension.name}. ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(queue.extension.name, queue.extension.extensionNumber, ['Failed to set fixed order members', ''], e.error ?? '', queue))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }

@@ -36,7 +36,7 @@ class CallQueue implements CSVFormattable, ExcelFormattable, DataTableFormattabl
         public markAsRead?: boolean,
         public notificationEmails?: string[],
         ) {
-        this.sortMembers()
+        // this.sortMembers()
     }
 
     toRow(): string {
