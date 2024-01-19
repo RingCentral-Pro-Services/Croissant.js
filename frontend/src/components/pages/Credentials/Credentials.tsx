@@ -21,6 +21,7 @@ import useLogin from "../../../hooks/useLogin";
 import * as Excel from 'exceljs'
 import { SecretQuestion } from "./models/SecretQuestion";
 import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel";
+import { useAuditTrail } from "../../../hooks/useAuditTrail";
 
 const Credentials = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -45,6 +46,7 @@ const Credentials = () => {
     const { readCredentials } = useReadCredentials(postMessage, postTimedMessage, postError)
     const { setCredentials: setExtCredentials } = useSetCredentials(postMessage, postTimedMessage, postError)
     const { writePrettyExcel } = useWritePrettyExcel()
+    const { reportToAuditTrail } = useAuditTrail()
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -95,6 +97,13 @@ const Credentials = () => {
             await setExtCredentials(cred)
             setProgressValue((prev) => prev + 1)
         }
+
+        reportToAuditTrail({
+            action: `Updated credentials for ${credentials.length} extensions`,
+            tool: 'Credentials',
+            type: 'Tool',
+            uid: targetUID
+        })
 
         setIsSyncing(false)
     }
