@@ -58,7 +58,7 @@ const useCreatePTTChannel = (postMessage: (message: Message) => void, postTimedM
                 "Authorization": `Bearer ${token}`
             }
             const url = baseUpdateURL.replace('channelId', channel.data.id!)
-            const response = await RestCentral.put(url, headers, channel.payload())
+            const response = await RestCentral.patch(url, headers, channel.payload())
 
             if (response.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
