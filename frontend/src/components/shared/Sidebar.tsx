@@ -222,7 +222,7 @@ function Sidebar({ setColorTheme }: SidebarProps) {
         <Navbar.Section className={classes.header}>
           <Group position="apart">
             {/* <Logo width={rem(120)} /> */}
-            <Code sx={{ fontWeight: 700 }}>Croissant v3.3.0</Code>
+            <Code sx={{ fontWeight: 700 }}>Croissant {process.env.REACT_APP_VERSION}</Code>
           </Group>
         </Navbar.Section>
 
