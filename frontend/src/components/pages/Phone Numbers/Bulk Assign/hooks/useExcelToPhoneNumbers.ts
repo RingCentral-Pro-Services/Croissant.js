@@ -28,9 +28,15 @@ const useExcelToPhoneNumbers = (postMessage: (message: Message) => void, postErr
                 continue
             }
 
-            if (extensionID === '') {
+            if ((!extensionNumber || extensionNumber === '') && !extensionID  || extensionID === '') {
+                const number = new PhoneNumberPayload(phoneNumber ?? '', numberID, isolatedExtension ?? '', undefined)
+                data.push(number)
+                continue
+            }
+
+            if (!extensionID  || extensionID === '') {
                 console.error(`Could not find extension ${isolatedExtension}`)
-                postMessage(new Message(`Could not find extension ${isolatedExtension}`, 'error'))
+                postMessage(new Message(`Could not find extension for number ${isolatedNumber}. Number will be assigned to auto-receptionist`, 'warning'))
                 continue
             }
 

@@ -2,14 +2,14 @@ import { GridColDef, GridValidRowModel } from "@mui/x-data-grid";
 import { DataGridFormattable } from "../../../../../models/DataGridFormattable";
 
 export class PhoneNumberPayload implements DataGridFormattable {
-    constructor(public phoneNumber: string, public phoneNumberID: string, public extensionNumber: string, public extensionID: string, public id: string = '') {
+    constructor(public phoneNumber: string, public phoneNumberID: string, public extensionNumber: string, public extensionID?: string, public id: string = '') {
         this.id = this.randomID().toString()
     }
 
     toDataGidHeader(): any {
         return [
             { field: 'phoneNumber', headerName: 'Phone Number', width: 200 },
-            { field: 'extensionNumber', headerName: 'Extension', width: 100 },
+            { field: 'extensionNumber', headerName: 'Extension', width: 300 },
         ]
     }
 
@@ -17,7 +17,7 @@ export class PhoneNumberPayload implements DataGridFormattable {
         return {
             id: this.id,
             phoneNumber: this.phoneNumber,
-            extensionNumber: this.extensionNumber
+            extensionNumber: this.extensionNumber !== '' ? this.extensionNumber : 'Auto-Receptionist'
         }
     }
 
@@ -31,10 +31,8 @@ export class PhoneNumberPayload implements DataGridFormattable {
 
     payload() {
         return {
-            usageType: 'DirectNumber',
-            extension: {
-                id: this.extensionID
-            }
+            usageType: this.extensionID ? 'DirectNumber' : 'CompanyNumber',
+            ... (this.extensionID && { extension: { id: this.extensionID } })
         }
     }
 

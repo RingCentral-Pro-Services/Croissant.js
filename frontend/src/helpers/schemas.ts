@@ -300,7 +300,7 @@ export const PhoneNumberPayloadSchema = z.object({
     'Extension': z.coerce.string({
         required_error: 'Missing extension number',
         invalid_type_error: 'Extension number data type invalid. Expected text, found number'
-    }).trim()
+    }).trim().optional(),
 })
 
 export const LocationUpdateSchema = z.object({

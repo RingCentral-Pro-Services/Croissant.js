@@ -9,7 +9,6 @@ import useSidebar from "../../../../hooks/useSidebar";
 import useValidateExcelData from "../../../../hooks/useValidateExcelData";
 import useExtensions from "../../../../rcapi/useExtensions";
 import useGetAccessToken from "../../../../rcapi/useGetAccessToken";
-import usePhoneNumberMap from "../../../../rcapi/usePhoneNumberMap";
 import FeedbackArea from "../../../shared/FeedbackArea";
 import FeedbackForm from "../../../shared/FeedbackForm";
 import FileSelect from "../../../shared/FileSelect";
@@ -20,6 +19,7 @@ import useExcelToPhoneNumbers from "./hooks/useExcelToPhoneNumbers";
 import { IconExternalLink } from "@tabler/icons-react";
 import { useAuditTrail } from "../../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../../shared/SystemNotifications";
+import usePhoneNumberList from "../../Migration/Users/hooks/usePhoneNumberList";
 
 const BulkAssign = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -39,7 +39,8 @@ const BulkAssign = () => {
     const { extensionsList, isExtensionListPending, isMultiSiteEnabled, fetchExtensions } = useExtensions(postMessage)
     const {readFile, isExcelDataPending, excelData} = useReadExcel()
     const {validate, validatedData, isDataValidationPending} = useValidateExcelData(PhoneNumberPayloadSchema, postMessage, postError)
-    const {getPhoneNumberMap, phoneNumbers, isPhoneNumberMapPending} = usePhoneNumberMap()
+    // const {getPhoneNumberMap, phoneNumbers, isPhoneNumberMapPending} = usePhoneNumberMap()
+    const {getPhoneNumberMap, phoneNumbers, isPhoneNumberMapPending} = usePhoneNumberList()
     const {convert, isConverPending, phoneNumberPayloads} = useExcelToPhoneNumbers(postMessage, postError)
     const {assignNumbers, isAssignmentPending} = useAssignPhoneNumbers(setProgressValue, postMessage, postTimedMessage, postError)
     const { reportToAuditTrail } = useAuditTrail()

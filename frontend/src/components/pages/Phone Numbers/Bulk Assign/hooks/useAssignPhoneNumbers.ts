@@ -11,7 +11,7 @@ const useAssignPhoneNumbers = (setProgressValue: (value: (any)) => void, postMes
     const [rateLimitIntervaal, setRateLimitInterval] = useState(250)
     const [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
     const [shouldAssignNumbers, setShouldAssignNumbers] = useState(false)
-    const baseURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/phone-number/phoneNumberId'
+    const baseURL = 'https://platform.ringcentral.com/restapi/v2/accounts/~/phone-numbers/phoneNumberId'
 
     const assignNumbers = (numbers: PhoneNumberPayload[]) => {
         setPayloads(numbers)
@@ -37,7 +37,7 @@ const useAssignPhoneNumbers = (setProgressValue: (value: (any)) => void, postMes
                 }
 
                 const url = baseURL.replace('phoneNumberId', payloads[currentExtensionIndex].phoneNumberID)
-                const response = await RestCentral.put(url, headers, payloads[currentExtensionIndex].payload())
+                const response = await RestCentral.patch(url, headers, payloads[currentExtensionIndex].payload())
                 console.log(response)
 
                 if (response.rateLimitInterval > 0) {
