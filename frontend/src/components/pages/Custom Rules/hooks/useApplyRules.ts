@@ -28,10 +28,18 @@ const useApplyRules = (postMessage: (message: Message) => void, postTimedMessage
                 "Authorization": `Bearer ${token}`
             }
             const url = baseURL.replace('extensionId', `${extension.id}`)
-            const payload = {...rule}
+            const payload = { ...rule }
             if (!maintainVoicemailDestination) payload!.voicemail!.recipient.id = extension.id
             if (payload?.callHandlingAction !== 'TakeMessagesOnly') delete payload?.voicemail
             if (payload?.callHandlingAction !== 'TransferToExtension') delete payload?.transfer
+            if (payload.callHandlingAction === 'TransferToExtension') {
+                payload.voicemail = {
+                    enabled: false,
+                    recipient: {
+                        id: extension.id
+                    }
+                }
+            }
             if (payload.callHandlingAction === 'PlayAnnouncementOnly') {
                 payload.voicemail = {
                     enabled: false,
@@ -67,7 +75,7 @@ const useApplyRules = (postMessage: (message: Message) => void, postTimedMessage
         return new Promise(resolve => setTimeout(resolve, ms))
     }
 
-    return {applyRules}
+    return { applyRules }
 }
 
 export default useApplyRules
