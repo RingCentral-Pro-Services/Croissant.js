@@ -9,6 +9,39 @@ import { CallHandlingRules } from "../models/CallHandlingRules"
 import {CallQueueKeys} from '../helpers/Keys'
 import { Greeting, Presets, HoldPresets } from "../models/Greetings"
 
+const ringTimeMap: Map<string, number> = new Map([
+    ['2 Rings/10 Seconds', 10],
+    ['3 Rings/15 Seconds', 15],
+    ['4 Rings/20 Seconds', 20],
+    ['5 Rings/25 Seconds', 25],
+    ['6 Rings/30 Seconds', 30],
+    ['9 Rings/45 Seconds', 45],
+    ['12 Rings/1 Minute', 60],
+    ['24 Rings/2 Minutes', 120],
+    ['60 Rings/5 Minutes', 300],
+    ['10 secs', 10],
+    ['15 secs', 15],
+    ['30 secs', 30],
+    ['45 secs', 45],
+    ['1 min', 60],
+    ['2 min', 120],
+    ['5 min', 300],
+    ['10 min', 600],
+    ['15 min', 900],
+    ['10 Seconds', 10],
+    ['15 Seconds', 15],
+    ['20 Seconds', 20],
+    ['25 Seconds', 25],
+    ['30 Seconds', 30],
+    ['1 Minute', 60],
+    ['2 Minutes', 120],
+    ['3 Minutes', 180],
+    ['4 Minutes', 240],
+    ['5 Minutes', 300],
+    ['10 Minutes', 600],
+    ['15 Minutes', 900],
+])
+
 const useExcelToQueues = (postMessage: (message: Message) => void, postError: (error: SyncError) => void) => {
     const [queues, setQueues] = useState<CallQueue[]>([])
     const [isQueueConvertPending, setIsQueueConvertPending] = useState(true)
@@ -139,10 +172,14 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
             settings.transferMode = translatedRingType(data[CallQueueKeys.ringType])
         }
         if (settings.transferMode != 'Simultaneous' && CallQueueKeys.userRingTime in data) {
-            const timeString = data[CallQueueKeys.userRingTime].toString().replace(/\D/g, '')
-            let time = parseInt(timeString)
+            const timeString = data[CallQueueKeys.userRingTime]
+            let time = ringTimeMap.get(timeString)
+            
+            if (!time) {
+                time = 20
+                postMessage(new Message(`The ring time for ${data['Queue Name']} is invalid. The default ring time of 20 seconds will be used.`, 'warning'))
+            }
 
-            if (time < 10) time = time * 60
             settings.agentTimeout = time
         }
         if (CallQueueKeys.maxCallers in data) {
@@ -151,18 +188,28 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
         }
         if (CallQueueKeys.totalRingTime in data) {
             if (data[CallQueueKeys.totalRingTime] === '10 min' || data[CallQueueKeys.totalRingTime] === '15 min') {
-                const timeString = data[CallQueueKeys.totalRingTime].toString().replace(/\D/g, '')
-                let time = parseInt(timeString) * 60
+                const timeString = data[CallQueueKeys.totalRingTime]
+                let time = ringTimeMap.get(timeString)
+
+                if (!time) {
+                    time = 180
+                    postMessage(new Message(`The hold time for ${data['Queue Name']} is invalid. The default hold time of 3 minutes will be used.`, 'warning'))
+                }
+
                 settings.holdTime = time
             }
             else if (data[CallQueueKeys.totalRingTime] === "Don't Wait" || data[CallQueueKeys.totalRingTime] === '1 secs') {
                 settings.holdTime = 1
             }
             else {
-                const timeString = data[CallQueueKeys.totalRingTime].toString().replace(/\D/g, '')
-                let time = parseInt(timeString)
+                const timeString = data[CallQueueKeys.totalRingTime]
+                let time = ringTimeMap.get(timeString)
+
+                if (!time) {
+                    time = 180
+                    postMessage(new Message(`The hold time for ${data['Queue Name']} is invalid. The default hold time of 3 minutes will be used.`, 'warning'))
+                }
     
-                if (time < 10) time = time * 60
                 settings.holdTime = time
             }
         }
@@ -408,7 +455,20 @@ const useExcelToQueues = (postMessage: (message: Message) => void, postError: (e
 
     const translatedRingType = (text: string) => {
         if (text === 'Sequential') return 'FixedOrder'
-        return text
+        switch(text) {
+            case 'Longest Idle':
+                return 'Rotating'
+            case 'Fixed Order':
+                return 'FixedOrder'
+            case 'Simultaneous':
+                return 'Simultaneous'
+            case 'Rotating':
+                return 'Rotating'
+            case 'Sequential':
+                return 'FixedOrder'
+            default:
+                return 'Rotating'
+        }
     }
 
     const idForQueue = (extension: string, extensionsList: RCExtension[]) => {
