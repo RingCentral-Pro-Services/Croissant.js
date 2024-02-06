@@ -33,18 +33,22 @@ const useApplyRules = (postMessage: (message: Message) => void, postTimedMessage
             if (payload?.callHandlingAction !== 'TakeMessagesOnly') delete payload?.voicemail
             if (payload?.callHandlingAction !== 'TransferToExtension') delete payload?.transfer
             if (payload.callHandlingAction === 'TransferToExtension') {
-                payload.voicemail = {
-                    enabled: false,
-                    recipient: {
-                        id: extension.id
+                if (extension.type !== 'Department') {
+                    payload.voicemail = {
+                        enabled: false,
+                        recipient: {
+                            id: extension.id
+                        }
                     }
                 }
             }
             if (payload.callHandlingAction === 'PlayAnnouncementOnly') {
-                payload.voicemail = {
-                    enabled: false,
-                    recipient: {
-                        id: extension.id
+                if (extension.type !== 'Department') {
+                    payload.voicemail = {
+                        enabled: false,
+                        recipient: {
+                            id: extension.id
+                        }
                     }
                 }
             }
