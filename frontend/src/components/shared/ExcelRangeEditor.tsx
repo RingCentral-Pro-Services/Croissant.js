@@ -20,7 +20,7 @@ export const ExcelRangeEditor = (props: { ranges: ExcelRange[], onRangeChange: (
     return (
         <div style={{ width: 500 }}>
             <h3>Edit Excel Ranges</h3>
-            <p>Croissant will use these ranges when reading excel files.</p>
+            <p>We'll use these ranges when reading excel files.</p>
             <div style={{ maxHeight: 400, overflowX: 'auto' }}>
                 {ranges.map((range) => (
                     <ExcelRangeEditorRow range={range} onChange={handleChange} />

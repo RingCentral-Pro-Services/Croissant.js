@@ -85,7 +85,7 @@ function App() {
   const [user, setUser] = useAtom(userAtom)
 
   useEffect(() => {
-    document.title = "Croissant"
+    document.title = `${process.env.REACT_APP_APP_NAME}`
     // const storedTheme = localStorage.getItem('theme')
     const storedUser = localStorage.getItem('currentUser')
     // if (storedTheme) {
