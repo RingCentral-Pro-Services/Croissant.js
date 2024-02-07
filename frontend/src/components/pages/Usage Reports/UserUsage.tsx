@@ -72,7 +72,7 @@ export const UserUsage = () => {
             sheetName: 'Usage',
             headers: ['Name', 'Usage Count'],
             data: usageItems
-        }], 'croissant-usage-by-user.xlsx')
+        }], 'build-usage-by-user.xlsx')
     }
 
     return (

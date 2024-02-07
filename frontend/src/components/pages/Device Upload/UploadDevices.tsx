@@ -150,7 +150,7 @@ const UploadDevices = () => {
                     <li>Extensions must have an "existing device" in service web before running this tool</li>
                     <li>The tool will not work if the extension has anything other than an "existing device"</li>
                     <li>Do not try to use a device that isn't listed in the dropdown</li>
-                    <li>Reach out in the Croissant Tool chat if you are having issues</li>
+                    <li>Reach out in the {process.env.REACT_APP_APP_NAME} chat if you are having issues</li>
                 </ul>
             </ToolCard>
             <ToolCard>
