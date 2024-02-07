@@ -21,7 +21,7 @@ const FatalError = () => {
             <div className="error-container">
                 <h2>{headline}</h2>
                 <p>We're sorry, but an unexpected error ocurred. Please check your file and try again.</p>
-                <p>Need help? Reach out in the Croissant Tool group.</p>
+                <p>Need help? Reach out in the {process.env.REACT_APP_APP_NAME} group.</p>
             </div>
         </>
     )

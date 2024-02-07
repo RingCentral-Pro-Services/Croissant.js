@@ -289,7 +289,8 @@ export const createSiteSchema = z.object({
         invalid_type_error: 'Outbound cnam data type invalid'
     }).trim().optional(),
     'Main Extension Number': z.coerce.string().trim().optional(),
-    'Site Code': z.coerce.string().trim().optional()
+    'Site Code': z.coerce.string().trim().optional(),
+    'Emergency Response Location Nickname': z.coerce.string().trim().optional()
 })
 
 export const PhoneNumberPayloadSchema = z.object({
