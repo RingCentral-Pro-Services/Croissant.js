@@ -8,7 +8,7 @@ import { RestCentral } from "../../../../rcapi/RestCentral";
 const useFetchRoles = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
     const [isFetchingRoles, setIsFetchingRoles] = useState(false)
     const [roles, setRoles] = useState<Role[]>([])
-    const url = 'https://platform.ringcentral.com/restapi/v1.0/account/~/user-role?custom=true&perPage=1000'
+    const url = 'https://platform.ringcentral.com/restapi/v1.0/account/~/user-role?perPage=1000'
     const baseWaitingPeriod = 250
 
     const fetchRoles = async () => {

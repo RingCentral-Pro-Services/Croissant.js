@@ -33,7 +33,7 @@ const ExtensionEditor = () => {
     const {postMessage, postError, messages, errors} = useMessageQueue()
     const {postTimedMessage, timedMessages} = usePostTimedMessage()
     const {fetchExtensions, extensionsList, isExtensionListPending} = useExtensionList(postMessage)
-    const {setOldFirstName, setOldLastName, setOldEmail, setNewFirstName, setNewLastName, setNewEmail, editedExtensions} = useExtensionEditing(extensionsList)
+    const {setOldFirstName, setOldLastName, setOldEmail, setOldRecordName, setNewFirstName, setNewLastName, setNewRecordName, setNewEmail, editedExtensions} = useExtensionEditing(extensionsList)
     const {updateExtensions, isExtensionUpdatePending} = useUpdateExtensions(setProgressValue, postMessage, postTimedMessage, postError)
     const { reportToAuditTrail } = useAuditTrail()
 
@@ -82,6 +82,7 @@ const ExtensionEditor = () => {
                 </div>
                 <SimpleReplacement leftTitle="If first name contains" rightTitle="Replace with" setLeftValue={setOldFirstName} setRightValue={setNewFirstName} />
                 <SimpleReplacement leftTitle="If last name contains" rightTitle="Replace with" setLeftValue={setOldLastName} setRightValue={setNewLastName} />
+                <SimpleReplacement leftTitle="If record name contains" rightTitle="Replace with" setLeftValue={setOldRecordName} setRightValue={setNewRecordName} />
                 <SimpleReplacement leftTitle="If email contains" rightTitle="Replace with" setLeftValue={setOldEmail} setRightValue={setNewEmail} />
                 {isSyncing ? <progress value={progressValue} max={maxProgressValue} /> : <></>}
                 {editedExtensions.length > 0 ? <FeedbackArea gridData={editedExtensions} additiveFilter={true} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
