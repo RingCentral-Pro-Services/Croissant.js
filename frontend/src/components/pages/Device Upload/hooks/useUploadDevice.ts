@@ -53,7 +53,15 @@ const useUploadDevice = (postMessage: (message: Message) => void, postTimedMessa
             const response = await RestCentral.get(baseDeviceListURL.replace('extensionId', `${extension.data.id}`), headers)
             console.log('Device response')
             console.log(response.data)
-            const deviceIDs = response.data.records.map((record: any) => record.id)
+            const validDevices = response.data.records.filter((record: any) => record.type === 'OtherPhone')
+
+            if (validDevices.length < 1) {
+                postMessage(new Message(`No devices of type 'Existing Device' found for ${extension.data.name}. Device will not be uploaded`, 'error'))
+                postError(new SyncError(extension.data.name, parseInt(extension.data.extensionNumber), ['No valid devices found', ''], ''))
+                return []
+            }
+
+            const deviceIDs = validDevices.map((device: any) => device.id)
 
             if (response.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)

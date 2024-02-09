@@ -93,9 +93,6 @@ export class IVRTransformer implements Transformer<IVRMenu> {
             text: ""
         }
 
-        // TODO: Check to see if the prompt is an audio prompt
-        // Then get the URI of the audio prompt
-
         if (rawText.includes('.mp3') || rawText.includes('.wav')) {
             const audio = this.getIVRAudioPrompt(rawText.trim(), audioPromptList)
             if (audio.id === '') {
@@ -189,8 +186,10 @@ export class IVRTransformer implements Transformer<IVRMenu> {
             id: ""
         }
 
+        const filenameWithoutExtension = filename.replaceAll('.mp3', '').replaceAll('.wav', '')
+
         for (const prompt of audioPromptList) {
-            if (prompt.filename === filename) {
+            if ([filename, filenameWithoutExtension].includes(prompt.filename)) {
                 result.id = prompt.id
                 result.uri = prompt.uri
             }
