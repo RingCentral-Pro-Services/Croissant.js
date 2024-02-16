@@ -129,7 +129,7 @@ const useUploadDevice = (postMessage: (message: Message) => void, postTimedMessa
             console.log(`Failed to set device for ${device.data.extension.data.name}`)
             console.log(e)
             postMessage(new Message(`Failed to set device for ${device.data.extension.data.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(device.data.extension.data.name, parseInt(device.data.extension.data.extensionNumber), ['Failed to set device', ''], e.error ?? ''))
+            postError(new SyncError(device.data.extension.data.name, parseInt(device.data.extension.data.extensionNumber), ['Failed to set device', ''], e.error ?? '', device.data))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
             return undefined
         }
@@ -176,7 +176,7 @@ const useUploadDevice = (postMessage: (message: Message) => void, postTimedMessa
             console.log(`Failed to set unassigned device`)
             console.log(e)
             postMessage(new Message(`Failed to set unassigned device ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(device.data.extension.data.name, parseInt(device.data.extension.data.extensionNumber), ['Failed to set unassigned device', ''], e.error ?? ''))
+            postError(new SyncError(device.data.extension.data.name, parseInt(device.data.extension.data.extensionNumber), ['Failed to set unassigned device', ''], e.error ?? '', device.data))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
             return undefined
         }

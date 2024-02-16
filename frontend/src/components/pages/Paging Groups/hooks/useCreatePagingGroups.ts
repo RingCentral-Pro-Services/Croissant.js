@@ -57,7 +57,7 @@ const useCreatePagingGroups = (setProgressValue: (value: (any)) => void, postMes
                 console.log('Failed to create paging group')
                 console.log(e)
                 postMessage(new Message(`Failed to create paging group ${pagingGroups[currentExtensionIndex].data.name}. ${e.error ?? ''}`,'error'))
-                postError(new SyncError(pagingGroups[currentExtensionIndex].data.name, 0, ['Failed to create', ''], e.error ?? ''))
+                postError(new SyncError(pagingGroups[currentExtensionIndex].data.name, 0, ['Failed to create', ''], e.error ?? '', pagingGroups[currentExtensionIndex].payload()))
                 next()
             }
         }, rateLimitInterval)

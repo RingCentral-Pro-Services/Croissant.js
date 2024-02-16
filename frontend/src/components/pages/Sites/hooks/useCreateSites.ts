@@ -64,7 +64,7 @@ const useCreateSites = (setProgressValue: (value: (any)) => void, postMessage: (
 
                 console.log(`Failed to create site '${sites[currentExtensionIndex].data.name}'`)
                 postMessage(new Message(`Failed to create site '${sites[currentExtensionIndex].data.name}.' ${e.error}`, 'error'))
-                postError(new SyncError(sites[currentExtensionIndex].data.name, parseInt(sites[currentExtensionIndex].data.extensionNumber), ['Failed to create site', ''], e.error ?? ''))
+                postError(new SyncError(sites[currentExtensionIndex].data.name, parseInt(sites[currentExtensionIndex].data.extensionNumber), ['Failed to create site', ''], e.error ?? '', sites[currentExtensionIndex].payload()))
                 console.log(e)
                 next()
             }

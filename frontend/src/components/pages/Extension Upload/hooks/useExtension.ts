@@ -69,7 +69,7 @@ const useExtension = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(`Failed to make extension ${extension.data.name}`)
             console.log(e)
             postMessage(new Message(`Failed to make extension ${extension.data.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(extension.data.name, parseInt(extension.data.extensionNumber), ['Failed to create extension', ''], e.error ?? ''))
+            postError(new SyncError(extension.data.name, parseInt(extension.data.extensionNumber), ['Failed to create extension', ''], e.error ?? '', extension.data))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
@@ -98,7 +98,7 @@ const useExtension = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(`Failed to make extension ${extension.data.name}`)
             console.log(e)
             postMessage(new Message(`Failed to make extension ${extension.data.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(extension.data.name, parseInt(extension.data.extensionNumber), ['Failed to create extension', ''], e.error ?? ''))
+            postError(new SyncError(extension.data.name, parseInt(extension.data.extensionNumber), ['Failed to create extension', ''], e.error ?? '', extension.data))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
@@ -129,7 +129,7 @@ const useExtension = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(`Failed to set role ${extension.data.name}`)
             console.log(e)
             postMessage(new Message(`Failed to set role ${extension.data.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(extension.data.name, parseInt(extension.data.extensionNumber), ['Failed to set role', ''], e.error ?? ''))
+            postError(new SyncError(extension.data.name, parseInt(extension.data.extensionNumber), ['Failed to set role', ''], e.error ?? '', extension.rolePayload()))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
