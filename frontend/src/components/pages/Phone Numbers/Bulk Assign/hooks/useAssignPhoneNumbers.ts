@@ -53,7 +53,7 @@ const useAssignPhoneNumbers = (setProgressValue: (value: (any)) => void, postMes
                 console.log('Something went wrong assigning numbers')
                 console.log(e)
                 postMessage(new Message(`Something went wrong assigning number ${payloads[currentExtensionIndex].phoneNumber}. ${e.error ?? ''}`, 'error'))
-                postError(new SyncError(payloads[currentExtensionIndex].phoneNumber, 0, ['Fail to assign number', ''], e.error ?? ''))
+                postError(new SyncError(payloads[currentExtensionIndex].phoneNumber, 0, ['Fail to assign number', ''], e.error ?? '', payloads[currentExtensionIndex].payload()))
                 next()
             }
         }, rateLimitIntervaal)

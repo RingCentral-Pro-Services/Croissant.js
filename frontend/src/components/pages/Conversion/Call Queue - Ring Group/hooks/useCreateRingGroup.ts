@@ -120,7 +120,7 @@ export const useCreateRingGroup = (postMessage: (message: Message) => void, post
                 postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             postMessage(new Message(`Failed to create ring group ${group.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError('', 0, ['Failed to create ring group', group.name], e.error ?? ''))
+            postError(new SyncError('', 0, ['Failed to create ring group', group.name], e.error ?? '', group))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
@@ -150,7 +150,7 @@ export const useCreateRingGroup = (postMessage: (message: Message) => void, post
                 postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             postMessage(new Message(`Failed to set business hours for ring group ${group.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError('', 0, ['Failed to set business hours', group.name], e.error ?? ''))            
+            postError(new SyncError('', 0, ['Failed to set business hours', group.name], e.error ?? '', group))            
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
@@ -182,7 +182,7 @@ export const useCreateRingGroup = (postMessage: (message: Message) => void, post
                 postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             postMessage(new Message(`Failed to get call handling for ring group ${group.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError('', 0, ['Failed to get call handling', group.name], e.error ?? ''))            
+            postError(new SyncError('', 0, ['Failed to get call handling', group.name], e.error ?? '', group))            
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
@@ -229,7 +229,7 @@ export const useCreateRingGroup = (postMessage: (message: Message) => void, post
                 postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             postMessage(new Message(`Failed to set business hours for ring group ${group.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError('', 0, ['Failed to set business hours', group.name], e.error ?? ''))            
+            postError(new SyncError('', 0, ['Failed to set business hours', group.name], e.error ?? '', group))            
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
@@ -287,7 +287,7 @@ export const useCreateRingGroup = (postMessage: (message: Message) => void, post
                 postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             postMessage(new Message(`Failed to set missed call action for ring group ${group.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError('', 0, ['Failed to set missed call action', group.name], e.error ?? ''))            
+            postError(new SyncError('', 0, ['Failed to set missed call action', group.name], e.error ?? '', group))            
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
@@ -340,7 +340,7 @@ export const useCreateRingGroup = (postMessage: (message: Message) => void, post
                 postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             postMessage(new Message(`Failed to set after hours call handling for ring group ${group.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError('', 0, ['Failed to set after hours call handling', group.name], e.error ?? ''))            
+            postError(new SyncError('', 0, ['Failed to set after hours call handling', group.name], e.error ?? '', group))            
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
@@ -406,7 +406,7 @@ export const useCreateRingGroup = (postMessage: (message: Message) => void, post
             console.log(`Failed to set business hours greetings`)
             console.log(e)
             postMessage(new Message(`Failed to set business hours greetings for ${group.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(group.name, parseInt(group.extensionNumber), ['Failed to set business hours greetings', ''], e.error ?? ''))
+            postError(new SyncError(group.name, parseInt(group.extensionNumber), ['Failed to set business hours greetings', ''], e.error ?? '', group))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
@@ -444,7 +444,7 @@ export const useCreateRingGroup = (postMessage: (message: Message) => void, post
             console.log(`Failed to set custom ${greeting.type} greeting`)
             console.log(e)
             postMessage(new Message(`Failed to set custom ${greeting.type} greeting for ${group.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError(group.name, parseInt(group.extensionNumber), ['Failed to set custom greeting', ''], e.error ?? ''))
+            postError(new SyncError(group.name, parseInt(group.extensionNumber), ['Failed to set custom greeting', ''], e.error ?? '', greeting))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
@@ -483,7 +483,7 @@ export const useCreateRingGroup = (postMessage: (message: Message) => void, post
                 postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             postMessage(new Message(`Failed to set notification settings for ring group ${group.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError('', 0, ['Failed to set notification settings', group.name], e.error ?? ''))            
+            postError(new SyncError('', 0, ['Failed to set notification settings', group.name], e.error ?? '', group))            
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
@@ -530,7 +530,7 @@ export const useCreateRingGroup = (postMessage: (message: Message) => void, post
                 postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             postMessage(new Message(`Failed to reassign phone number ${phoneNumber.phoneNumber} to ring group ${group.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError('', 0, ['Failed to reassign phone number', phoneNumber.phoneNumber], e.error ?? ''))            
+            postError(new SyncError('', 0, ['Failed to reassign phone number', phoneNumber.phoneNumber], e.error ?? '', phoneNumber))            
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
@@ -579,7 +579,7 @@ export const useCreateRingGroup = (postMessage: (message: Message) => void, post
                 postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             postMessage(new Message(`Failed to add forwarding device ${device.name} ${e.error ?? ''}`, 'error'))
-            postError(new SyncError('', 0, ['Failed to add forwarding device', device.name], e.error ?? ''))            
+            postError(new SyncError('', 0, ['Failed to add forwarding device', device.name], e.error ?? '', group))            
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
