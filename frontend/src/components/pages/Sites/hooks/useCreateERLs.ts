@@ -59,7 +59,7 @@ const useCreateERLs = (setProgressValue: (value: (any)) => void, postMessage: (m
                 }
                 console.log(`Failed to create ERL for site '${sites[currentExtensionIndex].data.name}'`)
                 postMessage(new Message(`Failed to create ERL for site '${sites[currentExtensionIndex].data.name}.' ${e.error}`, 'error'))
-                postError(new SyncError(sites[currentExtensionIndex].data.name, parseInt(sites[currentExtensionIndex].data.extensionNumber), ['Failed to create ERL', ''], e.error ?? ''))
+                postError(new SyncError(sites[currentExtensionIndex].data.name, parseInt(sites[currentExtensionIndex].data.extensionNumber), ['Failed to create ERL', ''], e.error ?? '',  sites[currentExtensionIndex].erlPayload()))
                 console.log(e)
                 next()
             }

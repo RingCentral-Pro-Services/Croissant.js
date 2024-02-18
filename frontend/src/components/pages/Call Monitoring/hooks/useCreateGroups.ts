@@ -57,7 +57,7 @@ const useCreateGroups = (setProgressValue: (value: (any)) => void, postMessage: 
                 console.log('Something went horibly wrong creating group')
                 console.log(e)
                 postMessage(new Message(`Something went wrong creating group '${callMonitoringGroups[currentExtensionIndex].data.name}'. ${e.error ?? ''}`, 'error'))
-                postError(new SyncError(callMonitoringGroups[currentExtensionIndex].data.name, 0, ['Failed to create group', ''], e.error ?? ''))
+                postError(new SyncError(callMonitoringGroups[currentExtensionIndex].data.name, 0, ['Failed to create group', ''], e.error ?? '', callMonitoringGroups[currentExtensionIndex].data))
                 next()
             }
         }, rateLimitIntervaal)
