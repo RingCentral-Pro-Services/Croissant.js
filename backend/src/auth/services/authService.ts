@@ -5,6 +5,7 @@ import { isDepartmentWhiteListed, isUserWhiteListed } from '../../access-control
 import { isUserAdmin } from "../../access-control/services/dbService";
 import { AuditTrailItem } from "../../audit-trail/interface/AuditTrailItem";
 import { addAuditTrailItem } from "../../audit-trail/services/dbService";
+import { TokenData } from "../interfaces/TokenData";
 const axios = require('axios').default;
 
 export const processAuth = async (req: Request, res: Response, next: any) => {
@@ -16,18 +17,15 @@ export const processAuth = async (req: Request, res: Response, next: any) => {
         return
     }
 
-    const rcsdk = new SDK({
-        server: SDK.server.production,
-        clientId: process.env.RC_CLIENT_ID,
-        clientSecret: process.env.RC_CLIENT_SECRET,
-        redirectUri: process.env.RC_REDIRECT_URI
-    })
-    const platform = rcsdk.platform()
-    var response = await platform.login({ code: code })
-    const data = await response.json()
+    const data = await fetchToken(code, process.env.RC_REDIRECT_URI!)
 
-    const refreshToken = data["refresh_token"]
-    const accessToken = data["access_token"]
+    if (!data) {
+        res.redirect(`/token`)
+        return
+    }
+
+    const refreshToken = data.refresh_token
+    const accessToken = data.access_token
 
     const user = await getUserData(accessToken)
 
@@ -83,15 +81,12 @@ export const processBizAuth = async (req: Request, res: Response, next: any) => 
         return
     }
 
-    const rcsdk = new SDK({
-        server: SDK.server.production,
-        clientId: process.env.RC_CLIENT_ID,
-        clientSecret: process.env.RC_CLIENT_SECRET,
-        redirectUri: process.env.RC_SEGREGATED_REDIRECT_URI
-    })
-    const platform = rcsdk.platform()
-    var response = await platform.login({ code: code })
-    const data = await response.json()
+    const data = await fetchToken(code, process.env.RC_REDIRECT_URI!)
+
+    if (!data) {
+        res.redirect(`/token`)
+        return
+    }
 
     const refreshToken = data["refresh_token"]
     const accessToken = data["access_token"]
@@ -99,6 +94,25 @@ export const processBizAuth = async (req: Request, res: Response, next: any) => 
     res.cookie('auth_token', accessToken)
     res.cookie('auth_refresh', refreshToken)
     res.redirect(`/biztoken?state=${state}`)
+}
+
+const fetchToken = async (code: string, redirectUri: string) => {
+    try {
+        const rcsdk = new SDK({
+            server: SDK.server.production,
+            clientId: process.env.RC_CLIENT_ID,
+            clientSecret: process.env.RC_CLIENT_SECRET,
+            redirectUri: redirectUri
+        })
+        const platform = rcsdk.platform()
+        var response = await platform.login({ code: code })
+        const data: TokenData = await response.json()
+        return data
+    }
+    catch (e) {
+        console.log('Failed to fetch token')
+        console.log(e)
+    }
 }
 
 export const refreshToken = async (req: Request, res: Response, next: any) => {
