@@ -8,7 +8,7 @@ import { router as auditTrailRouter } from './audit-trail/routes/index'
 import { router as notificationRouter } from './notifications/routes/index'
 import { sequelize } from './database/Sequelize';
 import { DepartmentModel } from './access-control/models/DepartmentModel'
-import { AdminModel } from  './access-control/models/AdminModel'
+import { AdminModel } from './access-control/models/AdminModel'
 import { UserModel } from './access-control/models/UserModel'
 import { AuditItemModel } from './audit-trail/models/AuditItemModel'
 import { NotificationModel } from './notifications/models/NotificationModel';
@@ -35,6 +35,31 @@ app.listen(PORT, () => {
 })
 
 app.use(express.static(path.resolve(__dirname, '../../frontend/build')))
+
+app.get('/ivr-hours', (req: any, res: any) => {
+  const body = {
+    "name": "1044",
+    "store": {
+      "sundayFrom": "11:00",
+      "sundayTo": "21:00",
+      "mondayFrom": "11:00",
+      "mondayTo": "21:00",
+      "tuesdayFrom": "11:00",
+      "tuesdayTo": "21:00",
+      "wednesdayFrom": "11:00",
+      "wednesdayTo": "21:00",
+      "thursdayFrom": "11:00",
+      "thursdayTo": "21:00",
+      "fridayFrom": "11:00",
+      "fridayTo": "21:00",
+      "saturdayFrom": "11:30",
+      "saturdayTo": "21:00"
+    },
+    "drive": null
+  }
+
+  res.send([body])
+})
 
 app.get('*', (req: any, res: any) => {
   res.sendFile(path.resolve(__dirname, '../../frontend/build', 'index.html'));
