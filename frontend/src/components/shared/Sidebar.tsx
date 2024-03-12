@@ -30,6 +30,7 @@ import { UserButton } from "./UserButton";
 import { useAtomValue } from 'jotai'
 import { userAtom } from "../../App";
 import Modal from "./Modal";
+import { Settings } from "../pages/Settings/Settings";
 
 interface SidebarGroup {
   label: string
@@ -121,6 +122,7 @@ const mockdata: SidebarGroup[] = [
     initiallyOpened: false,
     links: [
       { label: 'Account Dump', link: '/accountdump' },
+      { label: 'Insights', link: '/account-insights' },
       { label: 'Credentials', link: '/credentials' },
       { label: 'Upload Devices', link: '/uploaddevices' },
       { label: 'Account Templates', link: '/accounttemplates' },
@@ -216,7 +218,8 @@ function Sidebar({ setColorTheme }: SidebarProps) {
 
   return (
     <div className="navigation-bar">
-      <Modal open={isShowingSignOutModal} setOpen={setIsShowingSignOutModal} handleAccept={handleSignOutButtonClick} title='Sign out?' body='Do you want to sign out and be redirected to the login page?' rejectLabel='No, go back' acceptLabel='Yes, sign out' />
+      {/* <Modal open={isShowingSignOutModal} setOpen={setIsShowingSignOutModal} handleAccept={handleSignOutButtonClick} title='Sign out?' body='Do you want to sign out and be redirected to the login page?' rejectLabel='No, go back' acceptLabel='Yes, sign out' /> */}
+      <Settings isShowing={isShowingSignOutModal} close={() => setIsShowingSignOutModal(false)} />
 
       <Navbar sx={{ position: 'fixed', zIndex: 1 }} width={{ sm: 250 }} p="md" className={classes.navbar}>
         <Navbar.Section className={classes.header}>
