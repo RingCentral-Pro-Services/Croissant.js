@@ -27,6 +27,7 @@ const Credentials = () => {
     const [targetUID, setTargetUID] = useState("")
     const [isSyncing, setIsSyncing] = useState(false)
     const [isReady, setIsReady] = useState(false)
+    const [isDone, setIsDone] = useState(false)
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [selectedSheet, setSelectedSheet] = useState('')
     const [secretQuestions, setSecretQuestions] = useState<SecretQuestion[]>([])
@@ -105,6 +106,7 @@ const Credentials = () => {
             uid: targetUID
         })
 
+        setIsDone(true)
         setIsSyncing(false)
     }
 
@@ -173,6 +175,7 @@ const Credentials = () => {
                     messages={messages}
                     errors={errors}
                     timedMessages={timedMessages}
+                    isDone={isDone}
                 />
             </ToolCard>
         </>

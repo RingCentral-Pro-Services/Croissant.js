@@ -117,6 +117,7 @@ const MigrateUsers = () => {
     const [isPending, setIsPending] = useState(false)
     const [isShowingModal, setIsShowingModal] = useState(false)
     const [isShowingSegregatedModal, setIsShowingSegregatedModal] = useState(false)
+    const [isDone, setIsDone] = useState(false)
     const currentUser = useAtomValue(userAtom)
     const supportedExtensionTypes = ['ERLs', 'Custom Roles', 'Call Recording Settings', 'Cost Centers', 'User', 'Limited Extension', 'Call Queue', 'IVR Menu', 'Prompt Library', 'Message-Only', 'Announcement-Only', 'Call Monitoring Groups', 'Park Location', 'User Group', 'Unassigned Devices']
 
@@ -928,6 +929,7 @@ const MigrateUsers = () => {
         console.log(leBundles)
         console.log('Sites')
         console.log(siteBundles)
+        setIsDone(true)
         postMessage(new Message('Finished migrating', 'info'))
     }
 
@@ -1294,7 +1296,7 @@ const MigrateUsers = () => {
                 <ProgressBar label='Configure Queues' value={configureQueuesProgress} max={maxConfigureQueuesProgress} />
                 <ProgressBar label='Configure Main Site' value={configureMainSiteProgress} max={maxConfigureMainSiteProgress} />
                 <ProgressBar label='Configure Sites' value={configureSitesProgress} max={maxConfigureSitesProgress} />
-                <FeedbackArea messages={messages} timedMessages={timedMessages} errors={errors} notifications={notifications} />
+                <FeedbackArea messages={messages} timedMessages={timedMessages} errors={errors} notifications={notifications} isDone={isDone} />
             </ToolCard>
         </>
     )
