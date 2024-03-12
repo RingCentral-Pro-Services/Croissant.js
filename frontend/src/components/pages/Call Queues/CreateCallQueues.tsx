@@ -177,7 +177,7 @@ const CreateCallQueues = () => {
                 <Button className='healthy-margin-left' variant='outline' onClick={handleTemplateDownloadClick}>Template</Button>
                 {(isSyncing && currentExtensionIndex >= queues.length) ? <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button> : <></>}
                 {!(queues.length > 0) ? <></> : <progress id='sync_progress' value={currentExtensionIndex} max={queues.length} />}
-                {isQueueConvertPending ? <></> : <FeedbackArea gridData={queues} messages={messages} timedMessages={timedMessages} errors={errors} />}
+                {isQueueConvertPending ? <></> : <FeedbackArea gridData={queues} messages={messages} timedMessages={timedMessages} isDone={currentExtensionIndex >= queues.length} errors={errors} />}
             </div>
         </>
     )

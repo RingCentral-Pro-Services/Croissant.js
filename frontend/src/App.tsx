@@ -53,6 +53,8 @@ import { UsageReports } from './components/pages/Usage Reports/UsageReports';
 import { UserUsage } from './components/pages/Usage Reports/UserUsage';
 import { AlertCenter } from './components/pages/Alert Center/AlertCenter';
 import Credentials from './components/pages/Credentials/Credentials';
+import AccountInsights from './components/pages/Insights/AccountInsights';
+import { useSettings } from './components/pages/Settings/hooks/useSettings';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -80,9 +82,27 @@ export const userAtom = atom({
   isAdmin: false
 })
 
+interface SettingsType {
+  shouldAutoDownloadErrors: boolean
+  shouldDelayAfterRequests: boolean
+  requestDelay: number
+}
+
+const getSavedSettings = () => {
+  const settings: SettingsType | undefined = JSON.parse(localStorage.getItem('app_settings') ?? '')
+  return settings
+}
+
+export const settingsAtom = atom({
+  shouldAutoDownloadErrors: getSavedSettings()?.shouldAutoDownloadErrors ?? false,
+  shouldDelayAfterRequests: getSavedSettings()?.shouldDelayAfterRequests ?? false,
+  requestDelay: getSavedSettings()?.requestDelay ?? 250
+})
+
 function App() {
   const[theme, setTheme] = useState<string>('light')
   const [user, setUser] = useAtom(userAtom)
+  useSettings()
 
   useEffect(() => {
     document.title = `${process.env.REACT_APP_APP_NAME}`
@@ -169,6 +189,7 @@ function App() {
                 <Route path='/convert-call-queues' element={<ConvertCallQueues />} />
                 <Route path='/convert-users' element={<ConvertUsers />} />
                 <Route path='/credentials' element={<Credentials />} />
+                <Route path='/account-insights' element={<AccountInsights />} />
               </Routes>
             </Suspense>
           </ErrorBoundary>

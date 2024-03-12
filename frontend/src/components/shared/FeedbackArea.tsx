@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import MessagesArea from "./MessagesArea";
 import { Tabs, Tab, Box, Typography, IconButton } from '@mui/material'
 import { FileDownload } from '@mui/icons-material'
@@ -12,6 +12,8 @@ import { DataGridFormattable } from "../../models/DataGridFormattable";
 import FilterArea from "./FilterArea";
 import { NotificationItem } from "../../models/NotificationItem";
 import useExportPrettyExcel from "../../hooks/useExportPrettyExcel";
+import { useAtomValue } from "jotai";
+import { settingsAtom } from "../../App";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -29,12 +31,19 @@ interface FeedbackAreaProps {
   showSiteFilter?: boolean
   additiveFilter?: boolean
   defaultTab?: number
+  isDone?: boolean
 }
 
-const FeedbackArea: React.FC<FeedbackAreaProps> = ({ messages, timedMessages, errors, notifications, gridData = [], onFilterSelection, showSiteFilter = false, additiveFilter = false, defaultTab = 0 }) => {
+const FeedbackArea: React.FC<FeedbackAreaProps> = ({ messages, timedMessages, errors, notifications, gridData = [], onFilterSelection, showSiteFilter = false, additiveFilter = false, defaultTab = 0, isDone = false }) => {
   const [value, setValue] = React.useState(defaultTab);
   const { writeExcel } = useWriteExcelFile()
   const { exportPrettyExcel } = useExportPrettyExcel()
+  const settings = useAtomValue(settingsAtom)
+
+  useEffect(() => {
+    if (!isDone || !settings.shouldAutoDownloadErrors) return
+    handleDownloadButtonClick()
+  }, [isDone])
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
