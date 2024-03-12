@@ -1,5 +1,5 @@
 import { Checkbox, FormControlLabel, Typography } from "@mui/material";
-import { Button } from "@mantine/core";
+import { Button, Modal as MantineModal } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import { extensionSchema } from "../../../helpers/schemas";
 import useAnalytics from "../../../hooks/useAnalytics";
@@ -26,9 +26,13 @@ import useDeviceDictionary from "./hooks/useDeviceDictionary";
 import { Device } from "../Migration/User Data Download/models/UserDataBundle";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../shared/SystemNotifications";
+import RCExtension from "../../../models/RCExtension";
+import useWriteExcelFile from "../../../hooks/useWriteExcelFile";
 
 const ExtensionUpload = () => {
     const [targetUID, setTargetUID] = useState("")
+    const [isShowingDuplicateModal, setIsShowingDuplicateModal] = useState(false)
+    const [conflictingExtensions, setConflictingExtensions] = useState<Extension[]>([])
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [selectedSheet, setSelectedSheet] = useState('')
     const [isSyncing, setIsSyncing] = useState(false)
@@ -50,23 +54,24 @@ const ExtensionUpload = () => {
     const supportedExtensionTypes = ['Announcement-Only', 'Message-Only', 'Limited Extension', 'User', 'Virtual User']
 
     const increaseProgress = () => {
-        setCurrentExtensionIndex( prev => prev + 1)
+        setCurrentExtensionIndex(prev => prev + 1)
     }
 
     useLogin('extensionupload', isSyncing)
     useSidebar('Extension Upload')
-    const {fireEvent} = useAnalytics()
-    const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError, userName} = useGetAccessToken()
-    const {postMessage, postError, messages, errors} = useMessageQueue()
-    const {postTimedMessage, timedMessages} = usePostTimedMessage()
-    const {fetchExtensions, extensionsList, isExtensionListPending, isMultiSiteEnabled} = useExtensionList(postMessage)
-    const {fetchDeviceDictionary} = useDeviceDictionary(postMessage, postTimedMessage, postError)
-    const {readFile, excelData, isExcelDataPending} = useReadExcel()
-    const {validate, validatedData, isDataValidationPending} = useValidateExcelData(extensionSchema, postMessage, postError)
-    const {convertExcelToExtensions, isExtensionConverPending, extensions} = useExcelToExtensions(shouldAlterEmails, postMessage, postError)
-    const {fetchRoles, roles} = useFetchRoles(postMessage, postTimedMessage, postError)
-    const {createExtension} = useExtension(postMessage, postTimedMessage, postError, isMultiSiteEnabled, increaseProgress)
+    const { fireEvent } = useAnalytics()
+    const { fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError, userName } = useGetAccessToken()
+    const { postMessage, postError, messages, errors } = useMessageQueue()
+    const { postTimedMessage, timedMessages } = usePostTimedMessage()
+    const { fetchExtensions, extensionsList, isExtensionListPending, isMultiSiteEnabled } = useExtensionList(postMessage)
+    const { fetchDeviceDictionary } = useDeviceDictionary(postMessage, postTimedMessage, postError)
+    const { readFile, excelData, isExcelDataPending } = useReadExcel()
+    const { validate, validatedData, isDataValidationPending } = useValidateExcelData(extensionSchema, postMessage, postError)
+    const { convertExcelToExtensions, isExtensionConverPending, extensions } = useExcelToExtensions(shouldAlterEmails, postMessage, postError)
+    const { fetchRoles, roles } = useFetchRoles(postMessage, postTimedMessage, postError)
+    const { createExtension } = useExtension(postMessage, postTimedMessage, postError, isMultiSiteEnabled, increaseProgress)
     const { reportToAuditTrail } = useAuditTrail()
+    const { writeExcel } = useWriteExcelFile()
 
     const setup = async () => {
         await fetchExtensions()
@@ -79,7 +84,7 @@ const ExtensionUpload = () => {
         if (targetUID.length < 5) return
         localStorage.setItem('target_uid', targetUID)
         fetchToken(targetUID)
-    },[targetUID])
+    }, [targetUID])
 
     useEffect(() => {
         if (!hasCustomerToken) return
@@ -90,7 +95,7 @@ const ExtensionUpload = () => {
         if (isExcelDataPending) return
         validate(excelData)
     }, [isExcelDataPending, excelData])
- 
+
     useEffect(() => {
         if (isDataValidationPending) return
         convertExcelToExtensions(validatedData, extensionsList, roles, deviceDictionary)
@@ -118,6 +123,13 @@ const ExtensionUpload = () => {
         console.log('Read Extensions')
         console.log(extensions)
 
+        const conflictingExtensions = findDuplicateEmails(extensionsList, extensions)
+        if (conflictingExtensions.length > 0) {
+            console.log(`Uh oh. ${conflictingExtensions.length} conflicting extensions`)
+            setConflictingExtensions(conflictingExtensions)
+            setIsShowingDuplicateModal(true)
+        }
+
         setDeficitLabel(label)
 
         setUnassignedUserIDs(unassignedUsers)
@@ -128,7 +140,7 @@ const ExtensionUpload = () => {
 
     useEffect(() => {
         const filtered = extensions.filter((ext) => selectedExtensionTypes.includes(ext.prettyType()))
-        
+
         const licensedUsers = filtered.filter((ext) => ext.data.type === 'User')
         const limitedExtensions = filtered.filter((ext) => ext.data.type === 'Limited')
         const unassignedUsers = extensionsList.filter((extension) => extension.status == 'Unassigned' && extension.type === 'User').map((extension) => extension.id)
@@ -175,6 +187,27 @@ const ExtensionUpload = () => {
         readFile(selectedFile, selectedSheet)
     }
 
+    const findDuplicateEmails = (existingExtensions: RCExtension[], newExtensions: Extension[]) => {
+        const conflictingxtensions: Extension[] = []
+        const validExistingExtensions = existingExtensions.filter((ext) => ext.contact && ext.contact.email)
+
+        for (let extension of newExtensions) {
+            const existingExtensionWithEmail = validExistingExtensions.find((ext) => ext.contact.email === extension.data.contact.email.replace('.ps.ringcentral.com', ''))
+            if (existingExtensionWithEmail) {
+                extension.data.contact.email = extension.data.contact.email.replace('.ps.ringcentral.com', '')
+                conflictingxtensions.push(extension)
+            }
+        }
+
+        return conflictingxtensions
+    }
+
+    const handleExportConflictingExtensions = () => {
+        const header = ['Mailbox ID', 'Name', 'Ext', 'Email', 'Site', 'Phone Numbers', 'Type', 'Status', 'Hidden']
+        writeExcel(header, conflictingExtensions, 'Conflicting Extensions', 'conflicting-extensions.xlsx')
+        setIsShowingDuplicateModal(false)
+    }
+
     const handleSyncButtonClick = () => {
         setIsSyncing(true)
         fireEvent('extension-upload')
@@ -188,6 +221,22 @@ const ExtensionUpload = () => {
 
     return (
         <>
+            <MantineModal opened={isShowingDuplicateModal} onClose={() => setIsShowingDuplicateModal(false)} title="Conflicting email addresses " closeOnClickOutside={false}>
+                <p>Warning! Some extensions are assigned email addresses that are already present in the account!</p>
+                <p>Conflicting Extensions:</p>
+                <div className="modal-content">
+                    <ul>
+                        {conflictingExtensions.map((ext) => (
+                            <li key={ext.data.contact.email}>{ext.data.name} Ext. {ext.data.extensionNumber}</li>
+                        ))}
+                    </ul>
+                </div>
+                <div className="modal-buttons">
+                    <Button variant='outline' onClick={handleExportConflictingExtensions}>Export Conflicting Extensions</Button>
+                    <Button className="healthy-margin-left" onClick={() => setIsShowingDuplicateModal(false)}>Okay</Button>
+                </div>
+            </MantineModal>
+
             <SystemNotifications toolName="Extension Upload" />
             <Header title='Extension Upload' body={`Create extensions using the BRD's users tab`} documentationURL="https://dqgriffin.com/blog/rgOq6D6cGUzNteQkEXE4">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
@@ -198,7 +247,7 @@ const ExtensionUpload = () => {
                 <FileSelect enabled={!isSyncing} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
                 <AdaptiveFilter title='Extension Types' placeholder='search' options={supportedExtensionTypes} defaultSelected={supportedExtensionTypes} setSelected={setSelectedExtensionTypes} disabled={isExtensionConverPending || isSyncing} />
                 <Button variant="filled" disabled={filteredExtensions.length === 0 || userDeficit > 0 || leDeficit > 0 || isSyncing} onClick={handleSyncButtonClick}>Sync</Button>
-                <FormControlLabel className='healthy-margin-left' control={<Checkbox defaultChecked onChange={() => setShouldAlterEmails(!shouldAlterEmails)}/>} label="Add .ps.ringcentral.com" />
+                <FormControlLabel className='healthy-margin-left' control={<Checkbox defaultChecked onChange={() => setShouldAlterEmails(!shouldAlterEmails)} />} label="Add .ps.ringcentral.com" />
                 <Modal open={isShowingModal} setOpen={setIsShowingModal} handleAccept={() => console.log('acceptance')} title='Not enough unassigned extensions' body={deficitLabel} acceptLabel='Okay' />
                 {(isSyncing && currentExtensionIndex === filteredExtensions.length) ? <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button> : <></>}
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Extension Upload" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
