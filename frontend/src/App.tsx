@@ -89,13 +89,19 @@ interface SettingsType {
 }
 
 const getSavedSettings = () => {
-  const settings: SettingsType | undefined = JSON.parse(localStorage.getItem('app_settings') ?? '')
+  const serializedSettings = localStorage.getItem('app_settings')
+
+  if (!serializedSettings) {
+    return
+  }
+
+  const settings: SettingsType | undefined = JSON.parse(serializedSettings ?? '')
   return settings
 }
 
 export const settingsAtom = atom({
   shouldAutoDownloadErrors: getSavedSettings()?.shouldAutoDownloadErrors ?? false,
-  shouldDelayAfterRequests: getSavedSettings()?.shouldDelayAfterRequests ?? false,
+  shouldDelayAfterRequests: getSavedSettings()?.shouldDelayAfterRequests ?? true,
   requestDelay: getSavedSettings()?.requestDelay ?? 250
 })
 
