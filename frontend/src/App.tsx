@@ -53,6 +53,7 @@ import { UsageReports } from './components/pages/Usage Reports/UsageReports';
 import { UserUsage } from './components/pages/Usage Reports/UserUsage';
 import { AlertCenter } from './components/pages/Alert Center/AlertCenter';
 import Credentials from './components/pages/Credentials/Credentials';
+import AccountInsights from './components/pages/Insights/AccountInsights';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -169,6 +170,7 @@ function App() {
                 <Route path='/convert-call-queues' element={<ConvertCallQueues />} />
                 <Route path='/convert-users' element={<ConvertUsers />} />
                 <Route path='/credentials' element={<Credentials />} />
+                <Route path='/account-insights' element={<AccountInsights />} />
               </Routes>
             </Suspense>
           </ErrorBoundary>
