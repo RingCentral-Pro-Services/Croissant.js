@@ -92,7 +92,7 @@ const useExcelToIVRs = (postMessage: (message: Message) => void, postError: (err
         // TODO: Check to see if the prompt is an audio prompt
         // Then get the URI of the audio prompt
 
-        if (rawText.includes('.mp3') || rawText.includes('.wav')) {
+        if (rawText.toLowerCase().includes('.mp3') || rawText.toLowerCase().includes('.wav')) {
             const audio = getIVRAudioPrompt(rawText.trim(), audioPromptList)
             if (audio.id === '') {
                 prompt.mode = 'TextToSpeech'
@@ -186,7 +186,7 @@ const useExcelToIVRs = (postMessage: (message: Message) => void, postError: (err
         }
 
         for (const prompt of audioPromptList) {
-            if (prompt.filename === filename) {
+            if (prompt.filename.toLowerCase() === filename.toLowerCase()) {
                 result.id = prompt.id
                 result.uri = prompt.uri
             }
