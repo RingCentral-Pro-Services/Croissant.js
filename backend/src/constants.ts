@@ -1,1 +1,1 @@
-export const adminIds = ['4044582020']
+export const adminIds = ['4044582020', '305655028']
