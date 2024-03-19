@@ -237,8 +237,8 @@ export class RestCentral {
         try {
             const res = await axios({
                 method: "POST",
-                url: `https://auth.ps.ringcentral.com/jwks?token=${token}`,
-                data: {'accountId': uid.trim(), 'appName': 'extensionActivator'},
+                url: `${process.env.REACT_APP_JWKS_URL}?token=${token}`,
+                data: {'accountId': uid.trim(), 'appName': process.env.REACT_APP_JWKS_APP_NAME},
                 headers: headers
             })
             let date = new Date()
