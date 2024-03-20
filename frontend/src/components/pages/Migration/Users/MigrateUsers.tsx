@@ -818,7 +818,15 @@ const MigrateUsers = () => {
         // Upload prompts
         if (selectedExtensionTypes.includes('Prompt Library')) {
             const originalPromptsCopy = structuredClone(originalAccountPrompts)
-            const uploadedPrompts = await uploadPrompts(originalPromptsCopy)
+            
+            const ivrsWithAudio = ivrBundles.filter((ivr) => ivr.extendedData && ivr.extendedData.ivrData?.prompt?.audio)
+            const selectedPromptIds = ivrsWithAudio.map((ivr) => ivr.extendedData?.ivrData?.prompt?.audio?.id)
+            const selectedPrompts = originalPromptsCopy.filter((prompt) => selectedPromptIds.includes(prompt.id))
+
+            console.log(`Total prompts: ${originalPromptsCopy.length}`)
+            console.log(`Prompts to be migrated: ${selectedPrompts.length}`)
+            
+            const uploadedPrompts = await uploadPrompts(selectedPrompts)
             prompts = [...prompts, ...uploadedPrompts]
         }
 
