@@ -28,6 +28,7 @@ import { useAuditTrail } from "../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../shared/SystemNotifications";
 import RCExtension from "../../../models/RCExtension";
 import useWriteExcelFile from "../../../hooks/useWriteExcelFile";
+import useSiteList from "../Migration/Sites/hooks/useSiteList";
 
 const ExtensionUpload = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -50,6 +51,7 @@ const ExtensionUpload = () => {
     const [selectedExtensionTypes, setSelectedExtensionTypes] = useState<string[]>([])
     const [shouldAlterEmails, setShouldAlterEmails] = useState(true)
     const [deviceDictionary, setDeviceDictionary] = useState<Device[]>([])
+    const [accountSites, setAccountSites] = useState<SiteData[]>([])
     const defaultSheet = 'Users'
     const supportedExtensionTypes = ['Announcement-Only', 'Message-Only', 'Limited Extension', 'User', 'Virtual User']
 
@@ -69,14 +71,17 @@ const ExtensionUpload = () => {
     const { validate, validatedData, isDataValidationPending } = useValidateExcelData(extensionSchema, postMessage, postError)
     const { convertExcelToExtensions, isExtensionConverPending, extensions } = useExcelToExtensions(shouldAlterEmails, postMessage, postError)
     const { fetchRoles, roles } = useFetchRoles(postMessage, postTimedMessage, postError)
-    const { createExtension } = useExtension(postMessage, postTimedMessage, postError, isMultiSiteEnabled, increaseProgress)
+    const { createExtension } = useExtension(postMessage, postTimedMessage, postError, isMultiSiteEnabled, accountSites, increaseProgress)
     const { reportToAuditTrail } = useAuditTrail()
+    const { fetchSites } = useSiteList(postMessage, postTimedMessage, postError, (sites) => console.log(''))
     const { writeExcel } = useWriteExcelFile()
 
     const setup = async () => {
         await fetchExtensions()
         await fetchRoles()
         const devices = await fetchDeviceDictionary()
+        const sites = await fetchSites()
+        setAccountSites(sites)
         setDeviceDictionary(devices)
     }
 
