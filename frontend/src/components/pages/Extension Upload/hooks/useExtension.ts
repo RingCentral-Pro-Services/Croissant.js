@@ -11,7 +11,7 @@ interface DeviceModelPayload {
     serial: string
 }
 
-const useExtension = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void, isMultiSiteEnabled: boolean, callback: () => void) => {
+const useExtension = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void, isMultiSiteEnabled: boolean, sites: SiteData[], callback: () => void) => {
     const baseCreateURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension'
     const baseUpdateURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId'
     const baseRoleURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/assigned-role'
@@ -42,6 +42,7 @@ const useExtension = (postMessage: (message: Message) => void, postTimedMessage:
                 await setRole(extension, accessToken)
             }
         }
+        await setRegionalSettings(extension, accessToken)
         await addDevice(extension, accessToken)
         callback()
     }
@@ -99,6 +100,46 @@ const useExtension = (postMessage: (message: Message) => void, postTimedMessage:
             console.log(e)
             postMessage(new Message(`Failed to make extension ${extension.data.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(extension.data.name, parseInt(extension.data.extensionNumber), ['Failed to create extension', ''], e.error ?? '', extension.data))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const setRegionalSettings = async (extension: Extension, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+
+            const assignedSite = sites.find((site) => site.name === extension.data.site?.name)
+
+            if (!assignedSite) {
+                postMessage(new Message(`Could not set regional settings for ${extension.data.name}. Site not found.`, 'error'))
+                postError(new SyncError(extension.data.name, parseInt(extension.data.extensionNumber), ['Failed to set regional settings', ''], '', extension.data))
+                return
+            }
+
+            const body = {
+                regionalSettings: assignedSite.regionalSettings
+            }
+            
+            const response = await RestCentral.put(baseUpdateURL.replace('extensionId', `${extension.data.id}`), headers, body)
+            
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to make set region settings ${extension.data.name}`)
+            console.log(e)
+            postMessage(new Message(`Could not set regional settings for ${extension.data.name}. Site not found. ${e.error}`, 'error'))
+            postError(new SyncError(extension.data.name, parseInt(extension.data.extensionNumber), ['Failed to set regional settings', ''], e.error ?? '', extension.data))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
