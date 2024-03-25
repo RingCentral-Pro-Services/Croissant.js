@@ -27,6 +27,9 @@ import useReadFromFile from "./hooks/useReadFromFile"
 import FileSelect from "../../shared/FileSelect"
 import { useAuditTrail } from "../../../hooks/useAuditTrail"
 import { SystemNotifications } from "../../shared/SystemNotifications"
+import { Admin } from "../../shared/Admin"
+import AdaptiveFilter from "../../shared/AdaptiveFilter"
+import { NotAdmin } from "../../shared/NotAdmin"
 
 const ExtensionDeleter = () => {
     const {fireEvent} = useAnalytics()
@@ -247,9 +250,16 @@ const ExtensionDeleter = () => {
                 <br />
                 <div hidden={isExtensionListPending}>
                     <AdditiveFilter options={prettyExtensionTypes} title='Extension Types' placeholder='Extension Types' setSelected={setSelectedExtensionTypes} />
-                    <AdditiveFilter options={sites} title='Sites' placeholder='Sites' setSelected={setSelectedSites} />
-                    {/* <Button className="vertical-middle" sx={{top: 9}} variant="contained" onClick={() => deleteExtensions(filteredExtensions)}>Delete</Button> */}
-                    {/* <FileSelect enabled={true} handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={false} setSelectedSheet={setSelectedSheet} defaultSheet={"Delete Extensions"} accept={".xlsx"} /> */}
+                    <NotAdmin>
+                        <AdditiveFilter options={sites} title='Sites' placeholder='Sites' setSelected={setSelectedSites} />
+                    </NotAdmin>
+                    
+                    <Admin>
+                        {sites.length > 0 ? <AdaptiveFilter verticalAlign='bottom' options={sites} title='Sites' placeholder='Sites' setSelected={setSelectedSites} /> : null}
+                        <div style={{display: 'inline-block', verticalAlign: 'bottom'}}>
+                            <FileSelect enabled={true} handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={false} setSelectedSheet={setSelectedSheet} defaultSheet={"Delete Extensions"} accept={".xlsx"} />
+                        </div>
+                    </Admin>
                     <Button disabled={isPending || selectedExtensions.length === 0} className="vertical-middle" sx={{top: 9}} variant="filled" onClick={handleDeleteButtonClick}>Delete</Button>
                     <Button disabled={filteredExtensions.length === 0} className="vertical-middle healthy-margin-left" sx={{top: 9}} variant="outlined" leftIcon={ <FileDownload/>} onClick={handleDownloadButtonClick} >Download</Button>
                     <Modal open={isShowingModal} setOpen={setIsShowingModal} handleAccept={handleModalAcceptance} title='Are you sure about that?' body={`You're about to delete ${selectedExtensions.length} extensions from ${companyName}. Be sure that you understand the implications of this.`} acceptLabel={`Yes, delete ${selectedExtensions.length} extensions`} rejectLabel='Go back' />

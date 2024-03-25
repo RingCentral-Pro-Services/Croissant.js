@@ -129,7 +129,7 @@ const DirectCreateMenus = () => {
         fireEvent('create-menu')
         reportToAuditTrail({
             action: `Created ${filterMenus.length} IVRs`,
-            tool: 'Export IVRs',
+            tool: 'Create IVRs',
             type: 'Tool',
             uid: targetUID
         })
