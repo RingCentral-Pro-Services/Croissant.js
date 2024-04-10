@@ -6,6 +6,7 @@ import { router as feedbackRouter } from './feedback/routes/index'
 import { router as accessControlRouter } from './access-control/routes/index'
 import { router as auditTrailRouter } from './audit-trail/routes/index'
 import { router as notificationRouter } from './notifications/routes/index'
+import { router as supportRouter } from './support/routes/index'
 import { sequelize } from './database/Sequelize';
 import { DepartmentModel } from './access-control/models/DepartmentModel'
 import { AdminModel } from './access-control/models/AdminModel'
@@ -20,6 +21,7 @@ app.use(feedbackRouter)
 app.use(accessControlRouter)
 app.use(auditTrailRouter)
 app.use(notificationRouter)
+app.use(supportRouter)
 
 sequelize.sync({ alter: false }).then(() => {
   console.log('Database & tables created!')
