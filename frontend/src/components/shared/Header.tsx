@@ -18,11 +18,11 @@ const Header = (props: HeaderProps) => {
 
     return (
         <div className="header">
-            <div>
+            <div className="header-container">
                 <h2>{title}</h2>
                 {documentationURL ? <FeedIcon /> : <></>}
                 {documentationURL ? <a href={documentationURL} target="_blank">Documentation</a>: <></>}
-                <Button variant='subtle' onClick={onHelpButtonClick}>Need help?</Button>
+                <Button className="healthy-margin-left" variant='subtle' onClick={onHelpButtonClick}>Need help?</Button>
             </div>
             {/* <p>{body}</p> */}
         </div>
