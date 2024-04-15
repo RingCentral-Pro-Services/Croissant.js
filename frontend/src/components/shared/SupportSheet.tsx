@@ -1,4 +1,4 @@
-import { Button, Modal, Text, Textarea } from "@mantine/core";
+import { Button, Modal, Text, Textarea, Title } from "@mantine/core";
 import axios from "axios";
 import React, { useState } from "react";
 import { Message } from "../../models/Message";
@@ -8,6 +8,12 @@ export const SupportSheet = (props: {isOpen: boolean, onClose: () => void, selec
     const { isOpen, selectedFile, onClose } = props
     const [inputText, setInputText] = useState('')
     const [error, setError] = useState('')
+
+    const handleClose = () => {
+        onClose()
+        setInputText('')
+        setError('')
+    }
 
     const handleSubmit = () => {
         const token = localStorage.getItem('rc_access_token')
@@ -34,27 +40,36 @@ export const SupportSheet = (props: {isOpen: boolean, onClose: () => void, selec
                 },
                 data: formData
             })
+            handleClose()
         }
         catch (e) {
             console.log('Failed to post support message')
             console.log(e)
-            setError('Something went wrong. Are you a member of the P&D Tool chat?')
+            setError(`Something went wrong. Are you a member of the ${process.env.REACT_APP_APP_NAME} chat?`)
         }
     }
 
     return (
-        <Modal opened={isOpen} onClose={onClose} title="Get help">
+        <Modal opened={isOpen} onClose={handleClose} withCloseButton={false}>
             {error !== '' ? <Text>{error}</Text> : null}
+
+            <Title order={3}>Get help</Title>
+            <Text className="mega-margin-bottom" size='sm'>Describe the issue you're facing below. Your message will be posted publicly in the {process.env.REACT_APP_APP_NAME} chat.</Text>
 
             <Textarea
                 value={inputText}
+                autosize
+                minRows={4}
                 onChange={(e) => setInputText(e.target.value)}
                 placeholder="Tell us what's going on in detail..."
             />
 
             {selectedFile ? <Text className="mini-margin-top" fz='sm'>{selectedFile?.name} will be included with your message.</Text> : null}
 
-            <Button disabled={inputText.length < 10} className="healthy-margin-top" onClick={handleSubmit}>Submit</Button>
+            <div className="mega-margin-top">
+                <Button className="healthy-margin-right" color='gray' onClick={handleClose} >Close</Button>
+                <Button disabled={inputText.length < 10} className="healthy-margin-top" onClick={handleSubmit}>Submit</Button>
+            </div>
         </Modal>
     )
 }
