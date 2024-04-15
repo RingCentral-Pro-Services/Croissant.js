@@ -96,6 +96,7 @@ import ImportAccountData from "./components/ImportAccountData";
 import { useAuditTrail } from "../../../../hooks/useAuditTrail";
 import { useUploadUnassignedDevices } from "./hooks/useUploadUnassignedDevices";
 import { SystemNotifications } from "../../../shared/SystemNotifications";
+import { SupportSheet } from "../../../shared/SupportSheet";
 const FileSaver = require('file-saver');
 
 
@@ -112,6 +113,7 @@ const MigrateUsers = () => {
     const [userDataBundles, setUserDataBundles] = useState<UserDataBundle[]>([])
     const [shouldShowSiteFilter, setShouldShowSiteFilter] = useState(false)
     const [isDoneFetchingSites, setIsDoneFetchingSites] = useState(false)
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     const [isPullingData, setIsPullingData] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
     const [isPending, setIsPending] = useState(false)
@@ -1157,6 +1159,12 @@ const MigrateUsers = () => {
     return (
         <>
             <SystemNotifications toolName="Auto Migrate" />
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                messages={messages}
+                errors={errors}
+            />
             <Modal 
                 open={isShowingSegregatedModal}
                 setOpen={setIsShowingSegregatedModal}
@@ -1168,7 +1176,7 @@ const MigrateUsers = () => {
                 handleReject={() => console.log('')}
             />
             <ImportAccountData isOpen={isShowingImportModal} setIsOpen={setIsShowingImportModal} />
-            <Header title='Migration' body='Migrate from one account to another' />
+            <Header title='Migration' body='Migrate from one account to another' onHelpButtonClick={() => setIsSupportModalOpen(true)} />
             <ToolCard>
                 <h2>Things to know</h2>
                 <ol>

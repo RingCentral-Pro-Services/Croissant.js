@@ -30,11 +30,13 @@ import { SystemNotifications } from "../../shared/SystemNotifications"
 import { Admin } from "../../shared/Admin"
 import AdaptiveFilter from "../../shared/AdaptiveFilter"
 import { NotAdmin } from "../../shared/NotAdmin"
+import { SupportSheet } from "../../shared/SupportSheet"
 
 const ExtensionDeleter = () => {
     const {fireEvent} = useAnalytics()
     const [targetUID, setTargetUID] = useState('')
     const [sites, setSites] = useState<string[]>([])
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     const [selectedSites, setSelectedSites] = useState<string[]>([])
     const [selectedExtensionTypes, setSelectedExtensionTypes] = useState<string[]>([])
     const [filteredExtensions, setFilteredExtensions] = useState<Extension[]>([])
@@ -239,7 +241,14 @@ const ExtensionDeleter = () => {
     return (
         <>
             <SystemNotifications toolName="Delete Extensions" />
-            <Header title="Delete Extensions" body="Delete extensions in bulk" documentationURL="https://dqgriffin.com/blog/LbdYZP9HvJYrBrZGqFjh">
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                selectedFile={selectedFile}
+                messages={messages}
+                errors={errors}
+            />
+            <Header title="Delete Extensions" body="Delete extensions in bulk" documentationURL="https://dqgriffin.com/blog/LbdYZP9HvJYrBrZGqFjh" onHelpButtonClick={() => setIsSupportModalOpen(true)}>
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Extension Deleter" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />

@@ -8,8 +8,6 @@ const createPostUrl = 'https://platform.ringcentral.com/team-messaging/v1/chats/
 const uploadFileUrl = 'https://platform.ringcentral.com/team-messaging/v1/files'
 
 export const processSupportRequest = async (req: Request, res: Response) => {
-    console.log('Support request received')
-
     const form = formidable({});
     const token = req.headers.authorization
     const chatId = process.env.SUPPORT_CHAT_ID
@@ -37,7 +35,7 @@ export const processSupportRequest = async (req: Request, res: Response) => {
         await postMessage(chatId, token, userText, attachments)
     });
 
-    res.send('Support request processed')
+    res.send('OK')
 }
 
 const getAttachmentIds = async (files: formidable.Files, token: string) => {

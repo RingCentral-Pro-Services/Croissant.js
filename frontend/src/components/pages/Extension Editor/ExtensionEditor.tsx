@@ -6,8 +6,6 @@ import useLogin from "../../../hooks/useLogin";
 import useMessageQueue from "../../../hooks/useMessageQueue";
 import usePostTimedMessage from "../../../hooks/usePostTimedMessage";
 import useSidebar from "../../../hooks/useSidebar";
-import { EditedExtension } from "../../../models/EditedExtension";
-import RCExtension from "../../../models/RCExtension";
 import useExtensionList from "../../../rcapi/useExtensionList";
 import useGetAccessToken from "../../../rcapi/useGetAccessToken";
 import useUpdateExtensions from "../../../rcapi/useUpdateExtensions";
@@ -18,6 +16,7 @@ import SimpleReplacement from "../../shared/SimpleReplacement";
 import UIDInputField from "../../shared/UIDInputField";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../shared/SystemNotifications";
+import { SupportSheet } from "../../shared/SupportSheet";
 
 const ExtensionEditor = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -25,6 +24,7 @@ const ExtensionEditor = () => {
     const [maxProgressValue, setMaxProgressValue] = useState(0)
     const [isSyncing, setIsSyncing] = useState(false)
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
 
     useLogin('editextensions', isSyncing)
     useSidebar('Edit Extensions')
@@ -69,7 +69,13 @@ const ExtensionEditor = () => {
     return (
         <>
             <SystemNotifications toolName="Edit Extensions" />
-            <Header title="Edit Extensions" body="Find & replace in extension names and email addresses" documentationURL="https://dqgriffin.com/blog/3iskKnldBEh01MoOYvje">
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                messages={messages}
+                errors={errors}
+            />
+            <Header title="Edit Extensions" body="Find & replace in extension names and email addresses" documentationURL="https://dqgriffin.com/blog/3iskKnldBEh01MoOYvje" onHelpButtonClick={() => setIsSupportModalOpen(true)} >
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Edit Extensions" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />

@@ -18,6 +18,7 @@ import useAuditPresence from './hooks/useAuditPresence'
 import { ExtensionPresence } from './models/ExtensionPresence'
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../shared/SystemNotifications";
+import { SupportSheet } from "../../shared/SupportSheet";
 
 const Presence = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -28,6 +29,7 @@ const Presence = () => {
     const [selectedExtensions, setSelectedExtensions] = useState<Extension[]>([])
     const [presenceData, setPresenceData] = useState<ExtensionPresence[]>([])
     const [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
 
     const increaseProgress = (data: ExtensionPresence) => {
         setPresenceData([...presenceData, data])
@@ -99,7 +101,13 @@ const Presence = () => {
     return (
         <>
             <SystemNotifications toolName="Presence" />
-            <Header title='Presence' body='Export user presence settings' documentationURL='https://dqgriffin.com/blog/3iskKnldBEh01MoOYvje'/>
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                messages={messages}
+                errors={errors}
+            />
+            <Header title='Presence' body='Export user presence settings' documentationURL='https://dqgriffin.com/blog/3iskKnldBEh01MoOYvje' onHelpButtonClick={() => setIsSupportModalOpen(true)} />
             <div className="tool-card">
                 <h2>Presence</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />

@@ -28,6 +28,7 @@ import useConfigureQueue from "../../Migration/Users/hooks/useConfigureQueue";
 import { useDeleteExtension } from "../../../../rcapi/useDeleteExtension";
 import { useAuditTrail } from "../../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../../shared/SystemNotifications";
+import { SupportSheet } from "../../../shared/SupportSheet";
 
 export interface ConvertSettings {
     deleteOldExtension: boolean
@@ -39,6 +40,7 @@ export const ConvertCallQueues = () => {
     const [targetUID, setTargetUID] = useState("")
     const [isSyncing, setIsSyncing] = useState(false)
     const [selectableExtensions, setSelectableExtensions] = useState<Extension[]>([])
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     const [selectedExtensions, setSelectedExtensions] = useState<Extension[]>([])
     const [progressValue, setProgressValue] = useState(0)
     const [progressText, setProgressText] = useState("")
@@ -170,6 +172,12 @@ export const ConvertCallQueues = () => {
     return (
         <>
             <SystemNotifications toolName="Convert Call Queues" />
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                messages={messages}
+                errors={errors}
+            />
             <Modal opened={isShowingConfirmation} onClose={() => setIsShowingConfirmation(false)} withCloseButton={false} centered>
                 <h3>Confirm</h3>
                 <p>You're about to convert {selectedExtensions.length} {mode === 'Call Queue → Ring Group' ? 'call queues' : 'ring groups'} to {mode === 'Call Queue → Ring Group' ? 'ring groups' : 'call queues'}</p>
@@ -195,7 +203,7 @@ export const ConvertCallQueues = () => {
                 </div>
             </Modal>
 
-            <Header title="Call Queues ⇄ Ring Groups" body="" />
+            <Header title="Call Queues ⇄ Ring Groups" body="" onHelpButtonClick={() => setIsSupportModalOpen(true)}/>
             <ToolCard>
                 <h2>Things to know</h2>
                 <ol>

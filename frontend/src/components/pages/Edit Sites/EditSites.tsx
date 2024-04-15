@@ -21,6 +21,7 @@ import Header from "../../shared/Header";
 import UIDInputField from "../../shared/UIDInputField";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../shared/SystemNotifications";
+import { SupportSheet } from "../../shared/SupportSheet";
 
 const EditSites = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -31,6 +32,7 @@ const EditSites = () => {
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
     const [isSyncing, setIsSyncing] = useState(false)
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
     const defaultSheet = 'Sites'
 
@@ -118,7 +120,14 @@ const EditSites = () => {
     return (
         <>
             <SystemNotifications toolName="Edit Sites" />
-            <Header title='Edit Sites' body='Edit site names and extension numbers in bulk' documentationURL="https://dqgriffin.com/blog/so8Z5rWf9Z4lWXRXqxK4">
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                selectedFile={selectedFile}
+                messages={messages}
+                errors={errors}
+            />
+            <Header title='Edit Sites' body='Edit site names and extension numbers in bulk' documentationURL="https://dqgriffin.com/blog/so8Z5rWf9Z4lWXRXqxK4" onHelpButtonClick={() => setIsSupportModalOpen(true)} >
                 <Button variant='subtle' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Edit Sites" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
