@@ -22,6 +22,7 @@ import FeedbackForm from "../../shared/FeedbackForm"
 import useSidebar from "../../../hooks/useSidebar"
 import { useAuditTrail } from "../../../hooks/useAuditTrail"
 import { SystemNotifications } from "../../shared/SystemNotifications"
+import { SupportSheet } from "../../shared/SupportSheet"
 
 const NotificationAudit = () => {
     const {fireEvent} = useAnalytics()
@@ -36,6 +37,7 @@ const NotificationAudit = () => {
     const [selectedSheet, setSelectedSheet] = useState('')
     const {readFile, excelData, isExcelDataPending} = useReadExcel()
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
 
     useLogin('notificationsaudit', isPending)
     useSidebar('Notifications')
@@ -151,7 +153,14 @@ const NotificationAudit = () => {
     return (
         <>
             <SystemNotifications toolName="Notifications" />
-            <Header title="Notifications" body="Audit and update notification emails" documentationURL="https://dqgriffin.com/blog/LbdYZP9HvJYrBrZGqFjh">
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                selectedFile={selectedFile}
+                messages={messages}
+                errors={errors}
+            />
+            <Header title="Notifications" body="Audit and update notification emails" documentationURL="https://dqgriffin.com/blog/LbdYZP9HvJYrBrZGqFjh" onHelpButtonClick={() => setIsSupportModalOpen(true)}>
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Notifications" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />

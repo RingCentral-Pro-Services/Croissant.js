@@ -29,6 +29,7 @@ const BulkAssign = () => {
     const [progessMax, setProgressMax] = useState(0)
     const [isSyncing, setIsSyncing] = useState(false)
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     const defaultSheet = 'Phone Numbers'
 
     useLogin('bulkassign', isSyncing)
@@ -98,6 +99,7 @@ const BulkAssign = () => {
     return (
         <>
             <SystemNotifications toolName="Bulk Number Assign" />
+            
             <Header title="Bulk Number Assign" body="Assign phone numbers in bulk" documentationURL="https://dqgriffin.com/blog/jgEcv35VZJZlVnmcHZ2U">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>

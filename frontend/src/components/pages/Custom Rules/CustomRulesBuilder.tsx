@@ -19,10 +19,12 @@ import useReadCustomRules from "./hooks/useReadCustomRules";
 import { CustomRuleSchema } from "./models/CustomRuleSchema";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../shared/SystemNotifications";
+import { SupportSheet } from "../../shared/SupportSheet";
 
 const CustomRulesBuilder = () => {
     const [targetUID, setTargetUID] = useState('')
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     const [selectedSheet, setSelectedSheet] = useState('')
     const [isSyncing, setIsSyncing] = useState(false)
     const [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
@@ -94,7 +96,14 @@ const CustomRulesBuilder = () => {
     return (
         <>
             <SystemNotifications toolName="Build Custom Rules" />
-            <Header title='Build Custom Rules' body='Build and update custom rules using a simple Excel spreadsheet' documentationURL="https://dqgriffin.com/blog/PC9PLU3H4ZIJZZIfv6Oy">
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                selectedFile={selectedFile}
+                messages={messages}
+                errors={errors}
+            />
+            <Header title='Build Custom Rules' body='Build and update custom rules using a simple Excel spreadsheet' documentationURL="https://dqgriffin.com/blog/PC9PLU3H4ZIJZZIfv6Oy" onHelpButtonClick={() => setIsSupportModalOpen(true)}>
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <div className="tool-card">

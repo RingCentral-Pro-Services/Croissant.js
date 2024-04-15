@@ -16,11 +16,13 @@ import useAuditParkLocation from "./hooks/useAuditParkLocation";
 import { ParkLocation } from "./models/ParkLocation";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../shared/SystemNotifications";
+import { SupportSheet } from "../../shared/SupportSheet";
 
 const ParkLocations = () => {
     const [targetUID, setTargetUID] = useState('')
     const [isSyncing, setIsSyncing] = useState(false)
     const [isReadyToSync, setIsReadyToSync] = useState(false)
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     const [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
     const [parkLocationExtensions, setParkLocationExtensions] = useState<Extension[]>([])
     const [auditedParkLocations, setAuditedParkLocations] = useState<ParkLocation[]>([])
@@ -87,7 +89,13 @@ const ParkLocations = () => {
     return (
         <>
             <SystemNotifications toolName="Park Locations" />
-            <Header title='Park Locations' body='Audit Park Locations' />
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                messages={messages}
+                errors={errors}
+            />
+            <Header title='Park Locations' body='Audit Park Locations' onHelpButtonClick={() => setIsSupportModalOpen(true)} />
             <div className="tool-card">
                 <h2>Park Locations</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />

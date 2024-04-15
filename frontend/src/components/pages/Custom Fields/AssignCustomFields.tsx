@@ -23,10 +23,12 @@ import ProgressBar from "../../shared/ProgressBar";
 import useWriteExcelFile from "../../../hooks/useWriteExcelFile";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../shared/SystemNotifications";
+import { SupportSheet } from "../../shared/SupportSheet";
 
 export const AssignCustomFields = () => {
     const [targetUID, setTargetUID] = useState("")
     const [isSyncing, setIsSyncing] = useState(false)
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [customFields, setCustomFields] = useState<CustomField[]>([])
     const [customFieldAssignments, setCustomFieldAssignments] = useState<CustomFieldAssignment[]>([])
@@ -107,6 +109,13 @@ export const AssignCustomFields = () => {
     return (
         <>
             <SystemNotifications toolName="Assign Custom Fields" />
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                selectedFile={selectedFile}
+                messages={messages}
+                errors={errors}
+            />
             <ToolCard>
                 <h2>Assign Custom Fields</h2>
                 <UIDInputField 

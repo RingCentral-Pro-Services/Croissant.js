@@ -307,7 +307,7 @@ body {
   border-radius: 0!important;
 }
 
-.header div {
+.header .header-container {
   display: flex;
   align-items: center;
   margin-left: 61px;

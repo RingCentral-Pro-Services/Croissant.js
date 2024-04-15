@@ -18,11 +18,13 @@ import useGetCustomRules from "./hooks/useGetCustomRules";
 import { CustomRule } from "./models/CustomRule";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../shared/SystemNotifications";
+import { SupportSheet } from "../../shared/SupportSheet";
 
 const CustomRulesExport = () => {
     const supportedExtensionTypes = ['User', 'Call Queue', 'Site']
     const [targetUID, setTargetUID] = useState('')
     const [siteNames, setSiteNames] = useState<string[]>([])
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     const [selectedSiteNames, setSelectedSiteNames] = useState<string[]>([])
     const [selectedExtensions, setSelectedExtensions] = useState<Extension[]>([])
     const [isFilterReady, setIsFilterReady] = useState(false)
@@ -130,7 +132,13 @@ const CustomRulesExport = () => {
     return (
         <>
             <SystemNotifications toolName="Export Custom Rules" />
-            <Header title="Export Custom Rules" body="Generate a spreadsheet with all custom rules assigned to extensions" />
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                messages={messages}
+                errors={errors}
+            />
+            <Header title="Export Custom Rules" body="Generate a spreadsheet with all custom rules assigned to extensions" onHelpButtonClick={() => setIsSupportModalOpen(true)} />
             <div className="tool-card">
                 <h2>Export Custom Rules</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />

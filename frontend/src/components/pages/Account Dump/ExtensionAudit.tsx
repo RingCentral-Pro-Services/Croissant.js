@@ -18,6 +18,7 @@ import { useSetAtom } from 'jotai'
 import { userAtom } from '../../../App'
 import { useAuditTrail } from '../../../hooks/useAuditTrail'
 import { SystemNotifications } from '../../shared/SystemNotifications'
+import { SupportSheet } from '../../shared/SupportSheet'
 
 const ExtensionAudit = () => {
     useLogin('accountdump')
@@ -25,6 +26,7 @@ const ExtensionAudit = () => {
     const {fireEvent} = useAnalytics()
     let [targetUID, setTargetUID] = useState("")
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError, userName} = useGetAccessToken()
     let {messages, errors, postMessage} = useMessageQueue()
     const {getPhoneNumberMap, isPhoneNumberMapPending, phoneNumberMap} = usePhoneNumberMap()
@@ -73,7 +75,13 @@ const ExtensionAudit = () => {
     return (
         <>
             <SystemNotifications toolName="Account Dump" />
-            <Header title='Account Dump' body='This tool generatates a list of all extensions in an account' documentationURL='https://dqgriffin.com/blog/2rchSy0wVOH7oiBCUeOZ'>
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                messages={messages}
+                errors={errors}
+            />
+            <Header title='Account Dump' body='This tool generatates a list of all extensions in an account' documentationURL='https://dqgriffin.com/blog/2rchSy0wVOH7oiBCUeOZ' onHelpButtonClick={() => setIsSupportModalOpen(true)}>
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <div className='tool-card'>

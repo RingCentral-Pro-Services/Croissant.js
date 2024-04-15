@@ -25,6 +25,7 @@ import CallQueue from "../../../models/CallQueue"
 import { sanitize } from "../../../helpers/Sanatize"
 import { useAuditTrail } from "../../../hooks/useAuditTrail"
 import { SystemNotifications } from "../../shared/SystemNotifications"
+import { SupportSheet } from "../../shared/SupportSheet"
 
 const CreateCallQueues = () => {
     let [isPending, setIsPending] = useState(true)
@@ -33,6 +34,7 @@ const CreateCallQueues = () => {
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
     const [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
     const [isShowingWarningModal, setIsShowingWarningModal] = useState(false)
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     const [existingQueues, setExistingQueues] = useState<CallQueue[]>([])
     const [selectedFile, setSelectedFile] = useState<File | null>()
     const [selectedSheet, setSelectedSheet] = useState<string>('')
@@ -149,6 +151,13 @@ const CreateCallQueues = () => {
     return (
         <>
             <SystemNotifications toolName="Create Call Queues" />
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                selectedFile={selectedFile}
+                messages={messages}
+                errors={errors}
+            />
             <Modal opened={isShowingWarningModal} onClose={ () => setIsShowingWarningModal(false)} title="Overlapping Queues " closeOnClickOutside={false}>
                 <p>Warning! Due to overlapping extension numbers, uploading this file will overwrite {existingQueues.length} Queues that already exist in the account. Please review your file carefully to prevent any unintended changes.</p>
                 <p>Overlapping IVRs:</p>
@@ -165,7 +174,7 @@ const CreateCallQueues = () => {
                 </div>
             </Modal>
 
-            <Header title="Create Call Queues" body="Create and update call queues in bulk" documentationURL='https://dqgriffin.com/blog/3IfuqLAoOfN2fPXXFh19'>
+            <Header title="Create Call Queues" body="Create and update call queues in bulk" documentationURL='https://dqgriffin.com/blog/3IfuqLAoOfN2fPXXFh19' onHelpButtonClick={() => setIsSupportModalOpen(true)}>
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <div className="tool-card">

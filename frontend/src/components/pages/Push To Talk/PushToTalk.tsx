@@ -22,6 +22,7 @@ import { PTTChannel } from "./models/PTTChannel";
 import { PTTSchema } from "./models/schemas";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../shared/SystemNotifications";
+import { SupportSheet } from "../../shared/SupportSheet";
 
 const PushToTalk = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -29,6 +30,7 @@ const PushToTalk = () => {
     const [auditedChannels, setAuditedChannels] = useState<PTTChannel[]>([])
     const [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     const [selectedSheet, setSelectedSheet] = useState('')
     const [isAuditing, setIsAuditing] = useState(false)
     const [isSyncing, setIsSyncing] = useState(false)
@@ -135,7 +137,14 @@ const PushToTalk = () => {
     return (
         <>
             <SystemNotifications toolName="Push To Talk" />
-            <Header title="Push To Talk" body="Create, update, and export Push-to-talk channels" documentationURL="https://dqgriffin.com/blog/MoMTlQc0JRL1kwL7PITs" />
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                selectedFile={selectedFile}
+                messages={messages}
+                errors={errors}
+            />
+            <Header title="Push To Talk" body="Create, update, and export Push-to-talk channels" documentationURL="https://dqgriffin.com/blog/MoMTlQc0JRL1kwL7PITs" onHelpButtonClick={() => setIsSupportModalOpen(true)} />
             <div className="tool-card">
                 <h2>Push to Talk</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />

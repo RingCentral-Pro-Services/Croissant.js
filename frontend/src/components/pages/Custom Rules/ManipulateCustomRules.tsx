@@ -20,11 +20,13 @@ import useManipulateRules from "./hooks/useManipulateRules";
 import useSimpleRuleList from "./hooks/useSimpleRuleList";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../shared/SystemNotifications";
+import { SupportSheet } from "../../shared/SupportSheet";
 
 const ManipulateCustomRules = () => {
     const [targetUID, setTargetUID] = useState('')
     const [activeStep, setActiveStep] = useState(0)
     const [targetRuleName, setTargetRuleName] = useState('')
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     const [ruleAction, setRuleAction] = useState('')
     const [siteNames, setSiteNames] = useState<string[]>([])
     const [selectedSiteNames, setSelectedSiteNames] = useState<string[]>([])
@@ -120,7 +122,13 @@ const ManipulateCustomRules = () => {
     return (
         <>
             <SystemNotifications toolName="Delete Custom Rule" />
-            <Header title="Enable / Disable Custom Rules" body="Enable, disable, an delete custom rules in bulk" documentationURL="https://dqgriffin.com/blog/UxKvg9LxHgN8A8qlusBV">
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                messages={messages}
+                errors={errors}
+            />
+            <Header title="Enable / Disable Custom Rules" body="Enable, disable, an delete custom rules in bulk" documentationURL="https://dqgriffin.com/blog/UxKvg9LxHgN8A8qlusBV" onHelpButtonClick={() => setIsSupportModalOpen(true)}>
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Enable / Disable Custom Rules" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />

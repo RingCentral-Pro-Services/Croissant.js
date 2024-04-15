@@ -19,6 +19,7 @@ import useFetchERLs from "./hooks/useFetchERLs";
 import { IconExternalLink } from "@tabler/icons-react";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../shared/SystemNotifications";
+import { SupportSheet } from "../../shared/SupportSheet";
 
 const LocationUpdates = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -27,6 +28,7 @@ const LocationUpdates = () => {
     const [progressValue, setProgressValue] = useState(0)
     const [progessMax, setProgressMax] = useState(0)
     const [isSyncing, setIsSyncing] = useState(false)
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     const defaultSheet = 'Automatic Location Updates'
 
     useLogin('locationupdates', isSyncing)
@@ -88,7 +90,14 @@ const LocationUpdates = () => {
     return (
         <>
             <SystemNotifications toolName="Automatic Location Updates" />
-            <Header title="Automatic Location Updates" body="Create wireless access point maps and switch maps to facilitate automatic location updates" />
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                selectedFile={selectedFile}
+                messages={messages}
+                errors={errors}
+            />
+            <Header title="Automatic Location Updates" body="Create wireless access point maps and switch maps to facilitate automatic location updates" onHelpButtonClick={() => setIsSupportModalOpen(true)} />
             <div className="tool-card">
                 <h2>Automatic Location Updates</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />

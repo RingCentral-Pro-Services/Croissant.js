@@ -20,6 +20,7 @@ import useCreateSites from "./hooks/useCreateSites";
 import useExcelToSites from "./hooks/useExcelToSites";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../shared/SystemNotifications";
+import { SupportSheet } from "../../shared/SupportSheet";
 
 const Sites = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -32,6 +33,7 @@ const Sites = () => {
     const [erlProgressMax, setErlProgressMax] = useState(0)
     const [shouldBuildERLs, setShouldBuildERLs] = useState(true)
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     const defaultSheet = 'Site Information'
 
     useLogin('sites', isSyncing)
@@ -100,7 +102,14 @@ const Sites = () => {
     return (
         <>
             <SystemNotifications toolName="Create Sites" />
-            <Header title="Create Sites" body="Build sites in bulk" documentationURL="https://dqgriffin.com/blog/KkZuGBUv3C7BabG7PdPA">
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                selectedFile={selectedFile}
+                messages={messages}
+                errors={errors}
+            />
+            <Header title="Create Sites" body="Build sites in bulk" documentationURL="https://dqgriffin.com/blog/KkZuGBUv3C7BabG7PdPA" onHelpButtonClick={() => setIsSupportModalOpen(true)} >
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <div className="tool-card">

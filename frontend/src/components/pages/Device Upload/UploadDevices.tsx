@@ -25,12 +25,14 @@ import * as Excel from 'exceljs'
 import useCreateUnassignedDevices from "./hooks/useCreateUnassignedDevices";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../shared/SystemNotifications";
+import { SupportSheet } from "../../shared/SupportSheet";
 
 const UploadDevices = () => {
     const [targetUID, setTargetUID] = useState("")
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [selectedSheet, setSelectedSheet] = useState('')
     const [isSyncing, setIsSyncing] = useState(false)
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     const [deviceDictionary, setDeviceDictionary] = useState<Device[]>([])
     const [isReady, setIsReady] = useState(false)
     const [progressValue, setProgressValue] = useState(0)
@@ -142,7 +144,14 @@ const UploadDevices = () => {
     return (
         <>
             <SystemNotifications toolName="Upload Devices" />
-            <Header title="Upload Devices" body="Upload devices in bulk" />
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                selectedFile={selectedFile}
+                messages={messages}
+                errors={errors}
+            />
+            <Header title="Upload Devices" body="Upload devices in bulk" onHelpButtonClick={() => setIsSupportModalOpen(true)} />
             <ToolCard>
                 <p>Things to know</p>
                 <ul>
