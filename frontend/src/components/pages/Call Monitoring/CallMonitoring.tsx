@@ -22,10 +22,12 @@ import useWriteExcelFile from "../../../hooks/useWriteExcelFile";
 import { IconExternalLink } from "@tabler/icons-react";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../shared/SystemNotifications";
+import { SupportSheet } from "../../shared/SupportSheet";
 
 const CallMonitoring = () => {
     const [targetUID, setTargetUID] = useState("")
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     const [selectedSheet, setSelectedSheet] = useState('')
     const [isSyncing, setIsSyncing] = useState(false)
     const [progressValue, setProgressValue] = useState(0)
@@ -98,7 +100,14 @@ const CallMonitoring = () => {
     return (
         <>
             <SystemNotifications toolName="Call Monitoring" />
-            <Header title='Call Monitoring' body='Create call monitoring groups in bulk. Note that this tool is not for updating existing groups. If you try it, duplicate groups will be created.' documentationURL="https://dqgriffin.com/blog/17i7vnnbekmjJNxzWBZs">
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                selectedFile={selectedFile}
+                messages={messages}
+                errors={errors}
+            />
+            <Header title='Call Monitoring' body='Create call monitoring groups in bulk. Note that this tool is not for updating existing groups. If you try it, duplicate groups will be created.' documentationURL="https://dqgriffin.com/blog/17i7vnnbekmjJNxzWBZs" onHelpButtonClick={() => setIsSupportModalOpen(true)}>
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <div className="tool-card">

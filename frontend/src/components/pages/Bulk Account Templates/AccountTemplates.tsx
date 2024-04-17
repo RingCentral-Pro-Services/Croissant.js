@@ -21,11 +21,13 @@ import useRegionalFormats from "./hooks/useRegionalFormats";
 import { TemplateData, TemplateEngine } from "./TemplateEngine";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../shared/SystemNotifications";
+import { SupportSheet } from "../../shared/SupportSheet";
 
 const AccountTemplates = () => {
     const [isSyncing, setIsSyncing] = useState(false)
     const [progressValue, setProgressValue] = useState(0)
     const [selectedFile, setSelectedFile] = useState<File | null>()
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     const [selectedSheet, setSelectedSheet] = useState<string>('')
     const [templateData, setTemplateData] = useState<TemplateData>({
         sites: [],
@@ -136,7 +138,14 @@ const AccountTemplates = () => {
     return (
         <>
             <SystemNotifications toolName="Account Templates" />
-            <Header title="Bulk Account Templates" body="Bootstrap many accounts using a template" />
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                selectedFile={selectedFile}
+                messages={messages}
+                errors={errors}
+            />
+            <Header title="Bulk Account Templates" body="Bootstrap many accounts using a template" onHelpButtonClick={() => setIsSupportModalOpen(true)} />
             <ToolCard>
                 <h2>Account Templates</h2>
                 <FileSelect enabled={true} accept=".xlsx" handleSubmit={handleFileSelect} isPending={false} setSelectedFile={setSelectedFile} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />

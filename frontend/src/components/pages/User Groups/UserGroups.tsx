@@ -19,6 +19,7 @@ import useUserGroupsList from "./hooks/useUserGroupsList";
 import { UserGroupSchema } from "./models/schema";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../shared/SystemNotifications";
+import { SupportSheet } from "../../shared/SupportSheet";
 
 const UserGroups = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -27,6 +28,7 @@ const UserGroups = () => {
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [selectedSheet, setSelectedSheet] = useState('')
     const [currentExtensionIndex, setCurrentExtensionIndex] = useState(0)
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     const defaultSheet = 'User Groups'
 
     const increaseProgress = () => {
@@ -108,7 +110,14 @@ const UserGroups = () => {
     return (
         <>
             <SystemNotifications toolName="User Groups" />
-            <Header title='User Groups' body='Create, update, and audit user groups' documentationURL="https://dqgriffin.com/blog/i2WLGk4HTAMiGiit4Xsy" />
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                selectedFile={selectedFile}
+                messages={messages}
+                errors={errors}
+            />
+            <Header title='User Groups' body='Create, update, and audit user groups' documentationURL="https://dqgriffin.com/blog/i2WLGk4HTAMiGiit4Xsy" onHelpButtonClick={(() => setIsSupportModalOpen(true))} />
             <div className="tool-card">
                 <h2>User Groups</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />

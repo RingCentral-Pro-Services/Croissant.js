@@ -29,6 +29,7 @@ import { SystemNotifications } from "../../shared/SystemNotifications";
 import RCExtension from "../../../models/RCExtension";
 import useWriteExcelFile from "../../../hooks/useWriteExcelFile";
 import useSiteList from "../Migration/Sites/hooks/useSiteList";
+import { SupportSheet } from "../../shared/SupportSheet";
 
 const ExtensionUpload = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -52,6 +53,7 @@ const ExtensionUpload = () => {
     const [shouldAlterEmails, setShouldAlterEmails] = useState(true)
     const [deviceDictionary, setDeviceDictionary] = useState<Device[]>([])
     const [accountSites, setAccountSites] = useState<SiteData[]>([])
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     const defaultSheet = 'Users'
     const supportedExtensionTypes = ['Announcement-Only', 'Message-Only', 'Limited Extension', 'User', 'Virtual User']
 
@@ -243,7 +245,14 @@ const ExtensionUpload = () => {
             </MantineModal>
 
             <SystemNotifications toolName="Extension Upload" />
-            <Header title='Extension Upload' body={`Create extensions using the BRD's users tab`} documentationURL="https://dqgriffin.com/blog/rgOq6D6cGUzNteQkEXE4">
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                selectedFile={selectedFile}
+                messages={messages}
+                errors={errors}
+            />
+            <Header title='Extension Upload' body={`Create extensions using the BRD's users tab`} documentationURL="https://dqgriffin.com/blog/rgOq6D6cGUzNteQkEXE4" onHelpButtonClick={() => setIsSupportModalOpen(true)}>
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <div className="tool-card">

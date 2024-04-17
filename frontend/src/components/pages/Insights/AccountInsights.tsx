@@ -6,12 +6,14 @@ import useMessageQueue from "../../../hooks/useMessageQueue";
 import UIDInputField from "../../shared/UIDInputField";
 import EmailChecker from "./Email Checker/EmailChecker";
 import useLogin from "../../../hooks/useLogin";
+import { SupportSheet } from "../../shared/SupportSheet";
 
 const AccountInsights = () =>  {
     const [targetUID, setTargetUID] = useState("")
     useLogin('account-insignts')
     const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError, userName} = useGetAccessToken()
     let {messages, errors, postMessage} = useMessageQueue()
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -21,7 +23,13 @@ const AccountInsights = () =>  {
     
     return (
         <>
-            <Header title="Account Insights" body="" />
+            <Header title="Account Insights" body="" onHelpButtonClick={() => setIsSupportModalOpen(true)} />
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                messages={messages}
+                errors={errors}
+            />
             <ToolCard>
                 <h2>Account</h2>
                 <UIDInputField

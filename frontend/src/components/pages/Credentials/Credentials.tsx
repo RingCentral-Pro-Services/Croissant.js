@@ -22,12 +22,14 @@ import * as Excel from 'exceljs'
 import { SecretQuestion } from "./models/SecretQuestion";
 import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
+import { SupportSheet } from "../../shared/SupportSheet";
 
 const Credentials = () => {
     const [targetUID, setTargetUID] = useState("")
     const [isSyncing, setIsSyncing] = useState(false)
     const [isReady, setIsReady] = useState(false)
     const [isDone, setIsDone] = useState(false)
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [selectedSheet, setSelectedSheet] = useState('')
     const [secretQuestions, setSecretQuestions] = useState<SecretQuestion[]>([])
@@ -124,7 +126,15 @@ const Credentials = () => {
 
     return (
         <>
-            <Header title="Credentials" body="" />
+            <SupportSheet
+                isOpen={isSupportModalOpen}
+                onClose={() => setIsSupportModalOpen(false)}
+                selectedFile={selectedFile}
+                messages={messages}
+                errors={errors}
+            />
+
+            <Header title="Credentials" body="" onHelpButtonClick={() => setIsSupportModalOpen(true)} />
 
             <ToolCard>
                 <h3>Things to know</h3>

@@ -21,12 +21,14 @@ import SimpleSelection from "../../shared/SimpleSelection";
 import UIDInputField from "../../shared/UIDInputField";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../shared/SystemNotifications";
+import { SupportSheet } from "../../shared/SupportSheet";
 
 const Deskphones = () => {
     const [filteredExtensions, setFilteredExtensions] = useState<RCExtension[]>([])
     const [selectedExtensions, setSelectedExtensions] = useState<RCExtension[]>([])
     const [targetUID, setTargetUID] = useState('')
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     const [siteNames, setSiteNames] = useState<string[]>([])
     const [selectedSites, setSelectedSites] = useState<string[]>([])
     const [callForwardingProgressValue, setCallForwardingProgressValue] = useState(0)
@@ -139,7 +141,13 @@ const Deskphones = () => {
     return (
         <>
             <SystemNotifications toolName="Desk Phones" />
-            <Header title="Desk Phones" body="Set ring time for physical phones in bulk" documentationURL="https://dqgriffin.com/blog/E56ORu2TkiCB4CviXQNJ">
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                messages={messages}
+                errors={errors}
+            />
+            <Header title="Desk Phones" body="Set ring time for physical phones in bulk" documentationURL="https://dqgriffin.com/blog/E56ORu2TkiCB4CviXQNJ" onHelpButtonClick={() => setIsSupportModalOpen(true)}>
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Desk Phones" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />

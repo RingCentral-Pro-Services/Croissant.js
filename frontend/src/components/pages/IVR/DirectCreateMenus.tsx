@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import useMessageQueue from "../../../hooks/useMessageQueue";
 import useExtensionList from "../../../rcapi/useExtensionList";
 import useGetAccessToken from "../../../rcapi/useGetAccessToken";
@@ -30,43 +30,47 @@ import useWriteExcelFile from "../../../hooks/useWriteExcelFile";
 import { sanitize } from "../../../helpers/Sanatize";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../shared/SystemNotifications";
+import { SupportSheet } from "../../shared/SupportSheet";
+import Header from "../../shared/Header";
+import ToolCard from "../../shared/ToolCard";
 
 const DirectCreateMenus = () => {
     useLogin('create-ivr')
-    const {fireEvent} = useAnalytics()
+    const { fireEvent } = useAnalytics()
     let [targetUID, setTargetUID] = useState("")
     let [isReadyToSync, setReadyToSync] = useState(false)
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     let [isPending, setIsPending] = useState(false)
     const [isShowingWarningModal, setIsShowingWarningModal] = useState(false)
     const [menus, setMenus] = useState<IVRMenu[]>([])
     const [existingMenus, setExistingMenus] = useState<IVRMenu[]>([])
-    let {messages, errors, postMessage, postError} = useMessageQueue()
-    const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError} = useGetAccessToken()
+    let { messages, errors, postMessage, postError } = useMessageQueue()
+    const { fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError } = useGetAccessToken()
     const { extensionsList, isExtensionListPending, isMultiSiteEnabled, fetchExtensions } = useExtensionList(postMessage)
     const [selectedFile, setSelectedFile] = useState<File | null>()
-    const {excelData, isExcelDataPending, readFile} = useReadExcel()
-    const {menus: excelMenus, isMenuConvertPending, converToMenus} = useExcelToIVRs(postMessage, postError)
-    const {readLucidchart, isLucidchartPending, menus: lucidchartMenus, pages, setPages} = useReadLucidchart(postMessage)
+    const { excelData, isExcelDataPending, readFile } = useReadExcel()
+    const { menus: excelMenus, isMenuConvertPending, converToMenus } = useExcelToIVRs(postMessage, postError)
+    const { readLucidchart, isLucidchartPending, menus: lucidchartMenus, pages, setPages } = useReadLucidchart(postMessage)
     const defaultSheet = 'IVRs'
-    const {timedMessages, postTimedMessage} = usePostTimedMessage()
-    const {audioPromptList, isAudioPromptListPending, fetchAudioPrompts} = useGetAudioPrompts(postMessage, postTimedMessage)
+    const { timedMessages, postTimedMessage } = usePostTimedMessage()
+    const { audioPromptList, isAudioPromptListPending, fetchAudioPrompts } = useGetAudioPrompts(postMessage, postTimedMessage)
 
     // Filter stuff
     const [isDisplayingFilterBox, setDisplayFilterBox] = useState(false)
     const [filteredPages, setFilteredPages] = useState(null)
-    const {handleFilterClick, handleInput, selectAll} = useFilterServices(pages, setPages, filteredPages, setFilteredPages)
+    const { handleFilterClick, handleInput, selectAll } = useFilterServices(pages, setPages, filteredPages, setFilteredPages)
     const [selectedSheet, setSelectedSheet] = useState<string>('')
     const [selectedSites, setSelectedSites] = useState<string[]>([])
     const [filterMenus, setFilteredMenus] = useState<IVRMenu[]>([])
 
-    const {validatedData, validate, isDataValidationPending} = useValidateExcelData(ivrSchema, postMessage, postError)
+    const { validatedData, validate, isDataValidationPending } = useValidateExcelData(ivrSchema, postMessage, postError)
 
     // Progress bar
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgressValue, setMaxProgressValue] = useState(0)
-    const {createMenus, isSyncing} = useCreateIVRs(setProgressValue, postMessage, postTimedMessage, postError, isMultiSiteEnabled)
+    const { createMenus, isSyncing } = useCreateIVRs(setProgressValue, postMessage, postTimedMessage, postError, isMultiSiteEnabled)
 
-    const {writeExcel} = useWriteExcelFile()
+    const { writeExcel } = useWriteExcelFile()
     const { reportToAuditTrail } = useAuditTrail()
 
     const handleFileSelect = async () => {
@@ -138,8 +142,8 @@ const DirectCreateMenus = () => {
 
     const handleExportExistingMenusClick = () => {
         let header = ['Menu Name', 'Menu Ext', 'Phone Number', 'Site', 'Prompt Mode', 'Prompt Name/Script', 'Key 1 Action', 'Key 1 Destination', 'Key 2 Action', 'Key 2 Destination', 'Key 3 Action', 'Key 3 Destination',
-                     'Key 4 Action', 'Key 4 Destination', 'Key 5 Action', 'Key 5 Destination', 'Key 6 Action', 'Key 6 Destination', 'Key 7 Action', 'Key 7 Destination',
-                     'Key 8 Action', 'Key 8 Destination', 'Key 9 Action', 'Key 9 Destination', 'Key 0 Action', 'Key 0 Destination', 'Key # Press', 'Key * Press']
+            'Key 4 Action', 'Key 4 Destination', 'Key 5 Action', 'Key 5 Destination', 'Key 6 Action', 'Key 6 Destination', 'Key 7 Action', 'Key 7 Destination',
+            'Key 8 Action', 'Key 8 Destination', 'Key 9 Action', 'Key 9 Destination', 'Key 0 Action', 'Key 0 Destination', 'Key # Press', 'Key * Press']
         writeExcel(header, existingMenus, 'Overlapping IVRs', `overlapping-ivrs-${sanitize(companyName)}.xlsx`)
     }
 
@@ -159,7 +163,7 @@ const DirectCreateMenus = () => {
     //     else if (selectedFile.name.includes('.xlsx')) {
     //         readFile(selectedFile, selectedSheet)
     //     }
-        
+
     // }, [isAudioPromptListPending, extensionsList, selectedFile])
 
     useEffect(() => {
@@ -207,7 +211,7 @@ const DirectCreateMenus = () => {
         if (targetUID.length < 5) return
         localStorage.setItem('target_uid', targetUID)
         fetchToken(targetUID)
-    },[targetUID])
+    }, [targetUID])
 
     useEffect(() => {
         if (isSyncing) return
@@ -220,11 +224,19 @@ const DirectCreateMenus = () => {
         console.log(filtered)
         setFilteredMenus(filtered)
     }, [pages, selectedSites])
-    
+
     return (
-        <div>
+        <>
             <SystemNotifications toolName="Create IVRs" />
-            <Modal opened={isShowingWarningModal} onClose={ () => setIsShowingWarningModal(false)} title="Overlapping IVRs " closeOnClickOutside={false}>
+            <SupportSheet
+                isOpen={isSupportModalOpen}
+                onClose={() => setIsSupportModalOpen(false)}
+                selectedFile={selectedFile}
+                messages={messages}
+                errors={errors}
+            />
+            <Header title='Create IVR Menus' body='Create IVRs using either the BRD or a Lucidchart document' documentationURL='https://dqgriffin.com/blog/VbhCfcUYShTARLrnBKYn' onHelpButtonClick={() => setIsSupportModalOpen(true)}></Header>
+            <Modal opened={isShowingWarningModal} onClose={() => setIsShowingWarningModal(false)} title="Overlapping IVRs " closeOnClickOutside={false}>
                 <p>Warning! Due to overlapping extension numbers, uploading this file will overwrite {existingMenus.length} IVRs that already exist in the account. Please review your file carefully to prevent any unintended changes.</p>
                 <p>Overlapping IVRs:</p>
                 <div className="modal-content">
@@ -240,17 +252,20 @@ const DirectCreateMenus = () => {
                 </div>
             </Modal>
 
-            <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} loading={isTokenPending} error={tokenError} />
-            <FileSelect enabled={hasCustomerToken} accept=".xlsx, .csv" handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={isPending} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
-            {isDisplayingFilterBox ? <AdaptiveFilter title='Pages' placeholder='Search...' setSelected={setSelectedSites} options={pages.map((page) => page.label)} defaultSelected={pages.map((page) => page.label)} /> : <></>}
-            <Button disabled={!hasCustomerToken || menus.length === 0 || isSyncing} variant="filled" className="inline" onClick={handleSyncButtonClick}>Sync</Button>
-            <Button className='healthy-margin-left' variant='outline' onClick={() => window.open('https://docs.google.com/spreadsheets/d/1jcXdr5mc-HpmbkjRq4V-2_G_pftrSOHqFYSyo5wLs2k/edit?usp=sharing', '_blank')} rightIcon={<IconExternalLink />} >Template</Button>
-            {!(menus.length > 0) ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
-            {timedMessages.map((timedMessage) => (
-                <p>{timedMessage.body}</p>
-            ))}
-            {!(menus.length > 0 || messages.length > 0 || timedMessages.length > 0) ? <></> : <FeedbackArea gridData={filterMenus} messages={messages} timedMessages={timedMessages} errors={errors} /> }
-        </ div>
+            <ToolCard>
+                <UIDInputField setTargetUID={setTargetUID} disabled={hasCustomerToken} disabledText={companyName} loading={isTokenPending} error={tokenError} />
+                <FileSelect enabled={hasCustomerToken} accept=".xlsx, .csv" handleSubmit={handleFileSelect} setSelectedFile={setSelectedFile} isPending={isPending} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} />
+                {isDisplayingFilterBox ? <AdaptiveFilter title='Pages' placeholder='Search...' setSelected={setSelectedSites} options={pages.map((page) => page.label)} defaultSelected={pages.map((page) => page.label)} /> : <></>}
+                <Button disabled={!hasCustomerToken || menus.length === 0 || isSyncing} variant="filled" className="inline" onClick={handleSyncButtonClick}>Sync</Button>
+                <Button className='healthy-margin-left' variant='outline' onClick={() => window.open('https://docs.google.com/spreadsheets/d/1jcXdr5mc-HpmbkjRq4V-2_G_pftrSOHqFYSyo5wLs2k/edit?usp=sharing', '_blank')} rightIcon={<IconExternalLink />} >Template</Button>
+                {!(menus.length > 0) ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
+                {timedMessages.map((timedMessage) => (
+                    <p>{timedMessage.body}</p>
+                ))}
+                {!(menus.length > 0 || messages.length > 0 || timedMessages.length > 0) ? <></> : <FeedbackArea gridData={filterMenus} messages={messages} timedMessages={timedMessages} errors={errors} />}
+            </ToolCard>
+        </>
+
     )
 }
 

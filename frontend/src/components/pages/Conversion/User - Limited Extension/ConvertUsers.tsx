@@ -10,6 +10,7 @@ import { Accordion, SegmentedControl } from "@mantine/core";
 import SettingToggle from "../../../shared/Settings Components/SettingToggle";
 import UIDInputField from "../../../shared/UIDInputField";
 import { SystemNotifications } from "../../../shared/SystemNotifications";
+import { SupportSheet } from "../../../shared/SupportSheet";
 
 export interface UserConvertSettings {
     deleteOldExtension: boolean
@@ -19,6 +20,7 @@ export interface UserConvertSettings {
 export const ConvertUsers = () => {
     const [targetUID, setTargetUID] = useState("")
     const [isSyncing, setIsSyncing] = useState(false)
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     const [selectableExtensions, setSelectableExtensions] = useState<Extension[]>([])
     const [selectedExtensions, setSelectedExtensions] = useState<Extension[]>([])
     const [mode, setMode] = useState('User → Limited Extension')
@@ -46,7 +48,13 @@ export const ConvertUsers = () => {
     return (
         <>
             <SystemNotifications toolName="Convert Users" />
-            <Header title="Users → Limited Extensions" body="" />
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                messages={messages}
+                errors={errors}
+            />
+            <Header title="Users → Limited Extensions" body="" onHelpButtonClick={() => setIsSupportModalOpen(true)} />
             <ToolCard>
                 <h2>Things to know</h2>
                 <ol>

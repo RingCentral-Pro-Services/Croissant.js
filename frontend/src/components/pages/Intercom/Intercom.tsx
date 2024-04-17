@@ -24,6 +24,7 @@ import useExcelToIntercom from "./hooks/useExcelToIntercom";
 import useIntercom from "./hooks/useIntercom";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../shared/SystemNotifications";
+import { SupportSheet } from "../../shared/SupportSheet";
 
 const Intercom = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -42,6 +43,7 @@ const Intercom = () => {
     const [isFetchingDevices, setIsFetchingDevices] = useState(false)
     const [action, setAction] = useState('audit')
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     const defaultSheet = 'Intercom'
 
     useLogin('intercom', isSyncing)
@@ -175,7 +177,14 @@ const Intercom = () => {
     return (
         <>
             <SystemNotifications toolName="Intercom" />
-            <Header title='Intercom' body='Enable, disable, and audit intercom' documentationURL="https://dqgriffin.com/blog/oss6kFK8brP8o8gCWflc">
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                selectedFile={selectedFile}
+                messages={messages}
+                errors={errors}
+            />
+            <Header title='Intercom' body='Enable, disable, and audit intercom' documentationURL="https://dqgriffin.com/blog/oss6kFK8brP8o8gCWflc" onHelpButtonClick={() => setIsSupportModalOpen(true)}>
                 <Button variant='subtle' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <div className="tool-card">

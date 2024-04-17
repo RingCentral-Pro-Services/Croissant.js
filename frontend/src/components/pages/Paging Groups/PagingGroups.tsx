@@ -23,6 +23,7 @@ import useExcelToPagingGroups from "./hooks/useExcelToPagingGroups";
 import { IconExternalLink } from "@tabler/icons-react";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../shared/SystemNotifications";
+import { SupportSheet } from "../../shared/SupportSheet";
 
 const PagingGroups = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -35,6 +36,7 @@ const PagingGroups = () => {
     const [progressMax, setProgressMax] = useState(0)
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
     const [isShowingDeviceMapProgress, setIsShowingDeviceMapProgress] = useState(false)
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     const defaultSheet = 'Paging Groups'
 
     useLogin('paginggroups', isSyncing)
@@ -134,6 +136,13 @@ const PagingGroups = () => {
     return (
         <>
             <SystemNotifications toolName="Paging Groups" />
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                selectedFile={selectedFile}
+                messages={messages}
+                errors={errors}
+            />
             <Header title="Paging Groups" body="Create and audit paging groups">
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>

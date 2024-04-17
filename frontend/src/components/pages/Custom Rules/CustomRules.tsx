@@ -21,10 +21,12 @@ import UIDInputField from "../../shared/UIDInputField";
 import useApplyRules from "./hooks/useApplyRules";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../shared/SystemNotifications";
+import { SupportSheet } from "../../shared/SupportSheet";
 
 const CustomRules = () => {
     const [targetUID, setTargetUID] = useState<string>('')
     const [activeStep, setActiveStep] = useState<number>(0)
+    const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     const [originalExtensionID, setOriginalExtensionID] = useState(0)
     const [selectedExtensionTypes, setSelectedExtensionTypes] = useState<string[]>([])
     const [siteNames, setSiteNames] = useState<string[]>([])
@@ -142,7 +144,13 @@ const CustomRules = () => {
     return (
         <>
             <SystemNotifications toolName="Copy Custom Rules" />
-            <Header title="Copy Custom Rules" body="Copy custom rules to other extensions" documentationURL="https://dqgriffin.com/blog/jrbhwHRfEahVdJzUeJdG">
+            <SupportSheet
+                isOpen={isSupportModalOpen} 
+                onClose={() => setIsSupportModalOpen(false)}
+                messages={messages}
+                errors={errors}
+            />
+            <Header title="Copy Custom Rules" body="Copy custom rules to other extensions" documentationURL="https://dqgriffin.com/blog/jrbhwHRfEahVdJzUeJdG" onHelpButtonClick={() => setIsSupportModalOpen(true)}>
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Copy Custom Rules" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
