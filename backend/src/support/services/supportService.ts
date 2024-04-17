@@ -58,24 +58,24 @@ export const processSupportRequest = async (req: Request, res: Response) => {
 
         const errors = fields.errors as string
         const messages = fields.messages as string
-        const parsedErrors = JSON.parse(errors) as SyncError[]
-        const parsedMessages = JSON.parse(messages) as Message[]
+
+        const errorsAndMessages = parseMessagesAndErrors(errors, messages)
         const errorsFilename = `reconstructed-errors-${getRandomId()}.xlsx`
+        const reconstructedErrorData = reconstructErrorsAndMessages(errorsAndMessages?.errors, errorsAndMessages?.messages)
 
-        const reconstructedErrors = parsedErrors.map((error) => new SyncError(error.extensionName, error.extensionNumber, error.error, error.platformResponse, error.object))
-        const reconstructedMessages = parsedMessages.map((message) => new Message(message.body, message.type, message.id))
-
-        await writeExcelFile([{
-            sheetName: 'messages',
-            data: reconstructedMessages,
-            startingRow: 1,
-            vertical: false
-        }, {
-            sheetName: 'errors',
-            data: reconstructedErrors,
-            startingRow: 1,
-            vertical: false
-        }], errorsFilename)
+        if (reconstructedErrorData) {
+            await writeExcelFile([{
+                sheetName: 'messages',
+                data: reconstructedErrorData?.messages,
+                startingRow: 1,
+                vertical: false
+            }, {
+                sheetName: 'errors',
+                data: reconstructedErrorData?.errors,
+                startingRow: 1,
+                vertical: false
+            }], errorsFilename)
+        }
 
         const attachments = await getAttachmentIds(files, errorsFilename, token)
         const userText = fields.userText as string
@@ -84,6 +84,52 @@ export const processSupportRequest = async (req: Request, res: Response) => {
     });
 
     res.send('OK')
+}
+
+const parseMessagesAndErrors = (rawErrors: string, rawMessages: string) => {
+    try {
+        const parsedErrors = JSON.parse(rawErrors) as SyncError[]
+        const parsedMessages = JSON.parse(rawMessages) as Message[]
+        return {
+            errors: parsedErrors,
+            messages: parsedMessages
+        }
+    }
+    catch(e) {
+        logger.error({
+            message: {
+                customMessage: 'Failed to parse messages and errors',
+                error: isCircular(e) ? '[circular object]' : e
+            }
+        })
+    }
+}
+
+const reconstructErrorsAndMessages = (errors?: SyncError[], messages?: Message[]) => {
+    if (!errors || !messages) {
+        return {
+            errors: [],
+            messages: []
+        }
+    }
+
+    try {
+        const reconstructedErrors = errors.map((error) => new SyncError(error.extensionName, error.extensionNumber, error.error, error.platformResponse, error.object))
+        const reconstructedMessages = messages.map((message) => new Message(message.body, message.type, message.id))
+
+        return {
+            errors: reconstructedErrors,
+            messages: reconstructedMessages
+        }
+    }
+    catch (e) {
+        logger.error({
+            message: {
+                customMessage: 'Failed to reconstruct messages and errors',
+                error: isCircular(e) ? '[circular object]' : e
+            }
+        })
+    }
 }
 
 const getAttachmentIds = async (files: formidable.Files, errorsPath: string, token: string) => {
@@ -107,7 +153,7 @@ const getAttachmentIds = async (files: formidable.Files, errorsPath: string, tok
         }
     }
 
-    if (errorsPath) {
+    if (errorsPath && fs.existsSync(errorsPath)) {
         const id = await uploadFile(token, errorsPath, 'errors.xlsx')
 
         if (id) {
