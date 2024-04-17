@@ -1,5 +1,7 @@
 import * as Excel from 'exceljs'
 import { ExcelSheetData } from '../models/ExcelSheetData'
+import logger from '../../utils/logger'
+import { isCircular } from '../../utils/utils'
 
 export const writeExcelFile = async (sheetData: ExcelSheetData[], filename: string,) => {
     const book = new Excel.Workbook()
@@ -37,6 +39,21 @@ export const writeExcelFile = async (sheetData: ExcelSheetData[], filename: stri
     }
 
     // const buffer = await book.xlsx.writeBuffer()
-    await book.xlsx.writeFile(filename)
+    try {
+        await book.xlsx.writeFile(filename)
+        logger.info({
+            message: {
+                customMessage: `Wrote xlsx file to ${filename}`
+            }
+        })
+    }
+    catch(e) {
+        logger.error({
+            message: {
+                customMessage: 'Failed to write xlsx file',
+                error: isCircular(e) ? '[circular object]' : e
+            }
+        })
+    }
     // return buffer
 }

@@ -6,29 +6,52 @@ import FormData from "form-data";
 import { writeExcelFile } from "./excelService";
 import { SyncError } from "../models/SyncError";
 import { Message } from "../models/Message";
+import logger from "../../utils/logger";
+import { isCircular } from "../../utils/utils";
 
 const createPostUrl = 'https://platform.ringcentral.com/team-messaging/v1/chats/chatId/posts'
 const uploadFileUrl = 'https://platform.ringcentral.com/team-messaging/v1/files'
 
 export const processSupportRequest = async (req: Request, res: Response) => {
+
+    logger.info({
+        message: {
+            customMessage: '/api/support'
+        }
+    })
+
     const form = formidable({});
     const token = req.headers.authorization
     const chatId = process.env.SUPPORT_CHAT_ID
 
     if (!chatId) {
-        console.error('Support chat id not found')
+        logger.warn({
+            message: {
+                customMessage: 'Support chat ID not found'
+            }
+        })
         res.status(500).send()
         return
     }
 
     if (!token) {
+        logger.warn({
+            message: {
+                customMessage: 'Missing authorization token'
+            }
+        })
         res.status(401).send('Authorization token required')
         return
     }
 
     form.parse(req, async (err, fields, files) => {
         if (err) {
-            console.error('Error processing support request:', err);
+            logger.error({
+                message: {
+                    customMessage: 'Error processing support request',
+                    error: isCircular(err) ? '[circular object]' : err
+                }
+            })
             res.status(500).send('Error processing support request');
             return;
         }
@@ -92,6 +115,13 @@ const getAttachmentIds = async (files: formidable.Files, errorsPath: string, tok
         }
     }
 
+    logger.info({
+        message: {
+            customMessage: 'Support request attachments',
+            attachments: attachments
+        }
+    })
+
     return attachments
 }
 
@@ -102,6 +132,14 @@ const getAttachmentPayload = (getAttachmentIds: string[]) => {
             type: 'File'
         }
     })
+
+    logger.info({
+        message: {
+            customMessage: 'Support request attacment payload',
+            payload: attachments
+        }
+    })
+
     return attachments
 }
 
@@ -126,7 +164,12 @@ const uploadFile = async (token: string, path: string, filename: string) => {
         }
     }
     catch (e: any) {
-        console.log('Error uploading file:', e)
+        logger.error({
+            message: {
+                customMessage: 'Failed to upload file to RC',
+                error: isCircular(e) ? '[circular object]' : e
+            }
+        })
     }
 }
 
