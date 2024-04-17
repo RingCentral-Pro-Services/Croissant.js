@@ -3,6 +3,9 @@ import formidable from 'formidable';
 import axios from "axios";
 import fs from "fs";
 import FormData from "form-data";
+import { writeExcelFile } from "./excelService";
+import { SyncError } from "../models/SyncError";
+import { Message } from "../models/Message";
 
 const createPostUrl = 'https://platform.ringcentral.com/team-messaging/v1/chats/chatId/posts'
 const uploadFileUrl = 'https://platform.ringcentral.com/team-messaging/v1/files'
@@ -30,15 +33,37 @@ export const processSupportRequest = async (req: Request, res: Response) => {
             return;
         }
 
-        const attachments = await getAttachmentIds(files, token)
+        const errors = fields.errors as string
+        const messages = fields.messages as string
+        const parsedErrors = JSON.parse(errors) as SyncError[]
+        const parsedMessages = JSON.parse(messages) as Message[]
+        const errorsFilename = `reconstructed-errors-${getRandomId()}.xlsx`
+
+        const reconstructedErrors = parsedErrors.map((error) => new SyncError(error.extensionName, error.extensionNumber, error.error, error.platformResponse, error.object))
+        const reconstructedMessages = parsedMessages.map((message) => new Message(message.body, message.type, message.id))
+
+        await writeExcelFile([{
+            sheetName: 'messages',
+            data: reconstructedMessages,
+            startingRow: 1,
+            vertical: false
+        }, {
+            sheetName: 'errors',
+            data: reconstructedErrors,
+            startingRow: 1,
+            vertical: false
+        }], errorsFilename)
+
+        const attachments = await getAttachmentIds(files, errorsFilename, token)
         const userText = fields.userText as string
         await postMessage(chatId, token, userText, attachments)
+        fs.unlinkSync(errorsFilename)
     });
 
     res.send('OK')
 }
 
-const getAttachmentIds = async (files: formidable.Files, token: string) => {
+const getAttachmentIds = async (files: formidable.Files, errorsPath: string, token: string) => {
     const attachments: string[] = []
 
     const uploadedFile = files.uploadFile as formidable.File
@@ -53,6 +78,14 @@ const getAttachmentIds = async (files: formidable.Files, token: string) => {
     const generatedErrors = files.generatedErrors as formidable.File
     if (generatedErrors) {
         const id = await uploadFile(token, generatedErrors.filepath, 'errors.xlsx')
+
+        if (id) {
+            attachments.push(id)
+        }
+    }
+
+    if (errorsPath) {
+        const id = await uploadFile(token, errorsPath, 'errors.xlsx')
 
         if (id) {
             attachments.push(id)
@@ -114,4 +147,8 @@ const postMessage = async (chatId: string, token: string, message: string, attac
     catch (e) {
         console.error('Error posting message:', e)
     }
+}
+
+const getRandomId = () => {
+    return Math.floor(Math.random() * 1000000)
 }

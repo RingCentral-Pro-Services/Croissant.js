@@ -5,7 +5,7 @@ import { Message } from "../../models/Message";
 import { SyncError } from "../../models/SyncError";
 
 export const SupportSheet = (props: {isOpen: boolean, onClose: () => void, selectedFile?: File | null | undefined, messages: Message[], errors: SyncError[]}) => {
-    const { isOpen, selectedFile, onClose } = props
+    const { isOpen, selectedFile, errors, messages, onClose } = props
     const [inputText, setInputText] = useState('')
     const [error, setError] = useState('')
 
@@ -16,17 +16,25 @@ export const SupportSheet = (props: {isOpen: boolean, onClose: () => void, selec
     }
 
     const handleSubmit = () => {
-        const token = localStorage.getItem('rc_access_token')
-        if (!token || !inputText || inputText.length === 0) return
-
-        const formData = new FormData()
-        formData.set('userText', inputText)
-
-        if (selectedFile) {
-            formData.append('uploadFile', selectedFile)
+        try {
+            const token = localStorage.getItem('rc_access_token')
+            if (!token || !inputText || inputText.length === 0) return
+    
+            const formData = new FormData()
+            formData.set('userText', inputText)
+    
+            if (selectedFile) {
+                formData.append('uploadFile', selectedFile)
+            }
+    
+            formData.append('errors', JSON.stringify(errors))
+            formData.append('messages', JSON.stringify(messages))
+    
+            postMessage(token, formData)
         }
-
-        postMessage(token, formData)
+        catch (e) {
+            console.log('Something went wrong submitting support request', e)
+        }
     }
 
     const postMessage = async (token: string, formData: FormData) => {
