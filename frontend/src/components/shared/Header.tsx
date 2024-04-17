@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import FeedIcon from '@mui/icons-material/Feed';
 import { Avatar, Button } from "@mantine/core";
+import { Admin } from "./Admin";
 
 // -----------------------------------------------------------------------------
 
@@ -22,7 +23,9 @@ const Header = (props: HeaderProps) => {
                 <h2>{title}</h2>
                 {documentationURL ? <FeedIcon /> : <></>}
                 {documentationURL ? <a href={documentationURL} target="_blank">Documentation</a>: <></>}
-                <Button className="healthy-margin-left" variant='subtle' onClick={onHelpButtonClick}>Need help?</Button>
+                <Admin>
+                    <Button className="healthy-margin-left" variant='subtle' onClick={onHelpButtonClick}>Need help?</Button>
+                </Admin>
             </div>
             {/* <p>{body}</p> */}
         </div>
