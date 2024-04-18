@@ -21,12 +21,6 @@ export const processSupportRequest = async (req: Request, res: Response) => {
     })
 
     const form = formidable({});
-    logger.info({
-        message: {
-            customMessage: 'Created form object'
-        }
-    })
-    
     const token = req.headers.authorization
     const chatId = process.env.SUPPORT_CHAT_ID
 
@@ -55,6 +49,15 @@ export const processSupportRequest = async (req: Request, res: Response) => {
         res.status(401).send('Authorization token required')
         return
     }
+
+    form.on('error', async (err) => {
+        logger.error({
+            message: {
+                customMessage: 'Error parsing form',
+                error: isCircular(err) ? '[circular object]' : err
+            }
+        })
+    })
 
     form.parse(req, async (err, fields, files) => {
         if (err) {
