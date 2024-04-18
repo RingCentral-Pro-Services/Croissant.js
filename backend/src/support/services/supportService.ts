@@ -6,9 +6,70 @@ import FormData from "form-data";
 import { writeExcelFile } from "./excelService";
 import { SyncError } from "../models/SyncError";
 import { Message } from "../models/Message";
+import logger from "../../utils/logger";
+import { isCircular } from "../../utils/utils";
 
 const createPostUrl = 'https://platform.ringcentral.com/team-messaging/v1/chats/chatId/posts'
 const uploadFileUrl = 'https://platform.ringcentral.com/team-messaging/v1/files'
+
+export const processSupportRequestV2 = async (req: Request, res: Response) => {
+    const token = req.headers.authorization
+    const chatId = process.env.SUPPORT_CHAT_ID
+    const body = req.body
+
+    if (!chatId) {
+        logger.warn({
+            message: {
+                customMessage: 'Support chat ID not found'
+            }
+        })
+        res.status(500).send()
+        return
+    }
+
+    if (!token) {
+        logger.warn({
+            message: {
+                customMessage: 'Missing authorization token'
+            }
+        })
+        res.status(401).send('Authorization token required')
+        return
+    }
+
+    const uploadedFilename = `uploaded-file-${getRandomId()}.xlsx`
+    const uploadedFileBase64 = body.uploadedFileBase64
+
+    if (uploadedFileBase64 && uploadedFileBase64.length > 0) {
+        const base64Buffer = Buffer.from(uploadedFileBase64, 'base64');
+        fs.writeFileSync(uploadedFilename, base64Buffer)
+    }
+
+    const errorsFilename = `reconstructed-errors-${getRandomId()}.xlsx`
+    const messages: Message[] = body.messages
+    const errors: SyncError[] = body.errors
+    const messageData = reconstructErrorsAndMessages(errors, messages)
+
+    if (messageData && (messageData.errors.length > 0 || messageData.messages.length > 0)) {
+        await writeExcelFile([{
+            sheetName: 'messages',
+            data: messageData?.messages,
+            startingRow: 1,
+            vertical: false
+        }, {
+            sheetName: 'errors',
+            data: messageData?.errors,
+            startingRow: 1,
+            vertical: false
+        }], errorsFilename)
+    }
+
+    const userText = body.userText
+    const attachments = await getAttachmentIds(uploadedFilename, errorsFilename, token)
+    await postMessage(chatId, token, userText, attachments)
+    res.send('OK')
+    cleanupFiles(uploadedFilename, errorsFilename)
+}
 
 export const processSupportRequest = async (req: Request, res: Response) => {
     const form = formidable({});
@@ -16,81 +77,177 @@ export const processSupportRequest = async (req: Request, res: Response) => {
     const chatId = process.env.SUPPORT_CHAT_ID
 
     if (!chatId) {
-        console.error('Support chat id not found')
+        logger.warn({
+            message: {
+                customMessage: 'Support chat ID not found'
+            }
+        })
         res.status(500).send()
         return
     }
 
     if (!token) {
+        logger.warn({
+            message: {
+                customMessage: 'Missing authorization token'
+            }
+        })
         res.status(401).send('Authorization token required')
         return
     }
 
+    form.on('error', async (err) => {
+        logger.error({
+            message: {
+                customMessage: 'Error parsing form',
+                error: isCircular(err) ? '[circular object]' : err
+            }
+        })
+    })
+
     form.parse(req, async (err, fields, files) => {
         if (err) {
-            console.error('Error processing support request:', err);
+            logger.error({
+                message: {
+                    customMessage: 'Error processing support request',
+                    error: isCircular(err) ? '[circular object]' : err
+                }
+            })
             res.status(500).send('Error processing support request');
             return;
         }
 
         const errors = fields.errors as string
         const messages = fields.messages as string
-        const parsedErrors = JSON.parse(errors) as SyncError[]
-        const parsedMessages = JSON.parse(messages) as Message[]
+
+        const errorsAndMessages = parseMessagesAndErrors(errors, messages)
         const errorsFilename = `reconstructed-errors-${getRandomId()}.xlsx`
+        const reconstructedErrorData = reconstructErrorsAndMessages(errorsAndMessages?.errors, errorsAndMessages?.messages)
 
-        const reconstructedErrors = parsedErrors.map((error) => new SyncError(error.extensionName, error.extensionNumber, error.error, error.platformResponse, error.object))
-        const reconstructedMessages = parsedMessages.map((message) => new Message(message.body, message.type, message.id))
+        const uploadedFilename = `uploaded-file-${getRandomId()}.xlsx`
+        const fileBase64 = fields.fileBase64 as string
 
-        await writeExcelFile([{
-            sheetName: 'messages',
-            data: reconstructedMessages,
-            startingRow: 1,
-            vertical: false
-        }, {
-            sheetName: 'errors',
-            data: reconstructedErrors,
-            startingRow: 1,
-            vertical: false
-        }], errorsFilename)
+        if (fileBase64) {
+            const base64Buffer = Buffer.from(fileBase64, 'base64');
+            fs.writeFileSync(uploadedFilename, base64Buffer)
+        }
 
-        const attachments = await getAttachmentIds(files, errorsFilename, token)
+        if (reconstructedErrorData) {
+            await writeExcelFile([{
+                sheetName: 'messages',
+                data: reconstructedErrorData?.messages,
+                startingRow: 1,
+                vertical: false
+            }, {
+                sheetName: 'errors',
+                data: reconstructedErrorData?.errors,
+                startingRow: 1,
+                vertical: false
+            }], errorsFilename)
+        }
+
+        const attachments = await getAttachmentIds(uploadedFilename, errorsFilename, token)
         const userText = fields.userText as string
+
         await postMessage(chatId, token, userText, attachments)
         fs.unlinkSync(errorsFilename)
+        fs.unlinkSync(uploadedFilename)
     });
 
     res.send('OK')
 }
 
-const getAttachmentIds = async (files: formidable.Files, errorsPath: string, token: string) => {
+const cleanupFiles = (uploadedFilePath: string, errorsPath: string) => {
+    if (uploadedFilePath && fs.existsSync(uploadedFilePath)) {
+        fs.unlinkSync(uploadedFilePath)
+    }
+
+    if (errorsPath && fs.existsSync(errorsPath)) {
+        fs.unlinkSync(errorsPath)
+    }
+}
+
+const parseMessagesAndErrors = (rawErrors: string, rawMessages: string) => {
+    try {
+        const parsedErrors = JSON.parse(rawErrors) as SyncError[]
+        const parsedMessages = JSON.parse(rawMessages) as Message[]
+        return {
+            errors: parsedErrors,
+            messages: parsedMessages
+        }
+    }
+    catch(e) {
+        logger.error({
+            message: {
+                customMessage: 'Failed to parse messages and errors',
+                error: isCircular(e) ? '[circular object]' : e
+            }
+        })
+    }
+}
+
+const reconstructErrorsAndMessages = (errors?: SyncError[], messages?: Message[]) => {
+    if (!errors || !messages) {
+        return {
+            errors: [],
+            messages: []
+        }
+    }
+
+    try {
+        const reconstructedErrors = errors.map((error) => new SyncError(error.extensionName, error.extensionNumber, error.error, error.platformResponse, error.object))
+        const reconstructedMessages = messages.map((message) => new Message(message.body, message.type, message.id))
+
+        return {
+            errors: reconstructedErrors,
+            messages: reconstructedMessages
+        }
+    }
+    catch (e) {
+        logger.error({
+            message: {
+                customMessage: 'Failed to reconstruct messages and errors',
+                error: isCircular(e) ? '[circular object]' : e
+            }
+        })
+        return {
+            errors: [],
+            messages: []
+        }
+    }
+}
+
+const getAttachmentIds = async (uploadedFilePath: string, errorsPath: string, token: string) => {
     const attachments: string[] = []
 
-    const uploadedFile = files.uploadFile as formidable.File
-    if (uploadedFile) {
-        const id = await uploadFile(token, uploadedFile.filepath, 'uploaded-file.xlsx')
+    logger.info({
+        message: {
+            customMessage: 'Getting attachment IDs'
+        }
+    })
+
+    if (uploadedFilePath && fs.existsSync(uploadedFilePath)) {
+        const id = await uploadFile(token, uploadedFilePath, 'uploaded-file.xlsx')
 
         if (id) {
             attachments.push(id)
         }
     }
 
-    const generatedErrors = files.generatedErrors as formidable.File
-    if (generatedErrors) {
-        const id = await uploadFile(token, generatedErrors.filepath, 'errors.xlsx')
-
-        if (id) {
-            attachments.push(id)
-        }
-    }
-
-    if (errorsPath) {
+    if (errorsPath && fs.existsSync(errorsPath)) {
         const id = await uploadFile(token, errorsPath, 'errors.xlsx')
 
         if (id) {
             attachments.push(id)
         }
     }
+
+    logger.info({
+        message: {
+            customMessage: 'Support request attachments',
+            attachments: attachments
+        }
+    })
 
     return attachments
 }
@@ -102,11 +259,27 @@ const getAttachmentPayload = (getAttachmentIds: string[]) => {
             type: 'File'
         }
     })
+
+    logger.info({
+        message: {
+            customMessage: 'Support request attacment payload',
+            payload: attachments
+        }
+    })
+
     return attachments
 }
 
 const uploadFile = async (token: string, path: string, filename: string) => {
     try {
+        logger.info({
+            message: {
+                customMessage: 'Uploading file to RC',
+                path: path,
+                filename: filename
+            }
+        })
+
         const formData = new FormData();
         formData.append('body', fs.createReadStream(path), filename)
 
@@ -126,12 +299,23 @@ const uploadFile = async (token: string, path: string, filename: string) => {
         }
     }
     catch (e: any) {
-        console.log('Error uploading file:', e)
+        logger.error({
+            message: {
+                customMessage: 'Failed to upload file to RC',
+                error: isCircular(e) ? '[circular object]' : e
+            }
+        })
     }
 }
 
 const postMessage = async (chatId: string, token: string, message: string, attachments: string[]) => {
     try {
+        logger.info({
+            message: {
+                customMessage: 'Posting message'
+            }
+        })
+
         const response = await axios({
             url: createPostUrl.replace('chatId', chatId),
             method: 'POST',
@@ -146,6 +330,12 @@ const postMessage = async (chatId: string, token: string, message: string, attac
     }
     catch (e) {
         console.error('Error posting message:', e)
+        logger.error({
+            message: {
+                customMessage: 'Error posting messsage',
+                error: isCircular(e) ? '[circular object]' : e
+            }
+        })
     }
 }
 

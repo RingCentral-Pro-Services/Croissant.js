@@ -15,7 +15,7 @@ import { AuditItemModel } from './audit-trail/models/AuditItemModel'
 import { NotificationModel } from './notifications/models/NotificationModel';
 
 const app = express();
-app.use(express.json())
+app.use(express.json({ limit: "50mb", extended: true }));
 app.use(authrouter)
 app.use(feedbackRouter)
 app.use(accessControlRouter)
