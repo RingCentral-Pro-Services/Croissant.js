@@ -12,6 +12,65 @@ import { isCircular } from "../../utils/utils";
 const createPostUrl = 'https://platform.ringcentral.com/team-messaging/v1/chats/chatId/posts'
 const uploadFileUrl = 'https://platform.ringcentral.com/team-messaging/v1/files'
 
+export const processSupportRequestV2 = async (req: Request, res: Response) => {
+    const token = req.headers.authorization
+    const chatId = process.env.SUPPORT_CHAT_ID
+    const body = req.body
+
+    if (!chatId) {
+        logger.warn({
+            message: {
+                customMessage: 'Support chat ID not found'
+            }
+        })
+        res.status(500).send()
+        return
+    }
+
+    if (!token) {
+        logger.warn({
+            message: {
+                customMessage: 'Missing authorization token'
+            }
+        })
+        res.status(401).send('Authorization token required')
+        return
+    }
+
+    const uploadedFilename = `uploaded-file-${getRandomId()}.xlsx`
+    const uploadedFileBase64 = body.uploadedFileBase64
+
+    if (uploadedFileBase64 && uploadedFileBase64.length > 0) {
+        const base64Buffer = Buffer.from(uploadedFileBase64, 'base64');
+        fs.writeFileSync(uploadedFilename, base64Buffer)
+    }
+
+    const errorsFilename = `reconstructed-errors-${getRandomId()}.xlsx`
+    const messages: Message[] = body.messages
+    const errors: SyncError[] = body.errors
+    const messageData = reconstructErrorsAndMessages(errors, messages)
+
+    if (messageData && (messageData.errors.length > 0 || messageData.messages.length > 0)) {
+        await writeExcelFile([{
+            sheetName: 'messages',
+            data: messageData?.messages,
+            startingRow: 1,
+            vertical: false
+        }, {
+            sheetName: 'errors',
+            data: messageData?.errors,
+            startingRow: 1,
+            vertical: false
+        }], errorsFilename)
+    }
+
+    const userText = body.userText
+    const attachments = await getAttachmentIds(uploadedFilename, errorsFilename, token)
+    await postMessage(chatId, token, userText, attachments)
+    res.send('OK')
+    cleanupFiles(uploadedFilename, errorsFilename)
+}
+
 export const processSupportRequest = async (req: Request, res: Response) => {
     const form = formidable({});
     const token = req.headers.authorization
@@ -67,8 +126,8 @@ export const processSupportRequest = async (req: Request, res: Response) => {
 
         const uploadedFilename = `uploaded-file-${getRandomId()}.xlsx`
         const fileBase64 = fields.fileBase64 as string
+
         if (fileBase64) {
-            const base64Data = fileBase64.replace(/^data:application\/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,/, "");
             const base64Buffer = Buffer.from(fileBase64, 'base64');
             fs.writeFileSync(uploadedFilename, base64Buffer)
         }
@@ -96,6 +155,16 @@ export const processSupportRequest = async (req: Request, res: Response) => {
     });
 
     res.send('OK')
+}
+
+const cleanupFiles = (uploadedFilePath: string, errorsPath: string) => {
+    if (uploadedFilePath && fs.existsSync(uploadedFilePath)) {
+        fs.unlinkSync(uploadedFilePath)
+    }
+
+    if (errorsPath && fs.existsSync(errorsPath)) {
+        fs.unlinkSync(errorsPath)
+    }
 }
 
 const parseMessagesAndErrors = (rawErrors: string, rawMessages: string) => {
@@ -141,6 +210,10 @@ const reconstructErrorsAndMessages = (errors?: SyncError[], messages?: Message[]
                 error: isCircular(e) ? '[circular object]' : e
             }
         })
+        return {
+            errors: [],
+            messages: []
+        }
     }
 }
 
