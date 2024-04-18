@@ -21,8 +21,20 @@ export const processSupportRequest = async (req: Request, res: Response) => {
     })
 
     const form = formidable({});
+    logger.info({
+        message: {
+            customMessage: 'Created form object'
+        }
+    })
+    
     const token = req.headers.authorization
     const chatId = process.env.SUPPORT_CHAT_ID
+
+    logger.info({
+        message: {
+            customMessage: 'Created form object'
+        }
+    })
 
     if (!chatId) {
         logger.warn({
