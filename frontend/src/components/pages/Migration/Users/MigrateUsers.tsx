@@ -953,6 +953,16 @@ const MigrateUsers = () => {
             }
         }
 
+        for (let bundle of messageOnlyBundles) {
+            const vmRecipient = originalExtensionList.find((ext) => ext.data.id === bundle.extendedData?.vmRecipientID)
+
+            if (!vmRecipient) {
+                continue
+            }
+
+            bundle.vmRecipientName = vmRecipient.data.name
+        }
+
         const callRecordingRows: CallRecordingExcelRow[] = []
         if (callRecordingSettings && callRecordingSettings.members) {
             for (let member of callRecordingSettings.members) {

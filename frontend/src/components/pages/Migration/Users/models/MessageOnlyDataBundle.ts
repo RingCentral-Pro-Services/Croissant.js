@@ -7,6 +7,7 @@ export class MessageOnlyDataBundle implements ExcelFormattable {
     public hasEncounteredFatalError = false
     public tempExtension = ''
     public vmRecipient = ''
+    public vmRecipientName = ''
     
     constructor(public extension: Extension, public extendedData?: ExtendedMOData, public phoneNumberMap?: Map<string, PhoneNumber>) {}
 
@@ -25,8 +26,8 @@ export class MessageOnlyDataBundle implements ExcelFormattable {
             this.extension.data.regionalSettings?.formattingLocale.name ?? '',
             this.extension.data.regionalSettings?.language.name ?? '',
             this.extension.data.regionalSettings?.timeFormat ?? '',
-            this.extendedData?.greeting ? 'Custom' : 'Default',
-            this.extendedData?.vmRecipientID ? this.extendedData.vmRecipientID : this.extension.data.name,
+            this.extendedData?.greeting?.custom ? 'Custom' : 'Default',
+            this.extendedData?.vmRecipientID ? this.vmRecipientName : this.extension.data.name,
             this.extendedData?.notifications?.voicemails.includeTranscription ? '' : '', // Come back to this
             this.extendedData?.notifications?.emailAddresses.join(', ') ?? '',
             this.prettyVoicemailNotificationSettings(),
