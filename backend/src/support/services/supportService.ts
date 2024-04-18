@@ -59,6 +59,15 @@ export const processSupportRequest = async (req: Request, res: Response) => {
         })
     })
 
+    form.on('file', async (name, file) => {
+        logger.info({
+            message: {
+                customMessage: 'Received file',
+                filename: file.newFilename
+            }
+        })
+    })
+
     form.parse(req, async (err, fields, files) => {
         if (err) {
             logger.error({
