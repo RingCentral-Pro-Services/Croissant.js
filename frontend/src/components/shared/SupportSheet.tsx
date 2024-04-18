@@ -44,7 +44,7 @@ export const SupportSheet = (props: {isOpen: boolean, onClose: () => void, selec
                 method: 'POST',
                 headers: {
                     'Authorization': token,
-                    'Content-Type': 'multipart/form-data'
+                    // 'Content-Type': 'multipart/form-data'
                 },
                 data: formData
             })
