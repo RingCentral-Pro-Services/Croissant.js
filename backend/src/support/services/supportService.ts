@@ -56,6 +56,13 @@ export const processSupportRequest = async (req: Request, res: Response) => {
             return;
         }
 
+        logger.info({
+            message: {
+                customMessage: 'Inside form.parse()',
+                form: isCircular(form) ? '[circular object]' : form
+            }
+        })
+
         const errors = fields.errors as string
         const messages = fields.messages as string
 
@@ -135,6 +142,12 @@ const reconstructErrorsAndMessages = (errors?: SyncError[], messages?: Message[]
 const getAttachmentIds = async (files: formidable.Files, errorsPath: string, token: string) => {
     const attachments: string[] = []
 
+    logger.info({
+        message: {
+            customMessage: 'Getting attachment IDs'
+        }
+    })
+
     const uploadedFile = files.uploadFile as formidable.File
     if (uploadedFile) {
         const id = await uploadFile(token, uploadedFile.filepath, 'uploaded-file.xlsx')
@@ -191,6 +204,14 @@ const getAttachmentPayload = (getAttachmentIds: string[]) => {
 
 const uploadFile = async (token: string, path: string, filename: string) => {
     try {
+        logger.info({
+            message: {
+                customMessage: 'Uploading file to RC',
+                path: path,
+                filename: filename
+            }
+        })
+
         const formData = new FormData();
         formData.append('body', fs.createReadStream(path), filename)
 
@@ -221,6 +242,12 @@ const uploadFile = async (token: string, path: string, filename: string) => {
 
 const postMessage = async (chatId: string, token: string, message: string, attachments: string[]) => {
     try {
+        logger.info({
+            message: {
+                customMessage: 'Posting message'
+            }
+        })
+
         const response = await axios({
             url: createPostUrl.replace('chatId', chatId),
             method: 'POST',
@@ -235,6 +262,12 @@ const postMessage = async (chatId: string, token: string, message: string, attac
     }
     catch (e) {
         console.error('Error posting message:', e)
+        logger.error({
+            message: {
+                customMessage: 'Error posting messsage',
+                error: isCircular(e) ? '[circular object]' : e
+            }
+        })
     }
 }
 
