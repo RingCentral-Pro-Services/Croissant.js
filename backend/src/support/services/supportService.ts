@@ -13,22 +13,9 @@ const createPostUrl = 'https://platform.ringcentral.com/team-messaging/v1/chats/
 const uploadFileUrl = 'https://platform.ringcentral.com/team-messaging/v1/files'
 
 export const processSupportRequest = async (req: Request, res: Response) => {
-
-    logger.info({
-        message: {
-            customMessage: '/api/support'
-        }
-    })
-
     const form = formidable({});
     const token = req.headers.authorization
     const chatId = process.env.SUPPORT_CHAT_ID
-
-    logger.info({
-        message: {
-            customMessage: 'Created form object'
-        }
-    })
 
     if (!chatId) {
         logger.warn({
@@ -59,15 +46,6 @@ export const processSupportRequest = async (req: Request, res: Response) => {
         })
     })
 
-    form.on('file', async (name, file) => {
-        logger.info({
-            message: {
-                customMessage: 'Received file',
-                filename: file.newFilename
-            }
-        })
-    })
-
     form.parse(req, async (err, fields, files) => {
         if (err) {
             logger.error({
@@ -80,19 +58,20 @@ export const processSupportRequest = async (req: Request, res: Response) => {
             return;
         }
 
-        logger.info({
-            message: {
-                customMessage: 'Inside form.parse()',
-                form: isCircular(form) ? '[circular object]' : form
-            }
-        })
-
         const errors = fields.errors as string
         const messages = fields.messages as string
 
         const errorsAndMessages = parseMessagesAndErrors(errors, messages)
         const errorsFilename = `reconstructed-errors-${getRandomId()}.xlsx`
         const reconstructedErrorData = reconstructErrorsAndMessages(errorsAndMessages?.errors, errorsAndMessages?.messages)
+
+        const uploadedFilename = `uploaded-file-${getRandomId()}.xlsx`
+        const fileBase64 = fields.fileBase64 as string
+        if (fileBase64) {
+            const base64Data = fileBase64.replace(/^data:application\/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,/, "");
+            const base64Buffer = Buffer.from(fileBase64, 'base64');
+            fs.writeFileSync(uploadedFilename, base64Buffer)
+        }
 
         if (reconstructedErrorData) {
             await writeExcelFile([{
@@ -108,10 +87,12 @@ export const processSupportRequest = async (req: Request, res: Response) => {
             }], errorsFilename)
         }
 
-        const attachments = await getAttachmentIds(files, errorsFilename, token)
+        const attachments = await getAttachmentIds(uploadedFilename, errorsFilename, token)
         const userText = fields.userText as string
+
         await postMessage(chatId, token, userText, attachments)
         fs.unlinkSync(errorsFilename)
+        fs.unlinkSync(uploadedFilename)
     });
 
     res.send('OK')
@@ -163,7 +144,7 @@ const reconstructErrorsAndMessages = (errors?: SyncError[], messages?: Message[]
     }
 }
 
-const getAttachmentIds = async (files: formidable.Files, errorsPath: string, token: string) => {
+const getAttachmentIds = async (uploadedFilePath: string, errorsPath: string, token: string) => {
     const attachments: string[] = []
 
     logger.info({
@@ -172,18 +153,8 @@ const getAttachmentIds = async (files: formidable.Files, errorsPath: string, tok
         }
     })
 
-    const uploadedFile = files.uploadFile as formidable.File
-    if (uploadedFile) {
-        const id = await uploadFile(token, uploadedFile.filepath, 'uploaded-file.xlsx')
-
-        if (id) {
-            attachments.push(id)
-        }
-    }
-
-    const generatedErrors = files.generatedErrors as formidable.File
-    if (generatedErrors) {
-        const id = await uploadFile(token, generatedErrors.filepath, 'errors.xlsx')
+    if (uploadedFilePath && fs.existsSync(uploadedFilePath)) {
+        const id = await uploadFile(token, uploadedFilePath, 'uploaded-file.xlsx')
 
         if (id) {
             attachments.push(id)
