@@ -80,6 +80,7 @@ export class LimitedExtensionDataBundle implements ExcelFormattable {
     prettyGreeting(greetingType: string) {
         const unavailableGreeting = this.extendedData?.businessHoursCallHandling?.greetings.find((greeting) => greeting.type === greetingType)
         if (!unavailableGreeting) return ''
+        if (unavailableGreeting.preset.name === 'None') return 'OFF'
         if (unavailableGreeting.custom) return 'Custom'
         return 'Default'
     }
