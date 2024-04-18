@@ -1,9 +1,7 @@
 import express from 'express';
 import { isRcEmployee } from '../../audit-trail/middleware/isRcEmployee';
-import { processSupportRequest } from '../services/supportService';
+import { processSupportRequest, processSupportRequestV2 } from '../services/supportService';
 
 export const router = express.Router();
-router.use(express.urlencoded({
-    extended: true
-    }));
 router.post('/api/support', isRcEmployee, processSupportRequest)
+router.post('/api/v2/support', isRcEmployee, processSupportRequestV2)

@@ -20,63 +20,55 @@ export const SupportSheet = (props: { isOpen: boolean, onClose: () => void, sele
             const token = localStorage.getItem('rc_access_token')
             if (!token || !inputText || inputText.length === 0) return
 
-            const formData = new FormData()
-            formData.set('userText', inputText)
+            let base64 = ''
 
             if (selectedFile) {
-                const base64 = await convertFileToBase64(selectedFile)
-                if (base64) {
-                    formData.append('fileBase64', base64)
+                const tempBase64 = await convertFileToBase64(selectedFile)
+                if (tempBase64) {
+                    base64 = tempBase64
                 }
             }
 
-            formData.append('errors', JSON.stringify(errors))
-            formData.append('messages', JSON.stringify(messages))
+            await axios({
+                method: 'POST',
+                url: '/api/v2/support',
+                headers: {
+                    'Authorization': token
+                },
+                data: {
+                    userText: inputText,
+                    messages: messages,
+                    errors: errors,
+                    ...(selectedFile && base64.length > 0 && {uploadedFileBase64: base64})
+                }
+            })
+            handleClose()
 
-            postMessage(token, formData)
+            // postMessage(token, formData)
         }
         catch (e) {
             console.log('Something went wrong submitting support request', e)
+            setError(`Something went wrong. Are you a member of the ${process.env.REACT_APP_APP_NAME} chat?`)
         }
     }
 
     const convertFileToBase64 = (file: File): Promise<string | undefined>  => {
         return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
+            const reader = new FileReader()
+            reader.readAsDataURL(file)
             reader.onload = function () {
                 const result = reader.result
                 if (!result || typeof result !== 'string') {
                     reject()
                     return
                 }
-                const base64String = result.split(',')[1]; // Extracting the Base64 content
-                resolve(base64String);
+                const base64String = result.split(',')[1]
+                resolve(base64String)
             };
             reader.onerror = function (error) {
-                reject(error);
+                reject(error)
             };
         });
-    }
-
-    const postMessage = async (token: string, formData: FormData) => {
-        try {
-            const res = await axios({
-                url: '/api/support',
-                method: 'POST',
-                headers: {
-                    'Authorization': token,
-                    // 'Content-Type': 'multipart/form-data'
-                },
-                data: formData
-            })
-            handleClose()
-        }
-        catch (e) {
-            console.log('Failed to post support message')
-            console.log(e)
-            setError(`Something went wrong. Are you a member of the ${process.env.REACT_APP_APP_NAME} chat?`)
-        }
     }
 
     return (
