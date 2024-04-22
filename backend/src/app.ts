@@ -63,6 +63,10 @@ app.get('/ivr-hours', (req: any, res: any) => {
   res.send([body])
 })
 
+app.post('/test', (req: any, res: any) => {
+  res.status(200).send('OK')
+})
+
 app.get('*', (req: any, res: any) => {
   res.sendFile(path.resolve(__dirname, '../../frontend/build', 'index.html'));
 })
