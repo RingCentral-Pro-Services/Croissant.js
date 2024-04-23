@@ -185,7 +185,7 @@ export const extensionSchema = z.object({
     'Email': z.string({
         required_error: 'Missing email',
         invalid_type_error: 'Email data type invalid'
-    }).trim(),
+    }).email('Email must be a valid email').trim(),
     'Extension': z.coerce.string({
         required_error: 'Missing extension number',
         invalid_type_error: 'Extension number data type invalid'
