@@ -14,7 +14,7 @@ const useExcelToExtensions = (shouldAlterEmails: boolean, postMessage: (message:
         let extensions: Extension[] = []
         for (let index = 0; index < excelData.length; index++) {
             const currentItem = excelData[index]
-            let firstName = currentItem['First Name']
+            let firstName: string = currentItem['First Name']
             let lastName = currentItem['Last Name']
             const type = currentItem['User Type']
 
@@ -22,6 +22,16 @@ const useExcelToExtensions = (shouldAlterEmails: boolean, postMessage: (message:
                 const result = evenlySplit(firstName)
                 firstName = result[0]
                 lastName = result[1]
+            }
+
+            if (firstName && firstName.includes('/')) {
+                firstName = firstName.replaceAll('/', ' ')
+                postMessage(new Message(`Slash removed from Ext. ${currentItem['Extension']}'s first name`, 'info'))
+            }
+
+            if (lastName && lastName.includes('/')) {
+                lastName = lastName.replaceAll('/', ' ')
+                postMessage(new Message(`Slash removed from Ext. ${currentItem['Extension']}'s last name`, 'info'))
             }
 
             const deviceType = currentItem['Existing Device Type'] ?? ''
