@@ -33,7 +33,7 @@ const useApplyRules = (postMessage: (message: Message) => void, postTimedMessage
             if (payload?.callHandlingAction !== 'TakeMessagesOnly') delete payload?.voicemail
             if (payload?.callHandlingAction !== 'TransferToExtension') delete payload?.transfer
             if (payload.callHandlingAction === 'TransferToExtension') {
-                if (extension.type !== 'Department') {
+                if (!['Site', 'Department'].includes(extension.type)) {
                     payload.voicemail = {
                         enabled: false,
                         recipient: {
@@ -43,7 +43,7 @@ const useApplyRules = (postMessage: (message: Message) => void, postTimedMessage
                 }
             }
             if (payload.callHandlingAction === 'PlayAnnouncementOnly') {
-                if (extension.type !== 'Department') {
+                if (!['Site', 'Department'].includes(extension.type)) {
                     payload.voicemail = {
                         enabled: false,
                         recipient: {
