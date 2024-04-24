@@ -54,6 +54,9 @@
      * @returns The isolated phone number as a string
      */
     isolatePhoneNumber(rawDestination: string) {
+        if (rawDestination.startsWith('"') && rawDestination.endsWith('"')) {
+            return rawDestination.substring(1, rawDestination.length - 1)
+        }
         return rawDestination.match(this.phoneNumber)?.toString().replace(/\D/g,'')
     }
 
