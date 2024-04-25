@@ -195,7 +195,7 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
     }
 
     const fetchAfterHoursCallHandling = async (userDataBundle: UserDataBundle, extensions: Extension[], token: string) => {
-        if (Object.keys(userDataBundle.extendedData!.businessHours!.schedule).length === 0) return
+        if (!userDataBundle.extendedData || !userDataBundle.extendedData.businessHours ||  Object.keys(userDataBundle.extendedData!.businessHours!.schedule).length === 0) return
 
         try {
             const headers = {
