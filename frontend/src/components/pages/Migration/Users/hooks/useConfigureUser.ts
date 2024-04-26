@@ -532,6 +532,8 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
                 }
             }
 
+            fixNotifications(bundle)
+
             const response = await RestCentral.put(baseNotificationsSettingsURL.replace('extensionId', `${bundle.extension.data.id}`), headers, bundle.extendedData?.notifications)
 
             if (response.rateLimitInterval > 0) {
@@ -550,6 +552,38 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
             postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to set notifications', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
+    }
+
+    // Sometimes users have invalid (missing) advanced email addresses. This function will fix them
+    const fixNotifications = (bundle: UserDataBundle) => {
+        let didFixEmails = false
+        if (bundle.extendedData?.notifications?.advancedMode) {
+            if (!bundle.extendedData.notifications.inboundFaxes.advancedEmailAddresses || bundle.extendedData.notifications.inboundFaxes.advancedEmailAddresses.length === 0) {
+                bundle.extendedData.notifications.inboundFaxes.advancedEmailAddresses = [bundle.extension.data.contact.email]
+                didFixEmails = true
+            }
+            if (!bundle.extendedData.notifications.inboundTexts.advancedEmailAddresses || bundle.extendedData.notifications.inboundTexts.advancedEmailAddresses.length === 0) {
+                bundle.extendedData.notifications.inboundTexts.advancedEmailAddresses = [bundle.extension.data.contact.email]
+                didFixEmails = true
+            }
+            if (!bundle.extendedData.notifications.missedCalls.advancedEmailAddresses || bundle.extendedData.notifications.missedCalls.advancedEmailAddresses.length === 0) {
+                bundle.extendedData.notifications.missedCalls.advancedEmailAddresses = [bundle.extension.data.contact.email]
+                didFixEmails = true
+            }
+            if (!bundle.extendedData.notifications.outboundFaxes.advancedEmailAddresses || bundle.extendedData.notifications.outboundFaxes.advancedEmailAddresses.length === 0) {
+                bundle.extendedData.notifications.outboundFaxes.advancedEmailAddresses = [bundle.extension.data.contact.email]
+                didFixEmails = true
+            }
+            if (!bundle.extendedData.notifications.voicemails.advancedEmailAddresses || bundle.extendedData.notifications.voicemails.advancedEmailAddresses.length === 0) {
+                bundle.extendedData.notifications.voicemails.advancedEmailAddresses = [bundle.extension.data.contact.email]
+                didFixEmails = true
+            }
+        }
+
+        if (didFixEmails) {
+            postMessage(new Message(`Fixed invalid advanced email addresses for ${bundle.extension.data.name} Ext. ${bundle.extension.data.extensionNumber}`, 'warning'))
+        }
+
     }
 
     const enableIntercom = async (bundle: UserDataBundle, deviceID: string, token: string) => {
