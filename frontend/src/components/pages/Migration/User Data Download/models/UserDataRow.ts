@@ -72,7 +72,7 @@ export class UserDataRow implements ExcelFormattable {
             this.afterHoursGreeting('ConnectingAudio'),
             this.afterHoursGreeting('HoldMusic'),
             this.blockedCallSettings?.mode ?? '',
-            this.blockedPhoneNumbers?.map((number) => `${number.label} - ${number.phoneNumber}`).join('\n') ?? '',
+            this.blockedPhoneNumbers?.map((number) => `${number.label ?? '[No label]'} - ${number.phoneNumber}`).join('\n') ?? '',
             this.blockedCallSettings?.noCallerId ?? '',
             this.blockedCallSettings?.payPhones ?? '',
             this.prettyForwardAllCalls(),
@@ -313,9 +313,17 @@ export class UserDataRow implements ExcelFormattable {
 
         let result = ''
 
-        for (const line of this.presenseLines) {
+        result += `Line ${1} - Ext. ${this.extension.data.extensionNumber}\n`
+        result += `Line ${2} - Ext. ${this.extension.data.extensionNumber}\n`
+
+        for (let index = 2; index < this.presenseLines.length; index++) {
+            const line = this.presenseLines[index]
             result += `Line ${line.id} - Ext. ${line.extension.extensionNumber}\n`
         }
+
+        // for (const line of this.presenseLines) {
+        //     result += `Line ${line.id} - Ext. ${line.extension.extensionNumber}\n`
+        // }
 
         return result
     }

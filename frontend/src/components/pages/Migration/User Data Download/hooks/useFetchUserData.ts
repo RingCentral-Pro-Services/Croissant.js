@@ -164,7 +164,7 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
                 const extensionID = userDataBundle.extendedData.businessHoursCallHandling.missedCall.extension.id
                 const extension = extensions.find((ext) => `${ext.data.id}` === `${extensionID}`)
                 if (extension) {
-                    userDataBundle.extendedData.businessHoursCallHandling.missedCall.extension.id = `${extension.data.name} - ${extension.data.extensionNumber}`
+                    userDataBundle.extendedData.businessHoursCallHandling.missedCall.extension.displayName = `${extension.data.name} - ${extension.data.extensionNumber}`
                 }
             }
 
