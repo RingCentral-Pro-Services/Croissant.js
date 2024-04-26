@@ -17,6 +17,7 @@ interface BasicRuleData {
 const useFetchMainSite = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgress, setMaxProgress] = useState(2)
+    const basicSettingsUrl = 'https://platform.ringcentral.com/restapi/v1.0/account/~/sites'
     const baseBusinessHoursURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/business-hours'
     const baseCallHandlingURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/answering-rule/ruleId'
     const baseCustomRulesURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/answering-rule'
@@ -50,6 +51,7 @@ const useFetchMainSite = (postMessage: (message: Message) => void, postTimedMess
         const bundle = new SiteDataBundle(siteData)
 
         await fetchBusinessHours(bundle, accessToken)
+        await fetchBasicSettings(bundle, accessToken)
         await fetchBusinessHoursCallHandling(bundle, accessToken)
         await fetchAfterHoursCallHandling(bundle, accessToken)
         const rules = await fetchCustomRuleIDs(bundle, accessToken)
@@ -61,6 +63,41 @@ const useFetchMainSite = (postMessage: (message: Message) => void, postTimedMess
         }
 
         return bundle
+    }
+
+    const fetchBasicSettings = async (bundle: SiteDataBundle, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const response = await RestCentral.get(basicSettingsUrl, headers)
+            const mainSite: SiteData = response.data.records.find((site: any) => site.id === 'main-site')
+
+            if (!mainSite) {
+                console.log('Main site not found')
+            }
+
+            bundle.extension.businessAddress = mainSite.businessAddress
+            bundle.extension.regionalSettings = mainSite.regionalSettings
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to get basic main site settings`)
+            console.log(e)
+            postMessage(new Message(`Failed to get address and regional settings for ${bundle.extension.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.name, parseInt(bundle.extension.extensionNumber), ['Failed to fetch address and regional settings', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
     }
 
     const fetchBusinessHours = async (bundle: SiteDataBundle, token: string) => {
