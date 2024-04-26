@@ -22,7 +22,20 @@ interface SiteData {
     regionalSettings: {
         timezone?: {
             name: string
-        }
+        },
+        formattingLocale?: {
+            name: string
+        },
+        greetingLanguage?: {
+            name: string
+        },
+        language?: {
+            name: string
+        },
+        homeCountry?: {
+            name: string
+        },
+        timeFormat?: string
     }
     code?: string
 }

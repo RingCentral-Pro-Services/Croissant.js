@@ -27,6 +27,11 @@ export class SiteDataBundle implements ExcelFormattable {
             this.extension.operator?.name ?? '', // Company fax / SMS recipient. Seems to have been deleted elsewhere. Look into this
             '', // Zero dialing settings
             this.extension.regionalSettings.timezone?.name ?? '',
+            this.extension.regionalSettings.formattingLocale?.name ?? '',
+            this.extension.regionalSettings.greetingLanguage?.name ?? '',
+            this.extension.regionalSettings.homeCountry?.name ?? '',
+            this.extension.regionalSettings.language?.name ?? '',
+            this.extension.regionalSettings.timeFormat ?? '',
             this.prettyCustomRules()
         ]
     }

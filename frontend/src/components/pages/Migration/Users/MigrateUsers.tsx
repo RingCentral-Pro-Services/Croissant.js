@@ -1060,6 +1060,12 @@ const MigrateUsers = () => {
 
         const roles = customRoles.map((role) => new CustomRoleExport(role))
 
+        const exportedSites = []
+        if (mainSiteBundle) {
+            exportedSites.push(mainSiteBundle)
+        }
+        exportedSites.push(...siteBundles)
+
         await exportPrettyExcel([
             {sheetName: 'Users', data: rows, startingRow: 6},
             {sheetName: 'Call Queues', data: callQueueBundles, startingRow: 5},
@@ -1070,7 +1076,7 @@ const MigrateUsers = () => {
             {sheetName: 'Call Monitoring', data: callMonitoringBundles, startingRow: 4},
             {sheetName: 'Park Locations', data: parkLocationBundles, startingRow: 3},
             {sheetName: 'Call Recording', data: callRecordingRows, startingRow: 16},
-            {sheetName: 'Sites', data: siteBundles, startingRow: 3},
+            {sheetName: 'Sites', data: exportedSites, startingRow: 3},
             {sheetName: 'Hot Desk Phones', data: hotDeskingDeviceRows, startingRow: 3},
             {sheetName: 'Unassigned Devices', data: unassignedDeviceRows, startingRow: 4},
             {sheetName: 'Emergency Response Locations', data: erlRows, startingRow: 3},
