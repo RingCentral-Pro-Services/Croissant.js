@@ -8,7 +8,7 @@ const useExcelToSites = (regionalFormats: RegionalFormat[]) => {
 
     // This may not be the best way to do this, but it works for now
     const timezoneMap = new Map<string, string>([
-        ['US/Eastern', '51'],
+        ['US/Eastern', '96'],
         ['US/Central', '98'],
         ['US/Mountain', '100'],
         ['US/Pacific', '101'],
