@@ -1364,7 +1364,7 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
 
             if (customRule.callHandlingAction === 'TakeMessagesOnly') {
 
-                const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === customRule.voicemail?.recipient.id)
+                const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === `${customRule.voicemail?.recipient.id}`)
                 if (!originalExtension) {
                     postMessage(new Message(`Failed to adjust voicemail recipient for custom rule ${customRule.name} on user ${bundle.extension.data.name}`, 'error'))
                     postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to adjust custom rule', customRule.name]))
