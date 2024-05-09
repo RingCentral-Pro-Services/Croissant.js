@@ -20,7 +20,7 @@ const useExtension = (postMessage: (message: Message) => void, postTimedMessage:
     const baseDeviceURL = ''
     const baseWaitingPeriod = 250
 
-    const createExtension = async (extension: Extension, id?: string) => {
+    const createExtension = async (extension: Extension, shouldUploadDevices: boolean, id?: string) => {
         const accessToken = localStorage.getItem('cs_access_token')
         if (!accessToken) {
             throw new Error('No access token')
@@ -43,7 +43,11 @@ const useExtension = (postMessage: (message: Message) => void, postTimedMessage:
             }
         }
         await setRegionalSettings(extension, accessToken)
-        await addDevice(extension, accessToken)
+
+        if (shouldUploadDevices) {
+            await addDevice(extension, accessToken)    
+        }
+
         callback()
     }
 

@@ -831,6 +831,22 @@ const defaultDevices = [
         "orderingCapability": "Enabled"
     },
     {
+        "type": "HardPhone",
+        "sku": "HP-65",
+        "model": {
+            "id": "65",
+            "name": "Polycom VVX411",
+            "lineCount": 12,
+            "addons": [],
+            "features": [
+                "Intercom",
+                "Paging",
+                "BLA",
+                "HELD"
+            ]
+        }
+    },
+    {
         "sku": "HP-79",
         "skuId": "LC_HD_611",
         "type": "HardPhone",
@@ -2025,11 +2041,11 @@ const useDeviceDictionary = (postMessage: (message: Message) => void, postTimedM
             }, 5000)
             const response = await RestCentral.get(url, headers)
             const devices = response.data.records as Device[]
-            
+
             if (response.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
-            
+
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
             return devices
         }
@@ -2046,7 +2062,7 @@ const useDeviceDictionary = (postMessage: (message: Message) => void, postTimedM
         }
     }
 
-    return {fetchDeviceDictionary}
+    return { fetchDeviceDictionary }
 }
 
 export default useDeviceDictionary
