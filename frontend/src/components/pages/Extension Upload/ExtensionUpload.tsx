@@ -54,6 +54,7 @@ const ExtensionUpload = () => {
     const [deviceDictionary, setDeviceDictionary] = useState<Device[]>([])
     const [accountSites, setAccountSites] = useState<SiteData[]>([])
     const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
+    const [shouldUploadDevices, setShouldUploadDevices] = useState(true)
     const defaultSheet = 'Users'
     const supportedExtensionTypes = ['Announcement-Only', 'Message-Only', 'Limited Extension', 'User', 'Virtual User']
 
@@ -177,15 +178,15 @@ const ExtensionUpload = () => {
     useEffect(() => {
         if (currentExtensionIndex >= filteredExtensions.length || !isSyncing) return
         if (filteredExtensions[currentExtensionIndex].data.type === 'User') {
-            createExtension(filteredExtensions[currentExtensionIndex], `${unassignedUserIDs[userIDIndex]}`)
+            createExtension(filteredExtensions[currentExtensionIndex], shouldUploadDevices, `${unassignedUserIDs[userIDIndex]}`)
             setUserIDIndex(prev => prev + 1)
         }
         else if (filteredExtensions[currentExtensionIndex].data.type === 'Limited') {
-            createExtension(filteredExtensions[currentExtensionIndex], `${unassignedLEIDs[limitedIDIndex]}`)
+            createExtension(filteredExtensions[currentExtensionIndex], shouldUploadDevices, `${unassignedLEIDs[limitedIDIndex]}`)
             setLimitedIDIndex(prev => prev + 1)
         }
         else {
-            createExtension(filteredExtensions[currentExtensionIndex])
+            createExtension(filteredExtensions[currentExtensionIndex], shouldUploadDevices)
         }
     }, [currentExtensionIndex, isSyncing])
 
@@ -261,7 +262,8 @@ const ExtensionUpload = () => {
                 <FileSelect enabled={!isSyncing} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
                 <AdaptiveFilter title='Extension Types' placeholder='search' options={supportedExtensionTypes} defaultSelected={supportedExtensionTypes} setSelected={setSelectedExtensionTypes} disabled={isExtensionConverPending || isSyncing} />
                 <Button variant="filled" disabled={filteredExtensions.length === 0 || userDeficit > 0 || leDeficit > 0 || isSyncing} onClick={handleSyncButtonClick}>Sync</Button>
-                <FormControlLabel className='healthy-margin-left' control={<Checkbox defaultChecked onChange={() => setShouldAlterEmails(!shouldAlterEmails)} />} label="Add .ps.ringcentral.com" />
+                <FormControlLabel className='healthy-margin-left' control={<Checkbox defaultChecked value={shouldAlterEmails} onChange={() => setShouldAlterEmails(!shouldAlterEmails)} />} label="Add .ps.ringcentral.com" />
+                <FormControlLabel className='healthy-margin-left' control={<Checkbox defaultChecked value={shouldUploadDevices} onChange={() => setShouldAlterEmails(!shouldUploadDevices)} />} label="Upload devices" />
                 <Modal open={isShowingModal} setOpen={setIsShowingModal} handleAccept={() => console.log('acceptance')} title='Not enough unassigned extensions' body={deficitLabel} acceptLabel='Okay' />
                 {(isSyncing && currentExtensionIndex === filteredExtensions.length) ? <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button> : <></>}
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Extension Upload" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
