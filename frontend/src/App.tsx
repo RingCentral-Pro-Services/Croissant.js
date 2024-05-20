@@ -55,6 +55,7 @@ import { AlertCenter } from './components/pages/Alert Center/AlertCenter';
 import Credentials from './components/pages/Credentials/Credentials';
 import AccountInsights from './components/pages/Insights/AccountInsights';
 import { useSettings } from './components/pages/Settings/hooks/useSettings';
+import { DeviceERLs } from './components/pages/ERLs/DeviceERLs';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -196,6 +197,7 @@ function App() {
                 <Route path='/convert-users' element={<ConvertUsers />} />
                 <Route path='/credentials' element={<Credentials />} />
                 <Route path='/account-insights' element={<AccountInsights />} />
+                <Route path='/device-erls' element={<DeviceERLs />} />
               </Routes>
             </Suspense>
           </ErrorBoundary>
