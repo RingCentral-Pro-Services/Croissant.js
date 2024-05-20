@@ -7,7 +7,7 @@ import { useAuditTrail } from "../hooks/useAuditTrail";
 const sign = require('jwt-encode');
 const axios = require('axios').default;
 
-const useGetAccessToken = () => {
+const useGetAccessToken = (callback?: () => void) => {
     const [hasCustomerToken, setHasToken] = useState(false)
     const [accountID, setAccountID] = useState('')
     const {companyName, isCompanyNamePending, getCompanyName, reset} = useGetCompanyName()
@@ -55,6 +55,7 @@ const useGetAccessToken = () => {
             setAccountID(uid)
             getCompanyName()
             setIsTokenPending(false)
+            if (callback) callback()
             // setHasToken(true)
         })
         .catch((res: any) => {
