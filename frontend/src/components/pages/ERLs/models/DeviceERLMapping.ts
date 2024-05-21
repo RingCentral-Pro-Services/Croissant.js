@@ -15,8 +15,8 @@ export class DeviceERLMapping implements DataGridFormattable {
 
     toDataGidHeader(): any {
         return [
-            { field: 'deviceName', headerName: 'Device Name', width: 200 },
-            { field: 'erlName', headerName: 'ERL', width: 200 },
+            { field: 'deviceName', headerName: 'Device Name', width: 400 },
+            { field: 'erlName', headerName: 'ERL', width: 400 },
         ]
     }
 
