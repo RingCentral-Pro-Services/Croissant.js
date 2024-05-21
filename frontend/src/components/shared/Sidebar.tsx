@@ -130,6 +130,7 @@ const mockdata: SidebarGroup[] = [
       { label: 'Delete Extensions', link: '/deleteextensions' },
       { label: 'Edit Extensions', link: '/editextensions' },
       { label: 'Notifications', link: '/notificationsaudit' },
+      { label: 'Assign ERLs', link: '/device-erls' },
       { label: 'Custom Fields', link: '/customfields' },
       { label: 'Desk Phones', link: '/deskphones' },
       { label: 'Intercom', link: '/intercom' },
