@@ -10,7 +10,6 @@ import usePostTimedMessage from "../../../hooks/usePostTimedMessage"
 import { Device } from "../Migration/User Data Download/models/UserDataBundle"
 import { DeviceUserMapping } from "./models/DeviceUserMapping"
 import { Button } from "@mantine/core"
-import useWriteExcelFile from "../../../hooks/useWriteExcelFile"
 import useFetchERLs from "../Automatic Location Updates/hooks/useFetchERLs"
 import { ERL } from "../Automatic Location Updates/models/ERL"
 import useWritePrettyExcel from "../../../hooks/useWritePrettyExcel"
@@ -21,7 +20,7 @@ import useReadExcel from "../../../hooks/useReadExcel"
 import FileSelect from "../../shared/FileSelect"
 import useValidateExcelData from "../../../hooks/useValidateExcelData"
 import { deviceERLMappingSchema } from "./schemas/schemas"
-import { readERLData } from "./utils/utils"
+import { applyERL, readERLData } from "./utils/utils"
 import { DeviceERLMapping } from "./models/DeviceERLMapping"
 import FeedbackArea from "../../shared/FeedbackArea"
 
@@ -39,16 +38,7 @@ export const DeviceERLs = () => {
         const extensions = await fetchExtensions()
         const devices = await fetchAccountDevices()
         const erls = await fetchERLs()
-
-        console.log('Extensions')
-        console.log(extensions)
-
-        console.log('Devices')
-        console.log(devices)
-
         const devicesWithUsers = devices.filter((device) => device.extension && device.phoneLines && device.phoneLines.length > 0)
-        console.log('Devices with users')
-        console.log(devicesWithUsers)
 
         const validDevices: Device[] = []
         const mappings: DeviceUserMapping[] = []
@@ -70,21 +60,18 @@ export const DeviceERLs = () => {
         setDeviceUserMappings(mappings)
         setERLs(erls)
         setAccountDevices(devices)
-        console.log('Valid devices')
-        console.log(mappings)
     }
 
-    const {fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError, userName} = useGetAccessToken(setup)
+    const { fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError, userName } = useGetAccessToken(setup)
     const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
-    let {messages, errors, postMessage, postError} = useMessageQueue()
-    const {postTimedMessage, timedMessages} = usePostTimedMessage()
-    const {extensionsList, isExtensionListPending, fetchExtensions} = useExtensions(postMessage)
+    let { messages, errors, postMessage, postError } = useMessageQueue()
+    const { postTimedMessage, timedMessages } = usePostTimedMessage()
+    const { fetchExtensions } = useExtensions(postMessage)
     const { fetchAccountDevices } = useAccountDevices(postMessage, postTimedMessage, postError)
     const { fetchERLs } = useFetchERLs()
-    const {writeExcel} = useWriteExcelFile()
-    const {writePrettyExcel} = useWritePrettyExcel()
-    const {readFile, excelData, isExcelDataPending} = useReadExcel()
-    const {validate, validatedData, isDataValidationPending} = useValidateExcelData(deviceERLMappingSchema, postMessage, postError)
+    const { writePrettyExcel } = useWritePrettyExcel()
+    const { readFile, excelData, isExcelDataPending } = useReadExcel()
+    const { validate, validatedData, isDataValidationPending}  = useValidateExcelData(deviceERLMappingSchema, postMessage, postError)
 
     useEffect(() => {
         if (targetUID.length < 5) return
@@ -117,13 +104,18 @@ export const DeviceERLs = () => {
 
     useEffect(() => {
         if (isDataValidationPending) return
-        console.log('Valid data')
-        console.log(validatedData)
         const mappings = readERLData(validatedData, accountDevices, erls)
-        console.log('Mappings')
-        console.log(mappings)
         setDeviceERLMappings(mappings)
     }, [isDataValidationPending])
+
+    const handleSyncClick = async () => {
+        for (const mapping of deviceERLMappings) {
+            const token = localStorage.getItem('cs_access_token')
+            if (!token) continue
+
+            await applyERL(mapping, token, postMessage, postError, postTimedMessage)
+        }
+    }
 
     return (
         <>
@@ -151,6 +143,10 @@ export const DeviceERLs = () => {
                     defaultSheet={defaultSheet}
                     accept='.xlsx'
                 />
+                <Button
+                    disabled={deviceERLMappings.length === 0}
+                    onClick={handleSyncClick}
+                >Sync</Button>
                 <FeedbackArea
                     gridData={deviceERLMappings}
                     messages={messages}
