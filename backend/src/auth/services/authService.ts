@@ -6,6 +6,7 @@ import { isUserAdmin } from "../../access-control/services/dbService";
 import { AuditTrailItem } from "../../audit-trail/interface/AuditTrailItem";
 import { addAuditTrailItem } from "../../audit-trail/services/dbService";
 import { TokenData } from "../interfaces/TokenData";
+import { getToken } from "psi-auth";
 const axios = require('axios').default;
 
 export const processAuth = async (req: Request, res: Response, next: any) => {
@@ -149,5 +150,28 @@ export const refreshToken = async (req: Request, res: Response, next: any) => {
         console.log('Failed to refresh token')
         console.log(e)
         res.status(500).send({ message: 'Internal server error' })
+    }
+}
+
+export const testJwks = async (req: Request, res: Response) => {
+    try {
+        const tokenData = await getToken({
+            accountId: process.env.NEW_JWKS_ACCOUNT_ID!,
+            appName: process.env.NEW_JWKS_APP_NAME!
+        })
+
+        if (!tokenData) {
+            console.log('Next-generation JWKS request failed')
+            return res.status(500).send('Request failed')
+        }
+
+        console.log('Next-generation JWKS response')
+        console.log(tokenData)
+        return res.status(200).send('Request succeeded')
+    }
+    catch (e: any) {
+        console.log('Next-generation JWKS request failed')
+        console.log(e)
+        return res.status(500).send('Request failed')
     }
 }

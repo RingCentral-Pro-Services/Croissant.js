@@ -8,6 +8,7 @@
   "scripts": {
     "start": "node build/app.js",
     "build": "npm install && tsc && cd ../frontend && npm install && npm run build",
+    "build-backend": "tsc",
     "rebuild": "tsc && cd ../frontend && npm install && npm run build && cd ../backend && npm start"
   },
   "dependencies": {
@@ -23,6 +24,7 @@
     "formidable": "^2.0.1",
     "nodemailer": "^6.7.5",
     "pg": "^8.11.3",
+    "psi-auth": "^1.0.9",
     "sequelize": "^6.35.1"
   },
   "engines": {
