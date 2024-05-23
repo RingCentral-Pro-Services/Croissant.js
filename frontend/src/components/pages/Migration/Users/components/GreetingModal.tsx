@@ -10,7 +10,7 @@ export const GreetingModal = (props: {isOpen: boolean, onClose: () => void}) => 
             <Text className="mega-margin-bottom">This tool aims to reduce the time and effort spent migrating extensions from one RingEX account to another.</Text>
 
             <Title order={4}>Things to know</Title>
-            <Text>Please read through the list below and read the <a style={{textDecoration: "none"}} target="_blank" referrerPolicy="no-referrer" href="https://docs.google.com/document/d/1NPOAVj8PtRguiNT1JgQRbpYddefc_fFhu6KN0JGvKFA/edit?usp=sharing">Migration Tool Intro</a> if you haven't yet.</Text>
+            <Text>Please read through the list below and read the <a style={{textDecoration: "none"}} target="_blank" referrerPolicy="no-referrer" href="https://docs.google.com/document/d/1NPOAVj8PtRguiNT1JgQRbpYddefc_fFhu6KN0JGvKFA/edit?usp=sharing"><Text style={{display: 'inline'}} c='blue' fw={500}>Migration Tool Intro</Text></a> if you haven't yet.</Text>
             <ol style={{maxHeight: 200, overflowY: "auto"}}>
                     <li>Call Queue managers will receive an email, even if they're disabled</li>
                     <li>All users, regardless of their status, will be built as Not Activated</li>
