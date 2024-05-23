@@ -75,6 +75,7 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
                 await setAfterHoursCallHandling(bundle, adjustedAfterHoursCallHandling, accessToken)
             }
         }
+        await disableConnectingMessage(bundle, accessToken)
     }
 
     const setSchedule = async (bundle: CallQueueDataBundle, token: string) => {
@@ -884,6 +885,53 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
         } 
         catch (e) {
             postMessage(new Message(`Failed to adjust custom rule ${customRule.name} on queue ${bundle.extension.data.name}`, 'error'))
+        }
+    }
+
+    const disableConnectingMessage = async (bundle: CallQueueDataBundle, token: string) => {
+        if (!bundle.extendedData?.businessHoursCallHandling?.greetings) return
+
+        const introGreeting = bundle.extendedData.businessHoursCallHandling.greetings.find((greeting) => greeting.type === 'Introductory')
+        if ((!introGreeting) || (introGreeting && introGreeting.preset.name !== 'None')) return
+
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+
+            const url = baseCallHandlingURL.replace('extensionId', `${bundle.extension.data.id}`).replace('ruleId', 'business-hours-rule')
+
+            const body = {
+                greetings: [
+                    {
+                        type: 'ConnectingMessage',
+                        preset: {
+                            id: 134405
+                        }
+                    }
+                ]
+            }
+
+            const response = await RestCentral.put(url, headers, body)
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+
+            console.log(`Failed to disable connecting message for ${bundle.extension.data.name}`)
+            console.log(e)
+            postMessage(new Message(`Failed to disable connecting message for queue ${bundle.extension.data.name}. Please toggle greeting on and off in service web. ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Failed to disable connecting message', ''], e.error ?? '', bundle.extendedData.businessHoursCallHandling))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
 

@@ -6,10 +6,15 @@ interface ProgressBarProps {
     value: number
     max: number
     label: string
+    hidden?: boolean
 }
 
-const ProgressBar: React.FC<ProgressBarProps> = ({value, max, label, className}) => {
+const ProgressBar: React.FC<ProgressBarProps> = ({value, max, label, className, hidden = false}) => {
     const normalise = (value: number) => ((value) * 100) / (max);
+
+    if (hidden) {
+        return null
+    }
 
     return (
         <div className={`${className ? className : ''}`} style={{display: 'block'}}>
