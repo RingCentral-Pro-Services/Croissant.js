@@ -97,6 +97,7 @@ import { useAuditTrail } from "../../../../hooks/useAuditTrail";
 import { useUploadUnassignedDevices } from "./hooks/useUploadUnassignedDevices";
 import { SystemNotifications } from "../../../shared/SystemNotifications";
 import { SupportSheet } from "../../../shared/SupportSheet";
+import { GreetingModal } from "./components/GreetingModal";
 const FileSaver = require('file-saver');
 
 
@@ -120,6 +121,7 @@ const MigrateUsers = () => {
     const [isShowingModal, setIsShowingModal] = useState(false)
     const [isShowingSegregatedModal, setIsShowingSegregatedModal] = useState(false)
     const [isDone, setIsDone] = useState(false)
+    const [isShowingGreetingModal, setIsShowingGreetingModal] = useState(true)
     const currentUser = useAtomValue(userAtom)
     const supportedExtensionTypes = ['ERLs', 'Custom Roles', 'Call Recording Settings', 'Cost Centers', 'User', 'Limited Extension', 'Call Queue', 'IVR Menu', 'Prompt Library', 'Message-Only', 'Announcement-Only', 'Call Monitoring Groups', 'Park Location', 'User Group', 'Unassigned Devices']
 
@@ -1175,6 +1177,7 @@ const MigrateUsers = () => {
     return (
         <>
             <SystemNotifications toolName="Auto Migrate" />
+            <GreetingModal isOpen={isShowingGreetingModal} onClose={() => setIsShowingGreetingModal(false)} />
             <SupportSheet
                 isOpen={isSupportModalOpen} 
                 onClose={() => setIsSupportModalOpen(false)}
@@ -1193,20 +1196,6 @@ const MigrateUsers = () => {
             />
             <ImportAccountData isOpen={isShowingImportModal} setIsOpen={setIsShowingImportModal} />
             <Header title='Migration' body='Migrate from one account to another' onHelpButtonClick={() => setIsSupportModalOpen(true)} />
-            <ToolCard>
-                <h2>Things to know</h2>
-                <ol>
-                    <li>Call Queues with disabled greetings will not have the greeting properly disabled. You will need to go back and disable the greeting in service web.</li>
-                    <li>Call Queue managers will receive an email, even if they're disabled</li>
-                    <li>All users, regardless of their status, will be built as Not Activated</li>
-                    <li>Unassigned extensions must exist in the account and must be built with existing devices</li>
-                    <li>The next available extension will be used if the original extension number is already in use</li>
-                    <li>The next available extension will be used if the original extension number length exceeds the max length in the new account</li>
-                    <li>ATT/Verizon accounts are only supported as the original account. You cannot migrate <em>to</em> one of these accounts</li>
-                    <li>For ATT/Verizon accounts, you will need to click the segregated login button below and login as the customer</li>
-                    <li>Only unassigned devices with serial numbers will be migrated</li>
-                </ol>
-            </ToolCard>
             <ToolCard>
                 <h2>Original Account</h2>
                 <p>Enter the UID that you are migrating <em>from</em></p>
