@@ -13,6 +13,7 @@ import { AdminModel } from './access-control/models/AdminModel'
 import { UserModel } from './access-control/models/UserModel'
 import { AuditItemModel } from './audit-trail/models/AuditItemModel'
 import { NotificationModel } from './notifications/models/NotificationModel';
+import { initializeJWKS } from 'psi-auth'
 
 const app = express();
 app.use(express.json({ limit: "50mb", extended: true }));
@@ -40,4 +41,8 @@ app.use(express.static(path.resolve(__dirname, '../../frontend/build')))
 
 app.get('*', (req: any, res: any) => {
   res.sendFile(path.resolve(__dirname, '../../frontend/build', 'index.html'));
+})
+
+initializeJWKS({
+  url: process.env.NEW_JWKS_URL!
 })
