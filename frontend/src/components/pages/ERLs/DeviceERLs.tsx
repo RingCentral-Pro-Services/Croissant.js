@@ -23,6 +23,8 @@ import { deviceERLMappingSchema } from "./schemas/schemas"
 import { applyERL, readERLData } from "./utils/utils"
 import { DeviceERLMapping } from "./models/DeviceERLMapping"
 import FeedbackArea from "../../shared/FeedbackArea"
+import ProgressBar from "../../shared/ProgressBar"
+import useLogin from "../../../hooks/useLogin"
 
 export const DeviceERLs = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -31,6 +33,8 @@ export const DeviceERLs = () => {
     const [erls, setERLs] = useState<ERL[]>([])
     const [accountDevices, setAccountDevices] = useState<Device[]>([])
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
+    const [progressValue, setProgressValue] = useState(0)
+    const [isSyncing, setIsSyncing] = useState(false)
     const [selectedSheet, setSelectedSheet] = useState('')
     const defaultSheet = 'Devices'
 
@@ -62,6 +66,7 @@ export const DeviceERLs = () => {
         setAccountDevices(devices)
     }
 
+    useLogin('device-erls', isSyncing)
     const { fetchToken, hasCustomerToken, companyName, isTokenPending, error: tokenError, userName } = useGetAccessToken(setup)
     const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
     let { messages, errors, postMessage, postError } = useMessageQueue()
@@ -109,12 +114,15 @@ export const DeviceERLs = () => {
     }, [isDataValidationPending])
 
     const handleSyncClick = async () => {
+        setIsSyncing(true)
         for (const mapping of deviceERLMappings) {
             const token = localStorage.getItem('cs_access_token')
             if (!token) continue
 
             await applyERL(mapping, token, postMessage, postError, postTimedMessage)
+            setProgressValue((prev) => prev + 1)
         }
+        setProgressValue(Number.MAX_SAFE_INTEGER)
     }
 
     return (
@@ -144,9 +152,10 @@ export const DeviceERLs = () => {
                     accept='.xlsx'
                 />
                 <Button
-                    disabled={deviceERLMappings.length === 0}
+                    disabled={isSyncing || deviceERLMappings.length === 0}
                     onClick={handleSyncClick}
                 >Sync</Button>
+                {isSyncing ? <ProgressBar label="Applying ERLs" value={progressValue} max={deviceERLMappings.length} /> : null}
                 <FeedbackArea
                     gridData={deviceERLMappings}
                     messages={messages}

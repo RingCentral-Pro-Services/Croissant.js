@@ -104,7 +104,7 @@ const UIDInputField: React.FC<UIDInputFieldProps> = ({setTargetUID, disabled, di
                     data={accounts.map((account) => account.name)}
                     onChange={handleInput}
                     rightSection={loading ? <Loader size="1rem" /> : null}
-                    placeholder="Account UID"
+                    placeholder="Account ID"
                 />
                     {/* {error === '' ? <></> : <Typography sx={{display: 'block', color: 'red'}} variant='caption' >{error}</Typography>} */}
                 </div>
