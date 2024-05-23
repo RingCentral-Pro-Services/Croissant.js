@@ -1265,9 +1265,9 @@ const MigrateUsers = () => {
             </ToolCard>
             <ToolCard>
                 <h2>Make Selections</h2>
-                <AdaptiveFilter options={supportedExtensionTypes} title='Extension Types' placeholder='Search' setSelected={setSelectedExtensionTypes} />
-                {shouldShowSiteFilter ? <AdaptiveFilter options={siteNames} title='Sites' placeholder='Search' setSelected={setSelectedSiteNames} /> : <></>}
-                {isMultiSiteEnabled ? <FormControlLabel control={<Checkbox defaultChecked value={settings.shouldMigrateSites} onChange={(e) => setSettings({...settings, shouldMigrateSites: e.target.checked})} />} label="Migrate Sites" /> : <></>}
+                <AdaptiveFilter disabled={isPullingData} options={supportedExtensionTypes} title='Extension Types' placeholder='Search' setSelected={setSelectedExtensionTypes} />
+                {shouldShowSiteFilter ? <AdaptiveFilter disabled={isPullingData} options={siteNames} title='Sites' placeholder='Search' setSelected={setSelectedSiteNames} /> : <></>}
+                {isMultiSiteEnabled ? <FormControlLabel control={<Checkbox disabled={isPullingData} defaultChecked value={settings.shouldMigrateSites} onChange={(e) => setSettings({...settings, shouldMigrateSites: e.target.checked})} />} label="Migrate Sites" /> : <></>}
                 <Button variant='filled' onClick={handleDisoverButtonClick} disabled={ isPullingData || isOriginalExtensionListPending} >Discover</Button>
                 <Button variant='outline' className="healthy-margin-left" onClick={handleExportButtonClick}>Export Account Data</Button>
                 <div className="healthy-margin-top">
@@ -1287,18 +1287,18 @@ const MigrateUsers = () => {
                     </FormControl>
                     {settings.numberSourceSelection === 'Specific Extension' ? <TextField className='vertical-bottom' size='small' id="outlined-basic" label="Specific Extension" variant="outlined" value={settings.specificExtension} onChange={(e) => setSettings({...settings, specificExtension: e.target.value})} /> : <></>}
                 </div>
-                <ProgressBar value={fetchMainSiteProgess} max={maxFetchMainSiteProgress} label='Main Site' />
-                <ProgressBar value={fetchSitesProgress} max={maxFetchSitesProgress} label='Sites' />
-                <ProgressBar value={userFetchProgress} max={maxUserFetchProgress} label='Users' />
-                <ProgressBar value={messageOnlyFetchProgress} max={maxMessageOnlyFetchProgress} label='Message-Only Extensions & Announcement-Only Extensions' />
-                <ProgressBar value={callQueueFetchProgress} max={maxCallQueueFetchProgress} label='Call Queues' />
-                <ProgressBar value={fetchAudioPromtProgress} max={maxFetchAudioPromptProgress} label='Prompt Library' />
-                <ProgressBar value={ivrFetchProgress} max={maxIVRFetchProgress} label='IVR Menus' />
-                <ProgressBar value={fetchLEsProgress} max={maxFetchLEsProgress} label='Limited Extensions' />
-                <ProgressBar value={fetchCallMonitoringProgess} max={maxFetchCallMonitoringProgress} label='Call Monitoring Groups' />
-                <ProgressBar value={fetchParkLocationsProgress} max={maxFetchParkLocationsProgress} label='Park Locations' />
-                <ProgressBar value={fetchUserGroupsProgess} max={maxFetchUserGroupsProgress} label='User Groups' />
-                <FeedbackArea gridData={filteredExtensions} onFilterSelection={handleFilterSelection} messages={[]} errors={[]} timedMessages={[]} />
+                <ProgressBar hidden={!isPullingData} value={fetchMainSiteProgess} max={maxFetchMainSiteProgress} label='Main Site' />
+                <ProgressBar hidden={!isPullingData} value={fetchSitesProgress} max={maxFetchSitesProgress} label='Sites' />
+                <ProgressBar hidden={!isPullingData || !selectedExtensionTypes.includes('User')} value={userFetchProgress} max={maxUserFetchProgress} label='Users' />
+                <ProgressBar hidden={!isPullingData || !(selectedExtensionTypes.includes('Message-Only') || selectedExtensionTypes.includes('Announcement-Only'))} value={messageOnlyFetchProgress} max={maxMessageOnlyFetchProgress} label='Message-Only Extensions & Announcement-Only Extensions' />
+                <ProgressBar hidden={!isPullingData || !selectedExtensionTypes.includes('Call Queue')} value={callQueueFetchProgress} max={maxCallQueueFetchProgress} label='Call Queues' />
+                <ProgressBar hidden={!isPullingData || !selectedExtensionTypes.includes('Prompt Library')} value={fetchAudioPromtProgress} max={maxFetchAudioPromptProgress} label='Prompt Library' />
+                <ProgressBar hidden={!isPullingData || !selectedExtensionTypes.includes('IVR Menu')} value={ivrFetchProgress} max={maxIVRFetchProgress} label='IVR Menus' />
+                <ProgressBar hidden={!isPullingData || !selectedExtensionTypes.includes('Limited Extension')} value={fetchLEsProgress} max={maxFetchLEsProgress} label='Limited Extensions' />
+                <ProgressBar hidden={!isPullingData || !selectedExtensionTypes.includes('Call Monitoring Groups')} value={fetchCallMonitoringProgess} max={maxFetchCallMonitoringProgress} label='Call Monitoring Groups' />
+                <ProgressBar hidden={!isPullingData || !selectedExtensionTypes.includes('Park Location')} value={fetchParkLocationsProgress} max={maxFetchParkLocationsProgress} label='Park Locations' />
+                <ProgressBar hidden={!isPullingData || !selectedExtensionTypes.includes('User Group')} value={fetchUserGroupsProgess} max={maxFetchUserGroupsProgress} label='User Groups' />
+                <FeedbackArea gridData={filteredExtensions} onFilterSelection={handleFilterSelection} messages={messages} errors={errors} timedMessages={timedMessages} />
             </ToolCard>
             <ToolCard>
                 <h2>Target Account</h2>
@@ -1308,27 +1308,27 @@ const MigrateUsers = () => {
                 {/* <Button onClick={() => setIsShowingImportModal(true)}>Import Account Data</Button> */}
                 <Button className='healthy-margin-left' sx={{top: 7}} variant='subtle' color='dark' leftIcon={<IconDownload />} onClick={handleDownloadUsersClick} >Migration Template</Button>
                 <Button className='healthy-margin-left' sx={{top: 7}} variant='subtle' color='dark' leftIcon={<IconDownload />} onClick={handleDownloadNumberMapClick} >Number Map</Button>
-                <ProgressBar label='Main Site' value={assignMainSiteNumbersProgress} max={maxAssignMainSiteNumbersProgress} />
-                <ProgressBar label='Create Sites' value={siteMigrationProgress} max={maxSiteProgress} />
-                <ProgressBar label='Unassigned Devices' value={deviceUploadProgress} max={deviceUploadProgressMax} />
-                <ProgressBar label='Cost Centers' value={createCostCentersProgress} max={maxCreateCostCentersProgress} />
-                <ProgressBar label='ERLs' value={erlProgress} max={maxERLProgress} />
-                <ProgressBar label='Custom Roles' value={customRoleProgress} max={maxCustomRoleProgress} />
-                <ProgressBar label='Create Users' value={createUsersProgress} max={maxCreateUsersProgress} />
-                <ProgressBar label='Create Queues' value={createQueuesProgress} max={maxCreateQueueProgess} />
-                <ProgressBar label='Message Only / Announcement Only' value={createMOsProgress} max={maxCreateMOsProgress} />
-                <ProgressBar label='Create IVRs' value={createIVRsProgress} max={maxCreateIVRsProgress} />
-                <ProgressBar label='Create LEs' value={createLEsProgress} max={maxCreateLEsProgress} />
-                <ProgressBar label='Create Call Monitoring Groups' value={createMonitoringGroupsProgess} max={maxCreateMonitoringGroupsProgress} />
-                <ProgressBar label='Park Locations' value={createParkLocationsProgress} max={maxCreateParkLocationsProgress} />
-                <ProgressBar label='Prompt Library' value={uploadPromptsProgress} max={maxUploadPromptsProgress} />
-                <ProgressBar label='User Groups' value={createUserGroupsProgress} max={maxCreateUserGroupsProgress} />
-                <ProgressBar label='Configure IVRs' value={configureIVRsProgress} max={maxConfigureIVRsProgress} />
-                <ProgressBar label='Configure Users' value={configureUsersProgress} max={maxConfigureUsersProgress} />
-                <ProgressBar label='Configure Queues' value={configureQueuesProgress} max={maxConfigureQueuesProgress} />
-                <ProgressBar label='Configure Main Site' value={configureMainSiteProgress} max={maxConfigureMainSiteProgress} />
-                <ProgressBar label='Configure Sites' value={configureSitesProgress} max={maxConfigureSitesProgress} />
-                <FeedbackArea messages={messages} timedMessages={timedMessages} errors={errors} notifications={notifications} isDone={isDone} />
+                <ProgressBar hidden={!isMigrating || !settings.shouldMigrateSites} label='Main Site' value={assignMainSiteNumbersProgress} max={maxAssignMainSiteNumbersProgress} />
+                <ProgressBar hidden={!isMigrating || !settings.shouldMigrateSites} label='Create Sites' value={siteMigrationProgress} max={maxSiteProgress} />
+                <ProgressBar hidden={!isMigrating || !selectedExtensionTypes.includes('Unassigned Devices')} label='Unassigned Devices' value={deviceUploadProgress} max={deviceUploadProgressMax} />
+                <ProgressBar hidden={!isMigrating || !selectedExtensionTypes.includes('Cost Centers')} label='Cost Centers' value={createCostCentersProgress} max={maxCreateCostCentersProgress} />
+                <ProgressBar hidden={!isMigrating || !selectedExtensionTypes.includes('ERLs')} label='ERLs' value={erlProgress} max={maxERLProgress} />
+                <ProgressBar hidden={!isMigrating || !selectedExtensionTypes.includes('Custom Roles')} label='Custom Roles' value={customRoleProgress} max={maxCustomRoleProgress} />
+                <ProgressBar hidden={!isMigrating || !selectedExtensionTypes.includes('User')} label='Create Users' value={createUsersProgress} max={maxCreateUsersProgress} />
+                <ProgressBar hidden={!isMigrating || !selectedExtensionTypes.includes('Call Queue')} label='Create Queues' value={createQueuesProgress} max={maxCreateQueueProgess} />
+                <ProgressBar hidden={!isMigrating || !(selectedExtensionTypes.includes('Message-Only') || selectedExtensionTypes.includes('Announcement-Only'))} label='Message Only / Announcement Only' value={createMOsProgress} max={maxCreateMOsProgress} />
+                <ProgressBar hidden={!isMigrating || !selectedExtensionTypes.includes('IVR Menu')} label='Create IVRs' value={createIVRsProgress} max={maxCreateIVRsProgress} />
+                <ProgressBar hidden={!isMigrating || !selectedExtensionTypes.includes('Limited Extension')} label='Create LEs' value={createLEsProgress} max={maxCreateLEsProgress} />
+                <ProgressBar hidden={!isMigrating || !selectedExtensionTypes.includes('Call Monitoring Groups')} label='Create Call Monitoring Groups' value={createMonitoringGroupsProgess} max={maxCreateMonitoringGroupsProgress} />
+                <ProgressBar hidden={!isMigrating || !selectedExtensionTypes.includes('Park Location')} label='Park Locations' value={createParkLocationsProgress} max={maxCreateParkLocationsProgress} />
+                <ProgressBar hidden={!isMigrating || !selectedExtensionTypes.includes('Prompt Library')} label='Prompt Library' value={uploadPromptsProgress} max={maxUploadPromptsProgress} />
+                <ProgressBar hidden={!isMigrating || !selectedExtensionTypes.includes('User Group')} label='User Groups' value={createUserGroupsProgress} max={maxCreateUserGroupsProgress} />
+                <ProgressBar hidden={!isMigrating || !selectedExtensionTypes.includes('IVR Group')} label='Configure IVRs' value={configureIVRsProgress} max={maxConfigureIVRsProgress} />
+                <ProgressBar hidden={!isMigrating || !selectedExtensionTypes.includes('User')} label='Configure Users' value={configureUsersProgress} max={maxConfigureUsersProgress} />
+                <ProgressBar hidden={!isMigrating || !selectedExtensionTypes.includes('Call Queue')} label='Configure Queues' value={configureQueuesProgress} max={maxConfigureQueuesProgress} />
+                <ProgressBar hidden={!isMigrating || !settings.shouldMigrateSites} label='Configure Main Site' value={configureMainSiteProgress} max={maxConfigureMainSiteProgress} />
+                <ProgressBar hidden={!isMigrating || !settings.shouldMigrateSites} label='Configure Sites' value={configureSitesProgress} max={maxConfigureSitesProgress} />
+                <FeedbackArea defaultTab={1} messages={messages} timedMessages={timedMessages} errors={errors} notifications={notifications} isDone={isDone} />
             </ToolCard>
         </>
     )
