@@ -98,6 +98,7 @@ import { useUploadUnassignedDevices } from "./hooks/useUploadUnassignedDevices";
 import { SystemNotifications } from "../../../shared/SystemNotifications";
 import { SupportSheet } from "../../../shared/SupportSheet";
 import { GreetingModal } from "./components/GreetingModal";
+import { useTimeZones } from "./hooks/useTimeZones";
 const FileSaver = require('file-saver');
 
 
@@ -204,6 +205,7 @@ const MigrateUsers = () => {
     const {fetchCostCenters} = useFetchCostCenters(postMessage, postTimedMessage, postError)
     const {fetchCallRecordingSettings} = useFetchCallRecordingSettings(postMessage, postTimedMessage, postError)
 
+    const { fetchTimeZones } = useTimeZones(postMessage, postTimedMessage, postError)
     const {assignMainSiteNumbers, progressValue: assignMainSiteNumbersProgress, maxProgress: maxAssignMainSiteNumbersProgress} = useAssignMainSiteNumbers(postMessage, postTimedMessage, postError)
     const {migrateSites, maxProgress: maxSiteProgress, progressValue: siteMigrationProgress} = useMigrateSites(postMessage, postTimedMessage, postError)
     const {migrateCustomRoles, progressValue: customRoleProgress, maxProgress: maxCustomRoleProgress} = useMigrateCustomRoles(postMessage, postTimedMessage, postError)
@@ -662,6 +664,8 @@ const MigrateUsers = () => {
         let prompts: IVRAudioPrompt[] = []
         let targetSiteBundle = getTargetSiteBundle()
 
+        const timezones = await fetchTimeZones()
+
         if (settings.shouldRemoveSites) {
             removeSitesFromExtensions()
         }
@@ -861,7 +865,7 @@ const MigrateUsers = () => {
 
         console.log(`Migrating ${userDataBundles.length} users`)
         console.log(userDataBundles)
-        await migrateUsers(availablePhoneNumbers, availableTollFreeNumbers, userDataBundles, unassignedExtensions, targetExts, settings.emailSuffix)
+        await migrateUsers(availablePhoneNumbers, availableTollFreeNumbers, userDataBundles, unassignedExtensions, targetExts, settings.emailSuffix, timezones)
 
         const migratedUsers = userDataBundles.map((bundle) => bundle.extension)
         targetExts = [...targetExts, ...migratedUsers]
