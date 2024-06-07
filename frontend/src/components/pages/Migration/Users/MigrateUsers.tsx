@@ -1016,6 +1016,23 @@ const MigrateUsers = () => {
             }
         }
 
+        // Call queues
+        for (let queue of callQueueBundles) {
+            if (queue.extendedData?.businessHoursCallHandling?.voicemail?.recipient.id) {
+                const originalExtension = originalExtensionList.find((ext) => `${ext.data.id}` === `${queue.extendedData?.businessHoursCallHandling?.voicemail?.recipient.id}`)
+                if (originalExtension) {
+                    queue.voicemailRecipient = `${originalExtension.data.name} - Ext. ${originalExtension.data.extensionNumber}`
+                }
+            }
+
+            if (queue.extendedData?.afterHoursCallHandling?.voicemail?.recipient.id) {
+                const originalExtension = originalExtensionList.find((ext) => `${ext.data.id}` === `${queue.extendedData?.afterHoursCallHandling?.voicemail?.recipient.id}`)
+                if (originalExtension) {
+                    queue.afterHoursVoicemailRecipient = `${originalExtension.data.name} - Ext. ${originalExtension.data.extensionNumber}`
+                }
+            }
+        }
+
         // Hot desking devices
         const hotDeskingDevices = originalAccountDevices.filter((device) => device.useAsCommonPhone)
         const hotDeskingDeviceRows: HotDeskingDevice[] = []
