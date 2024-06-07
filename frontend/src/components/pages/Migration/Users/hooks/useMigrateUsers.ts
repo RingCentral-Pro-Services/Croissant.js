@@ -4,13 +4,14 @@ import { Message } from "../../../../../models/Message";
 import { SyncError } from "../../../../../models/SyncError";
 import { Device, PhoneNumber, UserDataBundle } from "../../User Data Download/models/UserDataBundle";
 import useMigrateUser from "./useMigrateUser";
+import { Timezone } from "../../../../../models/Timezone";
 
 const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void, isCrossRegion: boolean) => {
     const [progressValue, setProgressValue] = useState(0)
     const [maxProgress, setMaxProgress] = useState(2)
     const {migrateUser} = useMigrateUser(postMessage, postTimedMessage, postError, isCrossRegion)
 
-    const migrateUsers = async (availablePhoneNumbers: PhoneNumber[], availableTollFreeNumbers: PhoneNumber[], dataBundles: UserDataBundle[], unassignedExtensions: Extension[], extensions: Extension[], emailSuffix: string) => {
+    const migrateUsers = async (availablePhoneNumbers: PhoneNumber[], availableTollFreeNumbers: PhoneNumber[], dataBundles: UserDataBundle[], unassignedExtensions: Extension[], extensions: Extension[], emailSuffix: string, timezones: Timezone[]) => {
         const accessToken = localStorage.getItem('cs_access_token')
         if (!accessToken) {
             throw new Error('No access token')
@@ -80,15 +81,15 @@ const useMigrateUsers = (postMessage: (message: Message) => void, postTimedMessa
                 }
 
                 if (unassignedIDs.length !== 0) {
-                    await migrateUser(bundle, phoneNumberBundle, unassignedIDs)
+                    await migrateUser(bundle, phoneNumberBundle, timezones, unassignedIDs)
                 }
                 else {
-                    await migrateUser(bundle, phoneNumberBundle)    
+                    await migrateUser(bundle, phoneNumberBundle, timezones)    
                 }
 
             }
             else {
-                await migrateUser(bundle, phoneNumberBundle)
+                await migrateUser(bundle, phoneNumberBundle, timezones)
             }
             setProgressValue((prev) => prev + 1)
         }

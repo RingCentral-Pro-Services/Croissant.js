@@ -1,5 +1,6 @@
 import { Message } from "../../../../../models/Message";
 import { SyncError } from "../../../../../models/SyncError";
+import { Timezone } from "../../../../../models/Timezone";
 import { RestCentral } from "../../../../../rcapi/RestCentral";
 import { PhoneNumber, UserDataBundle } from "../../User Data Download/models/UserDataBundle";
 
@@ -11,7 +12,7 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
     const basePhoneNumberURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/phone-number/phoneNumberId'
     const baseWaitingPeriod = 250
 
-    const migrateUser = async (dataBundle: UserDataBundle, phoneNumbers: PhoneNumber[], extensionIDs?: string[]) => {
+    const migrateUser = async (dataBundle: UserDataBundle, phoneNumbers: PhoneNumber[], timezones: Timezone[], extensionIDs?: string[]) => {
         const accessToken = localStorage.getItem('cs_access_token')
         if (!accessToken) {
             throw new Error('No access token')
@@ -19,6 +20,7 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
 
         // The API doesn't let you set hidden field and will emit an error if you try
         delete dataBundle.extension.data.hidden
+        adjustTimeZone(dataBundle, timezones)
 
         if (!extensionIDs) {
             // This is a virtual user
@@ -35,6 +37,34 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
 
         for (const phoneNumber of phoneNumbers) {
             await assignPhoneNumber(dataBundle, phoneNumber.id, accessToken)
+        }
+    }
+
+    const adjustTimeZone = (bundle: UserDataBundle, timezones: Timezone[]) => {
+        if (!bundle.extension.data.regionalSettings) return
+
+        const originalTimeZone = bundle.extension.data.regionalSettings.timezone
+        const newTimeZone = timezones.find((timeZone) => timeZone.name === originalTimeZone.name && timeZone.bias === originalTimeZone.bias)
+
+        if (newTimeZone) {
+            bundle.extension.data.regionalSettings.timezone.id = newTimeZone.id
+        }
+
+        if (bundle.extension.data.regionalSettings.timezone.id === "51") {
+            // Deprecated eastern time
+            bundle.extension.data.regionalSettings.timezone.id = "96"
+        }
+        else if (bundle.extension.data.regionalSettings.timezone.id === "58") {
+            // Deprecated pacific time
+            bundle.extension.data.regionalSettings.timezone.id = "101"
+        }
+        else if (bundle.extension.data.regionalSettings.timezone.id === "53") {
+            // Deprecated central time
+            bundle.extension.data.regionalSettings.timezone.id = "98"
+        }
+        else if (bundle.extension.data.regionalSettings.timezone.id === "57") {
+            // Deprecated mountain time
+            bundle.extension.data.regionalSettings.timezone.id = "100"
         }
     }
 
