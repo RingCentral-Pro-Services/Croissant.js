@@ -6,6 +6,8 @@ export class CallQueueDataBundle implements ExcelFormattable {
     public hasEncounteredFatalError = false
     public tempExtension = ''
     public extensions: Extension[] = []
+    public voicemailRecipient = ''
+    public afterHoursVoicemailRecipient = ''
 
     // Used for Ring Group to Call Queue conversion tool
     public originalExtension?: Extension
@@ -53,9 +55,9 @@ export class CallQueueDataBundle implements ExcelFormattable {
             this.prettyAfterHoursAction(),
             this.prettyAfterHoursDestination(),
             this.greeting('Voicemail'),
-            this.extendedData?.businessHoursCallHandling?.voicemail?.recipient?.displayName ?? '',
+            this.voicemailRecipient ?? '',
             this.afterHoursGreeting('Voicemail'),
-            this.extendedData?.afterHoursCallHandling?.voicemail?.recipient?.displayName ?? '',
+            this.afterHoursVoicemailRecipient ?? '',
             this.extendedData?.notifications?.emailAddresses?.join(', ') ?? '',
             this.extendedData?.notifications?.voicemails.advancedEmailAddresses?.join(', ') ?? '',
             this.prettyVoicemailNotificationSettings(),
