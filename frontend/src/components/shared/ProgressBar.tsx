@@ -22,7 +22,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({value, max, label, className, 
                 <p style={{display: 'inline-block', fontWeight: 500, fontSize: 'medium', marginBottom: 0}}>{label}</p>
                 <div style={{ display: 'inline-block', float: 'right', paddingRight: 10 }}>
                     {value > 0 ? <p style={{display: 'inline-block', fontWeight: 500, fontSize: 'medium', marginBottom: 0}}>{value <= max ? value : max}</p> : null}
-                    {value > 0 ? <p style={{display: 'inline-block', fontSize: 'medium', fontWeight: 300, marginBottom: 0}}>/{max}</p> : null}
+                    {value > 0 ? <p style={{display: 'inline-block', fontSize: 'medium', fontWeight: 200, marginBottom: 0}}>/{max}</p> : null}
                 </div>
             </div>
             <Progress className="mini-margin-bottom" value={normalise(value)} />

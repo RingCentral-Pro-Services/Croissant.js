@@ -20,7 +20,7 @@ export class SiteDataBundle implements ExcelFormattable {
             this.extension.businessAddress.state,
             this.extension.businessAddress.zip,
             this.extension.businessAddress.country,
-            this.extension.callerIdName,
+            this.extension.callerIdName ?? 'Same as main site',
             this.prettyBusinessHours(),
             this.prettyRouting('BusinessHours'),
             this.prettyRouting('AfterHours'),
