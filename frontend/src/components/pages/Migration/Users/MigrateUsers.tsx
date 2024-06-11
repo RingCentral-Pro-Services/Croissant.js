@@ -954,6 +954,12 @@ const MigrateUsers = () => {
         const rows: UserDataRow[] = []
 
         for (const bundle of userDataBundles) {
+            if (userGroupBundles.length > 0) {
+                const userGroups = userGroupBundles.filter((group) => group.data.members?.map((member) => `${member.id}`).includes(`${bundle.extension.data.id}`))
+                const userGroupsManaged = userGroupBundles.filter((group) => group.data.managers?.map((member) => `${member.id}`).includes(`${bundle.extension.data.id}`))
+                bundle.userGroups = [...userGroupsManaged, ...userGroups].map((group) => group.data.displayName).join(', ')
+            }
+
             for (const row of bundle.toRows()) {
                 rows.push(row)
             }
