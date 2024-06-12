@@ -33,6 +33,7 @@ import { SystemNotifications } from "../../shared/SystemNotifications";
 import { SupportSheet } from "../../shared/SupportSheet";
 import Header from "../../shared/Header";
 import ToolCard from "../../shared/ToolCard";
+import ProgressBar from "../../shared/ProgressBar";
 
 const DirectCreateMenus = () => {
     useLogin('create-ivr')
@@ -258,7 +259,7 @@ const DirectCreateMenus = () => {
                 {isDisplayingFilterBox ? <AdaptiveFilter title='Pages' placeholder='Search...' setSelected={setSelectedSites} options={pages.map((page) => page.label)} defaultSelected={pages.map((page) => page.label)} /> : <></>}
                 <Button disabled={!hasCustomerToken || menus.length === 0 || isSyncing} variant="filled" className="inline" onClick={handleSyncButtonClick}>Sync</Button>
                 <Button className='healthy-margin-left' variant='outline' onClick={() => window.open('https://docs.google.com/spreadsheets/d/1jcXdr5mc-HpmbkjRq4V-2_G_pftrSOHqFYSyo5wLs2k/edit?usp=sharing', '_blank')} rightIcon={<IconExternalLink />} >Template</Button>
-                {!(menus.length > 0) ? <></> : <progress id='sync_progress' value={progressValue} max={maxProgressValue} />}
+                {!(menus.length > 0) ? <></> : <ProgressBar label="IVRs" value={progressValue} max={maxProgressValue} />}
                 {timedMessages.map((timedMessage) => (
                     <p>{timedMessage.body}</p>
                 ))}
