@@ -19,6 +19,7 @@ import { CustomRule } from "./models/CustomRule";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../shared/SystemNotifications";
 import { SupportSheet } from "../../shared/SupportSheet";
+import ProgressBar from "../../shared/ProgressBar";
 
 const CustomRulesExport = () => {
     const supportedExtensionTypes = ['User', 'Call Queue', 'Site']
@@ -145,8 +146,8 @@ const CustomRulesExport = () => {
                 {isFilterReady && isMultiSiteEnabled ? <AdaptiveFilter options={siteNames} defaultSelected={siteNames} title='Sites' placeholder='Search...' setSelected={setSelectedSiteNames} />  : <></>}
                 {isFilterReady ? <AdaptiveFilter options={supportedExtensionTypes} defaultSelected={supportedExtensionTypes} title='Extension types' placeholder='Search...' setSelected={setSelectedExtensionTypes} />  : <></>}
                 <Button variant='filled' onClick={handleButtonClick} disabled={isExtensionListPending || isAuditingCompanyRules || isAuditing}>Go</Button>
-                {isAuditingCompanyRules ? <> <p>Main Site Rules</p> <progress value={companyRuleProgress} max={maxCompanyRuleProgress} /> </> : <></>}
-                {isAuditing && selectedExtensions.length != 0 ? <> <p>Extension Rules</p> <progress value={currentExtensionIndex} max={selectedExtensions.length} /> </> : <></>}
+                {isAuditingCompanyRules ? <ProgressBar label="Main Site Rules" value={companyRuleProgress} max={maxCompanyRuleProgress} /> : <></>}
+                {isAuditing && selectedExtensions.length != 0 ? <ProgressBar label="Extension Rules" value={currentExtensionIndex} max={selectedExtensions.length} /> : <></>}
                 {isExtensionListPending ? <></> : <FeedbackArea gridData={selectedExtensions} messages={messages} errors={errors} timedMessages={timedMessages} />}
             </div>
         </>
