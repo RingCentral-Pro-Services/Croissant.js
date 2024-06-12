@@ -15,7 +15,7 @@ export class ProspectiveDevice implements DataGridFormattable {
 
     toDataGridRow(): any {
         return {
-            id: this.data.extension.data.id,
+            id: `${this.data.macAddress}-${this.data.name}`,
             extension: this.data.extension.data.name,
             model: this.data.modelName,
             macAddress: this.data.macAddress,
