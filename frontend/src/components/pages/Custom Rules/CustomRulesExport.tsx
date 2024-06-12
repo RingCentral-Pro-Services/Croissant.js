@@ -146,7 +146,7 @@ const CustomRulesExport = () => {
                 {isFilterReady && isMultiSiteEnabled ? <AdaptiveFilter options={siteNames} defaultSelected={siteNames} title='Sites' placeholder='Search...' setSelected={setSelectedSiteNames} />  : <></>}
                 {isFilterReady ? <AdaptiveFilter options={supportedExtensionTypes} defaultSelected={supportedExtensionTypes} title='Extension types' placeholder='Search...' setSelected={setSelectedExtensionTypes} />  : <></>}
                 <Button variant='filled' onClick={handleButtonClick} disabled={isExtensionListPending || isAuditingCompanyRules || isAuditing}>Go</Button>
-                {isAuditingCompanyRules ? <ProgressBar label="Main Site Rules" value={companyRuleProgress} max={maxCompanyRuleProgress} /> : <></>}
+                {isAuditingCompanyRules ? <ProgressBar label="Main Site Rules" value={isCompanyRuleListPending ? companyRuleProgress : Number.MAX_SAFE_INTEGER} max={maxCompanyRuleProgress} /> : <></>}
                 {isAuditing && selectedExtensions.length != 0 ? <ProgressBar label="Extension Rules" value={currentExtensionIndex} max={selectedExtensions.length} /> : <></>}
                 {isExtensionListPending ? <></> : <FeedbackArea gridData={selectedExtensions} messages={messages} errors={errors} timedMessages={timedMessages} />}
             </div>
