@@ -1292,6 +1292,28 @@ const defaultDevices = [
         "orderingCapability": "Enabled"
     },
     {
+        "sku": "HP-101",
+        "skuId": "LC_HD_937",
+        "type": "HardPhone",
+        "model": {
+            "id": "72",
+            "name": "Yealink T46S",
+            "deviceClass": "DeskPhone",
+            "lineCount": 4,
+            "addons": [],
+            "features": [
+                "Intercom",
+                "Paging",
+                "CommonPhone",
+                "BLA",
+                "HELD"
+            ]
+        },
+        "countryId": 1,
+        "assistedProvisioningCapability": "Enabled",
+        "orderingCapability": "Enabled"
+    },
+    {
         "sku": "HP-135",
         "skuId": "LC_HD_956",
         "type": "HardPhone",
