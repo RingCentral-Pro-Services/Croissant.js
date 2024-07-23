@@ -105,6 +105,7 @@ const mockdata: SidebarGroup[] = [
     initiallyOpened: false,
     links: [
       { label: 'Bulk Assign', link: '/bulkassign' },
+      { label: 'Rename Numbers', link: '/rename-numbers' },
     ],
   },
   {
