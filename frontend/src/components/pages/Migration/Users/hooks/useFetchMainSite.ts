@@ -58,7 +58,7 @@ const useFetchMainSite = (postMessage: (message: Message) => void, postTimedMess
         setProgressValue(0)
         setMaxProgress(rules.length)
         for (const rule of rules) {
-            fetchCustomRule(bundle, rule.id, accessToken)
+            await fetchCustomRule(bundle, rule.id, accessToken)
             setProgressValue((prev) => prev +1)
         }
 
