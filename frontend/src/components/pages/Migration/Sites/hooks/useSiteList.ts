@@ -16,44 +16,62 @@ const useSiteList = (postMessage: (message: Message) => void, postTimedMessage: 
         setIsFetchingSites(true)
 
         const sites: SiteData[] = []
-        await getSites(sites, accessToken)
+        let page = 1
+        let isDone = false
+
+        while(!isDone) {
+            const result = await getSites(page, accessToken)
+            if (!result) {
+                postMessage(new Message(`Something went wrong fetching sites (page ${page})`, 'error'))
+                isDone = true
+                break
+            }
+            sites.push(...result.sites)
+            isDone = result.isDone
+            page += 1
+        }
+
+        for (let i = 0; i < sites.length; i++) {
+            delete sites[i].uri
+        }
+
         setIsFetchingSites(false)
         callback(sites)
         return sites
     }
 
-    const getSites = async (sites: SiteData[], token: string) => {
+    const getSites = async (page: number, token: string) => {
         try {
             const headers = {
                 "Accept": "application/json",
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             }
-            const response = await RestCentral.get(baseURL, headers)
-            const records = response.data.records as SiteData[]
+            const response = await RestCentral.get(`${baseURL}&page=${page}`, headers)
+            let records = response.data.records as SiteData[]
+            records = records.filter((site) => site.id !== 'main-site')
 
-            for (let site of records) {
-                if (site.id === 'main-site') {
-                    continue
-                }
-                // delete site.id
-                delete site.uri
-                sites.push(site)
-            }
-
-            console.log(sites)
+            console.log('Sites response')
+            console.log(response)
 
             if (response.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+
+            const data: SiteResponse = {
+                sites: records,
+                isDone: response.data.paging.page >= response.data.paging.totalPages
+            }
+
+            return data
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
                 postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
-            console.log(`Failed to make fetch sits`)
+            console.log(`Failed to fetch sits`)
             console.log(e)
             postMessage(new Message(`Failed to fetch sites ${e.error ?? ''}`, 'error'))
             postError(new SyncError('', 0, ['Failed to fetch sites', ''], e.error ?? ''))
@@ -66,6 +84,11 @@ const useSiteList = (postMessage: (message: Message) => void, postTimedMessage: 
     }
 
     return { fetchSites, isFetchingSites }
+}
+
+interface SiteResponse {
+    sites: SiteData[],
+    isDone: boolean
 }
 
 export default useSiteList
