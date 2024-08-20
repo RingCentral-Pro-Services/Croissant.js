@@ -23,6 +23,7 @@ import { IconExternalLink } from "@tabler/icons-react";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../shared/SystemNotifications";
 import { SupportSheet } from "../../shared/SupportSheet";
+import ProgressBar from "../../shared/ProgressBar";
 
 const CallMonitoring = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -119,8 +120,8 @@ const CallMonitoring = () => {
                 <Button className='healthy-margin-left' variant='outline' onClick={() => window.open('https://docs.google.com/spreadsheets/d/11EuhgwFaaFNXj4tt99mhHIFzpsvSUNs2Y-oqLditq24/edit?usp=sharing', '_blank')} rightIcon={<IconExternalLink />} >Template</Button>
                 {isGroupCreationPending || isGroupAdjustmentPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Create Call Monitoring Groups" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
-                {isSyncing ? <progress value={progressValue} max={progressMax} /> : <></>}
-                {isAuditPending ? <progress value={auditProgress} max={auditProgressMax} /> : <></>}
+                {isSyncing ? <ProgressBar label="Syncing" value={progressValue} max={progressMax} /> : <></>}
+                {isAuditPending ? <ProgressBar label="Auditing" value={auditProgress} max={auditProgressMax} /> : <></>}
                 {isDataValidationPending ? <></> : <FeedbackArea gridData={monitoringGroups} messages={messages} errors={errors} timedMessages={timedMessages} />}
                 {isGroupAdjustmentPending ? <></> : <FeedbackArea gridData={auditedGroups} messages={messages} errors={errors} timedMessages={timedMessages} />}
             </div>

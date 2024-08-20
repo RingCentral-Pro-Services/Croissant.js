@@ -17,6 +17,7 @@ import { ParkLocation } from "./models/ParkLocation";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../shared/SystemNotifications";
 import { SupportSheet } from "../../shared/SupportSheet";
+import ProgressBar from "../../shared/ProgressBar";
 
 const ParkLocations = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -100,7 +101,7 @@ const ParkLocations = () => {
                 <h2>Park Locations</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                 <Button variant='filled' onClick={handleAuditButtonClick} disabled={isExtensionListPending || !isReadyToSync || isSyncing}>Audit</Button>
-                {isSyncing ? <progress value={currentExtensionIndex} max={parkLocationExtensions.length} /> : <></>}
+                {isSyncing ? <ProgressBar label="Creating park locations" value={currentExtensionIndex} max={parkLocationExtensions.length} /> : <></>}
                 {isSyncing ? <FeedbackArea gridData={parkLocationExtensions} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
             </div>
         </>

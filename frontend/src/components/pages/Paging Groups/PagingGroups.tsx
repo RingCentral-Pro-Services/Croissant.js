@@ -24,6 +24,7 @@ import { IconExternalLink } from "@tabler/icons-react";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../shared/SystemNotifications";
 import { SupportSheet } from "../../shared/SupportSheet";
+import ProgressBar from "../../shared/ProgressBar";
 
 const PagingGroups = () => {
     const [targetUID, setTargetUID] = useState("")
@@ -155,7 +156,7 @@ const PagingGroups = () => {
                 {isCreationPending ? <></> : <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>How was this experience?</Button>}
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Paging Groups" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
                 {isShowingDeviceMapProgress ? <> <Typography>Discovering Devices</Typography> <progress value={deviceMapProgressValue} max={deviceMapProgressMax} /> </> : <></>}
-                {isSyncing ? <> <Typography>Creating paging groups</Typography> <progress value={progressValue} max={progressMax} /> </> : <></>}
+                {isSyncing ? <ProgressBar label="Creating paging groups" value={progressValue} max={progressMax} /> : <></>}
                 {isDataValidationPending ? <></> : <FeedbackArea gridData={pagingGroups} messages={messages} timedMessages={timedMessages} errors={errors} />}
             </div>
         </>
