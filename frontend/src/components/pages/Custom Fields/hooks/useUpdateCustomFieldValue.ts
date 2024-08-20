@@ -36,14 +36,14 @@ export const useUpdateCustomFieldValue = (postMessage: (message: Message) => voi
             console.log(res)
 
             if (res.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${res.rateLimitInterval / 1000} seconds`, 'info'), res.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${res.rateLimitInterval / 1000} seconds`, 'info'), res.rateLimitInterval)
             }
 
             res.rateLimitInterval > 0 ? await wait(res.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to get device IDs`)
             console.log(e)

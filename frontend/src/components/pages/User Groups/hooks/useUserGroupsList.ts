@@ -47,11 +47,12 @@ const useUserGroupsList = (postMessage: (message: Message) => void, postTimedMes
                 const groups = groupData.map(group => new UserGroup(group))
                 setUserGroups((prev) => [...prev, ...groups])
 
-                if (response.data.navigation.nextPage) {
+                if (response.data.paging.page < response.data.paging.totalPages) {
                     setPage(page + 1)
                     setRateLimitInterval(250)
                 }
                 else {
+                    setPage(1)
                     setShouldFetchMembers(true)
                     setShouldFetch(false)
                 }
@@ -63,7 +64,7 @@ const useUserGroupsList = (postMessage: (message: Message) => void, postTimedMes
                 postError(new SyncError('', 0, ['Failed to tech user groups', ''], e.error ?? ''))
             }
         }, rateLimitInterval)
-    }, [shouldFetch, rateLimitInterval, baseURL])
+    }, [shouldFetch, rateLimitInterval, baseURL, page])
 
     useEffect(() => {
         const accessToken = localStorage.getItem('cs_access_token')

@@ -84,14 +84,14 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
             bundle.extension.data.id = response.data.id
 
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             // bundle.hasEncounteredFatalError = true
             // console.log(`Failed to create user`)
@@ -122,14 +122,14 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
             postMessage(new Message(`${bundle.extension.data.name} was created with the next available extension number: ${bundle.tempExtension}`, 'warning'))
 
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             bundle.hasEncounteredFatalError = true
             console.log(`Failed to create user`)
@@ -152,14 +152,14 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
             bundle.extension.data.id = response.data.id
 
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             // postMessage(new Message(`Failed to create user ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
             // postError(new SyncError('', 0, ['Failed to create user', bundle.extension.data.name], e.error ?? ''))
@@ -181,14 +181,14 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
             bundle.tempExtension = response.data.extensionNumber
             
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             bundle.hasEncounteredFatalError = true
             console.log(`Failed to create user`)
@@ -220,7 +220,7 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
             const id = response.data.records.find((record: any) => record.usageType === 'DirectNumber' && !record.extension) as PhoneNumber
 
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
@@ -228,7 +228,7 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to create user`)
             console.log(e)
@@ -255,14 +255,14 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
             
 
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to assign additional number`)
             console.log(e)
@@ -289,14 +289,14 @@ const useMigrateUser = (postMessage: (message: Message) => void, postTimedMessag
             
 
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to assign additional DL`)
             console.log(e)

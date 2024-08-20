@@ -75,14 +75,14 @@ export class UserManager {
             extension.data.id =response.data.id
 
             if (response.rateLimitInterval > 0) {
-                this.postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                this.postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(this.baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                this.postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                this.postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to make extension ${extension.data.name}`)
             console.log(e)
@@ -104,14 +104,14 @@ export class UserManager {
             extension.data.id = response.data.id
             
             if (response.rateLimitInterval > 0) {
-                this.postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                this.postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(this.baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                this.postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                this.postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to make extension ${extension.data.name}`)
             console.log(e)
@@ -135,14 +135,14 @@ export class UserManager {
             const response = await RestCentral.put(url, headers, extension.rolePayload())
             
             if (response.rateLimitInterval > 0) {
-                this.postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                this.postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(this.baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                this.postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                this.postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to set role ${extension.data.name}`)
             console.log(e)

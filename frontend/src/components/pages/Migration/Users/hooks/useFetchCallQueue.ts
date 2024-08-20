@@ -77,14 +77,14 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
             bundle.extension = new Extension(response.data)
 
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to get base data`)
             console.log(e)
@@ -108,14 +108,14 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
             
 
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to get business hours`)
             console.log(e)
@@ -136,14 +136,14 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
             bundle.extendedData!.managers = response.data.records
 
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to get managers`)
             console.log(e)
@@ -168,14 +168,14 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
             
 
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to get direct numbers`)
             console.log(e)
@@ -196,14 +196,14 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
             bundle.extendedData!.businessHoursCallHandling = response.data
            
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to get business hours call handling`)
             console.log(e)
@@ -226,14 +226,14 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
             bundle.extendedData!.afterHoursCallHandling = response.data
            
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to get after hours call handling`)
             console.log(e)
@@ -254,14 +254,14 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
             bundle.extendedData!.members = response.data.records
 
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to get members`)
             console.log(e)
@@ -282,14 +282,14 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
             bundle.extendedData!.notifications = response.data
 
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to get notification settings`)
             console.log(e)
@@ -313,14 +313,14 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
             }
            
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to get other settings`)
             console.log(e)
@@ -341,14 +341,14 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
             bundle.extendedData!.memberPresense = response.data.records
            
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to get member presense status`)
             console.log(e)
@@ -369,14 +369,14 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
             bundle.extendedData!.pickupMembers = response.data.records
            
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to get pickup members`)
             console.log(e)
@@ -397,7 +397,7 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
             
 
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
@@ -406,7 +406,7 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to get custom greeting URL`)
             console.log(e)
@@ -433,7 +433,7 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
             const buffer = await res.arrayBuffer()
 
             // if (response.rateLimitInterval > 0) {
-            //     postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            //     postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             // }
             
             // response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
@@ -442,7 +442,7 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to get custom greeting URL`)
             console.log(e)
@@ -463,14 +463,14 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
             userDataBundle.extendedData!.customRules = response.data.records
 
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to get custom rules`)
             console.log(e)
@@ -492,14 +492,14 @@ const useFetchCallQueue = (postMessage: (message: Message) => void, postTimedMes
             
 
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             // console.log(`Failed to get overflow settings`)
             // console.log(e)

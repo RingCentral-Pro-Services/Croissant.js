@@ -64,7 +64,7 @@ const useUploadDevice = (postMessage: (message: Message) => void, postTimedMessa
             const deviceIDs = validDevices.map((device: any) => device.id)
 
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
@@ -72,7 +72,7 @@ const useUploadDevice = (postMessage: (message: Message) => void, postTimedMessa
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to get device IDs`)
             console.log(e)
@@ -116,7 +116,7 @@ const useUploadDevice = (postMessage: (message: Message) => void, postTimedMessa
             }
             
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
@@ -124,7 +124,7 @@ const useUploadDevice = (postMessage: (message: Message) => void, postTimedMessa
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to set device for ${device.data.extension.data.name}`)
             console.log(e)
@@ -199,14 +199,14 @@ const useUploadDevice = (postMessage: (message: Message) => void, postTimedMessa
             const response = await RestCentral.put(baseDeviceUpdateURL.replace('deviceId', id), headers, body)
 
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to set device name`)
             console.log(e)

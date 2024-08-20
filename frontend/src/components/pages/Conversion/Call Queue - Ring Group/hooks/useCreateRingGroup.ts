@@ -432,7 +432,7 @@ export const useCreateRingGroup = (postMessage: (message: Message) => void, post
             const response = await RestCentral.post(baseCustomGreetingURL.replace('extensionId', `${group.id}`), headers, formData)
 
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)

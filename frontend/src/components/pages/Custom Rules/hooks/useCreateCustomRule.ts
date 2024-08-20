@@ -34,14 +34,14 @@ const useCreateCustomRule = (postMessage: (message: Message) => void, postTimedM
             const url = baseURL.replace('extensionId', `${rule.extension.data.id}`)
             const response = await RestCentral.post(url, headers, rule.payload())
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to make custom rule ${rule.data.name} for extension ${rule.extension.data.name} - Ext. ${rule.extension.data.extensionNumber}`)
             console.log(e)
@@ -61,14 +61,14 @@ const useCreateCustomRule = (postMessage: (message: Message) => void, postTimedM
             const url = baseUpdateURL.replace('extensionId', `${rule.extension.data.id}`).replace('answeringRuleId', rule.data.id!)
             const response = await RestCentral.put(url, headers, rule.payload())
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
             
             response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to update custom rule ${rule.data.name} for extension ${rule.extension.data.name} - Ext. ${rule.extension.data.extensionNumber}`)
             console.log(e)

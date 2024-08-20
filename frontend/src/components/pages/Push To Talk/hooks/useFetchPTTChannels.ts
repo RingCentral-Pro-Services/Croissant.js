@@ -30,7 +30,7 @@ const useFetchPTTChannels = (postMessage: (message: Message) => void, postTimedM
             const url = baseURL
             const response = await RestCentral.get(url, headers)
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
 
             const fetchedChannels = response.data.records as PTTChannelData[]
@@ -42,7 +42,7 @@ const useFetchPTTChannels = (postMessage: (message: Message) => void, postTimedM
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to fetch push-to-talk channels`)
             console.log(e)

@@ -56,7 +56,7 @@ export const applyERL = async (mapping: DeviceERLMapping, token: string, postMes
     }
     catch (e: any) {
         if (e.rateLimitInterval > 0) {
-            postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
         }
         postMessage(new Message(`Could not apply ERL ${mapping.erl.name} to device ${mapping.device.name}. ${e.error}`, 'error'))
         postError(new SyncError(mapping.device.name, 0, ['Failed to apply ERL', ''], e.error ?? '', mapping))
