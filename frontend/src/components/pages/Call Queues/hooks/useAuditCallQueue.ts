@@ -44,7 +44,7 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
             const response = await RestCentral.get(url, headers)
 
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
 
             const members = response.data.records.map((member: any) => member.extensionNumber) as string[]
@@ -54,7 +54,7 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to get queue members ${queue.extension.name}`)
             console.log(e)
@@ -76,7 +76,7 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
             const response = await RestCentral.get(url, headers)
 
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
 
             queue.businessHours = response.data
@@ -85,7 +85,7 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to get business hours ${queue.extension.name}`)
             console.log(e)
@@ -108,7 +108,7 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
             const response = await RestCentral.get(url, headers)
 
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
 
             const records = response.data.records as Array<any>
@@ -157,7 +157,7 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to get call handling ${queue.extension.name}`)
             console.log(e)
@@ -179,7 +179,7 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
             const response = await RestCentral.get(url, headers)
 
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
 
             const memberStatus = response.data.editableMemberStatus
@@ -189,7 +189,7 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to get member status ${queue.extension.name}`)
             console.log(e)
@@ -212,7 +212,7 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
             const response = await RestCentral.get(url, headers)
             
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
 
             const managers = response.data.records.map((record: any) => `${record.extension.name} Ext. ${record.extension.extensionNumber}`)
@@ -222,7 +222,7 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to get queue managers ${queue.extension.name}`)
             console.log(e)
@@ -244,7 +244,7 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
             const response = await RestCentral.get(url, headers)
 
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
 
             queue.sendEmailNotifications = response.data.voicemails.notifyByEmail
@@ -256,7 +256,7 @@ const useAuditCallQueue = (postMessage: (message: Message) => void, postTimedMes
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to get notification settings ${queue.extension.name}`)
             console.log(e)
