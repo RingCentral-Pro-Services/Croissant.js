@@ -20,6 +20,7 @@ import { UserGroupSchema } from "./models/schema";
 import { useAuditTrail } from "../../../hooks/useAuditTrail";
 import { SystemNotifications } from "../../shared/SystemNotifications";
 import { SupportSheet } from "../../shared/SupportSheet";
+import ProgressBar from "../../shared/ProgressBar";
 
 const UserGroups = () => {
     const [targetUID, setTargetUID] = useState('')
@@ -124,8 +125,8 @@ const UserGroups = () => {
                 <FileSelect enabled={!isSyncing || !isExtensionListPending} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />
                 <Button className='healthy-margin-right' variant='filled' onClick={handleSyncClick} disabled={!hasCustomerToken || isSyncing || isAuditing || isExtensionListPending || groups.length === 0}>Sync</Button>
                 <Button variant='filled' onClick={handleAuditButtonClick} disabled={!hasCustomerToken || isAuditing || isSyncing || isExtensionListPending}>Audit</Button>
-                {isAuditing ? <progress value={completedUserGroups.length} max={userGroups.length} /> : <></>}
-                {isSyncing ? <progress value={currentExtensionIndex} max={groups.length} /> : <></>}
+                {isAuditing ? <ProgressBar label="Auditing" value={completedUserGroups.length} max={userGroups.length} /> : <></>}
+                {isSyncing ? <ProgressBar label="Syncing" value={currentExtensionIndex} max={groups.length} /> : <></>}
                 <FeedbackArea gridData={groups} messages={messages} timedMessages={timedMessages} errors={errors} />
             </div>
         </>

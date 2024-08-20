@@ -24,7 +24,7 @@ const useRegionalFormats = (postMessage: (message: Message) => void, postTimedMe
             const response = await RestCentral.get(url, headers)
 
             if (response.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
 
             const regionalFormats = response.data.records as RegionalFormat[]
@@ -35,7 +35,7 @@ const useRegionalFormats = (postMessage: (message: Message) => void, postTimedMe
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to get regional formats`)
             console.log(e)

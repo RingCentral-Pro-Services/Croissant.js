@@ -48,7 +48,7 @@ export class IVRManager {
             const response = await RestCentral.post(this.url, headers, ivr.payload(this.sites.length > 0, false))
 
             if (response.rateLimitInterval > 0) {
-                this.postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                this.postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
 
             ivr.data.id = response.data.id
@@ -56,7 +56,7 @@ export class IVRManager {
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                this.postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                this.postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to make IVR ${ivr.data.name}`)
             console.log(e)
@@ -96,7 +96,7 @@ export class IVRManager {
             const response = await RestCentral.put(`${this.url}/${ivr.data.id}`, headers, body)
 
             if (response.rateLimitInterval > 0) {
-                this.postTimedMessage(new Message(`Rale limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+                this.postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
             }
 
             ivr.data.id = response.data.id
@@ -104,7 +104,7 @@ export class IVRManager {
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                this.postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                this.postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to make IVR ${ivr.data.name}`)
             console.log(e)

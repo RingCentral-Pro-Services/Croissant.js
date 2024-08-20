@@ -37,14 +37,14 @@ const useFetchPromptContent = (postMessage: (message: Message) => void, postTime
 
             if (remainingRequests === 1) {
                 console.log('Should be posting message')
-                postTimedMessage(new Message(`Rale limit reached. Waiting 60 seconds`, 'info'), 60000)
+                postTimedMessage(new Message(`Rate limit reached. Waiting 60 seconds`, 'info'), 60000)
             }
             
             remainingRequests === 1 ? await wait(60000) : await wait(baseWaitingPeriod)
         }
         catch (e: any) {
             if (e.rateLimitInterval > 0) {
-                postTimedMessage(new Message(`Rale limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
             }
             console.log(`Failed to set get prompt content`)
             console.log(e)
