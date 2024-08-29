@@ -919,6 +919,34 @@ const defaultDevices = [
         "orderingCapability": "Enabled"
     },
     {
+        "sku": "HP-79-7-1",
+        "skuId": "LC_HD_687",
+        "type": "HardPhone",
+        "model": {
+            "id": "67",
+            "name": "Polycom VVX601",
+            "deviceClass": "DeskPhone",
+            "lineCount": 102,
+            "addons": [
+                {
+                    "id": "7",
+                    "name": "Polycom - 90 lines",
+                    "count": 1
+                }
+            ],
+            "features": [
+                "Intercom",
+                "Paging",
+                "CommonPhone",
+                "BLA",
+                "HELD"
+            ]
+        },
+        "countryId": 1,
+        "assistedProvisioningCapability": "Disabled",
+        "orderingCapability": "Enabled"
+    },
+    {
         "sku": "HP-91",
         "skuId": "LC_HD_650",
         "type": "HardPhone",
