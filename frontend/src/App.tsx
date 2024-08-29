@@ -57,6 +57,7 @@ import AccountInsights from './components/pages/Insights/AccountInsights';
 import { useSettings } from './components/pages/Settings/hooks/useSettings';
 import { DeviceERLs } from './components/pages/ERLs/DeviceERLs';
 import { RenamePhoneNumbers } from './components/pages/Phone Numbers/Renaming/RenamePhoneNumbers';
+import { BulkConfigurator } from './components/pages/Bulk Configurator/BulkConfigurator';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -200,6 +201,7 @@ function App() {
                 <Route path='/account-insights' element={<AccountInsights />} />
                 <Route path='/device-erls' element={<DeviceERLs />} />
                 <Route path='/rename-numbers' element={<RenamePhoneNumbers />} />
+                <Route path='/bulk-configurator' element={<BulkConfigurator />} />
               </Routes>
             </Suspense>
           </ErrorBoundary>
