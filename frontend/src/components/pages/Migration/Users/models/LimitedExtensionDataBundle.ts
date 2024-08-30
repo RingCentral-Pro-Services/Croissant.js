@@ -36,8 +36,8 @@ export class LimitedExtensionDataBundle implements ExcelFormattable {
             '', // Locked. Ignored
             '', // WMI. Ignored
             this.extension.data.regionalSettings?.timezone.description ?? '',
-            this.extension.data.regionalSettings?.formattingLocale.name ?? '',
-            this.extension.data.regionalSettings?.language.name ?? '',
+            this.extension.data.regionalSettings?.formattingLocale?.name ?? '',
+            this.extension.data.regionalSettings?.language?.name ?? '',
             this.extension.data.regionalSettings?.timeFormat ?? '',
             '', // International calling. Ignored
             this.prettyGreeting('Unavailable'),
@@ -80,7 +80,7 @@ export class LimitedExtensionDataBundle implements ExcelFormattable {
     prettyGreeting(greetingType: string) {
         const unavailableGreeting = this.extendedData?.businessHoursCallHandling?.greetings.find((greeting) => greeting.type === greetingType)
         if (!unavailableGreeting) return ''
-        if (unavailableGreeting.preset.name === 'None') return 'OFF'
+        if (unavailableGreeting.preset?.name === 'None') return 'OFF'
         if (unavailableGreeting.custom) return 'Custom'
         return 'Default'
     }
