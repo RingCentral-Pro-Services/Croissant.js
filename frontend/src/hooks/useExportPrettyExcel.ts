@@ -36,6 +36,7 @@ const useExportPrettyExcel = () => {
                 }
                 catch (e) {
                     console.log('Failed to write excel row')
+                    console.log(e)
                 }
             }
 
