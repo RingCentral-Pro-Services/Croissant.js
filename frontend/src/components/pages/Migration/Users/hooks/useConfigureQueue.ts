@@ -892,7 +892,7 @@ const useConfigureQueue = (postMessage: (message: Message) => void, postTimedMes
         if (!bundle.extendedData?.businessHoursCallHandling?.greetings) return
 
         const introGreeting = bundle.extendedData.businessHoursCallHandling.greetings.find((greeting) => greeting.type === 'Introductory')
-        if ((!introGreeting) || (introGreeting && introGreeting.preset.name !== 'None')) return
+        if ((!introGreeting) || (introGreeting && introGreeting.preset?.name !== 'None')) return
 
         try {
             const headers = {
