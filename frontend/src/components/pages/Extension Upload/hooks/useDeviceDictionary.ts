@@ -809,6 +809,28 @@ const defaultDevices = [
         "orderingCapability": "Enabled"
     },
     {
+        "sku": "HP-77",
+        "skuId": "LC_HD_609",
+        "type": "HardPhone",
+        "model": {
+            "id": "76",
+            "name": "Polycom VVX150",
+            "deviceClass": "DeskPhone",
+            "lineCount": 4,
+            "addons": [],
+            "features": [
+                "Intercom",
+                "Paging",
+                "CommonPhone",
+                "BLA",
+                "HELD"
+            ]
+        },
+        "countryId": 1,
+        "assistedProvisioningCapability": "Enabled",
+        "orderingCapability": "Enabled"
+    },
+    {
         "sku": "HP-78",
         "skuId": "LC_HD_610",
         "type": "HardPhone",
