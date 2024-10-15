@@ -58,6 +58,7 @@ import { useSettings } from './components/pages/Settings/hooks/useSettings';
 import { DeviceERLs } from './components/pages/ERLs/DeviceERLs';
 import { RenamePhoneNumbers } from './components/pages/Phone Numbers/Renaming/RenamePhoneNumbers';
 import { BulkConfigurator } from './components/pages/Bulk Configurator/BulkConfigurator';
+import { AutoParkLocations } from './components/pages/Park Locations/AutoParkLocations';
 
 const AuditMenus = React.lazy(() => import('./components/pages/IVR/AuditMenus'));
 const CallQueues = React.lazy(() => import('./components/pages/Call Queues/CallQueues'));
@@ -202,6 +203,7 @@ function App() {
                 <Route path='/device-erls' element={<DeviceERLs />} />
                 <Route path='/rename-numbers' element={<RenamePhoneNumbers />} />
                 <Route path='/bulk-configurator' element={<BulkConfigurator />} />
+                <Route path='/auto-park-locations' element={<AutoParkLocations />} />
               </Routes>
             </Suspense>
           </ErrorBoundary>
