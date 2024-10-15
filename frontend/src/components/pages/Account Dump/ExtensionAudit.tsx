@@ -68,7 +68,7 @@ const ExtensionAudit = () => {
         if (isExtensionListPending) return
         addPhoneNumbers(extensionsList)
 
-        let header = ['Mailbox ID', 'Name', 'Ext', 'Email', 'Site', 'Phone Numbers', 'Type', 'Status', 'Hidden']
+        let header = ['Mailbox ID', 'Name', 'Ext', 'Email', 'Site', 'Phone Numbers', 'Type', 'Status', 'Hidden', 'Created At']
         writeExcel(header, extensionsList, 'Extensions', 'account-dump.xlsx')
     }, [isExtensionListPending, extensionsList])
 

@@ -157,6 +157,7 @@ const mockdata: SidebarGroup[] = [
       { label: 'User Groups', link: '/usergroups' },
       { label: 'Call Monitoring', link: '/callmonitoring' },
       { label: 'Paging Groups', link: '/paginggroups' },
+      // { label: 'Auto Park Locations', link: '/auto-park-locations' },
       { label: 'Park Locations', link: '/parklocations' },
     ],
   },

@@ -5,7 +5,7 @@ import { RestCentral } from "../../../../rcapi/RestCentral"
 import { ParkLocation } from "../models/ParkLocation"
 
 const useAuditParkLocation = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void, callback: (parkLocation: ParkLocation) => void) => {
-    const baseURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/park-locations/parkLocationId/users'
+    const baseURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/park-locations/parkLocationId/users?perPage=1000'
     const baseWaitingPeriod = 250
 
     const auditParkLocation = async (extension: Extension) => {

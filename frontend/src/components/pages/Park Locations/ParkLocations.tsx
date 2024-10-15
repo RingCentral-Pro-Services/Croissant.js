@@ -101,7 +101,7 @@ const ParkLocations = () => {
                 <h2>Park Locations</h2>
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} loading={isTokenPending} error={tokenError} />
                 <Button variant='filled' onClick={handleAuditButtonClick} disabled={isExtensionListPending || !isReadyToSync || isSyncing}>Audit</Button>
-                {isSyncing ? <ProgressBar label="Creating park locations" value={currentExtensionIndex} max={parkLocationExtensions.length} /> : <></>}
+                {isSyncing ? <ProgressBar label="Discovering park locations" value={currentExtensionIndex} max={parkLocationExtensions.length} /> : <></>}
                 {isSyncing ? <FeedbackArea gridData={parkLocationExtensions} messages={messages} timedMessages={timedMessages} errors={errors} /> : <></>}
             </div>
         </>

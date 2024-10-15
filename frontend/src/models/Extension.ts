@@ -98,7 +98,7 @@ export class Extension implements ExcelFormattable, DataGridFormattable {
     }
 
     toExcelRow(): string[] {
-        return [`${this.data.id}`, this.data.status === 'Unassigned' ? 'Unassigned Extension' : this.data.name, this.data.extensionNumber, this.data.contact ? this.data.contact.email : '', this.data.site?.name ?? 'N/A', this.data.phoneNumbers?.map((p) => p.phoneNumber).join(', ')  || '', this.prettyType(), this.data.status ?? '', `${this.data.hidden}`]
+        return [`${this.data.id}`, this.data.status === 'Unassigned' ? 'Unassigned Extension' : this.data.name, this.data.extensionNumber, this.data.contact ? this.data.contact.email : '', this.data.site?.name ?? 'N/A', this.data.phoneNumbers?.map((p) => p.phoneNumber).join(', ')  || '', this.prettyType(), this.data.status ?? '', `${this.data.hidden}`, this.data.creationTime ?? '']
     }
 
     toDataGridRow(): any {
@@ -111,7 +111,8 @@ export class Extension implements ExcelFormattable, DataGridFormattable {
             site: this.data.site?.name ?? 'N/A',
             type: this.prettyType(),
             status: this.data.status ?? '',
-            hidden: this.data.hidden
+            hidden: this.data.hidden,
+            creationTime: this.data.creationTime ?? ''
         }
     }
 
@@ -125,7 +126,8 @@ export class Extension implements ExcelFormattable, DataGridFormattable {
             { field: 'site', headerName: 'Site', width: 200,},
             { field: 'type', headerName: 'Type', width: 200 },
             { field: 'status', headerName: 'Status', width: 200 },
-            { field: 'hidden', headerName: 'Hidden', width: 200 }
+            { field: 'hidden', headerName: 'Hidden', width: 200 },
+            { field: 'creationTime', headerName: 'Created At', width: 200 }
         ]
     }
 
