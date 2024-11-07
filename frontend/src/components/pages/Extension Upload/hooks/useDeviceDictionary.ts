@@ -857,6 +857,116 @@ const defaultDevices = [
         "skuId": "LC_HD_610",
         "type": "HardPhone",
         "model": {
+            "id": "59",
+            "name": "Polycom VVX300",
+            "deviceClass": "DeskPhone",
+            "lineCount": 6,
+            "addons": [],
+            "features": [
+                "Intercom",
+                "Paging",
+                "CommonPhone",
+                "BLA",
+                "HELD"
+            ]
+        },
+        "countryId": 1,
+        "assistedProvisioningCapability": "Enabled",
+        "orderingCapability": "Enabled"
+    },
+    {
+        "sku": "HP-78",
+        "skuId": "LC_HD_610",
+        "type": "HardPhone",
+        "model": {
+            "id": "53",
+            "name": "Polycom VVX500",
+            "deviceClass": "DeskPhone",
+            "lineCount": 6,
+            "addons": [],
+            "features": [
+                "Intercom",
+                "Paging",
+                "CommonPhone",
+                "BLA",
+                "HELD"
+            ]
+        },
+        "countryId": 1,
+        "assistedProvisioningCapability": "Enabled",
+        "orderingCapability": "Enabled"
+    },
+    {
+        "sku": "HP-78",
+        "skuId": "LC_HD_610",
+        "type": "HardPhone",
+        "model": {
+            "id": "64",
+            "name": "Polycom VVX501",
+            "deviceClass": "DeskPhone",
+            "lineCount": 6,
+            "addons": [],
+            "features": [
+                "Intercom",
+                "Paging",
+                "CommonPhone",
+                "BLA",
+                "HELD"
+            ]
+        },
+        "countryId": 1,
+        "assistedProvisioningCapability": "Enabled",
+        "orderingCapability": "Enabled"
+    },
+    {
+        "sku": "HP-78",
+        "skuId": "LC_HD_610",
+        "type": "HardPhone",
+        "model": {
+            "id": "61",
+            "name": "Polycom VVX600",
+            "deviceClass": "DeskPhone",
+            "lineCount": 6,
+            "addons": [],
+            "features": [
+                "Intercom",
+                "Paging",
+                "CommonPhone",
+                "BLA",
+                "HELD"
+            ]
+        },
+        "countryId": 1,
+        "assistedProvisioningCapability": "Enabled",
+        "orderingCapability": "Enabled"
+    },
+    {
+        "sku": "HP-78",
+        "skuId": "LC_HD_610",
+        "type": "HardPhone",
+        "model": {
+            "id": "127",
+            "name": "Polycom CCX500",
+            "deviceClass": "DeskPhone",
+            "lineCount": 6,
+            "addons": [],
+            "features": [
+                "Intercom",
+                "Paging",
+                "CommonPhone",
+                "BLA",
+                "HELD"
+            ]
+        },
+        "countryId": 1,
+        "assistedProvisioningCapability": "Enabled",
+        "orderingCapability": "Enabled"
+    },
+    {
+        "sku": "HP-78",
+        "skuId": "LC_HD_610",
+        "type": "HardPhone",
+        "model": {
             "id": "78",
             "name": "Polycom VVX350",
             "deviceClass": "DeskPhone",

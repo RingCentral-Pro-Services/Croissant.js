@@ -109,6 +109,10 @@ export const Tools: Tool[] = [
         route: '/locationupdates'
     },
     {
+        name: 'Auto Park Locations',
+        route: '/auto-park-locations'
+    },
+    {
         name: 'Convert Call Queues',
         route: '/convert-call-queues'
     },
