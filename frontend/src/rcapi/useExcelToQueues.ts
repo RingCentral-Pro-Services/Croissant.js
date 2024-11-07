@@ -21,6 +21,7 @@ const ringTimeMap: Map<string, number> = new Map([
     ['60 Rings/5 Minutes', 300],
     ['10 secs', 10],
     ['15 secs', 15],
+    ['20 secs', 20],
     ['30 secs', 30],
     ['45 secs', 45],
     ['1 min', 60],
