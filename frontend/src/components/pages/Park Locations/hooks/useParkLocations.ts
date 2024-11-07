@@ -54,6 +54,7 @@ export const useParkLocations = (postMessage: (message: Message) => void, postTi
         catch (e: any) {
             console.log(`Failed to create park location ${parkLocationName}`)
             console.log(e)
+            postMessage(new Message(`Failed to create park location ${parkLocationName}. ${e.error}`, 'error'))
         }
     }
 
@@ -84,6 +85,7 @@ export const useParkLocations = (postMessage: (message: Message) => void, postTi
         catch (e: any) {
             console.log(`Failed to add members to park location ${parkLocationName}`)
             console.log(e)
+            postMessage(new Message(`Failed to add members to park location ${parkLocationName}. ${e.error}`, 'error'))
         }
     }
 

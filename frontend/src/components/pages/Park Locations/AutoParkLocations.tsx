@@ -6,7 +6,7 @@ import useExtensions from "../../../rcapi/useExtensions"
 import Header from "../../shared/Header"
 import ToolCard from "../../shared/ToolCard"
 import UIDInputField from "../../shared/UIDInputField"
-import { Button, Checkbox, Input, NumberInput, Radio } from "@mantine/core"
+import { Button, Checkbox, Input, Modal, NumberInput, Radio } from "@mantine/core"
 import useLogin from "../../../hooks/useLogin"
 import { Extension } from "../../../models/Extension"
 import AdaptiveFilter from "../../shared/AdaptiveFilter"
@@ -16,6 +16,7 @@ import { useParkLocations } from "./hooks/useParkLocations"
 import { Message } from "../../../models/Message"
 import { usePresense } from "./hooks/usePresense"
 import ProgressBar from "../../shared/ProgressBar"
+import { SystemNotifications } from "../../shared/SystemNotifications"
 
 export const AutoParkLocations = () => {
     const [isSyncing, setIsSyncing] = useState(false)
@@ -34,6 +35,7 @@ export const AutoParkLocations = () => {
     const [setPresenseLines, setSetPresenseLines] = useState(false)
     const [updatePresenseLines, setUpdatePresenseLines] = useState(false)
     const [progressValue, setProgressValue] = useState(0)
+    const [isShowingModal, setIsShowingModal] = useState(false)
 
     useLogin('auto-park-locations', isSyncing)
     const {postMessage, messages, errors, postError} = useMessageQueue()
@@ -99,7 +101,9 @@ export const AutoParkLocations = () => {
 
     const handleSyncClick = async () => {
         if (isSyncing) return
+        setIsShowingModal(false)
         setIsSyncing(true)
+        let extensionNumber = startingExtensionNumber
 
         for (let i = 0; i < selections.length; i++) {
             const selection = selections[i]
@@ -120,8 +124,9 @@ export const AutoParkLocations = () => {
             for (let iteration = 0; iteration < parkLocationsPerSelection; iteration++) {
                 const parkLocationName = adjustParkLocationName(namingScheme, selection, iteration + 1)
 
-                const parkLocationId = await createParkLocation(parkLocationName, site, startingExtensionNumber + iteration, members)
+                const parkLocationId = await createParkLocation(parkLocationName, site, extensionNumber, members)
                 if (parkLocationId) {
+                    extensionNumber += 1
                     parkLocationIds.push(parkLocationId)
                 }
             }
@@ -140,6 +145,26 @@ export const AutoParkLocations = () => {
 
     return (
         <>
+            <SystemNotifications toolName="Auto Park Locations" />
+            <Modal opened={isShowingModal} size='lg' onClose={() => setIsShowingModal(false)} title='Summary' centered>
+                <h3>Park Locations</h3>
+                <ul>
+                    <li>You've chosen to create park locations for {selections.length} sites</li>
+                    <li>You've chosen to create {parkLocationsPerSelection} park location(s) per site</li>
+                    <li>{selections.length * parkLocationsPerSelection} will be created in total</li>
+                    <li>The first park location will be extension {startingExtensionNumber}</li>
+                </ul>
+
+                <h3>Presense</h3>
+                <ul>
+                    {setPresenseLines ? <li>You've chosen to reset users' presense to default and add {parkLocationsPerSelection} park location(s) beginning on line {startingPresenseLineKey}</li> : null}
+                    {updatePresenseLines ? <li>You've chosen to update users' presense to add {parkLocationsPerSelection} park location(s) beginning on line {startingPresenseLineKey}</li> : null}
+                    {!setPresenseLines && !updatePresenseLines ? <li>You've chosen to not add park locations to users' presense</li> : null}
+                </ul>
+
+                <Button onClick={handleSyncClick}>Sync</Button>
+            </Modal>
+
             <Header title="Auto Park Locations" body="" />
             <ToolCard>
                 <UIDInputField
@@ -242,7 +267,7 @@ export const AutoParkLocations = () => {
                             />
                         </div>
 
-                        <Button onClick={handleSyncClick} disabled={isSyncing}>Start</Button>
+                        <Button onClick={() => setIsShowingModal(true)} disabled={isSyncing}>Start</Button>
                     </div>
 
                     <div>
