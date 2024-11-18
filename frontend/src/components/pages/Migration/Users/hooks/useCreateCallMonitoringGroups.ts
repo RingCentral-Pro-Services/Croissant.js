@@ -13,7 +13,13 @@ const useCreateCallMonitoringGroups = (postMessage: (message: Message) => void, 
     const createMonitoringGroups = async (groups: CallMonitoringDataBundle[], originalExtensions: Extension[], targetExtensions: Extension[]) => {
         setMaxProgress(groups.length)
         for (const group of groups) {
-            await createMonitoringGroup(group, originalExtensions, targetExtensions)
+            try {
+                await createMonitoringGroup(group, originalExtensions, targetExtensions)
+            }
+            catch (e: any) {
+                postMessage(new Message(`Something went wrong creating Call Monitoring Group ${group.data.name}`, 'error'))
+                postError(new SyncError(group.data.name, "", ['Unexepected error creating Call Monitoring Group', e.message], undefined, group))
+            }
             setProgressValue((prev) => prev + 1)
         }
     }

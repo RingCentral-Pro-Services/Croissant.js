@@ -19,7 +19,13 @@ const useConfigureIVRs = (postMessage: (message: Message) => void, postTimedMess
 
         setMaxProgress(bundles.length)
         for (const bundle of bundles) {
-            await configureIVR(bundle, originalExtensions, targetExtensions, originalPrompts, targetPrompts)
+            try {
+                await configureIVR(bundle, originalExtensions, targetExtensions, originalPrompts, targetPrompts)
+            }
+            catch (e: any) {
+                postMessage(new Message(`Something went wrong configuring IVR ${bundle.extension.data.name}`, 'error'))
+                postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Unexepected error configuring IVR', e.message], undefined, bundle))
+            }
             setProgressValue((prev) => prev + 1)
         }
     }

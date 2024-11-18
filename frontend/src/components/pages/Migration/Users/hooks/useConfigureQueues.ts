@@ -18,7 +18,13 @@ const useConfigureQueues = (postMessage: (message: Message) => void, postTimedMe
 
         setMaxProgress(bundles.length)
         for (const bundle of bundles) {
-            await configureQueue(bundle, originalExtensions, targetExtensions)
+            try {
+                await configureQueue(bundle, originalExtensions, targetExtensions)
+            }
+            catch (e: any) {
+                postMessage(new Message(`Something went wrong configuring Queue ${bundle.extension.data.name}`, 'error'))
+                postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Unexepected error configuring Queue', e.message], undefined, bundle))
+            }
             setProgressValue((prev) => prev + 1)
         }
     }

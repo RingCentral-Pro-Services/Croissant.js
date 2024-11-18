@@ -20,7 +20,13 @@ const useConfigureUsers = (postMessage: (message: Message) => void, postTimedMes
 
         setMaxProgress(bundles.length)
         for (const bundle of bundles) {
-            await configureUser(bundle, companyERLs, originalExtensions, targetExtensions, roles, globalSiteNumberMap, emailSuffix)
+            try {
+                await configureUser(bundle, companyERLs, originalExtensions, targetExtensions, roles, globalSiteNumberMap, emailSuffix)
+            }
+            catch (e: any) {
+                postMessage(new Message(`Something went wrong configuring User ${bundle.extension.data.name}`, 'error'))
+                postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Unexepected error configuring User', e.message], undefined, bundle))
+            }
             setProgressValue((prev) => prev + 1)
         }
     }

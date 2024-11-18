@@ -26,14 +26,20 @@ const useConfigureSites = (postMessage: (message: Message) => void, postTimedMes
 
         setMaxProgress(bundles.length)
         for (const bundle of bundles) {
-            await setSchedule(bundle, accessToken)
-            await setBusinessHoursCallHandling(bundle, originalExtensions, targetExtensions, accessToken)
-            await setAfterHoursCallHandling(bundle, originalExtensions, targetExtensions, accessToken)
-            for (let customRule of bundle.extendedData!.customRules!) {
-                let adjsutedRule = adjustCustomRule(bundle, customRule, originalExtensions, targetExtensions)
-                console.log('Adjusted custom rule')
-                console.log(adjsutedRule)
-                await addCustomRule(bundle, customRule, accessToken)
+            try {
+                await setSchedule(bundle, accessToken)
+                await setBusinessHoursCallHandling(bundle, originalExtensions, targetExtensions, accessToken)
+                await setAfterHoursCallHandling(bundle, originalExtensions, targetExtensions, accessToken)
+                for (let customRule of bundle.extendedData!.customRules!) {
+                    let adjsutedRule = adjustCustomRule(bundle, customRule, originalExtensions, targetExtensions)
+                    console.log('Adjusted custom rule')
+                    console.log(adjsutedRule)
+                    await addCustomRule(bundle, customRule, accessToken)
+                }
+            }
+            catch (e: any) {
+                postMessage(new Message(`Something went wrong configuring Site ${bundle.extension.name}`, 'error'))
+                postError(new SyncError(bundle.extension.name, bundle.extension.extensionNumber, ['Unexepected error configuring Site', e.message], undefined, bundle))
             }
             setProgressValue((prev) => prev + 1)
         }

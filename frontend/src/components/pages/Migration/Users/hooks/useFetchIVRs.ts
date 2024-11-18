@@ -25,7 +25,13 @@ const useFetchIVRs = (postMessage: (message: Message) => void, postTimedMessage:
         }
 
         for (let i = 0; i < bundles.length; i++) {
-            await fetchIVR(bundles[i])
+            try {
+                await fetchIVR(bundles[i])
+            }
+            catch (e: any) {
+                postMessage(new Message(`Something went wrong fetching IVR ${bundles[i].extension.data.name}`, 'error'))
+                postError(new SyncError(bundles[i].extension.data.name, bundles[i].extension.data.extensionNumber, ['Unexepected error fetching IVR', e.message], undefined, bundles[i]))
+            }
             setProgressValue((prev) => prev + 1)
         }
 

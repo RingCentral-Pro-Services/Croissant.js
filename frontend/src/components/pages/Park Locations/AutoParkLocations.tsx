@@ -248,18 +248,19 @@ export const AutoParkLocations = () => {
                                 className="healthy-margin-bottom"
                                 checked={setPresenseLines}
                                 onChange={(e) => setSetPresenseLines(e.currentTarget.checked)}
-                                label="Set presense (Overwrite)"
+                                label="Set presence (Overwrite)"
                             />
                             <Checkbox
+                                disabled
                                 checked={updatePresenseLines}
                                 onChange={(e) => setUpdatePresenseLines(e.currentTarget.checked)}
-                                label="Update presense" />
+                                label="Update presence" />
                         </div>
 
-                        <div className="healthy-margin-left healthy-margin-right" style={{ display: 'inline-block', width: 300 }}>
+                        <div className="healthy-margin-left healthy-margin-right" style={{ display: (setPresenseLines || updatePresenseLines) ? 'inline-block' : 'none', width: 300 }}>
                             <NumberInput
                                 label="Starting presense line"
-                                description="Starting presense line key"
+                                description="Starting presence line key"
                                 placeholder="Enter a number"
                                 value={startingPresenseLineKey}
                                 onChange={handlePresenseLineChange}
