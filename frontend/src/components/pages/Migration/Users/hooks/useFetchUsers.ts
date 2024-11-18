@@ -22,7 +22,13 @@ const useFetchUsers = (postMessage: (message: Message) => void, postTimedMessage
         }
 
         for (const bundle of dataBundles) {
-            await fetchUserData(bundle, extensions, false)
+            try {
+                await fetchUserData(bundle, extensions, false)
+            }
+            catch (e: any) {
+                postMessage(new Message(`Something went wrong fetching user ${bundle.extension.data.name}`, 'error'))
+                postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Unexepected error fetching user', e.message], undefined, bundle))
+            }
             setProgressValue((prev) => prev + 1)
         }
 

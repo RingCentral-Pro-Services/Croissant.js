@@ -17,8 +17,14 @@ const useFetchMOs = (postMessage: (message: Message) => void, postTimedMessage: 
         setMaxProgress(extensions.length)
 
         for (const extension of extensions) {
-            const bundle = await fetchMOData(extension)
-            if (bundle) dataBundles.push(bundle)
+            try {
+                const bundle = await fetchMOData(extension)
+                if (bundle) dataBundles.push(bundle)
+            }
+            catch (e: any) {
+                postMessage(new Message(`Something went wrong fetching Message-Only or Announcement-Only ${extension.data.name}`, 'error'))
+                postError(new SyncError(extension.data.name, extension.data.extensionNumber, ['Unexepected error fetching MO / AO', e.message], undefined, extension))
+            }
             setProgressValue((prev) => prev + 1)
         }
 

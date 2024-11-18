@@ -63,8 +63,14 @@ const useCreateMOs = (postMessage: (message: Message) => void, postTimedMessage:
                 numbers.push(tempNumber)
             }
 
-            await createMO(bundle, numbers)
-            createdMOs.push(bundle.extension)
+            try {
+                await createMO(bundle, numbers)
+                createdMOs.push(bundle.extension)
+            }
+            catch(e: any) {
+                postMessage(new Message(`Something went wrong configuring Message-Only or Announcement-Only ${bundle.extension.data.name}`, 'error'))
+                postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Unexepected error configuring MO / AO', e.message], undefined, bundle))
+            }
             setProgressValue((prev) => prev + 1)
         }
 
