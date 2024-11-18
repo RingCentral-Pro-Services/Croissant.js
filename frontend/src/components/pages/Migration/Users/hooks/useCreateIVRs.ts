@@ -70,8 +70,14 @@ const useCreateIVRs = (postMessage: (message: Message) => void, postTimedMessage
                 numbers.push(tempNumber)
             }
 
-            await createIVR(bundle, numbers)
-            createdIVRs.push(bundle.extension)
+            try {
+                await createIVR(bundle, numbers)
+                createdIVRs.push(bundle.extension)
+            }
+            catch (e: any) {
+                postMessage(new Message(`Something went wrong creating IVR ${bundle.extension.data.name}`, 'error'))
+                postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Unexepected error configuring IVR', e.message], undefined, bundle))
+            }
             setProgressValue((prev) => prev + 1)
         }
 

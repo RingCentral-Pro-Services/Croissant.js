@@ -19,9 +19,15 @@ const useFetchLEs = (postMessage: (message: Message) => void, postTimedMessage: 
 
         setMaxProgress(extensions.length)
         for (const extension of extensions) {
-            const bundle = await fetchLE(extension)
-            if (bundle) {
-                dataBundles.push(bundle)
+            try {
+                const bundle = await fetchLE(extension)
+                if (bundle) {
+                    dataBundles.push(bundle)
+                }
+            }
+            catch (e: any) {
+                postMessage(new Message(`Something went wrong fetching LE ${extension.data.name}`, 'error'))
+                postError(new SyncError(extension.data.name, extension.data.extensionNumber, ['Unexepected error fetching LE', e.message], undefined, extension))
             }
             setProgressValue((prev) => prev + 1)
         }

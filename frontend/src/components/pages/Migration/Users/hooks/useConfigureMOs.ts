@@ -14,7 +14,13 @@ const useConfigureMOs = (postMessage: (message: Message) => void, postTimedMessa
         }
 
         for (const bundle of bundles) {
-            await configureMO(bundle, originalExtensions, targetExtensions)
+            try {
+                await configureMO(bundle, originalExtensions, targetExtensions)
+            }
+            catch (e: any) {
+                postMessage(new Message(`Something went wrong configuring Message-Only or Announcement-Only  ${bundle.extension.data.name}`, 'error'))
+                postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Unexepected error configuring MO / AO', e.message], undefined, bundle))
+            }
         }
     }
 

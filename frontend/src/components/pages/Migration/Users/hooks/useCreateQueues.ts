@@ -68,8 +68,14 @@ const useCreateQueues = (postMessage: (message: Message) => void, postTimedMessa
                 numbers.push(tempNumber)
             }
 
-            await createQueue(bundle, numbers)
-            createdQueues.push(bundle.extension)
+            try {
+                await createQueue(bundle, numbers)
+                createdQueues.push(bundle.extension)
+            }
+            catch (e: any) {
+                postMessage(new Message(`Something went wrong creating Queue ${bundle.extension.data.name}`, 'error'))
+                postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Unexepected error configuring Queue', e.message], undefined, bundle))
+            }
             setProgressValue((prev) => prev + 1)
         }
         return createdQueues

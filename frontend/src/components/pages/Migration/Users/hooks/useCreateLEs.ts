@@ -73,8 +73,14 @@ const useCreateLEs = (postMessage: (message: Message) => void, postTimedMessage:
             const unassignedExt = unassignedExtensions.pop()!
             bundle.phoneNumberMap.set(bundle.extendedData!.devices![0].phoneLines[0].phoneInfo.phoneNumber, unassignedExt.data.phoneNumbers![0])
 
-            await createLE(bundle, erls, unassignedExt, numbers)
-            createdLEs.push(bundle.extension)
+            try {
+                await createLE(bundle, erls, unassignedExt, numbers)
+                createdLEs.push(bundle.extension)
+            }
+            catch (e: any) {
+                postMessage(new Message(`Something went wrong creating LE ${bundle.extension.data.name}`, 'error'))
+                postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['Unexepected error configuring LE', e.message], undefined, bundle))
+            }
             setProgressValue((prev) => prev + 1)
         }
 

@@ -25,7 +25,13 @@ const useFetchCallQueues = (postMessage: (message: Message) => void, postTimedMe
         }
 
         for (let i = 0; i < bundles.length; i++) {
-            await fetchCallQueue(bundles[i])
+            try {
+                await fetchCallQueue(bundles[i])
+            }
+            catch (e: any) {
+                postMessage(new Message(`Something went wrong fetching Queue ${bundles[i].extension.data.name}`, 'error'))
+                postError(new SyncError(bundles[i].extension.data.name, bundles[i].extension.data.extensionNumber, ['Unexepected error configuring Queue', e.message], undefined, bundles[i]))
+            }
             setProgressValue((prev) => prev + 1)
         }
 
