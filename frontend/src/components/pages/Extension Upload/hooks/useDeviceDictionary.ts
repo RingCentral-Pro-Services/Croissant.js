@@ -967,6 +967,28 @@ const defaultDevices = [
         "skuId": "LC_HD_610",
         "type": "HardPhone",
         "model": {
+            "id": "68",
+            "name": "Polycom VVX301",
+            "deviceClass": "DeskPhone",
+            "lineCount": 6,
+            "addons": [],
+            "features": [
+                "Intercom",
+                "Paging",
+                "CommonPhone",
+                "BLA",
+                "HELD"
+            ]
+        },
+        "countryId": 1,
+        "assistedProvisioningCapability": "Enabled",
+        "orderingCapability": "Enabled"
+    },
+    {
+        "sku": "HP-78",
+        "skuId": "LC_HD_610",
+        "type": "HardPhone",
+        "model": {
             "id": "78",
             "name": "Polycom VVX350",
             "deviceClass": "DeskPhone",
@@ -983,6 +1005,22 @@ const defaultDevices = [
         "countryId": 1,
         "assistedProvisioningCapability": "Enabled",
         "orderingCapability": "Enabled"
+    },
+    {
+        "type": "HardPhone",
+        "sku": "HP-65",
+        "model": {
+            "id": "55",
+            "name": "Polycom VVX410",
+            "lineCount": 12,
+            "addons": [],
+            "features": [
+                "Intercom",
+                "Paging",
+                "BLA",
+                "HELD"
+            ]
+        }
     },
     {
         "type": "HardPhone",
