@@ -1010,6 +1010,38 @@ const defaultDevices = [
         "type": "HardPhone",
         "sku": "HP-65",
         "model": {
+            "id": "58",
+            "name": "Polycom VVX400",
+            "lineCount": 12,
+            "addons": [],
+            "features": [
+                "Intercom",
+                "Paging",
+                "BLA",
+                "HELD"
+            ]
+        }
+    },
+    {
+        "type": "HardPhone",
+        "sku": "HP-65",
+        "model": {
+            "id": "99",
+            "name": "Polycom VVX401",
+            "lineCount": 12,
+            "addons": [],
+            "features": [
+                "Intercom",
+                "Paging",
+                "BLA",
+                "HELD"
+            ]
+        }
+    },
+    {
+        "type": "HardPhone",
+        "sku": "HP-65",
+        "model": {
             "id": "55",
             "name": "Polycom VVX410",
             "lineCount": 12,
