@@ -23,7 +23,7 @@ export class CallQueueDataBundle implements ExcelFormattable {
             this.extendedData?.directNumbers?.map((number) => number.phoneNumber).join(', ') ?? '',
             this.getTempNumbers(),
             this.extension.data.site?.name ?? '',
-            this.extension.data.contact.email ?? '',
+            this.extension.data.contact.email ?? this.prettyManagers() ?? '',
             this.extension.data.contact.pronouncedName?.text ?? '',
             this.prettyBusinessHours(),
             this.extension.data.regionalSettings?.timezone.description ?? '',
@@ -68,6 +68,17 @@ export class CallQueueDataBundle implements ExcelFormattable {
             this.prettyOverflowSettings(),
             '', // Notes. Ignored
         ]
+    }
+
+    prettyManagers() {
+        if (!this.extendedData?.managers || this.extendedData?.managers?.length === 0) return
+        let result = ''
+
+        for (const manager of this.extendedData.managers) {
+            result += `${manager.extension.name} - Ext. ${manager.extension.extensionNumber}`
+        }
+
+        return result
     }
 
     prettyCustomRules() {
