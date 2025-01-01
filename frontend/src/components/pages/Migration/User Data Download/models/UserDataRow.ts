@@ -470,6 +470,10 @@ export class UserDataRow implements ExcelFormattable {
 
         for (const callerIdOption of this.callerID?.byDevice) {
             if (Object.keys(callerIdOption.callerId).length === 0) result += `${callerIdOption.device.name} - Not set\n`
+            if (callerIdOption.callerId.type === 'Blocked') {
+                result += 'Blocked\n'
+                continue   
+            }
             if (callerIdOption.callerId.type !== 'PhoneNumber') result += `${callerIdOption.device.name} - ${callerIdOption.callerId.type}`
             result += `${callerIdOption.device.name} - ${callerIdOption.callerId.phoneInfo.phoneNumber}\n`
         }
