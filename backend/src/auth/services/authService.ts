@@ -1,10 +1,5 @@
 import { Request, Response } from "express";
 import { SDK } from '@ringcentral/sdk';
-import { getUserData } from './userService'
-import { isDepartmentWhiteListed, isUserWhiteListed } from '../../access-control/services/accessControlService'
-import { isUserAdmin } from "../../access-control/services/dbService";
-import { AuditTrailItem } from "../../audit-trail/interface/AuditTrailItem";
-import { addAuditTrailItem } from "../../audit-trail/services/dbService";
 import { TokenData } from "../interfaces/TokenData";
 import { getToken } from "psi-auth";
 const axios = require('axios').default;
@@ -28,48 +23,8 @@ export const processAuth = async (req: Request, res: Response, next: any) => {
     const refreshToken = data.refresh_token
     const accessToken = data.access_token
 
-    const user = await getUserData(accessToken)
-
-    if (!user) {
-        res.redirect(`/token`)
-        return
-    }
-
-    if (process.env.DISABLE_WHITELIST_CHECK !== 'true') {
-        const departmentWhitelisted = await isDepartmentWhiteListed(user.contact.department)
-
-        if (!departmentWhitelisted) {
-            const userWhiteListed = await isUserWhiteListed(user.id)
-
-            if (!userWhiteListed) {
-                const auditItem: AuditTrailItem = {
-                    action: 'Failed login attempt (Not whitelisted)',
-                    initiator: user.name,
-                    tool: 'Auth',
-                    type: 'Login',
-                    uid: 'N/A'
-                }
-                addAuditTrailItem(auditItem)
-                res.redirect(`/access-denied`)
-                return
-            }
-        }
-    }
-
-    const auditItem: AuditTrailItem = {
-        action: 'Successfully logged in',
-        initiator: user.name,
-        tool: 'Auth',
-        type: 'Login',
-        uid: 'N/A'
-    }
-    addAuditTrailItem(auditItem)
-
-    const isAdmin = await isUserAdmin(user.id)
-
     res.cookie('auth_token', accessToken)
     res.cookie('auth_refresh', refreshToken)
-    res.cookie('admin', isAdmin)
     res.redirect(`/token?state=${state}`)
 }
 
