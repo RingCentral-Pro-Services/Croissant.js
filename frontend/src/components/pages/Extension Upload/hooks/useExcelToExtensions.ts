@@ -47,7 +47,7 @@ const useExcelToExtensions = (shouldAlterEmails: boolean, postMessage: (message:
                     email: shouldAlterEmails ? `${currentItem['Email']}.ps.ringcentral.com` : currentItem['Email'],
                     department: currentItem['Dept'] ?? currentItem['Department'] ?? ''
                 },
-                extensionNumber: currentItem['Extension'],
+                extensionNumber: currentItem['Long Extension'] ?? currentItem['Extension'],
                 name: `${currentItem['First Name']} ${currentItem['Last Name'] ? ` ${currentItem['Last Name']}` : ''}`,
                 type: translateType(currentItem['User Type']),
                 site: {

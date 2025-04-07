@@ -1,5 +1,5 @@
 import { FormControlLabel, Typography } from "@mui/material";
-import { Button, Checkbox } from "@mantine/core";
+import { Button, Checkbox, Switch } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import { createSiteSchema } from "../../../helpers/schemas";
 import useLogin from "../../../hooks/useLogin";
@@ -34,13 +34,14 @@ const Sites = () => {
     const [shouldBuildERLs, setShouldBuildERLs] = useState(true)
     const [isShowingFeedbackForm, setIsShowingFeedbackForm] = useState(false)
     const [isSupportModalOpen, setIsSupportModalOpen] = useState(false)
+    const [isNewBrd, setIsNewBrd] = useState(false)
     const defaultSheet = 'Site Information'
 
     useLogin('sites', isSyncing)
     useSidebar('Create Sites')
     const {fetchToken, hasCustomerToken, companyName, error: tokenError, isTokenPending, userName} = useGetAccessToken()
     const {fetchRegionalFormats, regionalFormats, isRegionalFormatListPenging} = useRegionalFormats()
-    const {readVerticalExcel, excelData, isExcelDataPending} = useReadExcel()
+    const {readVerticalExcel, readFile, excelData, isExcelDataPending} = useReadExcel()
     let {messages, errors, postMessage, postError} = useMessageQueue()
     const {timedMessages, postTimedMessage} = usePostTimedMessage()
     const {validate, validatedData, isDataValidationPending} = useValidateExcelData(createSiteSchema, postMessage, postError)
@@ -67,7 +68,14 @@ const Sites = () => {
 
     const handleFileSelect = () => {
         if (!selectedFile) return
-        readVerticalExcel(selectedFile, selectedSheet)
+
+        if (isNewBrd) {
+            readFile(selectedFile, selectedSheet)
+        }
+        else {
+            readVerticalExcel(selectedFile, selectedSheet)
+        }
+
     }
 
     useEffect(() => {
@@ -98,6 +106,12 @@ const Sites = () => {
         createSites(sites)
     }
 
+    useEffect(() => {
+        if (isConvertPending) return
+        console.log("sites")
+        console.log(sites)
+    }, [isConvertPending])
+
 
     return (
         <>
@@ -113,7 +127,16 @@ const Sites = () => {
                 <Button variant='text' onClick={() => setIsShowingFeedbackForm(true)}>Give feedback</Button>
             </Header>
             <div className="tool-card">
-                <h2>Create Sites</h2>
+                <div>
+                    <h2 style={{ display: 'inline-block' }} >Create Sites</h2>
+                    <Switch
+                        className="mega-margin-left"
+                        style={{ display: 'inline-block' }}
+                        checked={isNewBrd}
+                        onChange={(event) => setIsNewBrd(event.currentTarget.checked)}
+                        label='New BRD'
+                    />
+                </div>
                 <FeedbackForm isOpen={isShowingFeedbackForm} setIsOpen={setIsShowingFeedbackForm} toolName="Create Sites" uid={targetUID} companyName={companyName} userName={userName} isUserInitiated={true} />
                 <UIDInputField disabled={hasCustomerToken} disabledText={companyName} setTargetUID={setTargetUID} error={tokenError} loading={isTokenPending} />
                 <FileSelect enabled={!isSyncing} setSelectedFile={setSelectedFile} isPending={false} handleSubmit={handleFileSelect} setSelectedSheet={setSelectedSheet} defaultSheet={defaultSheet} accept='.xlsx' />

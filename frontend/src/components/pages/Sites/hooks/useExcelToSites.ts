@@ -100,6 +100,39 @@ const useExcelToSites = (regionalFormats: RegionalFormat[]) => {
         ['Asia/Pyongyang', '93'],
     ])
 
+    const convertRegionName = (rawName: string) => {
+        switch (rawName) {
+            case 'English (U.S.)':
+                return 'English (United States)'
+            case 'English (U.K.)':
+                return 'English (United Kingdom)'
+            case 'German':
+                return 'German (Standard)'
+            case 'Spanish':
+                return 'Spanish (Spain, Modern Sort)'
+            case 'Spanish (Latin America)':
+                return 'Spanish (Latin America)'
+            case 'French':
+                return 'French (Standard)'
+            case 'French (Canada)':
+                return 'French (Canadian)'
+            case 'Italian':
+                return 'Italian (Standard)'
+            case 'Dutch (Netherlands)':
+                return 'Dutch (Netherlands)'
+            case 'Portuguese (Portugal)':
+                return 'Portuguese (Portugal)'
+            case 'Portuguese (Brazil)':
+                return 'Portuguese (Brazil)'
+            case 'Finnish':
+                return 'Finnish'
+            case 'Korean (South Korea)':
+                return 'Korean'
+            default:
+                return
+        }
+    }
+
     const convert = async (data: any) => {
         const sites: Site[] = []
 
@@ -107,19 +140,19 @@ const useExcelToSites = (regionalFormats: RegionalFormat[]) => {
             const data: SiteData = {
                 name: item['Site Name'],
                 street1: item['Address 1'] ?? item['Address'],
-                extensionNumber: item['Main Extension Number'],
+                extensionNumber: item['Main Extension Number'] ?? item['Site Extension Number'],
                 street2: item['Address 2'],
                 city: item['City'] ?? item['Suburb'],
                 state: item['State'],
                 zip: item['Postal Code'],
                 country: getCountry(item['Country']),
                 timezone: timezoneMap.get(item['Timezone']) || '51',
-                userLanguage: regionalFormats.find(rf => rf.name === item['User Language'])?.id || item['User Language'],
-                greetingLanguage: regionalFormats.find(rf => rf.name === item['Greeting Language'])?.id || item['Greeting Language'],
-                regionalFormat: regionalFormats.find(rf => rf.name === item['Regional Format'])?.id || item['Regional Format'],
+                userLanguage: regionalFormats.find(rf => rf.name === convertRegionName(item['User Language']))?.id || item['User Language'],
+                greetingLanguage: regionalFormats.find(rf => rf.name === convertRegionName(item['Greeting Language']))?.id || item['Greeting Language'],
+                regionalFormat: regionalFormats.find(rf => rf.name === convertRegionName(item['User Language']))?.id || item['Regional Format'],
                 timeFormat: getTimeFormat(`${item['Time Format']}`),
-                outboundCnam: item['Outbound Cnam'],
-                siteCode: item['Site Code'],
+                outboundCnam: item['Outbound Caller ID NAME (15 Character Max Limit)'] ?? item['Outbound Cnam'] ?? item['Site Name'],
+                siteCode: item['Site Code - 1 Digit (up to 9 Sites)'] ?? item['Site code - 2 Digits (up to 90 Sites)'] ?? item['Site Code - 3 Digits (up to 900 Sites)'] ?? item['Site Code - 4 Digits (up to 9,000 Sites)'] ?? item['Site Code - 5 Digits (up to 90,000 Sites)'] ?? item['Site Code'],
                 erlName: item['Emergency Response Location Nickname'],
             }
             const site = new Site(data)

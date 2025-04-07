@@ -195,12 +195,12 @@ export const extensionSchema = z.object({
         invalid_type_error: 'User type data type invalid'
     }).trim(),
     'Department': z.coerce.string().trim().optional(),
-    'Dept': z.string().trim().optional(),
+    'Dept': z.coerce.string().trim().optional(),
     'Pin': z.coerce.string().trim().optional(),
     'Password': z.string().trim().optional(),
     'Role': z.string().trim().optional(),
     'Existing Device Type': z.string().trim().optional(),
-    'MAC Address': z.string().trim().optional()
+    'MAC Address': z.coerce.string().trim().optional()
 })
 
 export const callMonitoringSchema = z.object({
@@ -288,7 +288,12 @@ export const createSiteSchema = z.object({
         required_error: 'Missing outbound cnam',
         invalid_type_error: 'Outbound cnam data type invalid'
     }).trim().optional(),
+    'Outbound Caller ID NAME (15 Character Max Limit)': z.string({
+        required_error: 'Missing outbound cnam',
+        invalid_type_error: 'Outbound cnam data type invalid'
+    }).trim().optional(),
     'Main Extension Number': z.coerce.string().trim().optional(),
+    'Site Extension Number': z.coerce.string().trim().optional(),
     'Site Code': z.coerce.string().trim().optional(),
     'Emergency Response Location Nickname': z.coerce.string().trim().optional()
 })
