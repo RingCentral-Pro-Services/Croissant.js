@@ -47,7 +47,7 @@ const useExcelToExtensions = (shouldAlterEmails: boolean, postMessage: (message:
                     email: shouldAlterEmails ? `${currentItem['Email']}.ps.ringcentral.com` : currentItem['Email'],
                     department: currentItem['Dept'] ?? currentItem['Department'] ?? ''
                 },
-                extensionNumber: currentItem['Extension'],
+                extensionNumber: currentItem['Long Extension'] ?? currentItem['Extension'],
                 name: `${currentItem['First Name']} ${currentItem['Last Name'] ? ` ${currentItem['Last Name']}` : ''}`,
                 type: translateType(currentItem['User Type']),
                 site: {
@@ -113,16 +113,34 @@ const useExcelToExtensions = (shouldAlterEmails: boolean, postMessage: (message:
         switch (rawType) {
             case 'User':
                 return 'User'
+            case 'User (RingEX)':
+                return 'User'
+            case 'User (RingEX)':
+                return 'User'
             case 'MS Teams User →':
                 return 'User'
             case 'Virtual User':
-                return 'User'
+                return 'VirtualUser'
             case 'LimitedExtension':
                 return 'Limited'
             case 'Message Only':
                 return 'Voicemail'
             case 'Announcement Only':
                 return 'Announcement'
+            case 'Fax (eFax)':
+                return 'VirtualUser'
+            case 'Fax (ATA)':
+                return 'User'
+            case 'VirtualUser (CX Agent)':
+                return 'VirtualUser'
+            case 'VirtualUser (CX Supervisor)':
+                return 'VirtualUser'
+            case 'VirtualUser (CX Admin)':
+                return 'VirtualUser'
+            case 'VirtualUser (CX Supervisor & Admin)':
+                return 'VirtualUser'
+            case 'User (CX Supervisor & Admin)':
+                return 'User'
             default:
                 return rawType
         }
