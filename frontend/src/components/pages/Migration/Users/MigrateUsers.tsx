@@ -329,7 +329,9 @@ const MigrateUsers = () => {
         // Users
         const updatedUsers = [...userDataBundles]
         for (let i = 0; i < updatedUsers.length; i++) {
-            delete updatedUsers[i].extension.data.site
+            if (updatedUsers[i].extension.data.site) {
+                updatedUsers[i].extension.data.site!.id = 'main-site'
+            }
         }
         setUserDataBundles(updatedUsers)
 
