@@ -51,6 +51,11 @@ const useFetchNotifications = (postMessage: (message: Message) => void, postTime
             
             let resData = response.data
             let bundle: NotificationSettingsPayload = resData
+            
+            if (bundle.callNotes) {
+                bundle.callNotes.advancedEmailAddresses = bundle.missedCalls.advancedEmailAddresses
+            }
+
             let notification = new NotificationSettings(extension, bundle)
 
             if (response.rateLimitInterval > 0) {
