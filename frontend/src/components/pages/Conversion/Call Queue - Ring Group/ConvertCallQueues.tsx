@@ -148,7 +148,7 @@ export const ConvertCallQueues = () => {
 
     const handleRingGroupToQueue = async (devices: Device[], queueGreetings: StandardGreeting[], userGreetings: StandardGreeting[]) => {
         
-        const ringGroups = await fetchUsers(selectedExtensions, [])
+        const ringGroups = await fetchUsers(selectedExtensions, [], false)
         const queues = convertToQueues(ringGroups, devices, queueGreetings)
         console.log('Queues')
         console.log(queues)

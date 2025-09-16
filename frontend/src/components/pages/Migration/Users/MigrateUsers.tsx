@@ -99,6 +99,7 @@ import { SystemNotifications } from "../../../shared/SystemNotifications";
 import { SupportSheet } from "../../../shared/SupportSheet";
 import { GreetingModal } from "./components/GreetingModal";
 import { useTimeZones } from "./hooks/useTimeZones";
+import { isUsingNewCallHandling } from "../utils";
 const FileSaver = require('file-saver');
 
 
@@ -521,6 +522,15 @@ const MigrateUsers = () => {
             uid: originalUID
         })
 
+        const accessToken = localStorage.getItem('cs_access_token')
+        if (!accessToken) {
+            postMessage(new Message('No access token found for account', 'error'))
+            return
+        }
+        const isNewCallHandling = await isUsingNewCallHandling(accessToken)
+        console.log(`Is new call handling: ${isNewCallHandling}`)
+        postMessage(new Message(`New Call Handling: ${isNewCallHandling}`, 'info'))
+
         // Devices
         const devices = await fetchAccountDevices()
         console.log('Devices')
@@ -566,7 +576,7 @@ const MigrateUsers = () => {
         }
 
         const roles = await fetchCustomRoles()
-        const userDataBundles = await fetchUsers(selectedExtensions.filter((ext) => ext.prettyType() === 'User'), originalExtensionList)
+        const userDataBundles = await fetchUsers(selectedExtensions.filter((ext) => ext.prettyType() === 'User'), originalExtensionList, isNewCallHandling)
         
         // Message-only extensions and announcement-only extensions
         const selectedMOs = selectedExtensions.filter((ext) => ext.prettyType() === 'Message-Only' || ext.prettyType() === 'Announcement-Only')
@@ -657,6 +667,15 @@ const MigrateUsers = () => {
             type: 'Tool',
             uid: targetUID
         })
+
+        const accessToken = localStorage.getItem('cs_access_token')
+        if (!accessToken) {
+            postMessage(new Message('No access token found for account', 'error'))
+            return
+        }
+        const isNewCallHandling = await isUsingNewCallHandling(accessToken)
+        console.log(`Is new call handling: ${isNewCallHandling}`)
+        postMessage(new Message(`New Call Handling: ${isNewCallHandling}`, 'info'))
 
         let targetExts = targetExtensionList
         let targetERLs = targetERLList
@@ -920,7 +939,7 @@ const MigrateUsers = () => {
         }
 
         await configureQueues(callQueueBundles, originalExtensionList, targetExts)
-        await configureUsers(userDataBundles, targetERLs, originalExtensionList, targetExts, roles, globalSiteNumberMap, settings.emailSuffix)
+        await configureUsers(userDataBundles, targetERLs, originalExtensionList, targetExts, roles, globalSiteNumberMap, settings.emailSuffix, isNewCallHandling)
         await configureMOs(messageOnlyBundles, originalExtensionList, targetExts)
         await configureIVRs(ivrBundles, originalExtensionList, targetExts, originalAccountPrompts, prompts)
         if (settings.shouldMigrateSites) {

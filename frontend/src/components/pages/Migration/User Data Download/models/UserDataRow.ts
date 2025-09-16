@@ -1,13 +1,15 @@
 import ExcelFormattable from "../../../../../models/ExcelFormattable";
 import { Extension } from "../../../../../models/Extension";
+import { StateBasedRule } from "../../types/state-based-rule";
 import { BlockedCallSettings, BlockedPhoneNumber, BusinessHours, CallerID, CallHandling, DefaultBridge, Delegate, Device, PERL, ForwardAllCalls, IncommingCallInfo, IntercomStatus, Notifications, PresenseAllowedUser, PresenseLine, PresenseSettings, Role, PhoneNumber, IntercomUser, CustomRule } from "./UserDataBundle";
 
 export class UserDataRow implements ExcelFormattable {
 
     public extensions: Extension[] = []
 
-    constructor(public extension: Extension, public type: string, public device?: Device, public directNumber?: string, 
+    constructor(public isNewCallHandling: boolean, public extension: Extension, public type: string, public device?: Device, public directNumber?: string, 
                 public businessHoursCallHandling?: CallHandling, public afterHoursCallHandling?: CallHandling,
+                public stateBasedRules?: StateBasedRule[],
                 public notifications?: Notifications, public callerID?: CallerID, public blockedCallSettings?: BlockedCallSettings,
                 public blockedPhoneNumbers?: BlockedPhoneNumber[], public presenseLines?: PresenseLine[], public presenseSettings?: PresenseSettings,
                 public presenseAllowedUsers?: PresenseAllowedUser[], public intercomStatus?: IntercomStatus, public delegates?: Delegate[], public erls?: PERL[],
@@ -76,7 +78,7 @@ export class UserDataRow implements ExcelFormattable {
             this.blockedCallSettings?.noCallerId ?? '',
             this.blockedCallSettings?.payPhones ?? '',
             this.prettyForwardAllCalls(),
-            this.businessHoursCallHandling?.forwarding?.ringingMode ?? '',
+            this.isNewCallHandling ? this.businessHoursCallHandling?.forwarding?.ringingMode ?? '' : this.stateBasedRules?.find((rule) => rule.state.id === 'work-hours')?.dispatching.type ?? 'Bruh',
             this.businessHoursCallHandling?.forwarding?.softPhonesAlwaysRing ? 'Always Ring' : this.prettyRingTime(this.businessHoursCallHandling?.forwarding?.softPhonesRingCount),
             this.prettyDeviceRingTime(),
             this.prettyVoicemailAction(),

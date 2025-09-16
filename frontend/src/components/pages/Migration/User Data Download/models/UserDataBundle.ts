@@ -3,6 +3,7 @@ import ExcelFormattable from "../../../../../models/ExcelFormattable";
 import { Extension } from "../../../../../models/Extension";
 import { Greeting } from "../../../../../models/Greetings";
 import { TransferPayload, UnconditionalForwardingPayload } from "../../../../../models/TransferPayload";
+import { StateBasedRule } from "../../types/state-based-rule";
 import { UserDataRow } from "./UserDataRow";
 
 export class UserDataBundle {
@@ -11,6 +12,7 @@ export class UserDataBundle {
     public hasEncounteredFatalError = false
     public tempExtension = ''
     public extensions: Extension[] = []
+    public isNewCallHandling = false
 
     constructor(public extension: Extension, public extendedData: ExtendedUserData | undefined, public phoneNumberMap?: Map<string, PhoneNumber>) { }
 
@@ -27,7 +29,7 @@ export class UserDataBundle {
             actualDevices = this.extendedData.devices.filter((device) => device.phoneLines && device.phoneLines.length !== 0 && device.phoneLines[0].lineType !== 'StandaloneFree')
 
             for (let i = 0; i < actualDevices.length; i++) {
-                const row = new UserDataRow(this.extension, 'Full DL', actualDevices[i], undefined, this.extendedData.businessHoursCallHandling, this.extendedData.afterHoursCallHandling, this.extendedData.notifications, this.extendedData.callerID, this.extendedData.blockedCallSettings, this.extendedData.blockedPhoneNumbers, this.extendedData.presenseLines, this.extendedData.presenseSettings, this.extendedData.presenseAllowedUsers, this.extendedData.intercomStatus, this.extendedData.delegates, this.extendedData.pERLs, this.extendedData.roles, this.extendedData.incommingCallInfo, this.extendedData.businessHours, this.extendedData.forwardAllCalls, this.extendedData.defaultBridge, this.userGroups, this.phoneNumberMap, this.tempExtension, this.extendedData.intercomUsers, this.extendedData.customRules)
+                const row = new UserDataRow(this.isNewCallHandling, this.extension, 'Full DL', actualDevices[i], undefined, this.extendedData.businessHoursCallHandling, this.extendedData.afterHoursCallHandling, this.extendedData.stateBasedRules, this.extendedData.notifications, this.extendedData.callerID, this.extendedData.blockedCallSettings, this.extendedData.blockedPhoneNumbers, this.extendedData.presenseLines, this.extendedData.presenseSettings, this.extendedData.presenseAllowedUsers, this.extendedData.intercomStatus, this.extendedData.delegates, this.extendedData.pERLs, this.extendedData.roles, this.extendedData.incommingCallInfo, this.extendedData.businessHours, this.extendedData.forwardAllCalls, this.extendedData.defaultBridge, this.userGroups, this.phoneNumberMap, this.tempExtension, this.extendedData.intercomUsers, this.extendedData.customRules)
                 row.extensions = this.extensions
                 rows.push(row)
             }
@@ -35,14 +37,14 @@ export class UserDataBundle {
 
         if (this.extendedData.directNumbers) {
             for (const directNumber of this.extendedData.directNumbers) {
-                const row = new UserDataRow(this.extension, 'Additional DID', undefined, directNumber.phoneNumber, this.extendedData.businessHoursCallHandling, this.extendedData.afterHoursCallHandling, this.extendedData.notifications, this.extendedData.callerID, this.extendedData.blockedCallSettings, this.extendedData.blockedPhoneNumbers, this.extendedData.presenseLines, this.extendedData.presenseSettings, this.extendedData.presenseAllowedUsers, this.extendedData.intercomStatus, this.extendedData.delegates, this.extendedData.pERLs, this.extendedData.roles, this.extendedData.incommingCallInfo, this.extendedData.businessHours, this.extendedData.forwardAllCalls, this.extendedData.defaultBridge, this.userGroups, this.phoneNumberMap, this.tempExtension, this.extendedData.intercomUsers, this.extendedData.customRules)
+                const row = new UserDataRow(this.isNewCallHandling, this.extension, 'Additional DID', undefined, directNumber.phoneNumber, this.extendedData.businessHoursCallHandling, this.extendedData.afterHoursCallHandling, this.extendedData.stateBasedRules, this.extendedData.notifications, this.extendedData.callerID, this.extendedData.blockedCallSettings, this.extendedData.blockedPhoneNumbers, this.extendedData.presenseLines, this.extendedData.presenseSettings, this.extendedData.presenseAllowedUsers, this.extendedData.intercomStatus, this.extendedData.delegates, this.extendedData.pERLs, this.extendedData.roles, this.extendedData.incommingCallInfo, this.extendedData.businessHours, this.extendedData.forwardAllCalls, this.extendedData.defaultBridge, this.userGroups, this.phoneNumberMap, this.tempExtension, this.extendedData.intercomUsers, this.extendedData.customRules)
                 row.extensions = this.extensions
                 rows.push(row)
             }
         }
 
         if ((!this.extendedData.devices && !this.extendedData.directNumbers) || (this.extendedData.devices.length === 0 && this.extendedData.directNumbers?.length === 0) || actualDevices.length === 0) {
-            const row = new UserDataRow(this.extension, 'Virtual', undefined, undefined, this.extendedData.businessHoursCallHandling, this.extendedData.afterHoursCallHandling, this.extendedData.notifications, this.extendedData.callerID, this.extendedData.blockedCallSettings, this.extendedData.blockedPhoneNumbers, this.extendedData.presenseLines, this.extendedData.presenseSettings, this.extendedData.presenseAllowedUsers, this.extendedData.intercomStatus, this.extendedData.delegates, this.extendedData.pERLs, this.extendedData.roles, this.extendedData.incommingCallInfo, this.extendedData.businessHours, this.extendedData.forwardAllCalls, this.extendedData.defaultBridge, this.userGroups, this.phoneNumberMap, this.tempExtension, this.extendedData.intercomUsers, this.extendedData.customRules)
+            const row = new UserDataRow(this.isNewCallHandling, this.extension, 'Virtual', undefined, undefined, this.extendedData.businessHoursCallHandling, this.extendedData.afterHoursCallHandling, this.extendedData.stateBasedRules, this.extendedData.notifications, this.extendedData.callerID, this.extendedData.blockedCallSettings, this.extendedData.blockedPhoneNumbers, this.extendedData.presenseLines, this.extendedData.presenseSettings, this.extendedData.presenseAllowedUsers, this.extendedData.intercomStatus, this.extendedData.delegates, this.extendedData.pERLs, this.extendedData.roles, this.extendedData.incommingCallInfo, this.extendedData.businessHours, this.extendedData.forwardAllCalls, this.extendedData.defaultBridge, this.userGroups, this.phoneNumberMap, this.tempExtension, this.extendedData.intercomUsers, this.extendedData.customRules)
             row.extensions = this.extensions
             rows.push(row)
         }
@@ -72,6 +74,7 @@ export interface ExtendedUserData {
     directNumbers?: PhoneNumber[]
     forwardAllCalls?: ForwardAllCalls
     defaultBridge?: DefaultBridge
+    stateBasedRules?: StateBasedRule[]
     customRules?: CustomRule[]
 }
 

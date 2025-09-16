@@ -2,6 +2,7 @@ import { Extension } from "../../../../../models/Extension"
 import { Message } from "../../../../../models/Message"
 import { SyncError } from "../../../../../models/SyncError"
 import { RestCentral } from "../../../../../rcapi/RestCentral"
+import { StateBasedRule } from "../../types/state-based-rule"
 import { PERL, PhoneNumber, Role, UserDataBundle } from "../models/UserDataBundle"
 const FileSaver = require('file-saver');
 
@@ -28,9 +29,10 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
     const basePMIURL = 'https://platform.ringcentral.com/rcvideo/v2/account/~/extension/extensionId/bridges/default'
     const baseCustomGreetingURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/greeting/greetingId'
     const baseCustomRulesURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/answering-rule?perPage=1000&type=Custom&view=Detailed'
+    const baseStateBasedRulesURL = 'https://platform.ringcentral.com/restapi/v2/accounts/~/extensions/extensionId/comm-handling/voice/state-rules'
     const baseWaitingPeriod = 250
 
-    const fetchUserData = async (userDataBundle: UserDataBundle, extensions: Extension[], shouldFetchDelegates: boolean = true) => {
+    const fetchUserData = async (userDataBundle: UserDataBundle, extensions: Extension[], shouldFetchDelegates: boolean = true, isNewCallHandling: boolean = false) => {
         const accessToken = localStorage.getItem('cs_access_token')
         if (!accessToken) {
             throw new Error('No access token')
@@ -39,8 +41,13 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
         await fetchBaseData(userDataBundle, accessToken)
         await fetchDevices(userDataBundle, accessToken)
         await fetchBusinessHours(userDataBundle, accessToken)
-        await fetchBusinessHoursCallHandling(userDataBundle, extensions, accessToken)
-        await fetchAfterHoursCallHandling(userDataBundle, extensions, accessToken)
+        if (!isNewCallHandling) {
+            await fetchBusinessHoursCallHandling(userDataBundle, extensions, accessToken)
+            await fetchAfterHoursCallHandling(userDataBundle, extensions, accessToken)
+        }
+        if (isNewCallHandling) {
+            await fetchStateBasedRules(userDataBundle, accessToken)
+        }
         await fetchNotificationSettings(userDataBundle, accessToken)
         await fetchCallerID(userDataBundle, accessToken)
         await fetchBlockedCallSettings(userDataBundle, accessToken)
@@ -88,6 +95,8 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
         if (userDataBundle.extension.data.type === 'DigitalUser') {
             userDataBundle.extension.data.type = 'User'
         }
+
+        userDataBundle.isNewCallHandling = isNewCallHandling
 
         callback()
     }
@@ -236,6 +245,35 @@ const useFetchUserData = (postMessage: (message: Message) => void, postTimedMess
             console.log(e)
             postMessage(new Message(`Failed to get after hours call handling for ${userDataBundle.extension.data.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(userDataBundle.extension.data.name, parseInt(userDataBundle.extension.data.extensionNumber), ['Failed to fetch after hours call handling', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const fetchStateBasedRules = async (userDataBundle: UserDataBundle, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+            const response = await RestCentral.get(baseStateBasedRulesURL.replace('extensionId', `${userDataBundle.extension.data.id}`), headers)
+            const rules: StateBasedRule[] = response.data.records
+            userDataBundle.extendedData!.stateBasedRules = rules
+
+            if (response.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${response.rateLimitInterval / 1000} seconds`, 'info'), response.rateLimitInterval)
+            }
+            
+            response.rateLimitInterval > 0 ? await wait(response.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to get state-based rules`)
+            console.log(e)
+            postMessage(new Message(`Failed to get state-based rules for ${userDataBundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(userDataBundle.extension.data.name, parseInt(userDataBundle.extension.data.extensionNumber), ['Failed to fetch state-based rules', ''], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }

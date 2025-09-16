@@ -4,6 +4,7 @@ import { Message } from "../../../../../models/Message";
 import { SyncError } from "../../../../../models/SyncError";
 import { RestCentral } from "../../../../../rcapi/RestCentral";
 import { ERL } from "../../../Automatic Location Updates/models/ERL";
+import { StateBasedRule } from "../../types/state-based-rule";
 import { BlockedPhoneNumber, CalledNumber, CallerIDDevice, CallerIDFeature, CallHandling, CallHandlingForwardingNumber, CallHandlingForwardingRule, CustomRule, Device, ForwardingNumber, IntercomUser, PERL, PhoneNumber, PresenseAllowedUser, PresenseLine, UserDataBundle } from "../../User Data Download/models/UserDataBundle";
 import { Role } from "../models/Role";
 
@@ -42,9 +43,10 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
     const baseCustomRuleURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/answering-rule'
     const baseCallerIdURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/caller-id'
     const basePresenseAllowedUsersURL = 'https://platform.ringcentral.com/restapi/v1.0/account/~/extension/extensionId/presence/permission'
+    const baseCallHandlingStateURL = 'https://platform.ringcentral.com/restapi/v2/accounts/~/extensions/extensionId/comm-handling/voice/state-rules/stateId'
     const baseWaitingPeriod = 250
 
-    const configureUser = async (bundle: UserDataBundle, companyERLs: ERL[], originalExtensions: Extension[], targetExtensions: Extension[], roles: Role[], globalSiteNumberMap: Map<string, PhoneNumber>, emailSuffix: string) => {
+    const configureUser = async (bundle: UserDataBundle, companyERLs: ERL[], originalExtensions: Extension[], targetExtensions: Extension[], roles: Role[], globalSiteNumberMap: Map<string, PhoneNumber>, emailSuffix: string, isNewCallHandling: boolean) => {
         
         // Don't bother trying to configure the user if they weren't created
         if (bundle.hasEncounteredFatalError) return
@@ -96,21 +98,26 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
             await addCustomRule(bundle, customRule, accessToken)
         }
 
-
-        const customBusinessHoursGreetings = await setDuringHoursGreetings(bundle, accessToken)
-        const customAfterHoursGreetings = await setAfterHoursGreetings(bundle, accessToken)
-
-        if (customBusinessHoursGreetings) {
-            for (const greeting of customBusinessHoursGreetings) {
-                console.log('setting custom greeting')
-                await setCustomGreeting(bundle, 'business-hours-rule', greeting, accessToken)
-            }
+        if (isNewCallHandling) {
+            // set state based rules
+            await setCallHandling(bundle, accessToken, originalExtensions, targetExtensions)
         }
+        else {
+            const customBusinessHoursGreetings = await setDuringHoursGreetings(bundle, accessToken)
+            const customAfterHoursGreetings = await setAfterHoursGreetings(bundle, accessToken)
 
-        if (customAfterHoursGreetings) {
-            for (const greeting of customAfterHoursGreetings) {
-                console.log('setting custom greeting')
-                await setCustomGreeting(bundle, 'after-hours-rule', greeting, accessToken)
+            if (customBusinessHoursGreetings) {
+                for (const greeting of customBusinessHoursGreetings) {
+                    console.log('setting custom greeting')
+                    await setCustomGreeting(bundle, 'business-hours-rule', greeting, accessToken)
+                }
+            }
+
+            if (customAfterHoursGreetings) {
+                for (const greeting of customAfterHoursGreetings) {
+                    console.log('setting custom greeting')
+                    await setCustomGreeting(bundle, 'after-hours-rule', greeting, accessToken)
+                }
             }
         }
 
@@ -681,6 +688,96 @@ const useConfigureUser = (postMessage: (message: Message) => void, postTimedMess
             console.log(e)
             postMessage(new Message(`Failed to set intercom users for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
             postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['Failed to set intercom users', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const setCallHandling = async (bundle: UserDataBundle, token: string, originalExtensions: Extension[], targetExtensions: Extension[]) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+
+            for (const state of bundle.extendedData?.stateBasedRules ?? []) {
+                let adjustedState = adjustCallHandlingState(bundle, state, originalExtensions, targetExtensions)
+                await setCallHandlingState(bundle, adjustedState, token)
+            }
+
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to set business hours greetings`)
+            console.log(e)
+            postMessage(new Message(`[ New Call Handling ] Failed to set call handling for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['[ New Call Handling ] Failed to set call handling', ''], e.error ?? ''))
+            e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
+        }
+    }
+
+    const adjustCallHandlingState = (bundle: UserDataBundle, state: StateBasedRule, originalExtensions: Extension[], targetExtensions: Extension[]) => {
+        try {
+            for (let action of state.dispatching.actions) {
+                if (Object.keys(action).includes('targets')) {
+
+                    // @ts-expect-error
+                    for (let target of action.targets!) {
+                        const originalExtension = originalExtensions.find((ext) => `${ext.data.id}` === `${target.extension.id}`)
+                        if (!originalExtension) {
+                            postMessage(new Message(`[New Call Handling] An extension in ${bundle.extension.data.name}'s call handling could not be found. It has been removed from the call handling`, 'warning'))
+                            postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['An extension was removed from call handling', target.extensionName ?? target.id]))
+                            // @ts-expect-error
+                            action.targets = action.targets.filter((t: any) => t.id !== target.id)
+                            continue
+                        }
+
+                        const newExtension = targetExtensions.find((ext) => ext.data.name === originalExtension.data.name && ext.prettyType() === originalExtension.prettyType())
+                        if (!newExtension) {
+                            postMessage(new Message(`[New Call Handling] An extension in ${bundle.extension.data.name}'s call handling could not be found. It has been removed from the call handling`, 'warning'))
+                            postError(new SyncError(bundle.extension.data.name, bundle.extension.data.extensionNumber, ['An extension was removed from call handling', target.extensionName ?? target.id]))
+                            // @ts-expect-error
+                            action.targets = action.targets.filter((t: any) => t.id !== target.id)
+                            continue
+                        }
+
+                        target.extension.id = `${newExtension.data.id}`
+                    }
+
+                }
+            }
+
+            return state
+        }
+        catch (e: any) {
+            console.log(`Failed to adjust call handling state`)
+            console.log(e)
+            postMessage(new Message(`[ New Call Handling ] Failed to adjust call handling state for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['[ New Call Handling ] Failed to adjust call handling state', state.displayName], e.error ?? ''))
+            return state
+        }
+    }
+
+    const setCallHandlingState = async (bundle: UserDataBundle, state: StateBasedRule, token: string) => {
+        try {
+            const headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+
+            const response = await RestCentral.put(baseCallHandlingURL.replace('extensionId', `${bundle.extension.data.id}`).replace('ruleId', 'business-hours-rule'), headers, state)
+        }
+        catch (e: any) {
+            if (e.rateLimitInterval > 0) {
+                postTimedMessage(new Message(`Rate limit reached. Waiting ${e.rateLimitInterval / 1000} seconds`, 'info'), e.rateLimitInterval)
+            }
+            console.log(`Failed to set ${state.displayName} hours greetings`)
+            console.log(e)
+            postMessage(new Message(`[ New Call Handling ] Failed to set ${state.displayName} call handling for ${bundle.extension.data.name} ${e.error ?? ''}`, 'error'))
+            postError(new SyncError(bundle.extension.data.name, parseInt(bundle.extension.data.extensionNumber), ['[ New Call Handling ] Failed to set call handling', state.displayName], e.error ?? ''))
             e.rateLimitInterval > 0 ? await wait(e.rateLimitInterval) : await wait(baseWaitingPeriod)
         }
     }
