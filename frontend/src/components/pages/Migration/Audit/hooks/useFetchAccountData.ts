@@ -268,7 +268,7 @@ const useAccountData = (settings: AuditSettings, selectedExtensionTypes: string[
 
         setProgressLabel('Fetching Users')
         setProgressValue(0)
-        const userDataBundles = await fetchUsers(selectedExtensions.filter((ext) => ext.prettyType() === 'User'), originalExtensionList)
+        const userDataBundles = await fetchUsers(selectedExtensions.filter((ext) => ext.prettyType() === 'User'), originalExtensionList, false)
         accountData.customeRoles = roles
         accountData.users = userDataBundles
         setStep((prev) => prev + 1)

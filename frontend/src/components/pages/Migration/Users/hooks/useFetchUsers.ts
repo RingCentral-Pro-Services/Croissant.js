@@ -4,6 +4,7 @@ import { Message } from "../../../../../models/Message"
 import { SyncError } from "../../../../../models/SyncError"
 import useFetchUserData from "../../User Data Download/hooks/useFetchUserData"
 import { UserDataBundle } from "../../User Data Download/models/UserDataBundle"
+import { boolean } from "zod"
 
 const useFetchUsers = (postMessage: (message: Message) => void, postTimedMessage: (message: Message, duration: number) => void, postError: (error: SyncError) => void) => {
 
@@ -11,7 +12,7 @@ const useFetchUsers = (postMessage: (message: Message) => void, postTimedMessage
     const [maxProgress, setMaxProgress] = useState(2)
     const {fetchUserData} = useFetchUserData(postMessage, postTimedMessage, postError, () => console.log('fetching next user'))
 
-    const fetchUsers = async (users: Extension[], extensions: Extension[]) => {
+    const fetchUsers = async (users: Extension[], extensions: Extension[], isNewCallHandling: boolean) => {
         const dataBundles: UserDataBundle[] = []
 
         setProgressValue(0)
@@ -23,7 +24,7 @@ const useFetchUsers = (postMessage: (message: Message) => void, postTimedMessage
 
         for (const bundle of dataBundles) {
             try {
-                await fetchUserData(bundle, extensions, false)
+                await fetchUserData(bundle, extensions, false, isNewCallHandling)
             }
             catch (e: any) {
                 postMessage(new Message(`Something went wrong fetching user ${bundle.extension.data.name}`, 'error'))

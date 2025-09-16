@@ -12,7 +12,7 @@ const useConfigureUsers = (postMessage: (message: Message) => void, postTimedMes
     const [maxProgress, setMaxProgress] = useState(2)
     const {configureUser} = useConfigureUser(postMessage, postTimedMessage, postError)
 
-    const configureUsers = async (bundles: UserDataBundle[], companyERLs: ERL[], originalExtensions: Extension[], targetExtensions: Extension[], roles: Role[], globalSiteNumberMap: Map<string, PhoneNumber>, emailSuffix: string) => {
+    const configureUsers = async (bundles: UserDataBundle[], companyERLs: ERL[], originalExtensions: Extension[], targetExtensions: Extension[], roles: Role[], globalSiteNumberMap: Map<string, PhoneNumber>, emailSuffix: string, isNewCallHandling: boolean) => {
         const accessToken = localStorage.getItem('cs_access_token')
         if (!accessToken) {
             throw new Error('No access token')
@@ -21,7 +21,7 @@ const useConfigureUsers = (postMessage: (message: Message) => void, postTimedMes
         setMaxProgress(bundles.length)
         for (const bundle of bundles) {
             try {
-                await configureUser(bundle, companyERLs, originalExtensions, targetExtensions, roles, globalSiteNumberMap, emailSuffix)
+                await configureUser(bundle, companyERLs, originalExtensions, targetExtensions, roles, globalSiteNumberMap, emailSuffix, isNewCallHandling)
             }
             catch (e: any) {
                 postMessage(new Message(`Something went wrong configuring User ${bundle.extension.data.name}`, 'error'))
