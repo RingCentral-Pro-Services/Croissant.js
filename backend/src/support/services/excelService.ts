@@ -28,7 +28,7 @@ export const writeExcelFile = async (sheetData: ExcelSheetData[], filename: stri
         if (sheet.vertical) {
             excelData.forEach((column, columnIndex) => {
                 column.forEach((cellValue, rowIndex) => {
-                    const cell = worksheet.getCell(rowIndex + sheet.startingRow, columnIndex + sheet.startingColumnIndex!);
+                    const cell = worksheet!.getCell(rowIndex + sheet.startingRow, columnIndex + sheet.startingColumnIndex!);
                     cell.value = cellValue;
                 });
             });
