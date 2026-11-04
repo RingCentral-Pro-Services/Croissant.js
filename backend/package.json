@@ -14,7 +14,7 @@
   "dependencies": {
     "@ringcentral-pro-serv/psi-logging-system": "^1.0.5",
     "@ringcentral/sdk": "^5.0.0",
-    "axios": "^0.27.2",
+    "axios": "^1.9.0",
     "csv-parser": "^3.0.0",
     "dotenv": "^16.0.2",
     "exceljs": "^4.3.0",
@@ -22,10 +22,13 @@
     "express-session": "^1.17.3",
     "form-data": "^4.0.0",
     "formidable": "^2.0.1",
-    "nodemailer": "^6.7.5",
+    "nodemailer": "^10.0.6",
     "pg": "^8.11.3",
     "psi-auth": "^1.0.9",
     "sequelize": "^6.35.1"
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
   },
   "engines": {
     "node": "16.15.1"

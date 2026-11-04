@@ -1,13 +1,14 @@
-
 # About
 
 Croissant serves RingCentral Professional Services by streamlining commonly performed tasks.
 
+Staging: https://staging-build.ps.ringcentral.com
 
+Production: https://build.ps.ringcentral.com
 
 ## Dev Dependencies
 
-Node 16.5.1
+Node 16.5.1 or above
 
 ## Environment Variables
 
@@ -16,7 +17,6 @@ See sample.env for a list of environment variables
 ## Installation
 
   
-
 ### Clone the repo
 
 ```bash
@@ -39,7 +39,6 @@ npm install
 npm run build
 ```
 
-  
 ## Start it up
 `npm start`
 
