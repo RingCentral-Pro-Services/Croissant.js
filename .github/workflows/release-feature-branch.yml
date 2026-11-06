@@ -1,0 +1,32 @@
+name: Deploy Feature Branch to Staging
+
+on:
+  workflow_dispatch:
+    inputs:
+      cluster:
+        description: 'Target staging cluster'
+        required: true
+        type: choice
+        options:
+          - psi-staging-eks
+      reason:
+        description: 'Reason for this deploy (optional — shows in run history)'
+        required: false
+        default: ''
+
+jobs:
+  pipeline:
+    uses: RingCentral-Pro-Services/platform-actions/.github/workflows/pipeline-feature-branch.yml@v3.0.0
+    with:
+      repo_name:     ${{ github.event.repository.name }}
+      ecr_repo_name: ${{ github.event.repository.name }}
+      branch:        ${{ github.ref_name }}
+      cluster:       ${{ inputs.cluster }}
+      env_file:      .env.staging
+      argocd_server: ${{ vars.ARGOCD_SERVER }}
+      reason:        ${{ inputs.reason }}
+    secrets:
+      aws_role_arn:           ${{ secrets.AWS_ROLE_ARN }}
+      gitops_app_id:          ${{ secrets.PSI_GITOPS_CI_APP_ID }}
+      gitops_app_private_key: ${{ secrets.PSI_GITOPS_CI_APP_PRIVATE_KEY }}
+      argocd_token:           ${{ secrets.ARGOCD_TOKEN }}
