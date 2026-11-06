@@ -1,0 +1,4 @@
+app: Croissant.js
+components:
+  - name: Croissant.js
+    dockerfile: .

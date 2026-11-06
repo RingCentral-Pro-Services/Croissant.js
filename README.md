@@ -7,7 +7,7 @@ Croissant serves RingCentral Professional Services by streamlining commonly perf
 
 ## Dev Dependencies
 
-Node 16.5.1
+Node 26 or above
 
 ## Environment Variables
 

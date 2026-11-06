@@ -1,0 +1,25 @@
+name: Release Staging Build and Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  pipeline:
+    uses: RingCentral-Pro-Services/platform-actions/.github/workflows/pipeline-staging.yml@v3.0.0
+    with:
+      repo_name:     ${{ github.event.repository.name }}
+      ecr_repo_name: ${{ github.event.repository.name }}
+      cluster:       psi-staging-eks
+      env_file:      .env.staging
+      argocd_server: ${{ vars.ARGOCD_SERVER }}
+    secrets:
+      aws_role_arn:           arn:aws:iam::256329341370:role/psi-github-ci-role
+      gitops_app_id:          ${{ secrets.PSI_GITOPS_CI_APP_ID }}
+      gitops_app_private_key: ${{ secrets.PSI_GITOPS_CI_APP_PRIVATE_KEY }}
+      argocd_token:           ${{ secrets.ARGOCD_TOKEN }}
